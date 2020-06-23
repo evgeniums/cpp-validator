@@ -4,66 +4,42 @@
 #include <boost/hana/lazy.hpp>
 #include <boost/hana/greater_equal.hpp>
 #include <boost/hana/core/when.hpp>
-#include <boost/hana/traits.hpp>
+#include <boost/hana.hpp>
 
 namespace hana = boost::hana;
 
 namespace cppvalidator
 {
 
-struct Invokable;
+struct invokable_tag;
 template <typename T>
 struct invokable_t
 {
-    using hana_tag=Invokable;
-    T handler;
+    using hana_tag=invokable_tag;
+    T fn;
 
-    invokable_t(T handler):handler(std::move(handler))
-    {}
-    auto operator()() const
-                -> decltype(handler())
+    auto operator()() const -> decltype(fn())
     {
-        return handler();
+        return fn();
     }
 };
 
 template <typename T>
-constexpr auto invokable(T fn) -> invokable_t<T>
+auto invokable(T&& fn) -> invokable_t<T>
 {
-    return invokable_t<T>(std::move(fn));
+    return invokable_t<T>{std::forward<T>(fn)};
 }
 
-struct val_t
+template <typename T>
+auto val(T&& v)
 {
-    template <typename T>
-    constexpr auto operator()(const T& t,
-                                typename std::enable_if<
-                                    std::is_same<
-                                        typename hana::tag_of<T>::type,
-                                        Invokable
-                                    >::value
-                                ,void*>::type =nullptr) const
-        -> decltype(t())
-    {
-        return t();
-    }
+  return hana::if_(hana::is_a<invokable_tag,T>,
+    [](auto&& x) { return x(); },
+    [](auto&& x) { return hana::id(std::forward<decltype(x)>(x)); }
+  )(std::forward<T>(v));
+}
 
-    template <typename T>
-    constexpr auto operator()(T&& t,
-                              typename std::enable_if<
-                                  !std::is_same<
-                                      typename hana::tag_of<T>::type,
-                                      Invokable
-                                  >::value
-                              ,void*>::type =nullptr) const
-        -> T
-    {
-        return hana::id(t);
-    }
-};
-constexpr val_t val{};
-
-struct property_value_t
+struct p_value_t
 {
     template <typename T>
     constexpr static T get(T&& v)
@@ -71,92 +47,83 @@ struct property_value_t
         return hana::id(std::forward<T>(v));
     }
 };
+constexpr p_value_t p_value{};
 
-auto has_size = hana::is_valid([](auto t) -> decltype(
-  hana::traits::declval(t).size()
-) { });
-struct property_size_t
+constexpr auto has_size = hana::is_valid([](auto&& v) -> decltype((void)v.size()){});
+auto try_get_size =[](auto&& v)
 {
-    template <typename T,
-              typename std::enable_if<has_size(hana::type_c<T>),void*>::type = nullptr
-              >
-    constexpr static size_t get(const T& v)
+  return hana::if_(has_size(v),
+    [](auto&& x) { return x.size(); },
+    [](auto&& x) { return hana::id(std::forward<decltype(x)>(x)); }
+  )(std::forward<decltype(v)>(v));
+};
+struct p_size_t
+{
+    template <typename T>
+    static auto get(T&& v) -> decltype(auto)
     {
-        return v.size();
-    }
-
-    template <typename T,
-              typename std::enable_if<!has_size(hana::type_c<T>),void*>::type = nullptr
-              >
-    constexpr static T get(T&& v)
-    {
-        return hana::id(v);
+        return try_get_size(std::forward<T>(v));
     }
 };
-
-constexpr property_value_t property_value{};
-constexpr property_size_t property_size{};
+constexpr p_size_t p_size{};
 
 
-template <typename ValT, typename PropertyT=property_value_t>
-BOOST_HANA_CONSTEXPR_LAMBDA auto get_property(ValT&& v) -> decltype(PropertyT::get(v))
+template <typename ValT, typename PropertyT=p_value_t>
+auto get_property(ValT&& v) -> decltype(auto)
 {
     return PropertyT::get(v);
 }
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto gte = [](auto a, auto b)
+auto gte = [](const auto& a, const auto& b)
 {
     return a>=b;
 };
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto apply = [](auto a, auto b, auto op)
+auto value_impl = [](auto a, auto b, auto op)
 {
     return op(val(a),val(b));
 };
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto value_validator = [](auto op, auto b) {
-    return hana::reverse_partial(apply,b,op);
+auto value = [](auto a, auto op, auto b)
+{
+    return op(val(a),val(b));
 };
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto apply_property = [](auto a, auto b, auto property, auto op)
+auto value_validator = [](auto op, auto b) {
+    return hana::reverse_partial(value_impl,b,op);
+};
+
+auto property_impl = [](auto a, auto b, auto property, auto op)
 {
     return op(get_property<decltype(val(a)),decltype(property)>(val(a)),
               get_property<decltype(val(b)),decltype(property)>(val(b)));
 };
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto property_validator = [](auto op, auto b, auto property)
+auto property = [](auto property, auto a, auto op, auto b)
 {
-    return hana::reverse_partial(apply_property,b,property,op);
+    return property_impl(a,b,property,op);
 };
 
-//struct all_elements_t
-//{
-//};
-//struct any_element_t
-//{
-//};
-//template <typename T>
-//struct element_range_t
-//{
-//    T begin;
-//    T end;
-//};
-//template <typename T>
-//struct element_at_t
-//{
-//    T index;
-//};
-
-//BOOST_HANA_CONSTEXPR_LAMBDA auto container_validator = [](auto op, auto b, auto elements, auto property)
-//{
-//    return hana::reverse_partial(apply_container,b,property,op);
-//};
-
-template <typename OpT, typename BT, typename PropertyT=property_value_t>
-constexpr auto validator(OpT&& op, BT&& b, PropertyT property=PropertyT())
-    -> decltype(hana::reverse_partial(apply_property,std::forward<BT>(b),std::forward<PropertyT>(property),std::forward<OpT>(op)))
+auto property_validator = [](auto property,auto op, auto b)
 {
-    return hana::reverse_partial(apply_property,std::forward<BT>(b),std::forward<PropertyT>(property),std::forward<OpT>(op));
+    return hana::reverse_partial(property_impl,b,property,op);
+};
+
+struct container_accessors
+{
+    // T next();
+    // T at();
+};
+
+struct all_elements_t
+{
+};
+
+template <typename OpT, typename BT, typename PropertyT=p_value_t>
+constexpr auto validator(PropertyT property,OpT&& op, BT&& b)
+    -> decltype(auto)
+{
+    return hana::reverse_partial(property_impl,std::forward<BT>(b),std::forward<PropertyT>(property),std::forward<OpT>(op));
 }
 
 }
@@ -167,6 +134,12 @@ BOOST_AUTO_TEST_SUITE(TestCppValidator)
 
 BOOST_AUTO_TEST_CASE(CheckScalarValue)
 {
+    BOOST_CHECK(!vld::property(vld::p_value,10,vld::gte,20));
+    std::string str("hsdfha;");
+    BOOST_CHECK(vld::property(vld::p_size,str,vld::gte,3));
+    size_t sz=100;
+    BOOST_CHECK(vld::value(sz,vld::gte,20));
+
     auto v1=vld::value_validator(
                     vld::gte,
                     5
@@ -186,6 +159,7 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
 
     int count=0;
     auto v2=vld::validator(
+                    vld::p_value,
                     vld::gte,
                     vld::invokable(
                         [&count](){return count;}
@@ -205,42 +179,43 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
 
     std::string hello("Hello world");
     auto v3=vld::validator(
+                    vld::p_size,
                     vld::gte,
-                    7,
-                    vld::property_size
+                    7
                 );
     BOOST_CHECK(v3(hello));
 
     auto v4=vld::property_validator(
+                    vld::p_value,
                     vld::gte,
                     vld::invokable(
                         []()
                         {
                             return std::string("Hi");
                         }
-                    ),
-                    vld::property_value
+                    )
                 );
     BOOST_CHECK(!v4(hello));
+    auto samplestr=std::string("How are you?");
     BOOST_CHECK(v4(
                     vld::invokable(
-                        []()
+                        [&samplestr]()
                         {
-                            return std::string("How are you?");
+                            return samplestr;
                         }
                     )
                 ));
 
     count=20;
     auto v5=vld::validator(
+                    vld::p_size,
                     vld::gte,
                     vld::invokable(
                         [&count]()
                         {
                             return count;
                         }
-                    ),
-                    vld::property_size
+                    )
                 );
     BOOST_CHECK(!v5(hello));
     BOOST_CHECK(v5(
@@ -262,6 +237,7 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
                 ));
 
     auto v6=vld::validator(
+                    vld::p_value,
                     vld::gte,
                     7
                 );
