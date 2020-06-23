@@ -109,22 +109,30 @@ auto property_validator = [](auto property,auto op, auto b)
     return hana::reverse_partial(property_impl,b,property,op);
 };
 
-struct container_accessors
-{
-    // T next();
-    // T at();
-};
-
-struct all_elements_t
-{
-};
-
-template <typename OpT, typename BT, typename PropertyT=p_value_t>
-constexpr auto validator(PropertyT property,OpT&& op, BT&& b)
+template <typename PropertyT,typename OpT, typename T>
+constexpr auto validator(PropertyT property,OpT&& op, T&& b)
     -> decltype(auto)
 {
-    return hana::reverse_partial(property_impl,std::forward<BT>(b),std::forward<PropertyT>(property),std::forward<OpT>(op));
+    return hana::reverse_partial(property_impl,std::forward<T>(b),std::forward<PropertyT>(property),std::forward<OpT>(op));
 }
+
+constexpr auto and_impl=[](auto&& a, auto&& b)
+{
+    return a && b;
+};
+constexpr auto or_impl=[](auto&& a, auto&& b)
+{
+    return a || b;
+};
+
+constexpr auto AND=hana::infix([](auto&& ...xs)
+{
+    return hana::fold(hana::make_tuple(std::forward<decltype(xs)>(xs)...),and_impl);
+});
+constexpr auto OR=hana::infix([](auto&& ...xs)
+{
+    return hana::fold(hana::make_tuple(std::forward<decltype(xs)>(xs)...),or_impl);
+});
 
 }
 
@@ -139,6 +147,29 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
     BOOST_CHECK(vld::property(vld::p_size,str,vld::gte,3));
     size_t sz=100;
     BOOST_CHECK(vld::value(sz,vld::gte,20));
+
+    BOOST_CHECK(
+                    vld::AND(
+                        vld::property(vld::p_size,str,vld::gte,4),
+                        vld::value(sz,vld::gte,20)
+                    )
+                );
+
+    BOOST_CHECK(
+                    vld::property(vld::p_size,str,vld::gte,4)
+                    ^vld::AND^
+                    vld::value(sz,vld::gte,20)
+                    ^vld::AND^
+                    vld::value(sz,vld::gte,99)
+                );
+
+    BOOST_CHECK(
+                    vld::property(vld::p_size,str,vld::gte,500)
+                    ^vld::OR^
+                    vld::value(sz,vld::gte,20)
+                    ^vld::OR^
+                    vld::value(sz,vld::gte,1000)
+                );
 
     auto v1=vld::value_validator(
                     vld::gte,
@@ -242,6 +273,61 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
                     7
                 );
     BOOST_CHECK(v6(50));
+
+#if 0
+
+    validator(
+                AND_(
+                    value(gte,10),
+                    property(size,gte,100)
+                    )
+             );
+
+    -> prepared(a) {
+
+        AND(value_(a,gte,10),property_(a,size,gte,100))
+    }
+
+    aggregate_and(auto&& a,auto&& xs)
+    {
+        bool ok=true;
+        int count=hana::while(i<hana::size(xs),0,
+        [&](int i)
+        {
+            if (ok)
+            {
+                ok=xs[i](a);
+            }
+            return ++i;
+        }
+        return ok;
+    }
+
+    aggregate_or(auto&& a,auto&& xs)
+    {
+        bool ok=false;
+        hana::while(i<hana::size(xs),0,
+        [&](int i)
+        {
+            if (!ok)
+            {
+                ok=xs[i](a);
+            }
+            return ++i;
+        }
+        return ok;
+    }
+
+    prepare_end(auto&& ..xs)
+    {
+        return hana::reverse_partial(aggregate_and,hana::make_tuple(std::forward<decltype(xs)>(xs)...));
+    }
+    prepare_or(auto&& ..xs)
+    {
+        return hana::reverse_partial(aggregate_or,hana::make_tuple(std::forward<decltype(xs)>(xs)...));
+    }
+
+#endif
 }
 
 BOOST_AUTO_TEST_SUITE_END()
