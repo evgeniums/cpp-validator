@@ -104,4 +104,64 @@ BOOST_AUTO_TEST_CASE(CheckAggregate)
     BOOST_CHECK(!aggregate_or(str3,and_tuple));
 }
 
+BOOST_AUTO_TEST_CASE(CheckLogicalAndOr)
+{
+    auto v1=value(gte,"abcd");
+    auto v2=_[size](gte,5);
+
+    std::string str1("abcdef");
+    std::string str2("00000000");
+    std::string str3("000");
+
+    auto and1=AND(v1,v2);
+    BOOST_CHECK(and1.apply(str1));
+    BOOST_CHECK(!and1.apply(str2));
+    BOOST_CHECK(!and1.apply(str3));
+
+    auto and2=value(gte,"abcd") ^AND^ _[size](gte,5);
+    BOOST_CHECK(and2.apply(str1));
+    BOOST_CHECK(!and2.apply(str2));
+    BOOST_CHECK(!and2.apply(str3));
+
+    auto or1=OR(v1,v2);
+    BOOST_CHECK(or1.apply(str1));
+    BOOST_CHECK(or1.apply(str2));
+    BOOST_CHECK(!or1.apply(str3));
+
+    auto or2=value(gte,"abcd") ^OR^ _[size](gte,5);
+    BOOST_CHECK(or2.apply(str1));
+    BOOST_CHECK(or2.apply(str2));
+    BOOST_CHECK(!or2.apply(str3));
+}
+
+BOOST_AUTO_TEST_CASE(CheckMapValidator)
+{
+    std::map<std::string,std::string> m;
+    m["one"]="one_value";
+    m["two"]="two_value";
+    m["three"]="three_value";
+    m["four"]="four_value";
+    m["five"]="five_value";
+
+    auto v01=_["one"](gte,"on");
+    auto v02=_["four"](gte,"fo");
+    auto v0=AND(v01,v02);
+    BOOST_CHECK(v0.apply(m));
+
+    auto v1=validator(
+            _[size](gte,5),
+            _["one"](gte,"one_v"),
+            _["two"](gte,"t"),
+            _["four"](value(gte,"four_val")),
+            _["five"](value(gte,"five") ^AND^ size(gte,9))
+            );
+
+    BOOST_CHECK(v1.apply(m));
+
+    std::map<std::string,std::string> m1;
+    m1["one"]="one_value";
+    m1["two"]="two_value";
+    BOOST_CHECK(!v1.apply(m1));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

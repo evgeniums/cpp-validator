@@ -194,7 +194,7 @@ constexpr auto type_p_value::operator () (OpT op, T b) const
 
 //-------------------------------------------------------------
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto get =[](const auto& v, const auto& k)
+BOOST_HANA_CONSTEXPR_LAMBDA auto get =[](auto&& v, const auto& k)
 {
     return hana::if_(hana::is_a<property_tag,decltype(k)>,
       [&v](auto&& x) { return property(v,x); },
@@ -203,11 +203,21 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto get =[](const auto& v, const auto& k)
 };
 
 //-------------------------------------------------------------
+struct validator_tag;
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto apply = [](auto&& a,auto&& v)
+{
+    return hana::if_(hana::is_a<validator_tag,decltype(v)>,
+      [&a](auto&& x) { return x.apply(a); },
+      [&a](auto&& x) { return x(a); }
+    )(std::forward<decltype(v)>(v));
+};
+
+//-------------------------------------------------------------
 
 namespace detail
 {
 
-struct validator_tag;
 template <typename Handler>
 struct validator
 {
@@ -230,9 +240,12 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto make_validator = [](auto fn)
     return validator<decltype(fn)>(std::move(fn));
 };
 
+struct single_validator_tag;
 template <typename T>
 struct compose_single_validator
 {
+    using hana_tag=single_validator_tag;
+
     T key;
 
     template <typename T1>
@@ -247,6 +260,15 @@ struct compose_single_validator
     {
         return make_validator(hana::compose(
                         value(std::forward<OpT>(op),std::forward<T1>(b)),
+                        hana::reverse_partial(get,key)
+                    ));
+    }
+
+    template <typename T1>
+    auto operator () (T1&& v) const
+    {
+        return make_validator(hana::compose(
+                        hana::reverse_partial(apply,std::forward<T1>(v)),
                         hana::reverse_partial(get,key)
                     ));
     }
@@ -266,15 +288,7 @@ constexpr _t _{};
 
 //-------------------------------------------------------------
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto apply = [](const auto& a,auto&& v)
-{
-    return hana::if_(hana::is_a<detail::validator_tag,decltype(v)>,
-      [&a](auto&& x) { return x.apply(a); },
-      [&a](auto&& x) { return x(a); }
-    )(std::forward<decltype(v)>(v));
-};
-
-BOOST_HANA_CONSTEXPR_LAMBDA auto aggregate_and = [](const auto& a,auto&& ops)
+BOOST_HANA_CONSTEXPR_LAMBDA auto aggregate_and = [](auto&& a,auto&& ops)
 {
     return hana::back(
         hana::scan_left(ops,true,
@@ -286,7 +300,7 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto aggregate_and = [](const auto& a,auto&& ops)
     );
 };
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto aggregate_or = [](const auto& a,auto&& ops)
+BOOST_HANA_CONSTEXPR_LAMBDA auto aggregate_or = [](auto&& a,auto&& ops)
 {
     return hana::value(hana::length(ops))==0
             ||
@@ -294,11 +308,49 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto aggregate_or = [](const auto& a,auto&& ops)
              hana::scan_left(ops,false,
                 [&a](bool prevResult, auto&& op)
                 {
-                    return prevResult || apply(a,op);
+                    return prevResult || apply(a,std::forward<decltype(op)>(op));
                 }
             )
     );
 };
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto AND=hana::infix([](auto&& ...xs)
+{
+    return detail::make_validator(
+                hana::reverse_partial(
+                    aggregate_and,
+                    hana::make_tuple(std::forward<decltype(xs)>(xs)...)
+                )
+           );
+});
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto OR=hana::infix([](auto&& ...xs)
+{
+    return detail::make_validator(
+                hana::reverse_partial(
+                    aggregate_or,
+                    hana::make_tuple(std::forward<decltype(xs)>(xs)...)
+                )
+           );
+});
+
+//-------------------------------------------------------------
+
+struct validator_t
+{
+    template <typename ... Args>
+    constexpr auto operator () (Args&& ...args) const
+    {
+        return AND(std::forward<Args>(args)...);
+    }
+
+    template <typename T>
+    constexpr auto operator () (T&& v) const
+    {
+        return hana::id(std::forward<T>(v));
+    }
+};
+constexpr validator_t validator{};
 
 //-------------------------------------------------------------
 
