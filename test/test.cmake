@@ -1,5 +1,6 @@
 SET(SOURCES
     ${SOURCES}
+    ${VALIDATOR_TEST_SRC}/dev.cpp
     ${VALIDATOR_TEST_SRC}/testvalidator.cpp
 )
 

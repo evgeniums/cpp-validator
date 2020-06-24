@@ -328,6 +328,193 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
     }
 
 #endif
+
+#if 0
+
+    auto v0=validator(
+        _[size](gte,10),
+        _["field1"](value(gte,10) ^AND^ size(gte,100)),
+        _["field100"](gte,fn0_100),
+        _["field200"][10](value(gte,10) ^AND^ value(lte,100))
+        _["container1"](element(all,value(ne,0)))
+        _["field300"](ne,_["field100"][12])
+        _["field400"](ne,_(other))
+        _["field500"](eq,_(other)["field1"])
+    );
+
+    v0.set_formatter(formatter);
+
+    v0(object)==true;
+    v0(adapter(object))==true;
+    v0["field100"](value)==true;
+    v0(adapter);
+
+    v0(object,err)==true;
+    v0(adapter(object),err)==true;
+    v0["field100"](value,err)==true;
+
+    _[size](gte,10) -> [](auto&& v){return validate(size,v,gte,10);}
+    _["field100"](gte,fn0_100) -> [](auto&& v){return validate(v["field100"],gte,10);}
+
+    _["field1"](value(gte,10) ^AND^ size(gte,100)) -> [](auto&& vv){return AND(value(gte,10),size(gte,100)(vv))(v["field1")];}
+
+    _[](auto&& k) -> pre_op(k)
+    _(other) -> struct other_wrap
+
+    pre_op
+    {
+       operator () (auto&& v, auto&& op, auto&& val)
+       {
+           return pre_validate(*this(v),op,val);
+       }
+
+        <with aggregator>
+       operator () (auto&& v, auto&& val)
+       {
+            return pre_validate_aggregator(*this(v),val);
+       }
+
+        <with property>
+       operator () (auto&& v, auto&& property)
+       {
+            return pre_validate_property(*this(v),property);
+       }
+
+        <if T is property>
+        operator () (auto&& v)
+        {
+             return property(v,k);
+        }
+        <if T is not property>
+        operator () (auto&& v)
+        {
+            return v[k];
+        }
+
+        <if other is adapter>
+        operator () (auto&& v, OpT op, OtherWrap other)
+        {
+            return pre_validate(unfold(v),op,other[k]);
+        }
+
+        <if other is adapter>
+        operator () (auto&& v, OpT op, pre_op self_field)
+        {
+            return pre_validate(unfold(v),op,unfold(v)[self_field]);
+        }
+
+        operator [] (auto&& kn)
+        {
+            return pre_op(chain,kn);
+        }
+
+        unfold(auto&& v)
+        {
+            return unfold(chain(*this(k)));
+        }
+
+       T k;
+       list<pre_op> chain;
+    }
+
+    struct other_wrap
+    {
+        operator [] (auto&& k)
+        {
+            return property(v,k);
+        }
+        operator [] (auto&& k)
+        {
+            return other[k];
+        }
+
+        T other;
+    }
+
+    auto v=validator(
+        AND_(
+            _["field1"](value(gte,10) ^AND^ size(gte,100)),
+            _["field100"](gte,15),
+            _["field200"](value(gte,10) ^AND^ value(lte,100)),
+            _[id](AND_(
+                   value(gte,10),
+                   property(size,gte,100)
+                   )),
+            _["field2"][id](AND_(
+                   value(gte,10),
+                   property(size,gte,100)
+                   )),
+            _["field2"][id](AND_(
+                   value(gte,10),
+                   property(size,gte,at("field10"))
+                   )),
+            at("field3")(AND_(
+                   value(gte,10),
+                   property(size,gte,at(other,"field10"))
+                   )),
+            at("field5").all_elements()(AND_(
+                   value(gte,10),
+                   property(size,gte,at(other,"field10"))
+                   ))
+            at("field6").element(all)(AND_(
+                   value(gte,10),
+                   property(size,gte,at(other,"field10"))
+                   ))
+            at("field6").element(any)(AND_(
+                   value(gte,10),
+                   property(size,gte,at(other,"field10"))
+                   ))
+            at("field6").element(index,10)(AND_(
+                   value(gte,10),
+                   property(size,gte,at(other,"field10"))
+                   ))
+            at("field6").element(range,range_gen)(AND_(
+                   value(gte,10),
+                   property(size,gte,at(other,"field10"))
+                   ))
+        )
+    );
+
+    struct adapter_a
+    {
+        operator () (op, auto b)
+        {
+            print("{} op {}",this->context,this->extract(b));
+        }
+    };
+
+    auto op(auto a,auto b)
+    {
+        if (is_adapter(a))
+        {
+            return a(op,b);
+        }
+        else
+        {
+            return _op_(a,b);
+        }
+    }
+
+
+    v(object);
+
+    dispatch_at(object,field)
+    {
+        if (is_adapter(object))
+        {
+            context=concat(object.context,field);
+            return adapter(object,context);
+        }
+        else
+        {
+            return object[field];
+        }
+    }
+
+    apply_at(object,at(field1,field2,field3)) -> a=dispatch_at(dispatch_at(dispatch_at(object,field1),field2),field3))
+    apply(a,and(value(op1,val1),property(prop2,op2,val2))) ->  apply_value(a,op1,val1) && apply_property(a,prop2,op2,val2)
+            -> op1(a,val1) && op2(prop2(a),val2)
+#endif
 }
 
 BOOST_AUTO_TEST_SUITE_END()
