@@ -19,6 +19,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_OPERATOR_HPP
 #define DRACOSHA_VALIDATOR_OPERATOR_HPP
 
+#include <string>
 #include <type_traits>
 
 #include <boost/hana.hpp>
@@ -26,6 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 
 namespace hana=boost::hana;
+using namespace hana::literals;
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -192,9 +194,110 @@ constexpr auto type_p_value::operator () (OpT op, T b) const
 
 //-------------------------------------------------------------
 
-struct _t
+BOOST_HANA_CONSTEXPR_LAMBDA auto get =[](const auto& v, const auto& k)
+{
+    return hana::if_(hana::is_a<property_tag,decltype(k)>,
+      [&v](auto&& x) { return property(v,x); },
+      [&v](auto&& x) { return v[x]; }
+    )(std::forward<decltype(k)>(k));
+};
+
+//-------------------------------------------------------------
+
+namespace detail
 {
 
+struct validator_tag;
+template <typename Handler>
+struct validator
+{
+    using hana_tag=validator_tag;
+
+    Handler fn;
+
+    validator(Handler fn):fn(std::move(fn))
+    {
+    }
+
+    template <typename ... Args>
+    auto apply(Args&&... args) const
+    {
+        return fn(std::forward<Args>(args)...);
+    }
+};
+BOOST_HANA_CONSTEXPR_LAMBDA auto make_validator = [](auto fn)
+{
+    return validator<decltype(fn)>(std::move(fn));
+};
+
+template <typename T>
+struct compose_single_validator
+{
+    T key;
+
+    template <typename T1>
+    compose_single_validator(T1&& key):key(std::forward<T1>(key))
+    {}
+
+    compose_single_validator(std::string str):key(std::move(str))
+    {}
+
+    template <typename OpT, typename T1>
+    auto operator () (OpT&& op, T1&& b) const
+    {
+        return make_validator(hana::compose(
+                        value(std::forward<OpT>(op),std::forward<T1>(b)),
+                        hana::reverse_partial(get,key)
+                    ));
+    }
+};
+
+}
+
+struct _t
+{
+    template <typename T>
+    constexpr auto operator [] (T&& key) const
+    {
+        return detail::compose_single_validator<typename std::decay<T>::type>(std::forward<T>(key));
+    }
+};
+constexpr _t _{};
+
+//-------------------------------------------------------------
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto apply = [](const auto& a,auto&& v)
+{
+    return hana::if_(hana::is_a<detail::validator_tag,decltype(v)>,
+      [&a](auto&& x) { return x.apply(a); },
+      [&a](auto&& x) { return x(a); }
+    )(std::forward<decltype(v)>(v));
+};
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto aggregate_and = [](const auto& a,auto&& ops)
+{
+    return hana::back(
+        hana::scan_left(ops,true,
+            [&a](bool prevResult, auto&& op)
+            {
+                return prevResult && apply(a,op);
+            }
+        )
+    );
+};
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto aggregate_or = [](const auto& a,auto&& ops)
+{
+    return hana::value(hana::length(ops))==0
+            ||
+           hana::back(
+             hana::scan_left(ops,false,
+                [&a](bool prevResult, auto&& op)
+                {
+                    return prevResult || apply(a,op);
+                }
+            )
+    );
 };
 
 //-------------------------------------------------------------

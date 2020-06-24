@@ -342,13 +342,12 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
         _["field500"](eq,_(other)["field1"])
     );
 
-    v0.set_formatter(formatter);
-
     v0(object)==true;
     v0(adapter(object))==true;
     v0["field100"](value)==true;
     v0(adapter);
 
+    err.set_formatter();
     v0(object,err)==true;
     v0(adapter(object),err)==true;
     v0["field100"](value,err)==true;
@@ -361,12 +360,27 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
     _[](auto&& k) -> pre_op(k)
     _(other) -> struct other_wrap
 
+    validate_invoker
+    {
+        HandlerT handler;
+
+    }
+
     pre_op
     {
-       operator () (auto&& v, auto&& op, auto&& val)
+       operator () (auto&& op, auto&& val)
        {
-           return pre_validate(*this(v),op,val);
+           return [this,op,val](auto&& v){validate(*this(v),op,val)};
        }
+        operator () (auto&& op, auto&& val, auto& err)
+        {
+            auto ok=[this,op,val](auto&& v){validate(*this(v),op,val)};
+            if (!ok)
+            {
+                err.format(v,op,chain);
+            }
+            return ok;
+        }
 
         <with aggregator>
        operator () (auto&& v, auto&& val)
