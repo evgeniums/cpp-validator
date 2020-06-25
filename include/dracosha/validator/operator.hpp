@@ -31,6 +31,156 @@ using namespace hana::literals;
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
+//-------------------------------------------------------------
+
+template <typename LeftT, typename RightT, typename=void>
+struct scalar_compare
+{
+    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
+    {
+        return left < right;
+    }
+    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
+    {
+        return left == right;
+    }
+    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
+    {
+        return left <= right;
+    }
+};
+template <typename LeftT, typename RightT>
+struct scalar_compare<LeftT,RightT,
+                        std::enable_if_t<
+                            std::is_signed<LeftT>::value &&
+                            !std::is_floating_point<LeftT>::value &&
+                            std::is_unsigned<RightT>::value &&
+                            !std::is_same<RightT, bool>::value
+                        >
+                    >
+{
+    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
+    {
+        if (left < 0)
+        {
+            return true;
+        }
+        return static_cast<std::make_unsigned_t<LeftT>>(left) < right;
+    }
+    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
+    {
+        return static_cast<std::make_unsigned_t<LeftT>>(left) == right;
+    }
+    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
+    {
+        if (left < 0)
+        {
+            return true;
+        }
+        return static_cast<std::make_unsigned_t<LeftT>>(left) <= right;
+    }
+};
+
+template <typename LeftT, typename RightT>
+struct scalar_compare<LeftT, RightT,
+        std::enable_if_t<
+            std::is_unsigned<LeftT>::value &&
+            std::is_signed<RightT>::value &&
+            !std::is_floating_point<RightT>::value &&
+            !std::is_same<LeftT, bool>::value>
+    >
+{
+    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
+    {
+        if (right < 0)
+        {
+            return false;
+        }
+        return left < static_cast<std::make_unsigned_t<RightT>>(right);
+    }
+    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
+    {
+        return left == static_cast<std::make_unsigned_t<RightT>>(right);
+    }
+    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
+    {
+        if (right < 0)
+        {
+            return false;
+        }
+        return left <= static_cast<std::make_unsigned_t<RightT>>(right);
+    }
+};
+
+template <typename LeftT,typename RightT>
+struct scalar_compare<LeftT,RightT,
+                    std::enable_if_t<!std::is_same<LeftT, bool>::value && std::is_same<RightT, bool>::value>
+                >
+{
+    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
+    {
+        return static_cast<bool>(left) < right;
+    }
+    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
+    {
+        return static_cast<bool>(left)==right;
+    }
+    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
+    {
+        return static_cast<bool>(left) <= right;
+    }
+};
+template <typename LeftT, typename RightT>
+struct scalar_compare<LeftT, RightT,
+        std::enable_if_t<std::is_same<LeftT, bool>::value && !std::is_same<RightT, bool>::value>
+    >
+{
+    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
+    {
+        return left < static_cast<bool>(right);
+    }
+    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
+    {
+        return left==static_cast<bool>(right);
+    }
+    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
+    {
+        return left <= static_cast<bool>(right);
+    }
+};
+
+template <typename LeftT, typename RightT, typename=void>
+struct compare
+{
+};
+
+template <typename LeftT, typename RightT>
+struct compare<LeftT, RightT,
+        std::enable_if_t<!std::is_scalar<LeftT>::value && !std::is_scalar<RightT>::value>>
+{
+    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
+    {
+        return left < right;
+    }
+    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
+    {
+        return left==right;
+    }
+    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
+    {
+        return left <= right;
+    }
+};
+
+template <typename LeftT, typename RightT>
+struct compare<LeftT, RightT,
+        std::enable_if_t<std::is_scalar<LeftT>::value || std::is_scalar<RightT>::value>
+    > : public scalar_compare<LeftT,RightT>
+{
+};
+
+//-------------------------------------------------------------
+
 struct operator_tag;
 
 struct op
@@ -45,7 +195,7 @@ struct gte_t : public op
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return a>=b;
+        return compare<T2,T1>::less_equal(b,a);
     }
 };
 constexpr gte_t gte{};
