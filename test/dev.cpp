@@ -62,10 +62,10 @@ BOOST_AUTO_TEST_CASE(CheckGet)
 
 BOOST_AUTO_TEST_CASE(CheckSingleValidatorCtor)
 {
-    BOOST_CHECK_EQUAL(_["hello"].key,std::string("hello"));
-    BOOST_CHECK_EQUAL(_[100].key,100);
+    BOOST_CHECK_EQUAL(_["hello"].key(),std::string("hello"));
+    BOOST_CHECK_EQUAL(_[100].key(),100);
     std::string h="hello";
-    BOOST_CHECK_EQUAL(_[h].key,std::string("hello"));
+    BOOST_CHECK_EQUAL(_[h].key(),std::string("hello"));
 }
 
 BOOST_AUTO_TEST_CASE(CheckSingleValidatorValueOp)
@@ -162,6 +162,32 @@ BOOST_AUTO_TEST_CASE(CheckMapValidator)
     m1["one"]="one_value";
     m1["two"]="two_value";
     BOOST_CHECK(!v1.apply(m1));
+}
+
+BOOST_AUTO_TEST_CASE(CheckNestedValidator)
+{
+    auto v0=_["first_map"]["one_2"];
+    BOOST_CHECK_EQUAL(v0.format_key_chain(),std::string("first_map.one_2"));
+
+    std::map<std::string,std::map<std::string,std::string>> m;
+    m["first_map"]={std::make_pair("one","one_value"),std::make_pair("two","two_value"),std::make_pair("three","three_value")};
+    m["second_map"]={std::make_pair("one_2","one_value_2"),std::make_pair("two_2","two_value_2"),std::make_pair("three_2","three_value_2")};
+
+    auto v1=validator(
+            _[size](gte,2),
+            _["first_map"](size(gte,3)),
+            _["first_map"]["one"](size(gte,9)),
+            _["second_map"]["two_2"](gte,"two_value_2")
+            );
+    BOOST_CHECK(v1.apply(m));
+
+    auto v2=validator(
+            _[size](gte,2),
+            _["first_map"](size(gte,3)),
+            _["first_map"]["one"](size(gte,9)),
+            _["second_map"]["one_2"](gte,"one_value_200")
+            );
+    BOOST_CHECK(!v2.apply(m));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

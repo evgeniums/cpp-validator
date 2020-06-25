@@ -194,7 +194,7 @@ constexpr auto type_p_value::operator () (OpT op, T b) const
 
 //-------------------------------------------------------------
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto get =[](auto&& v, const auto& k)
+BOOST_HANA_CONSTEXPR_LAMBDA auto get =[](auto&& v, auto&& k)
 {
     return hana::if_(hana::is_a<property_tag,decltype(k)>,
       [&v](auto&& x) { return property(v,x); },
@@ -241,18 +241,87 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto make_validator = [](auto fn)
 };
 
 struct single_validator_tag;
+
+template <template <typename...> class V>
+struct tuple_to_variadic
+{
+    template <typename T, typename ... Prefix>
+    constexpr static auto to_template(T&& t, Prefix&&... prefix)
+    {
+        auto concat=hana::concat(hana::make_tuple(prefix...),t);
+        auto types_tuple=hana::transform(concat,hana::make<hana::type_tag>);
+        return hana::unpack(types_tuple,hana::template_<V>);
+    }
+};
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto extract_back= [](auto&& v, auto&& ch)
+{
+    return hana::fold(std::forward<decltype(ch)>(ch),std::forward<decltype(v)>(v),
+            [](auto&& field, auto&& key)
+            {
+                return get(std::forward<decltype(field)>(field),std::forward<decltype(key)>(key));
+            }
+        );
+};
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto key_chain_str= [](auto&& ch)
+{
+    return hana::fold(std::forward<decltype(ch)>(ch),std::string(),
+            [](auto&& str, auto&& key)
+            {
+                if (!str.empty())
+                {
+                    str+=".";
+                }
+                return str+key;
+            }
+        );
+};
+
+template <typename T, typename=hana::when<true>>
+struct adjust_type
+{
+};
 template <typename T>
+struct adjust_type<T,
+                    hana::when<std::is_constructible<std::string,T>::value>
+                    >
+{
+    using type=std::string;
+};
+template <typename T>
+struct adjust_type<T,
+                    hana::when<!std::is_constructible<std::string,T>::value>
+                    >
+{
+    using type=typename std::decay<T>::type;
+};
+
+template <typename T, typename ...Chain>
 struct compose_single_validator
 {
     using hana_tag=single_validator_tag;
+    using type=typename adjust_type<T>::type;
 
-    T key;
+    hana::tuple<Chain...,type> chain;
 
-    template <typename T1>
-    compose_single_validator(T1&& key):key(std::forward<T1>(key))
+    template <typename T1, typename ChainT>
+    compose_single_validator(T1&& key, ChainT&& ch)
+         : chain(hana::append(std::forward<ChainT>(ch),std::forward<T1>(key)))
     {}
 
-    compose_single_validator(std::string str):key(std::move(str))
+    template <typename ChainT>
+    compose_single_validator(type k, ChainT&& ch)
+         : chain(hana::append(std::forward<ChainT>(ch),std::move(k)))
+    {}
+
+    template <typename T1>
+    compose_single_validator(T1&& key)
+         : chain(hana::make_tuple(std::forward<T1>(key)))
+    {}
+
+    compose_single_validator(std::string str)
+         : chain(hana::make_tuple(std::move(str)))
     {}
 
     template <typename OpT, typename T1>
@@ -260,7 +329,7 @@ struct compose_single_validator
     {
         return make_validator(hana::compose(
                         value(std::forward<OpT>(op),std::forward<T1>(b)),
-                        hana::reverse_partial(get,key)
+                        hana::reverse_partial(extract_back,chain)
                     ));
     }
 
@@ -269,8 +338,25 @@ struct compose_single_validator
     {
         return make_validator(hana::compose(
                         hana::reverse_partial(apply,std::forward<T1>(v)),
-                        hana::reverse_partial(get,key)
+                        hana::reverse_partial(extract_back,chain)
                     ));
+    }
+
+    const type& key() const
+    {
+        return hana::back(chain);
+    }
+
+    std::string format_key_chain() const
+    {
+        return key_chain_str(chain);
+    }
+
+    template <typename T1>
+    auto operator [] (T1&& key) const
+    {
+        auto tmpl=tuple_to_variadic<compose_single_validator>::to_template(chain,typename adjust_type<T1>::type(key));
+        return typename decltype(tmpl)::type(std::forward<T1>(key),chain);
     }
 };
 
@@ -290,28 +376,32 @@ constexpr _t _{};
 
 BOOST_HANA_CONSTEXPR_LAMBDA auto aggregate_and = [](auto&& a,auto&& ops)
 {
-    return hana::back(
-        hana::scan_left(ops,true,
-            [&a](bool prevResult, auto&& op)
-            {
-                return prevResult && apply(a,op);
-            }
-        )
-    );
+    return hana::fold(std::forward<decltype(ops)>(ops),true,
+                [&a](bool prevResult, auto&& op)
+                {
+                    if (!prevResult)
+                    {
+                        return false;
+                    }
+                    return apply(std::forward<decltype(a)>(a),std::forward<decltype(op)>(op));
+                }
+            );
 };
 
 BOOST_HANA_CONSTEXPR_LAMBDA auto aggregate_or = [](auto&& a,auto&& ops)
 {
     return hana::value(hana::length(ops))==0
             ||
-           hana::back(
-             hana::scan_left(ops,false,
+           hana::fold(std::forward<decltype(ops)>(ops),false,
                 [&a](bool prevResult, auto&& op)
                 {
-                    return prevResult || apply(a,std::forward<decltype(op)>(op));
+                    if (prevResult)
+                    {
+                        return true;
+                    }
+                    return apply(std::forward<decltype(a)>(a),std::forward<decltype(op)>(op));
                 }
-            )
-    );
+            );
 };
 
 BOOST_HANA_CONSTEXPR_LAMBDA auto AND=hana::infix([](auto&& ...xs)
