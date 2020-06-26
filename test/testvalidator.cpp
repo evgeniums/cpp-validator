@@ -340,7 +340,6 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
         _["container1"](element(all,value(ne,0)))
         _["field300"](ne,_["field100"][12])
         _["field400"](ne,_(other))
-        _["field500"](eq,_(other)["field1"])
     );
 
     v0(object)==true;
@@ -360,6 +359,16 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
 
     _[](auto&& k) -> pre_op(k)
     _(other) -> struct other_wrap
+
+    auto v1=validate_with_reference(
+        reference_object,
+        _[size](gte),
+        _["field1"](value(gte) ^AND^ size(gte)),
+        _["field100"](gte),
+        _["field200"][10](value(gte) ^AND^ value(lte))
+        _["field300"](ne)
+        _["field400"](ne)
+    );
 
     validate_invoker
     {

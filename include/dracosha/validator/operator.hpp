@@ -240,6 +240,8 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop)
 //-------------------------------------------------------------
 
 struct single_validator_tag;
+struct master_reference_tag;
+
 struct property_tag;
 
 #define DRACOSHA_VALIDATOR_HAS_PROPERTY_FN(val,prop) hana::is_valid([](auto&& v) -> decltype((void)v.prop()){})(val)
@@ -278,11 +280,17 @@ struct property_tag;
 
 //-------------------------------------------------------------
 
+BOOST_HANA_CONSTEXPR_LAMBDA auto has_at = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.at(std::forward<decltype(x)>(x))){});
 BOOST_HANA_CONSTEXPR_LAMBDA auto get =[](auto&& v, auto&& k)
 {
     return hana::if_(hana::is_a<property_tag,decltype(k)>,
       [&v](auto&& x) { return property(v,x); },
-      [&v](auto&& x) { return v[x]; }
+      [&v](auto&& x) {
+            return hana::if_(has_at(v,x),
+                [&v](auto&& j) { return v.at(j); },
+                [&v](auto&& j) { return v[j]; }
+            )(std::forward<decltype(x)>(x));
+      }
     )(std::forward<decltype(k)>(k));
 };
 
@@ -320,10 +328,10 @@ struct validate_t
 
     template <typename T1, typename T2, typename OpT, typename PropT>
     constexpr static bool invoke(T1&& a, PropT&& prop, OpT&& op, T2&& b,
-                                     typename std::enable_if<
+                                     std::enable_if_t<
                                        !hana::is_a<single_validator_tag,T2>,
                                        void*
-                                     >::type =nullptr
+                                     > =nullptr
                                  )
     {
         return op(
@@ -334,10 +342,10 @@ struct validate_t
 
     template <typename T1, typename T2, typename OpT, typename PropT, typename ChainT>
     constexpr static bool invoke(T1&& a, ChainT&& chain, PropT&& prop, OpT&& op, T2&& b,
-                                 typename std::enable_if<
-                                   !hana::is_a<single_validator_tag,T2>,
+                                 std::enable_if_t<
+                                   (!hana::is_a<single_validator_tag,T2> && !hana::is_a<master_reference_tag,T2>),
                                    void*
-                                 >::type =nullptr
+                                 > =nullptr
                                 )
     {
         auto&& ax=extract(std::forward<T1>(a));
@@ -349,16 +357,31 @@ struct validate_t
 
     template <typename T1, typename T2, typename OpT, typename PropT, typename ChainT>
     constexpr static bool invoke(T1&& a, ChainT&& chain, PropT&& prop, OpT&& op, T2&& b,
-                                 typename std::enable_if<
+                                 std::enable_if_t<
                                    hana::is_a<single_validator_tag,T2>,
                                    void*
-                                 >::type =nullptr
+                                 > =nullptr
                                 )
     {
         auto&& ax=extract(std::forward<T1>(a));
         return op(
                     property(extract_back(ax,chain),prop),
                     property(extract_back(ax,b.chain),prop)
+                );
+    }
+
+    template <typename T1, typename T2, typename OpT, typename PropT, typename ChainT>
+    constexpr static bool invoke(T1&& a, ChainT&& chain, PropT&& prop, OpT&& op, T2&& b,
+                                 std::enable_if_t<
+                                   hana::is_a<master_reference_tag,T2>,
+                                   void*
+                                 > =nullptr
+                                )
+    {
+        auto&& ax=extract(std::forward<T1>(a));
+        return op(
+                    property(extract_back(ax,chain),prop),
+                    property(extract_back(b(),chain),prop)
                 );
     }
 };
@@ -551,12 +574,40 @@ struct compose_single_validator
 
 }
 
+//-------------------------------------------------------------
+namespace detail
+{
+    template <typename T>
+    struct master_reference
+    {
+        using hana_tag=master_reference_tag;
+
+        master_reference(const T& obj) : ref(obj)
+        {}
+
+        const T& operator() () const
+        {
+            return ref;
+        }
+
+        const T& ref;
+    };
+}
+
+//-------------------------------------------------------------
+
 struct _t
 {
     template <typename T>
     constexpr auto operator [] (T&& key) const
     {
         return detail::compose_single_validator<typename std::decay<T>::type>(std::forward<T>(key));
+    }
+
+    template <typename T>
+    constexpr auto operator () (const T& masterRefObj) const
+    {
+        return detail::master_reference<T>(masterRefObj);
     }
 };
 constexpr _t _{};

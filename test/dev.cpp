@@ -226,4 +226,41 @@ BOOST_AUTO_TEST_CASE(CheckOtherSelfField)
     BOOST_CHECK(v1.apply(m));
 }
 
+BOOST_AUTO_TEST_CASE(CheckMasterReferenceField)
+{
+    std::map<int,int> m={{1,50},{2,40},{3,30},{4,20},{5,10}};
+    const std::map<int,int> ref1={{1,50},{2,40}};
+    const std::map<int,int> ref2={{1,500},{2,40},{1,1},{1,1},{1,1}};
+
+    auto v01=_[1](gte,_(ref1));
+    BOOST_CHECK(v01.apply(m));
+    auto v02=_[1](gte,_(ref2));
+    BOOST_CHECK(!v02.apply(m));
+
+    auto v1=validator(
+        _[1](gte,_(ref1)),
+        _[2](gte,_(ref2))
+    );
+    BOOST_CHECK(v1.apply(m));
+
+    auto v2=validator(
+        _[1](gte,_(ref2)),
+        _[2](gte,_(ref1))
+    );
+    BOOST_CHECK(!v2.apply(m));
+
+    std::map<std::string,std::string> m_str;
+    m_str["one"]="one_value";
+    m_str["two"]="two_value";
+
+    std::map<std::string,std::string> ref_str;
+    ref_str["one"]="one_v";
+    ref_str["two"]="two_v";
+    auto v3=validator(
+        _["one"](size(gte,_(ref_str))),
+        _["two"](size(gte,_(ref_str)))
+    );
+    BOOST_CHECK(v3.apply(m_str));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
