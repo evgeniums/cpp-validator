@@ -148,6 +148,19 @@ BOOST_AUTO_TEST_CASE(CheckMapValidator)
     auto v0=AND(v01,v02);
     BOOST_CHECK(v0.apply(m));
 
+    auto vv1=_["four"](value(gte,"four_val"));
+    BOOST_CHECK(vv1.apply(m));
+
+    auto vv2=_["five"](size(gte,9));
+    BOOST_CHECK(vv2.apply(m));
+
+    std::map<int,int> m_int={{1,50},{2,40},{3,30},{4,20},{5,10}};
+    auto vv3=_[1](value(gte,_[5]));
+    BOOST_CHECK(vv3.apply(m_int));
+
+    auto vv4=_[1](AND(value(gte,_[5])));
+    BOOST_CHECK(vv4.apply(m_int));
+
     auto v1=validator(
             _[size](gte,5),
             _["one"](gte,"one_v"),
@@ -188,6 +201,29 @@ BOOST_AUTO_TEST_CASE(CheckNestedValidator)
             _["second_map"]["one_2"](gte,"one_value_200")
             );
     BOOST_CHECK(!v2.apply(m));
+}
+
+BOOST_AUTO_TEST_CASE(CheckOtherSelfField)
+{
+    std::map<std::string,std::string> m;
+    m["one"]="one_value";
+    m["two"]="two_value";
+    m["three"]="three_value";
+    m["four"]="four_value";
+    m["five"]="one_value";
+
+    auto v01=_["one"](gte,_["five"]);
+    BOOST_CHECK(v01.apply(m));
+
+    auto v02=_["one"](value(gte,_["three"]));
+    BOOST_CHECK(!v02.apply(m));
+
+    auto v1=validator(
+            _["one"](gte,_["five"]),
+            _["two"](value(gte,_["five"])),
+            _["three"](size(gte,_["one"]))
+            );
+    BOOST_CHECK(v1.apply(m));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
