@@ -318,15 +318,6 @@ struct validate_t
         return invoke(std::forward<T1>(a),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
     }
 
-//    template <typename T1, typename T2, typename OpT, typename PropT>
-//    constexpr static bool invoke(T1&& a, PropT&& prop, OpT&& op, T2&& b)
-//    {
-//        return op(
-//                    property(extract(std::forward<T1>(a)),std::forward<PropT>(prop)),
-//                    extract(std::forward<T2>(b))
-//                );
-//    }
-
     template <typename T1, typename T2, typename OpT, typename PropT>
     constexpr static bool invoke(T1&& a, PropT&& prop, OpT&& op, T2&& b,
                                      typename std::enable_if<
@@ -368,15 +359,6 @@ struct validate_t
         return op(
                     property(extract_back(ax,chain),prop),
                     property(extract_back(ax,b.chain),prop)
-                );
-    }
-
-    template <typename T1, typename OpT, typename PropT>
-    constexpr static bool invoke(T1&& p, PropT&& prop, OpT&& op)
-    {
-        return op(
-                    property(extract(hana::first(p)),std::forward<PropT>(prop)),
-                    extract(hana::second(p))
                 );
     }
 };
@@ -537,44 +519,16 @@ struct compose_single_validator
          : chain(hana::make_tuple(std::move(str)))
     {}
 
-    template <typename OpT, typename T1>
-    auto operator () (OpT&& op, T1&& b,
-                      typename std::enable_if<
-                        !hana::is_a<single_validator_tag,T1>,
-                        void*
-                      >::type =nullptr) const
-    {
-        return make_validator(
-                    hana::compose(
-                        value(std::forward<OpT>(op),std::forward<T1>(b)),
-                        hana::reverse_partial(extract_back,chain)
-                    ));
-    }
-
-    template <typename OpT, typename T1>
-    auto operator () (OpT&& op, T1&& b,
-                      typename std::enable_if<
-                        hana::is_a<single_validator_tag,T1>,
-                        void*
-                      >::type =nullptr) const
-    {
-        return make_validator(
-                    hana::compose(
-                        value(std::forward<OpT>(op)),
-                        [this,b{std::forward<decltype(b)>(b)}](auto&& a)
-                        {
-                            return hana::make_pair(
-                                            extract_back(a,chain),
-                                            extract_back(a,b.chain)
-                                            );
-                        }
-                    ));
-    }
-
     template <typename T1>
     auto operator () (T1&& v) const
     {
         return make_validator(hana::reverse_partial(apply_chain,std::forward<T1>(v),chain));
+    }
+
+    template <typename OpT, typename T1>
+    auto operator () (OpT&& op, T1&& b) const
+    {
+        return (*this)(value(std::forward<OpT>(op),std::forward<T1>(b)));
     }
 
     const type& key() const

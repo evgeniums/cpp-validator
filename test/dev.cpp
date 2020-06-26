@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE(CheckOtherSelfField)
     auto v1=validator(
             _["one"](gte,_["five"]),
             _["two"](value(gte,_["five"])),
-            _["three"](size(gte,_["one"]))
+            _["three"](size(gte,_["one"]) ^OR^ value(gte,_["two"]))
             );
     BOOST_CHECK(v1.apply(m));
 }
