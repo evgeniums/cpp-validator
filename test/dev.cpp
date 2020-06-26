@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include <boost/test/unit_test.hpp>
 
@@ -261,6 +262,27 @@ BOOST_AUTO_TEST_CASE(CheckMasterReferenceField)
         _["two"](size(gte,_(ref_str)))
     );
     BOOST_CHECK(v3.apply(m_str));
+}
+
+BOOST_AUTO_TEST_CASE(FieldExists)
+{
+    std::map<std::string,std::string> m;
+    m["one"]="one_value";
+    m["two"]="two_value";
+
+    BOOST_CHECK(contains(m,"one"));
+    BOOST_CHECK(!contains(m,"ten"));
+    BOOST_CHECK(!contains(m,size));
+
+    int dummy=0;
+    BOOST_CHECK(!contains(dummy,"one"));
+
+    std::map<int,int> ref1={{1,50},{2,40}};
+    BOOST_CHECK(monadic_contains(ref1,1).value());
+    BOOST_CHECK(!monadic_contains(ref1,3).value());
+
+    BOOST_CHECK(monadic_contains(dummy,"one")==hana::nothing);
+    BOOST_CHECK(monadic_contains(m,"one").value());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
