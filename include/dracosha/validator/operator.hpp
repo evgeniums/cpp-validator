@@ -22,7 +22,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include <string>
 #include <type_traits>
 
+#if __cplusplus < 201703L || (defined (IOS_SDK_VERSION_X10) && IOS_SDK_VERSION_X10<120)
 #include <boost/optional.hpp>
+#else
+#include <optional>
+#endif
 
 #include <boost/hana.hpp>
 
@@ -32,6 +36,23 @@ namespace hana=boost::hana;
 using namespace hana::literals;
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+
+//-------------------------------------------------------------
+
+#if __cplusplus < 201703L || (defined (IOS_SDK_VERSION_X10) && IOS_SDK_VERSION_X10<120)
+    template <typename T> using optional=boost::optional<T>;    template <typename ...Args>
+    constexpr auto make_optional(Args&&... args)
+    {
+        return boost::make_optional(std::forward<Args>(args)...);
+    }
+#else
+    template <typename T> using optional=std::optional<T>;
+    template <typename ...Args>
+    constexpr auto make_optional(Args&&... args)
+    {
+        return std::make_optional(std::forward<Args>(args)...);
+    }
+#endif
 
 //-------------------------------------------------------------
 
@@ -428,14 +449,14 @@ struct property_tag;
 
 //-------------------------------------------------------------
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto get =[](auto&& v, auto&& k)
+BOOST_HANA_CONSTEXPR_LAMBDA auto get =[](auto&& v, auto&& k) -> decltype(auto)
 {
     return hana::if_(hana::is_a<property_tag,decltype(k)>,
-      [&v](auto&& x) { return property(v,x); },
-      [&v](auto&& x) {
+      [&v](auto&& x) -> decltype (auto) { return property(v,x); },
+      [&v](auto&& x) -> decltype (auto) {
             return hana::if_(detail::has_at(v,x),
-                [&v](auto&& j) { return v.at(j); },
-                [&v](auto&& j) { return v[j]; }
+                [&v](auto&& j) -> decltype (auto) { return v.at(j); },
+                [&v](auto&& j) -> decltype (auto) { return v[j]; }
             )(std::forward<decltype(x)>(x));
       }
     )(std::forward<decltype(k)>(k));
@@ -596,19 +617,19 @@ constexpr auto type_p_value::operator () (Args&&... args) const
 //-------------------------------------------------------------
 struct validator_tag;
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto apply = [](auto&& a,auto&& v)
+BOOST_HANA_CONSTEXPR_LAMBDA auto apply = [](auto&& a,auto&& v) -> decltype(auto)
 {
     return hana::if_(hana::is_a<validator_tag,decltype(v)>,
-      [&a](auto&& x) { return x.apply(a); },
-      [&a](auto&& x) { return x(a); }
+      [&a](auto&& x) -> decltype(auto) { return x.apply(a); },
+      [&a](auto&& x) -> decltype(auto) { return x(a); }
     )(std::forward<decltype(v)>(v));
 };
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto apply_chain = [](auto&& a,auto&& v,auto&& chain)
+BOOST_HANA_CONSTEXPR_LAMBDA auto apply_chain = [](auto&& a,auto&& v,auto&& chain) -> decltype(auto)
 {
     return hana::if_(hana::is_a<validator_tag,decltype(v)>,
-      [&a,&chain](auto&& x) { return x.apply(a,chain); },
-      [&a,&chain](auto&& x) { return x(a,chain); }
+      [&a,&chain](auto&& x) -> decltype(auto) { return x.apply(a,chain); },
+      [&a,&chain](auto&& x) -> decltype(auto) { return x(a,chain); }
     )(std::forward<decltype(v)>(v));
 };
 

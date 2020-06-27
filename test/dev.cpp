@@ -287,27 +287,80 @@ BOOST_AUTO_TEST_CASE(CheckContains)
 
 BOOST_HANA_CONSTEXPR_LAMBDA auto iterate_exists =[](auto&& obj,auto&& key)
 {
-    BOOST_HANA_CONSTEXPR_LAMBDA auto next=[&](bool)
+    if (obj && contains(*obj,key))
     {
-        return get(std::forward<decltype(obj)>(obj),std::forward<decltype(key)>(key));
-    };
-    return hana::chain(hana::sfinae(monadic_contains)(obj,key),hana::sfinae(next));
+        return &get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key));
+    }
+    return decltype(&get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key)))(nullptr);
 };
 
 BOOST_HANA_CONSTEXPR_LAMBDA auto check_exists =[](auto&& obj,auto&& chain)
 {
-    return hana::fold(std::forward<decltype(chain)>(chain),std::forward<decltype(obj)>(obj),iterate_exists);
+    return hana::fold(std::forward<decltype(chain)>(chain),&obj,iterate_exists)!=nullptr;
 };
 
 BOOST_AUTO_TEST_CASE(CheckExists)
 {
-    std::map<std::string,std::string> m;
-    m["one"]="one_value";
-    m["two"]="two_value";
+    std::map<std::string,std::string> m1;
+    m1["one"]="one_value";
+    m1["two"]="two_value";
 
-    auto chain=hana::make_tuple("one");
+    auto chain1=hana::make_tuple("one");
+    BOOST_CHECK(check_exists(m1,chain1));
 
-    BOOST_CHECK(check_exists(m,chain)==hana::nothing);
+    auto chain2=hana::make_tuple("hello");
+    BOOST_CHECK(!check_exists(m1,chain2));
+
+    std::map<std::string,std::map<std::string,std::string>> m2;
+    m2["first_map"]={std::make_pair("one","one_value"),std::make_pair("two","two_value"),std::make_pair("three","three_value")};
+    m2["second_map"]={std::make_pair("one_2","one_value_2"),std::make_pair("two_2","two_value_2"),std::make_pair("three_2","three_value_2")};
+
+    auto chain3=hana::make_tuple("first_map");
+    BOOST_CHECK(check_exists(m2,chain3));
+    BOOST_CHECK(!check_exists(m2,chain2));
+    auto chain4=hana::make_tuple("first_map","one");
+    BOOST_CHECK(check_exists(m2,chain4));
+    auto chain5=hana::make_tuple("first_map","ten");
+    BOOST_CHECK(!check_exists(m2,chain5));
+
+    std::map<std::string,std::map<int,std::string>> m3;
+    m3["first_map"]={std::make_pair(1,"one_value"),std::make_pair(2,"two_value"),std::make_pair(3,"three_value")};
+    m3["second_map"]={std::make_pair(10,"one_value_2"),std::make_pair(20,"two_value_2"),std::make_pair(30,"three_value_2")};
+    auto chain6=hana::make_tuple("first_map",1);
+    BOOST_CHECK(check_exists(m3,chain6));
+    auto chain7=hana::make_tuple("first_map",10);
+    BOOST_CHECK(!check_exists(m3,chain7));
+    auto chain8=hana::make_tuple("second_map",1);
+    BOOST_CHECK(!check_exists(m3,chain8));
+    auto chain9=hana::make_tuple("second_map",10);
+    BOOST_CHECK(check_exists(m3,chain9));
+}
+
+struct TestRefStruct
+{
+    TestRefStruct()
+    {
+        BOOST_TEST_MESSAGE("Default TestRefStruct ctor");
+    }
+    ~TestRefStruct()
+    {
+        BOOST_TEST_MESSAGE("TestRefStruct dtor");
+    }
+
+    TestRefStruct(const TestRefStruct&)=delete;
+
+    TestRefStruct(TestRefStruct&&)
+    {
+        BOOST_TEST_MESSAGE("Move TestRefStruct ctor");
+    }
+};
+
+BOOST_AUTO_TEST_CASE(CheckGetRef)
+{
+    std::map<size_t,TestRefStruct> m;
+    m.emplace(std::make_pair(1,TestRefStruct()));
+    const auto& a=get(m,1u);
+    std::ignore=a;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
