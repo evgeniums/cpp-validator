@@ -278,11 +278,11 @@ BOOST_AUTO_TEST_CASE(CheckContains)
     BOOST_CHECK(!contains(dummy,"one"));
 
     std::map<int,int> ref1={{1,50},{2,40}};
-    BOOST_CHECK(monadic_contains(ref1,1).value());
-    BOOST_CHECK(!monadic_contains(ref1,3).value());
+    BOOST_CHECK(safe_contains(ref1,1).value());
+    BOOST_CHECK(!safe_contains(ref1,3).value());
 
-    BOOST_CHECK(monadic_contains(dummy,"one")==hana::nothing);
-    BOOST_CHECK(monadic_contains(m,"one").value());
+    BOOST_CHECK(safe_contains(dummy,"one")==hana::nothing);
+    BOOST_CHECK(safe_contains(m,"one").value());
 }
 
 BOOST_AUTO_TEST_CASE(CheckSimpleExists)
@@ -345,6 +345,39 @@ BOOST_AUTO_TEST_CASE(CheckExists)
         _["ten"](exists,false)
     );
     BOOST_CHECK(v1.apply(m1));
+}
+
+BOOST_AUTO_TEST_CASE(CheckContainsCompileTime)
+{
+    std::map<std::string,int> m1;
+    m1["one"]=1;
+    m1["two"]=2;
+
+    auto chain1=hana::make_tuple(std::string("one"));
+    auto chain2=hana::make_tuple(std::string("one"),100);
+    std::map<std::string,std::map<int,int>> m3;
+    m3["first_map"]={std::make_pair(1,100),std::make_pair(2,200),std::make_pair(3,300)};
+    m3["second_map"]={std::make_pair(10,1000),std::make_pair(20,2000),std::make_pair(30,3000)};
+
+    constexpr auto chain1_c=hana::transform(chain1,hana::make_type);
+    constexpr auto chain2_c=hana::transform(chain2,hana::make_type);
+    constexpr auto m1_c=hana::make_type(m1);
+    constexpr auto m3_c=hana::make_type(m3);
+    BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(hana::sfinae(contains_c)(m1_c,hana::front(chain1_c))));
+    BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(
+        hana::monadic_fold_left<hana::optional_tag>(chain1_c,m1_c,hana::sfinae(contains_c))
+        )
+    );
+    BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(
+            hana::monadic_fold_left<hana::optional_tag>(chain2_c,m3_c,hana::sfinae(contains_c))
+        )
+    );
+    BOOST_HANA_CONSTANT_CHECK(hana::is_nothing(
+            hana::monadic_fold_left<hana::optional_tag>(chain2_c,m1_c,hana::sfinae(contains_c))
+        )
+    );
+
+    BOOST_CHECK(true);
 }
 
 struct TestRefStruct

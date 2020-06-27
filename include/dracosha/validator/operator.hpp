@@ -296,7 +296,23 @@ struct can_check_contains_t
 template <typename T1, typename T2>
 constexpr can_check_contains_t<T1,T2> can_check_contains{};
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto monadic_contains = [](auto&& a, auto&& b) -> decltype(auto)
+namespace detail
+{
+    template <typename T1, typename T2, typename=hana::when<true>>
+    struct contains_c
+    {
+    };
+    template <typename T1, typename T2>
+    struct contains_c<T1,T2,hana::when<can_check_contains<T1,T2>()>>
+    {
+        using type=typename std::decay<decltype(get(std::declval<T1>(),std::declval<T2>()))>::type;
+    };
+}
+
+using contains_c_t = hana::metafunction_t<detail::contains_c>;
+contains_c_t contains_c{};
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto safe_contains = [](auto&& a, auto&& b) -> decltype(auto)
 {
     auto fn=hana::if_(detail::has_has(a,b),
                 [](const auto& a1, const auto& b1) { return a1.has(b1); },
@@ -326,7 +342,7 @@ struct contains_t
                                                                     void*> =nullptr
                              ) const
     {
-        return monadic_contains(a,b).value();
+        return safe_contains(a,b).value();
     }
 
     template <typename T1, typename T2>
