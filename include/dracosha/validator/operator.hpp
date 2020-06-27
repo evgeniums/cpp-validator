@@ -231,21 +231,49 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto has_isSet_c = hana::is_valid([](auto v, auto x)
                                                                 )
                                                             {});
 
+//-------------------------------------------------------------
+
+template <typename T, typename=hana::when<true>>
+struct adjust_type
+{
+};
+template <typename T>
+struct adjust_type<T,
+                    hana::when<std::is_constructible<std::string,T>::value>
+                    >
+{
+    using type=std::string;
+};
+template <typename T>
+struct adjust_type<T,
+                    hana::when<!std::is_constructible<std::string,T>::value>
+                    >
+{
+    using type=typename std::decay<T>::type;
+};
+
+//-------------------------------------------------------------
+
 }
 
 template <typename T1, typename T2>
-constexpr bool can_check_contains (T1, T2)
+struct can_check_contains_t
 {
-    return detail::has_find_c(hana::type_c<T1>,hana::type_c<T2>)
-            ||
-           detail::has_has_c(hana::type_c<T1>,hana::type_c<T2>)
-            ||
-           detail::has_contains_c(hana::type_c<T1>,hana::type_c<T2>)
-            ||
-           detail::has_isSet_c(hana::type_c<T1>,hana::type_c<T2>);
-}
+    constexpr bool operator () () const
+    {
+        return detail::has_find_c(hana::type_c<T1>,hana::type_c<T2>)
+                ||
+               detail::has_has_c(hana::type_c<T1>,hana::type_c<T2>)
+                ||
+               detail::has_contains_c(hana::type_c<T1>,hana::type_c<T2>)
+                ||
+               detail::has_isSet_c(hana::type_c<T1>,hana::type_c<T2>);
+    }
+};
+template <typename T1, typename T2>
+constexpr can_check_contains_t<T1,T2> can_check_contains{};
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto monadic_contains = [](const auto& a, const auto& b)
+BOOST_HANA_CONSTEXPR_LAMBDA auto monadic_contains = [](auto&& a, auto&& b)
 {
     auto fn=hana::if_(detail::has_has(a,b),
                 [](const auto& a1, const auto& b1) { return a1.has(b1); },
@@ -271,7 +299,8 @@ struct contains_t
     constexpr bool operator () (
                                 const T1& a,
                                 const T2& b,
-                                std::enable_if_t<can_check_contains(hana::type_c<T1>,hana::type_c<T2>),void*> =nullptr
+                                std::enable_if_t<can_check_contains<T1,T2>(),
+                                                                    void*> =nullptr
                              ) const
     {
         return monadic_contains(a,b).value();
@@ -281,13 +310,34 @@ struct contains_t
     constexpr bool operator () (
                                 const T1&,
                                 const T2&,
-                                std::enable_if_t<!can_check_contains(hana::type_c<T1>,hana::type_c<T2>),void*> =nullptr
+                                std::enable_if_t<!can_check_contains<T1,T2>(),
+                                                                    void*> =nullptr
                              ) const
     {
         return false;
     }
 };
 constexpr contains_t contains{};
+
+//-------------------------------------------------------------
+
+namespace detail
+{
+//BOOST_HANA_CONSTEXPR_LAMBDA auto iterate_exists =[](auto&& obj,auto&& key)
+//{
+//    BOOST_HANA_CONSTEXPR_LAMBDA auto next=[&](bool)
+//    {
+//        return get(std::forward<decltype(obj)>(obj),std::forward<decltype(key)>(key));
+//    };
+//    return hana::chain(hana::sfinae(monadic_contains)(obj,key),hana::sfinae(next));
+//};
+
+//BOOST_HANA_CONSTEXPR_LAMBDA auto check(auto&& obj,auto&& chain)
+//{
+//    auto r=hana::monadic_fold_left(std::forward<decltype(chain)>(chain),std::forward<decltype(obj)>(obj),iterate_exists);
+//}
+
+}
 
 struct exists_t : public op
 {
@@ -390,17 +440,6 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto get =[](auto&& v, auto&& k)
       }
     )(std::forward<decltype(k)>(k));
 };
-
-//-------------------------------------------------------------
-
-//BOOST_HANA_CONSTEXPR_LAMBDA auto safe_get = [](auto&& v, auto&& k)
-//{
-//    if (contains(v,k))
-//    {
-//        return boost::make_optional(get(std::forward<decltype(v)>(v),std::forward<decltype(k)>(k)));
-//    }
-//    return boost::optional<decltype(get(v,k))>();
-//};
 
 //-------------------------------------------------------------
 
@@ -624,25 +663,6 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto key_chain_str= [](auto&& ch)
                 return str+key;
             }
         );
-};
-
-template <typename T, typename=hana::when<true>>
-struct adjust_type
-{
-};
-template <typename T>
-struct adjust_type<T,
-                    hana::when<std::is_constructible<std::string,T>::value>
-                    >
-{
-    using type=std::string;
-};
-template <typename T>
-struct adjust_type<T,
-                    hana::when<!std::is_constructible<std::string,T>::value>
-                    >
-{
-    using type=typename std::decay<T>::type;
 };
 
 template <typename T, typename ...Chain>

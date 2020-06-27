@@ -264,7 +264,7 @@ BOOST_AUTO_TEST_CASE(CheckMasterReferenceField)
     BOOST_CHECK(v3.apply(m_str));
 }
 
-BOOST_AUTO_TEST_CASE(FieldExists)
+BOOST_AUTO_TEST_CASE(CheckContains)
 {
     std::map<std::string,std::string> m;
     m["one"]="one_value";
@@ -283,6 +283,31 @@ BOOST_AUTO_TEST_CASE(FieldExists)
 
     BOOST_CHECK(monadic_contains(dummy,"one")==hana::nothing);
     BOOST_CHECK(monadic_contains(m,"one").value());
+}
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto iterate_exists =[](auto&& obj,auto&& key)
+{
+    BOOST_HANA_CONSTEXPR_LAMBDA auto next=[&](bool)
+    {
+        return get(std::forward<decltype(obj)>(obj),std::forward<decltype(key)>(key));
+    };
+    return hana::chain(hana::sfinae(monadic_contains)(obj,key),hana::sfinae(next));
+};
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto check_exists =[](auto&& obj,auto&& chain)
+{
+    return hana::fold(std::forward<decltype(chain)>(chain),std::forward<decltype(obj)>(obj),iterate_exists);
+};
+
+BOOST_AUTO_TEST_CASE(CheckExists)
+{
+    std::map<std::string,std::string> m;
+    m["one"]="one_value";
+    m["two"]="two_value";
+
+    auto chain=hana::make_tuple("one");
+
+    BOOST_CHECK(check_exists(m,chain)==hana::nothing);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
