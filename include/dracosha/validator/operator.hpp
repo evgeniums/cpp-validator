@@ -206,11 +206,19 @@ namespace detail
 {
 
 BOOST_HANA_CONSTEXPR_LAMBDA auto has_at = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.at(std::forward<decltype(x)>(x))){});
-
 BOOST_HANA_CONSTEXPR_LAMBDA auto has_has = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.has(std::forward<decltype(x)>(x))){});
 BOOST_HANA_CONSTEXPR_LAMBDA auto has_contains = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.contains(std::forward<decltype(x)>(x))){});
 BOOST_HANA_CONSTEXPR_LAMBDA auto has_find = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.find(std::forward<decltype(x)>(x))){});
 BOOST_HANA_CONSTEXPR_LAMBDA auto has_isSet = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.isSet(std::forward<decltype(x)>(x))){});
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto has_at_c = hana::is_valid([](auto&& v, auto&& x) -> decltype(
+                                                            (void)hana::traits::declval(v).at(hana::traits::declval(x))
+                                                           )
+                                                        {});
+BOOST_HANA_CONSTEXPR_LAMBDA auto has_brackets_c = hana::is_valid([](auto&& v, auto&& x) -> decltype(
+                                                            (void)hana::traits::declval(v)[hana::traits::declval(x)]
+                                                           )
+                                                        {});
 
 BOOST_HANA_CONSTEXPR_LAMBDA auto has_find_c = hana::is_valid([](auto v, auto x) -> decltype(
                                                                     (void)hana::traits::declval(v).find(hana::traits::declval(x))
@@ -256,6 +264,14 @@ struct adjust_type<T,
 
 //-------------------------------------------------------------
 
+namespace detail
+{
+BOOST_HANA_CONSTEXPR_LAMBDA auto has_property_c = hana::is_valid([](auto val, auto prop) -> decltype(
+                                                                (void)hana::traits::declval(prop).get(hana::traits::declval(val))
+                                                           )
+                                                        {});
+}
+
 struct property_tag;
 BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> decltype(auto)
 {
@@ -277,6 +293,21 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto get =[](auto&& v, auto&& k) -> decltype(auto)
     )(std::forward<decltype(k)>(k));
 };
 
+template <typename T1, typename T2>
+struct can_get_t
+{
+    constexpr bool operator () () const
+    {
+        return detail::has_at_c(hana::type_c<T1>,hana::type_c<T2>)
+               ||
+               detail::has_brackets_c(hana::type_c<T1>,hana::type_c<T2>)
+               ||
+               (hana::is_a<property_tag,T2> && detail::has_property_c(hana::type_c<T1>,hana::type_c<T2>));
+    }
+};
+template <typename T1, typename T2>
+constexpr can_get_t<T1,T2> can_get{};
+
 //-------------------------------------------------------------
 
 template <typename T1, typename T2>
@@ -290,7 +321,9 @@ struct can_check_contains_t
                 ||
                detail::has_contains_c(hana::type_c<T1>,hana::type_c<T2>)
                 ||
-               detail::has_isSet_c(hana::type_c<T1>,hana::type_c<T2>);
+               detail::has_isSet_c(hana::type_c<T1>,hana::type_c<T2>)
+                ||
+               (hana::is_a<property_tag,T2> && detail::has_property_c(hana::type_c<T1>,hana::type_c<T2>));
     }
 };
 template <typename T1, typename T2>
@@ -303,7 +336,7 @@ namespace detail
     {
     };
     template <typename T1, typename T2>
-    struct contains_c<T1,T2,hana::when<can_check_contains<T1,T2>()>>
+    struct contains_c<T1,T2,hana::when<can_check_contains<T1,T2>() && can_get<T1,T2>()>>
     {
         using type=typename std::decay<decltype(get(std::declval<T1>(),std::declval<T2>()))>::type;
     };
@@ -314,18 +347,21 @@ contains_c_t contains_c{};
 
 BOOST_HANA_CONSTEXPR_LAMBDA auto safe_contains = [](auto&& a, auto&& b) -> decltype(auto)
 {
-    auto fn=hana::if_(detail::has_has(a,b),
-                [](const auto& a1, const auto& b1) { return a1.has(b1); },
-                hana::if_(detail::has_contains(a,b),
-                    [](const auto& a2, const auto& b2) { return a2.contains(b2); },
-                    hana::if_(detail::has_find(a,b),
-                        [](const auto& a3, const auto& b3) { return a3.find(b3)!=a3.end(); },
-                        hana::if_(detail::has_isSet(a,b),
-                            [](const auto& a4, const auto& b4) { return a4.isSet(b4); },
-                            hana::nothing
+    auto fn=hana::if_((hana::is_a<property_tag,decltype(b)> && detail::has_property_c(hana::type_c<decltype(a)>,hana::type_c<decltype(b)>)),
+                [](const auto&, const auto&) { return true; },
+                hana::if_(detail::has_has(a,b),
+                    [](const auto& a1, const auto& b1) { return a1.has(b1); },
+                    hana::if_(detail::has_contains(a,b),
+                        [](const auto& a2, const auto& b2) { return a2.contains(b2); },
+                        hana::if_(detail::has_find(a,b),
+                            [](const auto& a3, const auto& b3) { return a3.find(b3)!=a3.end(); },
+                            hana::if_(detail::has_isSet(a,b),
+                                [](const auto& a4, const auto& b4) { return a4.isSet(b4); },
+                                hana::nothing
+                            )
                         )
                     )
-                )
+            )
         );
 
     auto bn=[](bool ok){return ok;};

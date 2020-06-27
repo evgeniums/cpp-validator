@@ -10,6 +10,33 @@ using namespace dracosha::validator;
 
 BOOST_AUTO_TEST_SUITE(TestOperators)
 
+struct TestRefStruct
+{
+    TestRefStruct()
+    {
+        BOOST_TEST_MESSAGE("Default TestRefStruct ctor");
+    }
+    ~TestRefStruct()
+    {
+        BOOST_TEST_MESSAGE("TestRefStruct dtor");
+    }
+
+    TestRefStruct(const TestRefStruct&)=delete;
+
+    TestRefStruct(TestRefStruct&&)
+    {
+        BOOST_TEST_MESSAGE("Move TestRefStruct ctor");
+    }
+};
+
+BOOST_AUTO_TEST_CASE(CheckGetRef)
+{
+    std::map<size_t,TestRefStruct> m;
+    m.emplace(std::make_pair(1,TestRefStruct()));
+    const auto& a=get(m,1u);
+    std::ignore=a;
+}
+
 BOOST_AUTO_TEST_CASE(CheckGteOperator)
 {
     BOOST_CHECK(gte(10,5));
@@ -272,7 +299,7 @@ BOOST_AUTO_TEST_CASE(CheckContains)
 
     BOOST_CHECK(contains(m,"one"));
     BOOST_CHECK(!contains(m,"ten"));
-    BOOST_CHECK(!contains(m,size));
+    BOOST_CHECK(contains(m,size));
 
     int dummy=0;
     BOOST_CHECK(!contains(dummy,"one"));
@@ -349,20 +376,27 @@ BOOST_AUTO_TEST_CASE(CheckExists)
 
 BOOST_AUTO_TEST_CASE(CheckContainsCompileTime)
 {
-    std::map<std::string,int> m1;
-    m1["one"]=1;
-    m1["two"]=2;
+    std::map<std::string,std::string> m1;
+    m1["one"]="one_v";
+    m1["two"]="two_v";
 
     auto chain1=hana::make_tuple(std::string("one"));
     auto chain2=hana::make_tuple(std::string("one"),100);
+    auto chain3=hana::make_tuple(std::string("one"),std::string("ten"));
+    auto chain4=hana::make_tuple(size);
+
     std::map<std::string,std::map<int,int>> m3;
     m3["first_map"]={std::make_pair(1,100),std::make_pair(2,200),std::make_pair(3,300)};
     m3["second_map"]={std::make_pair(10,1000),std::make_pair(20,2000),std::make_pair(30,3000)};
 
     constexpr auto chain1_c=hana::transform(chain1,hana::make_type);
     constexpr auto chain2_c=hana::transform(chain2,hana::make_type);
+    constexpr auto chain3_c=hana::transform(chain3,hana::make_type);
+    constexpr auto chain4_c=hana::transform(chain4,hana::make_type);
+
     constexpr auto m1_c=hana::make_type(m1);
     constexpr auto m3_c=hana::make_type(m3);
+
     BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(hana::sfinae(contains_c)(m1_c,hana::front(chain1_c))));
     BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(
         hana::monadic_fold_left<hana::optional_tag>(chain1_c,m1_c,hana::sfinae(contains_c))
@@ -372,39 +406,33 @@ BOOST_AUTO_TEST_CASE(CheckContainsCompileTime)
             hana::monadic_fold_left<hana::optional_tag>(chain2_c,m3_c,hana::sfinae(contains_c))
         )
     );
-    BOOST_HANA_CONSTANT_CHECK(hana::is_nothing(
+    BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(
             hana::monadic_fold_left<hana::optional_tag>(chain2_c,m1_c,hana::sfinae(contains_c))
+        )
+    );
+    BOOST_HANA_CONSTANT_CHECK(hana::is_nothing(
+            hana::monadic_fold_left<hana::optional_tag>(chain3_c,m1_c,hana::sfinae(contains_c))
+        )
+    );
+    BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(
+            hana::monadic_fold_left<hana::optional_tag>(chain4_c,m1_c,hana::sfinae(contains_c))
         )
     );
 
     BOOST_CHECK(true);
 }
 
-struct TestRefStruct
+BOOST_AUTO_TEST_CASE(CheckCanGetAtCompileTime)
 {
-    TestRefStruct()
-    {
-        BOOST_TEST_MESSAGE("Default TestRefStruct ctor");
-    }
-    ~TestRefStruct()
-    {
-        BOOST_TEST_MESSAGE("TestRefStruct dtor");
-    }
+    std::map<std::string,int> m1;
+    m1["one"]=1;
+    m1["two"]=2;
 
-    TestRefStruct(const TestRefStruct&)=delete;
+    static_assert(can_get<decltype(m1),std::string>(),"");
+    static_assert(!can_get<decltype(m1),int>(),"");
+    static_assert(can_get<decltype(m1),decltype(size)>(),"");
 
-    TestRefStruct(TestRefStruct&&)
-    {
-        BOOST_TEST_MESSAGE("Move TestRefStruct ctor");
-    }
-};
-
-BOOST_AUTO_TEST_CASE(CheckGetRef)
-{
-    std::map<size_t,TestRefStruct> m;
-    m.emplace(std::make_pair(1,TestRefStruct()));
-    const auto& a=get(m,1u);
-    std::ignore=a;
+    BOOST_CHECK(true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
