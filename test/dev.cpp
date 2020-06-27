@@ -285,21 +285,7 @@ BOOST_AUTO_TEST_CASE(CheckContains)
     BOOST_CHECK(monadic_contains(m,"one").value());
 }
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto iterate_exists =[](auto&& obj,auto&& key)
-{
-    if (obj && contains(*obj,key))
-    {
-        return &get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key));
-    }
-    return decltype(&get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key)))(nullptr);
-};
-
-BOOST_HANA_CONSTEXPR_LAMBDA auto check_exists =[](auto&& obj,auto&& chain)
-{
-    return hana::fold(std::forward<decltype(chain)>(chain),&obj,iterate_exists)!=nullptr;
-};
-
-BOOST_AUTO_TEST_CASE(CheckExists)
+BOOST_AUTO_TEST_CASE(CheckSimpleExists)
 {
     std::map<std::string,std::string> m1;
     m1["one"]="one_value";
@@ -334,6 +320,31 @@ BOOST_AUTO_TEST_CASE(CheckExists)
     BOOST_CHECK(!check_exists(m3,chain8));
     auto chain9=hana::make_tuple("second_map",10);
     BOOST_CHECK(check_exists(m3,chain9));
+}
+
+BOOST_AUTO_TEST_CASE(CheckExists)
+{
+    std::map<std::string,std::string> m1;
+    m1["one"]="one_value";
+    m1["two"]="two_value";
+
+    auto v01=_["one"](exists,true);
+    BOOST_CHECK(v01.apply(m1));
+
+    auto v02=_["ten"](exists,true);
+    BOOST_CHECK(!v02.apply(m1));
+
+    auto v03=_["ten"](exists,false);
+    BOOST_CHECK(v03.apply(m1));
+
+    auto v04=_["two"](exists,false);
+    BOOST_CHECK(!v04.apply(m1));
+
+    auto v1=validator(
+        _["one"](exists,true),
+        _["ten"](exists,false)
+    );
+    BOOST_CHECK(v1.apply(m1));
 }
 
 struct TestRefStruct

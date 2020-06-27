@@ -254,6 +254,31 @@ struct adjust_type<T,
 
 }
 
+//-------------------------------------------------------------
+
+struct property_tag;
+BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> decltype(auto)
+{
+    return std::decay<decltype(prop)>::type::get(std::forward<decltype(val)>(val));
+};
+
+//-------------------------------------------------------------
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto get =[](auto&& v, auto&& k) -> decltype(auto)
+{
+    return hana::if_(hana::is_a<property_tag,decltype(k)>,
+      [&v](auto&& x) -> decltype (auto) { return property(v,x); },
+      [&v](auto&& x) -> decltype (auto) {
+            return hana::if_(detail::has_at(v,x),
+                [&v](auto&& j) -> decltype (auto) { return v.at(j); },
+                [&v](auto&& j) -> decltype (auto) { return v[j]; }
+            )(std::forward<decltype(x)>(x));
+      }
+    )(std::forward<decltype(k)>(k));
+};
+
+//-------------------------------------------------------------
+
 template <typename T1, typename T2>
 struct can_check_contains_t
 {
@@ -321,28 +346,28 @@ constexpr contains_t contains{};
 
 namespace detail
 {
-//BOOST_HANA_CONSTEXPR_LAMBDA auto iterate_exists =[](auto&& obj,auto&& key)
-//{
-//    BOOST_HANA_CONSTEXPR_LAMBDA auto next=[&](bool)
-//    {
-//        return get(std::forward<decltype(obj)>(obj),std::forward<decltype(key)>(key));
-//    };
-//    return hana::chain(hana::sfinae(monadic_contains)(obj,key),hana::sfinae(next));
-//};
-
-//BOOST_HANA_CONSTEXPR_LAMBDA auto check(auto&& obj,auto&& chain)
-//{
-//    auto r=hana::monadic_fold_left(std::forward<decltype(chain)>(chain),std::forward<decltype(obj)>(obj),iterate_exists);
-//}
-
+BOOST_HANA_CONSTEXPR_LAMBDA auto iterate_exists =[](auto&& obj,auto&& key)
+{
+    if (obj && contains(*obj,key))
+    {
+        return &get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key));
+    }
+    return decltype(&get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key)))(nullptr);
+};
 }
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto check_exists =[](auto&& obj,auto&& chain)
+{
+    return hana::fold(std::forward<decltype(chain)>(chain),&obj,detail::iterate_exists)!=nullptr;
+};
 
 struct exists_t : public op
 {
-//    template <typename T1, typename T2>
-//    constexpr bool operator() (const T1& a, const T2& b) const
-//    {
-//    }
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b) const
+    {
+        return check_exists(a,b);
+    }
 };
 constexpr exists_t exists{};
 
@@ -378,17 +403,8 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto extract = [](auto&& v) ->decltype(auto)
 
 //-------------------------------------------------------------
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> decltype(auto)
-{
-    return std::decay<decltype(prop)>::type::get(std::forward<decltype(val)>(val));
-};
-
-//-------------------------------------------------------------
-
 struct single_validator_tag;
 struct master_reference_tag;
-
-struct property_tag;
 
 #define DRACOSHA_VALIDATOR_HAS_PROPERTY_FN(val,prop) hana::is_valid([](auto&& v) -> decltype((void)v.prop()){})(val)
 #define DRACOSHA_VALIDATOR_HAS_PROPERTY(val,prop) hana::is_valid([](auto&& v) -> decltype((void)v.prop){})(val)
@@ -423,21 +439,6 @@ struct property_tag;
     { \
         return prepare_validate(prop,std::forward<Args>(args)...); \
     }
-
-//-------------------------------------------------------------
-
-BOOST_HANA_CONSTEXPR_LAMBDA auto get =[](auto&& v, auto&& k) -> decltype(auto)
-{
-    return hana::if_(hana::is_a<property_tag,decltype(k)>,
-      [&v](auto&& x) -> decltype (auto) { return property(v,x); },
-      [&v](auto&& x) -> decltype (auto) {
-            return hana::if_(detail::has_at(v,x),
-                [&v](auto&& j) -> decltype (auto) { return v.at(j); },
-                [&v](auto&& j) -> decltype (auto) { return v[j]; }
-            )(std::forward<decltype(x)>(x));
-      }
-    )(std::forward<decltype(k)>(k));
-};
 
 //-------------------------------------------------------------
 
@@ -486,9 +487,20 @@ struct validate_t
     }
 
     template <typename T1, typename T2, typename OpT, typename PropT, typename ChainT>
+    constexpr static bool invoke(T1&& a, ChainT&& chain, PropT&&, OpT&&, T2&& b,
+                                 std::enable_if_t<std::is_same<exists_t,typename std::decay<OpT>::type>::value,
+                                   void*
+                                 > =nullptr
+                                )
+    {
+        auto&& ax=extract(std::forward<T1>(a));
+        return exists(ax,std::forward<decltype(chain)>(chain))==b;
+    }
+
+    template <typename T1, typename T2, typename OpT, typename PropT, typename ChainT>
     constexpr static bool invoke(T1&& a, ChainT&& chain, PropT&& prop, OpT&& op, T2&& b,
                                  std::enable_if_t<
-                                   (!hana::is_a<single_validator_tag,T2> && !hana::is_a<master_reference_tag,T2>),
+                                   (!hana::is_a<single_validator_tag,T2> && !hana::is_a<master_reference_tag,T2> && !std::is_same<exists_t,typename std::decay<OpT>::type>::value),
                                    void*
                                  > =nullptr
                                 )
