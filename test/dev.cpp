@@ -57,6 +57,10 @@ struct Aaa
     size_t size=10;
 };
 
+struct Bbb
+{
+};
+
 BOOST_AUTO_TEST_CASE(CheckProperty)
 {
     std::vector<char> v(5);
@@ -81,9 +85,12 @@ BOOST_AUTO_TEST_CASE(CheckProperty)
     BOOST_CHECK(!val(1));
 }
 
+
 BOOST_AUTO_TEST_CASE(CheckGet)
 {
     std::string str("hello");
+    static_assert(decltype(size)::has<std::string>(),"");
+    static_assert(has_property<std::string,decltype(size)>(),"");
     BOOST_CHECK_EQUAL(get(str,size),str.size());
     BOOST_CHECK_EQUAL(get(str,4),str.at(4));
 }
@@ -305,11 +312,10 @@ BOOST_AUTO_TEST_CASE(CheckContains)
     BOOST_CHECK(!contains(dummy,"one"));
 
     std::map<int,int> ref1={{1,50},{2,40}};
-    BOOST_CHECK(safe_contains(ref1,1).value());
-    BOOST_CHECK(!safe_contains(ref1,3).value());
+    BOOST_CHECK(contains(ref1,1));
+    BOOST_CHECK(!contains(ref1,3));
 
-    BOOST_CHECK(safe_contains(dummy,"one")==hana::nothing);
-    BOOST_CHECK(safe_contains(m,"one").value());
+    BOOST_CHECK(contains(m,"one"));
 }
 
 BOOST_AUTO_TEST_CASE(CheckSimpleExists)
@@ -374,6 +380,17 @@ BOOST_AUTO_TEST_CASE(CheckExists)
     BOOST_CHECK(v1.apply(m1));
 }
 
+
+template <typename T1, typename T2, typename=hana::when<true>>
+struct contains_c_
+{
+};
+template <typename T1, typename T2>
+struct contains_c_<T1,T2,hana::when<can_check_contains<T1,T2>() && can_get<T1,T2>.property()>>
+{
+    using type=typename std::decay<decltype(property(std::declval<T1>(),std::declval<T2>()))>::type;
+};
+
 BOOST_AUTO_TEST_CASE(CheckContainsCompileTime)
 {
     std::map<std::string,std::string> m1;
@@ -419,6 +436,17 @@ BOOST_AUTO_TEST_CASE(CheckContainsCompileTime)
         )
     );
 
+    Bbb m4;
+    constexpr auto m4_c=hana::make_type(m4);
+    BOOST_HANA_CONSTANT_CHECK(hana::is_nothing(
+            hana::monadic_fold_left<hana::optional_tag>(chain4_c,m4_c,hana::sfinae(contains_c))
+        )
+    );
+    BOOST_HANA_CONSTANT_CHECK(hana::is_nothing(
+            hana::monadic_fold_left<hana::optional_tag>(chain1_c,m4_c,hana::sfinae(contains_c))
+        )
+    );
+
     BOOST_CHECK(true);
 }
 
@@ -433,6 +461,38 @@ BOOST_AUTO_TEST_CASE(CheckCanGetAtCompileTime)
     static_assert(can_get<decltype(m1),decltype(size)>(),"");
 
     BOOST_CHECK(true);
+}
+
+BOOST_AUTO_TEST_CASE(CheckExistsWithCompileTime)
+{
+    std::map<std::string,std::string> m1;
+    m1["one"]="one_value";
+    m1["two"]="two_value";
+
+    auto v01=_[1.0f](exists,false);
+    BOOST_CHECK(v01.apply(m1));
+
+    auto v02=_[10.0f](exists,true);
+    BOOST_CHECK(!v02.apply(m1));
+
+    auto v03=_[size](exists,true);
+    BOOST_CHECK(v03.apply(m1));
+    BOOST_CHECK(!v03.apply(Bbb()));
+    BOOST_CHECK(!v02.apply(Bbb()));
+
+    auto v04=_[size](gte,10);
+    BOOST_CHECK(v04.apply(Aaa()));
+
+    std::map<std::string,std::map<int,int>> m3;
+    m3["first_map"]={std::make_pair(1,100),std::make_pair(2,200),std::make_pair(3,300)};
+    m3["second_map"]={std::make_pair(10,1000),std::make_pair(20,2000),std::make_pair(30,3000)};
+
+    auto v1=validator(
+        _["first_map"][size](exists,true),
+        _["first_map"][1](exists,true),
+        _["first_map"][10][size](exists,false)
+    );
+    BOOST_CHECK(v1.apply(m3));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
