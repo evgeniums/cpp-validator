@@ -291,6 +291,11 @@ struct has_property_t<T,PropT,hana::when<!hana::is_a<property_tag,PropT>>>
 template <typename T,typename PropT>
 constexpr detail::has_property_t<T,PropT> has_property{};
 
+BOOST_HANA_CONSTEXPR_LAMBDA auto has_property_c=[](auto a, auto b)
+{
+    return has_property<decltype(a),decltype(b)>();
+};
+
 BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> decltype(auto)
 {
     return std::decay<decltype(prop)>::type::get(std::forward<decltype(val)>(val));
