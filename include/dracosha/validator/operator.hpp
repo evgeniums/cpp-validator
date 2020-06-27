@@ -22,12 +22,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include <string>
 #include <type_traits>
 
-#if __cplusplus < 201703L || (defined (IOS_SDK_VERSION_X10) && IOS_SDK_VERSION_X10<120)
-#include <boost/optional.hpp>
-#else
-#include <optional>
-#endif
-
 #include <boost/hana.hpp>
 
 #include <dracosha/validator/config.hpp>
@@ -36,23 +30,6 @@ namespace hana=boost::hana;
 using namespace hana::literals;
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
-
-//-------------------------------------------------------------
-
-#if __cplusplus < 201703L || (defined (IOS_SDK_VERSION_X10) && IOS_SDK_VERSION_X10<120)
-    template <typename T> using optional=boost::optional<T>;    template <typename ...Args>
-    constexpr auto make_optional(Args&&... args)
-    {
-        return boost::make_optional(std::forward<Args>(args)...);
-    }
-#else
-    template <typename T> using optional=std::optional<T>;
-    template <typename ...Args>
-    constexpr auto make_optional(Args&&... args)
-    {
-        return std::make_optional(std::forward<Args>(args)...);
-    }
-#endif
 
 //-------------------------------------------------------------
 
@@ -294,7 +271,7 @@ struct can_check_contains_t
 template <typename T1, typename T2>
 constexpr can_check_contains_t<T1,T2> can_check_contains{};
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto monadic_contains = [](auto&& a, auto&& b)
+BOOST_HANA_CONSTEXPR_LAMBDA auto monadic_contains = [](auto&& a, auto&& b) -> decltype(auto)
 {
     auto fn=hana::if_(detail::has_has(a,b),
                 [](const auto& a1, const auto& b1) { return a1.has(b1); },
@@ -391,17 +368,17 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto invokable = [](auto&& fn) -> invokable_t<declty
 
 //-------------------------------------------------------------
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto extract = [](auto&& v)
+BOOST_HANA_CONSTEXPR_LAMBDA auto extract = [](auto&& v) ->decltype(auto)
 {
   return hana::if_(hana::is_a<invokable_tag,decltype(v)>,
-    [](auto&& x) { return x(); },
-    [](auto&& x) { return hana::id(std::forward<decltype(x)>(x)); }
+    [](auto&& x) -> decltype(auto) { return x(); },
+    [](auto&& x) -> decltype(auto) { return hana::id(std::forward<decltype(x)>(x)); }
   )(std::forward<decltype(v)>(v));
 };
 
 //-------------------------------------------------------------
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop)
+BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> decltype(auto)
 {
     return std::decay<decltype(prop)>::type::get(std::forward<decltype(val)>(val));
 };
@@ -417,14 +394,14 @@ struct property_tag;
 #define DRACOSHA_VALIDATOR_HAS_PROPERTY(val,prop) hana::is_valid([](auto&& v) -> decltype((void)v.prop){})(val)
 
 #define DRACOSHA_VALIDATOR_PROPERTY(prop) \
-    auto try_get_##prop =[](auto&& v) \
+    auto try_get_##prop =[](auto&& v) -> decltype(auto) \
     { \
       return hana::if_(DRACOSHA_VALIDATOR_HAS_PROPERTY_FN(v,prop), \
-        [](auto&& x) { return x.prop(); }, \
-        [](auto&& vv) { \
+        [](auto&& x) -> decltype(auto) { return x.prop(); }, \
+        [](auto&& vv) -> decltype(auto)  { \
                 return hana::if_(DRACOSHA_VALIDATOR_HAS_PROPERTY(vv,prop), \
-                  [](auto&& x) { return x.prop; }, \
-                  [](auto&& x) { return hana::id(std::forward<decltype(x)>(x)); } \
+                  [](auto&& x) -> decltype(auto) { return x.prop; }, \
+                  [](auto&& x) -> decltype(auto) { return hana::id(std::forward<decltype(x)>(x)); } \
                 )(std::forward<decltype(vv)>(vv)); \
             } \
       )(std::forward<decltype(v)>(v)); \
@@ -433,16 +410,16 @@ struct property_tag;
     { \
         using hana_tag=property_tag; \
         template <typename T> \
-        constexpr static size_t get(T&& v) \
+        constexpr static auto get(T&& v) -> decltype(auto) \
         { \
             return try_get_##prop(std::forward<T>(v)); \
         } \
         template <typename ...Args> \
-        constexpr auto operator () (Args&&... args) const; \
+        constexpr auto operator () (Args&&... args) const -> decltype(auto); \
     }; \
     constexpr type_p_##prop prop{}; \
     template <typename ...Args> \
-    constexpr auto type_p_##prop::operator () (Args&&... args) const \
+    constexpr auto type_p_##prop::operator () (Args&&... args) const -> decltype(auto)\
     { \
         return prepare_validate(prop,std::forward<Args>(args)...); \
     }
@@ -464,10 +441,10 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto get =[](auto&& v, auto&& k) -> decltype(auto)
 
 //-------------------------------------------------------------
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto extract_back= [](auto&& v, auto&& ch)
+BOOST_HANA_CONSTEXPR_LAMBDA auto extract_back= [](auto&& v, auto&& ch) -> decltype(auto)
 {
     return hana::fold(std::forward<decltype(ch)>(ch),std::forward<decltype(v)>(v),
-            [](auto&& field, auto&& key)
+            [](auto&& field, auto&& key) -> decltype(auto)
             {
                 return get(std::forward<decltype(field)>(field),std::forward<decltype(key)>(key));
             }
@@ -507,28 +484,6 @@ struct validate_t
                     extract(std::forward<T2>(b))
                 );
     }
-
-//    template <typename T1, typename T2, typename OpT, typename PropT, typename ChainT>
-//    constexpr static bool invoke(T1&& a, ChainT&& chain, PropT&&, OpT&&, T2&& b,
-//                                 std::enable_if_t<std::is_same<exists_t,std::decay<op>::type>::value,
-//                                   void*
-//                                 > =nullptr
-//                                )
-//    {
-//        auto&& ax=extract(std::forward<T1>(a));
-//        hana::fold(std::forward<decltype(chain)>(chain),std::forward<decltype(ax)>(ax),
-//                [](auto&& obj, auto&& key)
-//                {
-//                    hana::if_(contains(obj,key),
-//                        [](auto&& obj1, auto&& key1) { return return get(std::forward<decltype(obj1)>(obj1),std::forward<decltype(key1)>(key1)); },
-//                        [](auto&&, auto&&)
-//                        {
-//                            return std::false_type{};
-//                        }
-//                    )(std::forward<decltype(obj)>(obj),std::forward<decltype(key)>(key));
-//                }
-//            );
-//    }
 
     template <typename T1, typename T2, typename OpT, typename PropT, typename ChainT>
     constexpr static bool invoke(T1&& a, ChainT&& chain, PropT&& prop, OpT&& op, T2&& b,
@@ -579,7 +534,7 @@ constexpr validate_t validate{};
 
 //-------------------------------------------------------------
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto validate_invoke = [](auto&&... args)
+BOOST_HANA_CONSTEXPR_LAMBDA auto validate_invoke = [](auto&&... args) -> decltype(auto)
 {
     return validate.invoke(std::forward<decltype(args)>(args)...);
 };
@@ -587,7 +542,7 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto validate_invoke = [](auto&&... args)
 struct prepare_validate_t
 {
     template <typename ... Args>
-    constexpr auto operator() (Args&&... args) const
+    constexpr auto operator() (Args&&... args) const -> decltype(auto)
     {
         return hana::reverse_partial(validate_invoke,std::forward<Args>(args)...);
     }
@@ -650,7 +605,7 @@ struct validator
     }
 
     template <typename ... Args>
-    auto apply(Args&&... args) const
+    auto apply(Args&&... args) const -> decltype(auto)
     {
         return fn(std::forward<Args>(args)...);
     }
@@ -672,10 +627,10 @@ struct tuple_to_variadic
     }
 };
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto key_chain_str= [](auto&& ch)
+BOOST_HANA_CONSTEXPR_LAMBDA auto key_chain_str= [](auto&& ch) -> decltype(auto)
 {
     return hana::fold(std::forward<decltype(ch)>(ch),std::string(),
-            [](auto&& str, auto&& key)
+            [](auto&& str, auto&& key) -> decltype(auto)
             {
                 if (!str.empty())
                 {
@@ -714,13 +669,13 @@ struct compose_single_validator
     {}
 
     template <typename T1>
-    auto operator () (T1&& v) const
+    auto operator () (T1&& v) const -> decltype(auto)
     {
         return make_validator(hana::reverse_partial(apply_chain,std::forward<T1>(v),chain));
     }
 
     template <typename OpT, typename T1>
-    auto operator () (OpT&& op, T1&& b) const
+    auto operator () (OpT&& op, T1&& b) const -> decltype(auto)
     {
         return (*this)(value(std::forward<OpT>(op),std::forward<T1>(b)));
     }
@@ -736,7 +691,7 @@ struct compose_single_validator
     }
 
     template <typename T1>
-    auto operator [] (T1&& key) const
+    auto operator [] (T1&& key) const -> decltype(auto)
     {
         auto tmpl=tuple_to_variadic<compose_single_validator>::to_template(chain,typename adjust_type<T1>::type(key));
         return typename decltype(tmpl)::type(std::forward<T1>(key),chain);
@@ -770,13 +725,13 @@ namespace detail
 struct _t
 {
     template <typename T>
-    constexpr auto operator [] (T&& key) const
+    constexpr auto operator [] (T&& key) const -> decltype(auto)
     {
         return detail::compose_single_validator<typename std::decay<T>::type>(std::forward<T>(key));
     }
 
     template <typename T>
-    constexpr auto operator () (const T& masterRefObj) const
+    constexpr auto operator () (const T& masterRefObj) const -> decltype(auto)
     {
         return detail::master_reference<T>(masterRefObj);
     }
@@ -857,7 +812,7 @@ struct aggregate_or_t
 };
 aggregate_or_t aggregate_or{};
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto AND=hana::infix([](auto&& ...xs)
+BOOST_HANA_CONSTEXPR_LAMBDA auto AND=hana::infix([](auto&& ...xs) -> decltype(auto)
 {
     return detail::make_validator(
                 hana::reverse_partial(
@@ -867,7 +822,7 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto AND=hana::infix([](auto&& ...xs)
            );
 });
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto OR=hana::infix([](auto&& ...xs)
+BOOST_HANA_CONSTEXPR_LAMBDA auto OR=hana::infix([](auto&& ...xs) -> decltype(auto)
 {
     return detail::make_validator(
                 hana::reverse_partial(
@@ -882,13 +837,13 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto OR=hana::infix([](auto&& ...xs)
 struct validator_t
 {
     template <typename ... Args>
-    constexpr auto operator () (Args&& ...args) const
+    constexpr auto operator () (Args&& ...args) const -> decltype(auto)
     {
         return AND(std::forward<Args>(args)...);
     }
 
     template <typename T>
-    constexpr auto operator () (T&& v) const
+    constexpr auto operator () (T&& v) const -> decltype(auto)
     {
         return hana::id(std::forward<T>(v));
     }
