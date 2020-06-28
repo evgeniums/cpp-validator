@@ -101,24 +101,24 @@ struct member
     {}
 
     /**
-     * @brief Bind compound validator with current member
+     * @brief Bind compound validator to current member
      * @param v Prepared partial validator
      * @return Prepared partial validator bound to current member
      */
     template <typename T1>
-    auto operator () (T1&& v) const -> decltype(auto)
+    constexpr auto operator () (T1&& v) const -> decltype(auto)
     {
         return make_validator(hana::reverse_partial(apply_member,std::forward<T1>(v),*this));
     }
 
     /**
-     * @brief Bind plain operator with current member
+     * @brief Bind plain operator to current member
      * @param op Operator
      * @param b Argument to forward to operator
      * @return Prepared partial validator of "value" property bound to current member
      */
     template <typename OpT, typename T1>
-    auto operator () (OpT&& op, T1&& b) const -> decltype(auto)
+    constexpr auto operator () (OpT&& op, T1&& b) const -> decltype(auto)
     {
         return (*this)(value(std::forward<OpT>(op),std::forward<T1>(b)));
     }
@@ -127,7 +127,7 @@ struct member
      * @brief Get key of the member at current level
      * @return Key of current member
      */
-    const type& key() const
+    constexpr const type& key() const
     {
         return hana::back(path);
     }
@@ -148,7 +148,7 @@ struct member
      * @param key Member key
      */
     template <typename T1>
-    auto operator [] (T1&& key) const -> decltype(auto)
+    constexpr auto operator [] (T1&& key) const -> decltype(auto)
     {
         auto tmpl=tuple_to_variadic<member>::to_template(path,typename adjust_storable_type<T1>::type(key));
         return typename decltype(tmpl)::type(std::forward<T1>(key),path);

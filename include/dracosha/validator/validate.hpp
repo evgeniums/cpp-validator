@@ -69,7 +69,7 @@ struct validate_t
     template <typename T1, typename T2, typename OpT, typename PropT>
     constexpr bool operator() (PropT&& prop, T1&& a, OpT&& op, T2&& b) const
     {
-        // first two arguments of invoke are flipped against the order fo those arguments in operator ()
+        // first two arguments of invoke are flipped against the order fo those arguments in operator () above
         return invoke(std::forward<T1>(a),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
     }
 

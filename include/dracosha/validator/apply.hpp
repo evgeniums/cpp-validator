@@ -29,7 +29,7 @@ struct validator_tag;
 /**
   @brief Apply validating to object
   @param a Object to validate
-  @param b Either validation operator or compound validator
+  @param v Either validation operator or compound validator
   @return Validation result
   */
 BOOST_HANA_CONSTEXPR_LAMBDA auto apply = [](auto&& a,auto&& v) -> decltype(auto)
@@ -43,7 +43,7 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto apply = [](auto&& a,auto&& v) -> decltype(auto)
 /**
   @brief Apply validating to object's member
   @param a Object to validate
-  @param b Either validation operator or compound validator
+  @param v Either validation operator or compound validator
   @param member Object's member to validate
   @return Validation result
   */
