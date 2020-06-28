@@ -25,159 +25,14 @@ Distributed under the Boost Software License, Version 1.0.
 #include <boost/hana.hpp>
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/scalar_compare.hpp>
+#include <dracosha/validator/adjust_storable_type.hpp>
+#include <dracosha/validator/detail/check_has_method.hpp>
 
 namespace hana=boost::hana;
 using namespace hana::literals;
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
-
-//-------------------------------------------------------------
-
-template <typename LeftT, typename RightT, typename=void>
-struct scalar_compare
-{
-    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
-    {
-        return left < right;
-    }
-    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
-    {
-        return left == right;
-    }
-    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
-    {
-        return left <= right;
-    }
-};
-template <typename LeftT, typename RightT>
-struct scalar_compare<LeftT,RightT,
-                        std::enable_if_t<
-                            std::is_signed<LeftT>::value &&
-                            !std::is_floating_point<LeftT>::value &&
-                            std::is_unsigned<RightT>::value &&
-                            !std::is_same<RightT, bool>::value
-                        >
-                    >
-{
-    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
-    {
-        if (left < 0)
-        {
-            return true;
-        }
-        return static_cast<std::make_unsigned_t<LeftT>>(left) < right;
-    }
-    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
-    {
-        return static_cast<std::make_unsigned_t<LeftT>>(left) == right;
-    }
-    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
-    {
-        if (left < 0)
-        {
-            return true;
-        }
-        return static_cast<std::make_unsigned_t<LeftT>>(left) <= right;
-    }
-};
-
-template <typename LeftT, typename RightT>
-struct scalar_compare<LeftT, RightT,
-        std::enable_if_t<
-            std::is_unsigned<LeftT>::value &&
-            std::is_signed<RightT>::value &&
-            !std::is_floating_point<RightT>::value &&
-            !std::is_same<LeftT, bool>::value>
-    >
-{
-    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
-    {
-        if (right < 0)
-        {
-            return false;
-        }
-        return left < static_cast<std::make_unsigned_t<RightT>>(right);
-    }
-    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
-    {
-        return left == static_cast<std::make_unsigned_t<RightT>>(right);
-    }
-    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
-    {
-        if (right < 0)
-        {
-            return false;
-        }
-        return left <= static_cast<std::make_unsigned_t<RightT>>(right);
-    }
-};
-
-template <typename LeftT,typename RightT>
-struct scalar_compare<LeftT,RightT,
-                    std::enable_if_t<!std::is_same<LeftT, bool>::value && std::is_same<RightT, bool>::value>
-                >
-{
-    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
-    {
-        return static_cast<bool>(left) < right;
-    }
-    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
-    {
-        return static_cast<bool>(left)==right;
-    }
-    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
-    {
-        return static_cast<bool>(left) <= right;
-    }
-};
-template <typename LeftT, typename RightT>
-struct scalar_compare<LeftT, RightT,
-        std::enable_if_t<std::is_same<LeftT, bool>::value && !std::is_same<RightT, bool>::value>
-    >
-{
-    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
-    {
-        return left < static_cast<bool>(right);
-    }
-    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
-    {
-        return left==static_cast<bool>(right);
-    }
-    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
-    {
-        return left <= static_cast<bool>(right);
-    }
-};
-
-template <typename LeftT, typename RightT, typename=void>
-struct compare
-{
-};
-
-template <typename LeftT, typename RightT>
-struct compare<LeftT, RightT,
-        std::enable_if_t<!std::is_scalar<LeftT>::value && !std::is_scalar<RightT>::value>>
-{
-    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
-    {
-        return left < right;
-    }
-    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
-    {
-        return left==right;
-    }
-    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
-    {
-        return left <= right;
-    }
-};
-
-template <typename LeftT, typename RightT>
-struct compare<LeftT, RightT,
-        std::enable_if_t<std::is_scalar<LeftT>::value || std::is_scalar<RightT>::value>
-    > : public scalar_compare<LeftT,RightT>
-{
-};
 
 //-------------------------------------------------------------
 
@@ -199,68 +54,6 @@ struct gte_t : public op
     }
 };
 constexpr gte_t gte{};
-
-//-------------------------------------------------------------
-
-namespace detail
-{
-
-BOOST_HANA_CONSTEXPR_LAMBDA auto has_at = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.at(std::forward<decltype(x)>(x))){});
-BOOST_HANA_CONSTEXPR_LAMBDA auto has_has = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.has(std::forward<decltype(x)>(x))){});
-BOOST_HANA_CONSTEXPR_LAMBDA auto has_contains = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.contains(std::forward<decltype(x)>(x))){});
-BOOST_HANA_CONSTEXPR_LAMBDA auto has_find = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.find(std::forward<decltype(x)>(x))){});
-BOOST_HANA_CONSTEXPR_LAMBDA auto has_isSet = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.isSet(std::forward<decltype(x)>(x))){});
-
-BOOST_HANA_CONSTEXPR_LAMBDA auto has_at_c = hana::is_valid([](auto&& v, auto&& x) -> decltype(
-                                                            (void)hana::traits::declval(v).at(hana::traits::declval(x))
-                                                           )
-                                                        {});
-BOOST_HANA_CONSTEXPR_LAMBDA auto has_brackets_c = hana::is_valid([](auto&& v, auto&& x) -> decltype(
-                                                            (void)hana::traits::declval(v)[hana::traits::declval(x)]
-                                                           )
-                                                        {});
-
-BOOST_HANA_CONSTEXPR_LAMBDA auto has_find_c = hana::is_valid([](auto v, auto x) -> decltype(
-                                                                    (void)hana::traits::declval(v).find(hana::traits::declval(x))
-                                                                )
-                                                            {});
-BOOST_HANA_CONSTEXPR_LAMBDA auto has_has_c = hana::is_valid([](auto v, auto x) -> decltype(
-                                                                    (void)hana::traits::declval(v).has(hana::traits::declval(x))
-                                                                )
-                                                            {});
-BOOST_HANA_CONSTEXPR_LAMBDA auto has_contains_c = hana::is_valid([](auto v, auto x) -> decltype(
-                                                                    (void)hana::traits::declval(v).contains(hana::traits::declval(x))
-                                                                )
-                                                            {});
-BOOST_HANA_CONSTEXPR_LAMBDA auto has_isSet_c = hana::is_valid([](auto v, auto x) -> decltype(
-                                                                    (void)hana::traits::declval(v).isSet(hana::traits::declval(x))
-                                                                )
-                                                            {});
-
-//-------------------------------------------------------------
-
-template <typename T, typename=hana::when<true>>
-struct adjust_type
-{
-};
-template <typename T>
-struct adjust_type<T,
-                    hana::when<std::is_constructible<std::string,T>::value>
-                    >
-{
-    using type=std::string;
-};
-template <typename T>
-struct adjust_type<T,
-                    hana::when<!std::is_constructible<std::string,T>::value>
-                    >
-{
-    using type=typename std::decay<T>::type;
-};
-
-//-------------------------------------------------------------
-
-}
 
 //-------------------------------------------------------------
 struct property_tag;
@@ -934,7 +727,7 @@ template <typename T, typename ...ParentPathT>
 struct member
 {
     using hana_tag=member_tag;
-    using type=typename adjust_type<T>::type;
+    using type=typename adjust_storable_type<T>::type;
 
     hana::tuple<ParentPathT...,type> path;
 
@@ -1025,7 +818,7 @@ struct member
     template <typename T1>
     auto operator [] (T1&& key) const -> decltype(auto)
     {
-        auto tmpl=tuple_to_variadic<member>::to_template(path,typename adjust_type<T1>::type(key));
+        auto tmpl=tuple_to_variadic<member>::to_template(path,typename adjust_storable_type<T1>::type(key));
         return typename decltype(tmpl)::type(std::forward<T1>(key),path);
     }
 };
