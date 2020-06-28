@@ -380,17 +380,6 @@ BOOST_AUTO_TEST_CASE(CheckExists)
     BOOST_CHECK(v1.apply(m1));
 }
 
-
-template <typename T1, typename T2, typename=hana::when<true>>
-struct contains_c_
-{
-};
-template <typename T1, typename T2>
-struct contains_c_<T1,T2,hana::when<can_check_contains<T1,T2>() && can_get<T1,T2>.property()>>
-{
-    using type=typename std::decay<decltype(property(std::declval<T1>(),std::declval<T2>()))>::type;
-};
-
 BOOST_AUTO_TEST_CASE(CheckContainsCompileTime)
 {
     std::map<std::string,std::string> m1;

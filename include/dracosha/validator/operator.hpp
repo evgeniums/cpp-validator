@@ -672,7 +672,7 @@ struct validate_t
                                  > =nullptr
                                 )
     {
-        auto chain_c=hana::transform(chain,hana::make_type);
+        auto chain_c=hana::transform(chain.chain,hana::make_type);
         auto a_c=hana::type_c<decltype(a)>;
 
         return hana::if_(hana::is_nothing(hana::monadic_fold_left<hana::optional_tag>(chain_c,a_c,hana::sfinae(contains_c))),
@@ -685,7 +685,7 @@ struct validate_t
                 auto&& ax=extract(std::forward<decltype(a1)>(a1));
                 return exists(ax,std::forward<decltype(chain1)>(chain1))==b;
             }
-        )(std::forward<T1>(a),std::forward<ChainT>(chain));
+        )(std::forward<T1>(a),chain.chain);
     }
 
     template <typename T1, typename T2, typename OpT, typename PropT, typename ChainT>
@@ -698,7 +698,7 @@ struct validate_t
     {
         auto&& ax=extract(std::forward<T1>(a));
         return op(
-                    property(extract_back(ax,chain),std::forward<PropT>(prop)),
+                    property(extract_back(ax,chain.chain),std::forward<PropT>(prop)),
                     extract(std::forward<T2>(b))
                 );
     }
@@ -713,7 +713,7 @@ struct validate_t
     {
         auto&& ax=extract(std::forward<T1>(a));
         return op(
-                    property(extract_back(ax,chain),prop),
+                    property(extract_back(ax,chain.chain),prop),
                     property(extract_back(ax,b.chain),prop)
                 );
     }
@@ -728,8 +728,8 @@ struct validate_t
     {
         auto&& ax=extract(std::forward<T1>(a));
         return op(
-                    property(extract_back(ax,chain),prop),
-                    property(extract_back(b(),chain),prop)
+                    property(extract_back(ax,chain.chain),prop),
+                    property(extract_back(b(),chain.chain),prop)
                 );
     }
 };
@@ -849,6 +849,11 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto key_chain_str= [](auto&& ch) -> decltype(auto)
         );
 };
 
+/**
+ *  @brief Generic descriptor of a member that must be validated.
+ *
+ * Descriptor defines the path for extracting a member from the object under validation.
+ */
 template <typename T, typename ...Chain>
 struct compose_single_validator
 {
@@ -857,37 +862,70 @@ struct compose_single_validator
 
     hana::tuple<Chain...,type> chain;
 
+    /**
+     * @brief Ctor of nested member
+     * @param key Key of current member
+     * @param ch Chain of keys of parent levels
+     */
     template <typename T1, typename ChainT>
     compose_single_validator(T1&& key, ChainT&& ch)
          : chain(hana::append(std::forward<ChainT>(ch),std::forward<T1>(key)))
     {}
 
+    /**
+     * @brief Ctor of nested member
+     * @param key Key of current member
+     * @param ch Chain of keys of parent levels
+     */
     template <typename ChainT>
-    compose_single_validator(type k, ChainT&& ch)
-         : chain(hana::append(std::forward<ChainT>(ch),std::move(k)))
+    compose_single_validator(type key, ChainT&& ch)
+         : chain(hana::append(std::forward<ChainT>(ch),std::move(key)))
     {}
 
+    /**
+     * @brief Ctor
+     * @param key Key of current member
+     */
     template <typename T1>
     compose_single_validator(T1&& key)
          : chain(hana::make_tuple(std::forward<T1>(key)))
     {}
 
+    /**
+     * @brief Ctor with key of string type
+     * @param str Key of current member
+     */
     compose_single_validator(std::string str)
          : chain(hana::make_tuple(std::move(str)))
     {}
 
+    /**
+     * @brief Bind compound validator with current member
+     * @param v Prepared partial validator
+     * @return Prepared partial validator bound to current member
+     */
     template <typename T1>
     auto operator () (T1&& v) const -> decltype(auto)
     {
-        return make_validator(hana::reverse_partial(apply_chain,std::forward<T1>(v),chain));
+        return make_validator(hana::reverse_partial(apply_chain,std::forward<T1>(v),*this));
     }
 
+    /**
+     * @brief Bind plain operator with current member
+     * @param op Operator
+     * @param b Argument to forward to operator
+     * @return Prepared partial validator of "value" property bound to current member
+     */
     template <typename OpT, typename T1>
     auto operator () (OpT&& op, T1&& b) const -> decltype(auto)
     {
         return (*this)(value(std::forward<OpT>(op),std::forward<T1>(b)));
     }
 
+    /**
+     * @brief Get key of the member at this level
+     * @return Key of current member
+     */
     const type& key() const
     {
         return hana::back(chain);
@@ -898,6 +936,10 @@ struct compose_single_validator
         return key_chain_str(chain);
     }
 
+    /**
+     * @brief Append next level to members chain
+     * @param key Member key
+     */
     template <typename T1>
     auto operator [] (T1&& key) const -> decltype(auto)
     {
