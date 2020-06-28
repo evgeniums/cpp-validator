@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/prepare_validate.hpp
 *
-*  Defines utilities for validation preparing
+*  Defines helpers for validation preparing
 *
 */
 

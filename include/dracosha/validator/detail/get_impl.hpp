@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/detail/get_impl.hpp
 *
-*  Defines utilities for getting member from object.
+*  Defines helpers for getting member from object.
 *
 */
 

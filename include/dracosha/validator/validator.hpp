@@ -53,14 +53,27 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Helper for generating members and master reference wrappers
+ */
 struct _t
 {
+    /**
+     * @brief Create member
+     * @param key Key of the member
+     * @return Member
+     */
     template <typename T>
     constexpr auto operator [] (T&& key) const -> decltype(auto)
     {
         return member<typename std::decay<T>::type>(std::forward<T>(key));
     }
 
+    /**
+     * @brief Create master reference wrapper
+     * @param masterRefObj Object to use as a master reference
+     * @return Wrapper of master reference object
+     */
     template <typename T>
     constexpr auto operator () (const T& masterRefObj) const -> decltype(auto)
     {
@@ -71,14 +84,23 @@ constexpr _t _{};
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Helper class to wrap validators
+ */
 struct validator_t
 {
+    /**
+     * @brief Wrap list of validators or validation operators into logical AND
+     */
     template <typename ... Args>
     constexpr auto operator () (Args&& ...args) const -> decltype(auto)
     {
         return AND(std::forward<Args>(args)...);
     }
 
+    /**
+     * @brief Just syntax sugar, return input validator or validation operator as is
+     */
     template <typename T>
     constexpr auto operator () (T&& v) const -> decltype(auto)
     {
