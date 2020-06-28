@@ -493,6 +493,23 @@ BOOST_AUTO_TEST_CASE(CheckExistsWithCompileTime)
         _["first_map"][10][size](exists,false)
     );
     BOOST_CHECK(v1.apply(m3));
+
+//    auto v05=_["first_map"][10][size](gte,10);
+//    BOOST_CHECK(!v05.apply(m3));
+
+    std::vector<int> vec1={10,20,30,40,50};
+    auto v06=_[3](exists,true);
+    BOOST_CHECK(!v06.apply(vec1));
 }
+
+/**
+
+@todo
+    Configurable abort if not found
+    Translation
+    Adapter
+    Multiple elements
+    Check single field
+*/
 
 BOOST_AUTO_TEST_SUITE_END()
