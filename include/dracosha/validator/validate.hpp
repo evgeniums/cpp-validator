@@ -109,10 +109,7 @@ struct validate_t
                                  > =nullptr
                                 )
     {
-        auto path_c=hana::transform(member.path,hana::make_type);
-        auto a_c=hana::type_c<decltype(a)>;
-
-        return hana::if_(hana::is_nothing(hana::monadic_fold_left<hana::optional_tag>(path_c,a_c,hana::sfinae(check_member))),
+        return hana::if_(check_member_path(a,member.path),
             [&b](auto&&, auto&&)
             {
                 return b==false;

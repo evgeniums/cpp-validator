@@ -47,12 +47,28 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto iterate_exists =[](auto&& obj,auto&& key)
 };
 }
 
+/**
+  @brief Check if member at a given path exist in the object
+  @param obj Object under validation
+  @param path Member path as a tuple
+  @return Validation status
+
+  This operation is performed at runtime
+*/
 BOOST_HANA_CONSTEXPR_LAMBDA auto check_exists =[](auto&& obj,auto&& path)
 {
     return hana::fold(std::forward<decltype(path)>(path),&obj,detail::iterate_exists)!=nullptr;
 };
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto check_exists_static =[](auto obj,auto path)
+/**
+  @brief Check if path of types in member descriptor can exist in the object
+  @param obj Object under validation
+  @param path Member path as a tuple
+  @return Validation status
+
+  This operation is expected to be performed statically at compile time.
+*/
+BOOST_HANA_CONSTEXPR_LAMBDA auto check_member_path =[](auto obj,auto path)
 {
     auto path_c=hana::transform(path,hana::make_type);
     auto obj_c=hana::type_c<decltype(obj)>;
