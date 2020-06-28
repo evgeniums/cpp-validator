@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE(CheckMapValidator)
 BOOST_AUTO_TEST_CASE(CheckNestedValidator)
 {
     auto v0=_["first_map"]["one_2"];
-    BOOST_CHECK_EQUAL(v0.format_key_chain(),std::string("first_map.one_2"));
+    BOOST_CHECK_EQUAL(v0.path_str(),std::string("first_map.one_2"));
 
     std::map<std::string,std::map<std::string,std::string>> m;
     m["first_map"]={std::make_pair("one","one_value"),std::make_pair("two","two_value"),std::make_pair("three","three_value")};

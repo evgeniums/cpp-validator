@@ -515,9 +515,9 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto iterate_exists =[](auto&& obj,auto&& key)
 };
 }
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto check_exists =[](auto&& obj,auto&& chain)
+BOOST_HANA_CONSTEXPR_LAMBDA auto check_exists =[](auto&& obj,auto&& path)
 {
-    return hana::fold(std::forward<decltype(chain)>(chain),&obj,detail::iterate_exists)!=nullptr;
+    return hana::fold(std::forward<decltype(path)>(path),&obj,detail::iterate_exists)!=nullptr;
 };
 
 struct exists_t : public op
@@ -562,7 +562,7 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto extract = [](auto&& v) ->decltype(auto)
 
 //-------------------------------------------------------------
 
-struct single_validator_tag;
+struct member_tag;
 struct master_reference_tag;
 
 #define DRACOSHA_VALIDATOR_HAS_PROPERTY_FN(val,prop) hana::is_valid([](auto&& v) -> decltype((void)v.prop()){})(val)
@@ -620,10 +620,17 @@ struct master_reference_tag;
     }
 
 //-------------------------------------------------------------
+/**
+  @brief Extract last member's object in the path
+  @param Top level object
+  @param Path to the member to extract
+  @return Extracted member.
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto extract_back= [](auto&& v, auto&& ch) -> decltype(auto)
+    In most cases a reference will be returned except for the properties that return rvalues, e.g. size() or empty().
+*/
+BOOST_HANA_CONSTEXPR_LAMBDA auto extract_back= [](auto&& v, auto&& path) -> decltype(auto)
 {
-    return hana::fold(std::forward<decltype(ch)>(ch),std::forward<decltype(v)>(v),
+    return hana::fold(std::forward<decltype(path)>(path),std::forward<decltype(v)>(v),
             [](auto&& field, auto&& key) -> decltype(auto)
             {
                 return get(std::forward<decltype(field)>(field),std::forward<decltype(key)>(key));
@@ -654,7 +661,7 @@ struct validate_t
     template <typename T1, typename T2, typename OpT, typename PropT>
     constexpr static bool invoke(T1&& a, PropT&& prop, OpT&& op, T2&& b,
                                      std::enable_if_t<
-                                       !hana::is_a<single_validator_tag,T2>,
+                                       !hana::is_a<member_tag,T2>,
                                        void*
                                      > =nullptr
                                  )
@@ -665,61 +672,61 @@ struct validate_t
                 );
     }
 
-    template <typename T1, typename T2, typename OpT, typename PropT, typename ChainT>
-    constexpr static bool invoke(T1&& a, ChainT&& chain, PropT&&, OpT&&, T2&& b,
+    template <typename T1, typename T2, typename OpT, typename PropT, typename MemberT>
+    constexpr static bool invoke(T1&& a, MemberT&& member, PropT&&, OpT&&, T2&& b,
                                  std::enable_if_t<std::is_same<exists_t,typename std::decay<OpT>::type>::value,
                                    void*
                                  > =nullptr
                                 )
     {
-        auto chain_c=hana::transform(chain.chain,hana::make_type);
+        auto path_c=hana::transform(member.path,hana::make_type);
         auto a_c=hana::type_c<decltype(a)>;
 
-        return hana::if_(hana::is_nothing(hana::monadic_fold_left<hana::optional_tag>(chain_c,a_c,hana::sfinae(contains_c))),
+        return hana::if_(hana::is_nothing(hana::monadic_fold_left<hana::optional_tag>(path_c,a_c,hana::sfinae(contains_c))),
             [&b](auto&&, auto&&)
             {
                 return b==false;
             },
-            [&b](auto&& a1, auto&& chain1)
+            [&b](auto&& a1, auto&& path)
             {
                 auto&& ax=extract(std::forward<decltype(a1)>(a1));
-                return exists(ax,std::forward<decltype(chain1)>(chain1))==b;
+                return exists(ax,std::forward<decltype(path)>(path))==b;
             }
-        )(std::forward<T1>(a),chain.chain);
+        )(std::forward<T1>(a),member.path);
     }
 
-    template <typename T1, typename T2, typename OpT, typename PropT, typename ChainT>
-    constexpr static bool invoke(T1&& a, ChainT&& chain, PropT&& prop, OpT&& op, T2&& b,
+    template <typename T1, typename T2, typename OpT, typename PropT, typename MemberT>
+    constexpr static bool invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
                                  std::enable_if_t<
-                                   (!hana::is_a<single_validator_tag,T2> && !hana::is_a<master_reference_tag,T2> && !std::is_same<exists_t,typename std::decay<OpT>::type>::value),
+                                   (!hana::is_a<member_tag,T2> && !hana::is_a<master_reference_tag,T2> && !std::is_same<exists_t,typename std::decay<OpT>::type>::value),
                                    void*
                                  > =nullptr
                                 )
     {
         auto&& ax=extract(std::forward<T1>(a));
         return op(
-                    property(extract_back(ax,chain.chain),std::forward<PropT>(prop)),
+                    property(extract_back(ax,member.path),std::forward<PropT>(prop)),
                     extract(std::forward<T2>(b))
                 );
     }
 
-    template <typename T1, typename T2, typename OpT, typename PropT, typename ChainT>
-    constexpr static bool invoke(T1&& a, ChainT&& chain, PropT&& prop, OpT&& op, T2&& b,
+    template <typename T1, typename T2, typename OpT, typename PropT, typename MemberT>
+    constexpr static bool invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
                                  std::enable_if_t<
-                                   hana::is_a<single_validator_tag,T2>,
+                                   hana::is_a<member_tag,T2>,
                                    void*
                                  > =nullptr
                                 )
     {
         auto&& ax=extract(std::forward<T1>(a));
         return op(
-                    property(extract_back(ax,chain.chain),prop),
-                    property(extract_back(ax,b.chain),prop)
+                    property(extract_back(ax,member.path),prop),
+                    property(extract_back(ax,b.path),prop)
                 );
     }
 
-    template <typename T1, typename T2, typename OpT, typename PropT, typename ChainT>
-    constexpr static bool invoke(T1&& a, ChainT&& chain, PropT&& prop, OpT&& op, T2&& b,
+    template <typename T1, typename T2, typename OpT, typename PropT, typename MemberT>
+    constexpr static bool invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
                                  std::enable_if_t<
                                    hana::is_a<master_reference_tag,T2>,
                                    void*
@@ -728,8 +735,8 @@ struct validate_t
     {
         auto&& ax=extract(std::forward<T1>(a));
         return op(
-                    property(extract_back(ax,chain.chain),prop),
-                    property(extract_back(b(),chain.chain),prop)
+                    property(extract_back(ax,member.path),prop),
+                    property(extract_back(b(),member.path),prop)
                 );
     }
 };
@@ -788,11 +795,11 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto apply = [](auto&& a,auto&& v) -> decltype(auto)
     )(std::forward<decltype(v)>(v));
 };
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto apply_chain = [](auto&& a,auto&& v,auto&& chain) -> decltype(auto)
+BOOST_HANA_CONSTEXPR_LAMBDA auto apply_member = [](auto&& a,auto&& v,auto&& member) -> decltype(auto)
 {
     return hana::if_(hana::is_a<validator_tag,decltype(v)>,
-      [&a,&chain](auto&& x) -> decltype(auto) { return x.apply(a,chain); },
-      [&a,&chain](auto&& x) -> decltype(auto) { return x(a,chain); }
+      [&a,&member](auto&& x) -> decltype(auto) { return x.apply(a,member); },
+      [&a,&member](auto&& x) -> decltype(auto) { return x(a,member); }
     )(std::forward<decltype(v)>(v));
 };
 
@@ -835,9 +842,16 @@ struct tuple_to_variadic
     }
 };
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto key_chain_str= [](auto&& ch) -> decltype(auto)
+/**
+ * @brief Format a path as string with dot separated levels
+ * @param path Path as hana::tuple object
+ * @return Formatted path
+ *
+ * @note Only string keys can be formatted using this method
+ */
+BOOST_HANA_CONSTEXPR_LAMBDA auto format_path_str= [](auto&& path) -> decltype(auto)
 {
-    return hana::fold(std::forward<decltype(ch)>(ch),std::string(),
+    return hana::fold(std::forward<decltype(path)>(path),std::string(),
             [](auto&& str, auto&& key) -> decltype(auto)
             {
                 if (!str.empty())
@@ -852,34 +866,34 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto key_chain_str= [](auto&& ch) -> decltype(auto)
 /**
  *  @brief Generic descriptor of a member that must be validated.
  *
- * Descriptor defines the path for extracting a member from the object under validation.
+ * Descriptor defines the path for extracting specific member/subobject from the object under validation.
  */
-template <typename T, typename ...Chain>
-struct compose_single_validator
+template <typename T, typename ...ParentPathT>
+struct member
 {
-    using hana_tag=single_validator_tag;
+    using hana_tag=member_tag;
     using type=typename adjust_type<T>::type;
 
-    hana::tuple<Chain...,type> chain;
+    hana::tuple<ParentPathT...,type> path;
 
     /**
      * @brief Ctor of nested member
      * @param key Key of current member
-     * @param ch Chain of keys of parent levels
+     * @param parent Parent member which is of previous (upper) level
      */
-    template <typename T1, typename ChainT>
-    compose_single_validator(T1&& key, ChainT&& ch)
-         : chain(hana::append(std::forward<ChainT>(ch),std::forward<T1>(key)))
+    template <typename T1, typename MemberT>
+    member(T1&& key, MemberT&& parent)
+         : path(hana::append(std::forward<MemberT>(parent),std::forward<T1>(key)))
     {}
 
     /**
      * @brief Ctor of nested member
      * @param key Key of current member
-     * @param ch Chain of keys of parent levels
+     * @param parent Parent member which is of previous (upper) level
      */
-    template <typename ChainT>
-    compose_single_validator(type key, ChainT&& ch)
-         : chain(hana::append(std::forward<ChainT>(ch),std::move(key)))
+    template <typename MemberT>
+    member(type key, MemberT&& parent)
+         : path(hana::append(std::forward<MemberT>(parent),std::move(key)))
     {}
 
     /**
@@ -887,16 +901,16 @@ struct compose_single_validator
      * @param key Key of current member
      */
     template <typename T1>
-    compose_single_validator(T1&& key)
-         : chain(hana::make_tuple(std::forward<T1>(key)))
+    member(T1&& key)
+         : path(hana::make_tuple(std::forward<T1>(key)))
     {}
 
     /**
      * @brief Ctor with key of string type
      * @param str Key of current member
      */
-    compose_single_validator(std::string str)
-         : chain(hana::make_tuple(std::move(str)))
+    member(std::string str)
+         : path(hana::make_tuple(std::move(str)))
     {}
 
     /**
@@ -907,7 +921,7 @@ struct compose_single_validator
     template <typename T1>
     auto operator () (T1&& v) const -> decltype(auto)
     {
-        return make_validator(hana::reverse_partial(apply_chain,std::forward<T1>(v),*this));
+        return make_validator(hana::reverse_partial(apply_member,std::forward<T1>(v),*this));
     }
 
     /**
@@ -923,28 +937,34 @@ struct compose_single_validator
     }
 
     /**
-     * @brief Get key of the member at this level
+     * @brief Get key of the member at current level
      * @return Key of current member
      */
     const type& key() const
     {
-        return hana::back(chain);
-    }
-
-    std::string format_key_chain() const
-    {
-        return key_chain_str(chain);
+        return hana::back(path);
     }
 
     /**
-     * @brief Append next level to members chain
+     * @brief Format a path as string with dot separated levels
+     * @return Formatted path
+     *
+     * @note Only string keys can be formatted using this method
+     */
+    std::string path_str() const
+    {
+        return format_path_str(path);
+    }
+
+    /**
+     * @brief Append next level to member
      * @param key Member key
      */
     template <typename T1>
     auto operator [] (T1&& key) const -> decltype(auto)
     {
-        auto tmpl=tuple_to_variadic<compose_single_validator>::to_template(chain,typename adjust_type<T1>::type(key));
-        return typename decltype(tmpl)::type(std::forward<T1>(key),chain);
+        auto tmpl=tuple_to_variadic<member>::to_template(path,typename adjust_type<T1>::type(key));
+        return typename decltype(tmpl)::type(std::forward<T1>(key),path);
     }
 };
 
@@ -977,7 +997,7 @@ struct _t
     template <typename T>
     constexpr auto operator [] (T&& key) const -> decltype(auto)
     {
-        return detail::compose_single_validator<typename std::decay<T>::type>(std::forward<T>(key));
+        return detail::member<typename std::decay<T>::type>(std::forward<T>(key));
     }
 
     template <typename T>
@@ -1007,17 +1027,17 @@ struct aggregate_and_t
                 );
     }
 
-    template <typename T, typename OpsT, typename ChainT>
-    constexpr bool operator () (T&& a,ChainT&& chain,OpsT&& ops) const
+    template <typename T, typename OpsT, typename MemberT>
+    constexpr bool operator () (T&& a,MemberT&& member,OpsT&& ops) const
     {
         return hana::fold(std::forward<decltype(ops)>(ops),true,
-                    [&a,&chain](bool prevResult, auto&& op)
+                    [&a,&member](bool prevResult, auto&& op)
                     {
                         if (!prevResult)
                         {
                             return false;
                         }
-                        return apply_chain(std::forward<decltype(a)>(a),std::forward<decltype(op)>(op),std::forward<decltype(chain)>(chain));
+                        return apply_member(std::forward<decltype(a)>(a),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
                     }
                 );
     }
@@ -1043,19 +1063,19 @@ struct aggregate_or_t
                 );
     }
 
-    template <typename T, typename OpsT, typename ChainT>
-    constexpr bool operator () (T&& a,ChainT&& chain,OpsT&& ops) const
+    template <typename T, typename OpsT, typename MemberT>
+    constexpr bool operator () (T&& a,MemberT&& member,OpsT&& ops) const
     {
         return hana::value(hana::length(ops))==0
                 ||
                hana::fold(std::forward<decltype(ops)>(ops),false,
-                    [&a,&chain](bool prevResult, auto&& op)
+                    [&a,&member](bool prevResult, auto&& op)
                     {
                         if (prevResult)
                         {
                             return true;
                         }
-                        return apply_chain(std::forward<decltype(a)>(a),std::forward<decltype(op)>(op),std::forward<decltype(chain)>(chain));
+                        return apply_member(std::forward<decltype(a)>(a),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
                     }
                 );
     }
