@@ -624,7 +624,7 @@ struct master_reference_tag;
   @brief Extract last member's object in the path
   @param Top level object
   @param Path to the member to extract
-  @return Extracted member.
+  @return Extracted member
 
     In most cases a reference will be returned except for the properties that return rvalues, e.g. size() or empty().
 */
@@ -640,8 +640,18 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto extract_back= [](auto&& v, auto&& path) -> decl
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Validator
+ */
 struct validate_t
 {
+    /**
+     *  @brief Perform validation of object at one level without member nesting
+     *  @param a Object to validate
+     *  @param op Operator for validation
+     *  @param b Reference argument for validation
+     *  @return Validation status
+     */
     template <typename T1, typename T2, typename OpT>
     constexpr bool operator() (T1&& a, OpT&& op, T2&& b) const
     {
@@ -651,6 +661,14 @@ struct validate_t
                 );
     }
 
+    /**
+     *  @brief Perform validation of object's property at one level without member nesting
+     *  @param prop Property to validate
+     *  @param a Object whose property must be validated
+     *  @param op Operator for validation
+     *  @param b Reference argument for validation
+     *  @return Validation status
+     */
     template <typename T1, typename T2, typename OpT, typename PropT>
     constexpr bool operator() (PropT&& prop, T1&& a, OpT&& op, T2&& b) const
     {
@@ -658,6 +676,14 @@ struct validate_t
         return invoke(std::forward<T1>(a),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
     }
 
+    /**
+     *  @brief Perform validation of object's property at one level without member nesting
+     *  @param prop Property to validate
+     *  @param a Object to validate
+     *  @param op Operator for validation
+     *  @param b Reference argument for validation
+     *  @return Validation status
+     */
     template <typename T1, typename T2, typename OpT, typename PropT>
     constexpr static bool invoke(T1&& a, PropT&& prop, OpT&& op, T2&& b,
                                      std::enable_if_t<
@@ -672,6 +698,13 @@ struct validate_t
                 );
     }
 
+    /**
+     *  @brief Validate existance of a member
+     *  @param a Object to validate
+     *  @param member Member descriptor
+     *  @param b Boolean flag, when true check if member exists, when false check if member does not exist
+     *  @return Validation status
+     */
     template <typename T1, typename T2, typename OpT, typename PropT, typename MemberT>
     constexpr static bool invoke(T1&& a, MemberT&& member, PropT&&, OpT&&, T2&& b,
                                  std::enable_if_t<std::is_same<exists_t,typename std::decay<OpT>::type>::value,
@@ -695,10 +728,21 @@ struct validate_t
         )(std::forward<T1>(a),member.path);
     }
 
+    /**
+     *  @brief Normal validation of a member
+     *  @param a Object to validate
+     *  @param member Member descriptor
+     *  @param prop Property to validate
+     *  @param op Operator for validation
+     *  @param b Reference argument for validation
+     *  @return Validation status
+     */
     template <typename T1, typename T2, typename OpT, typename PropT, typename MemberT>
     constexpr static bool invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
                                  std::enable_if_t<
-                                   (!hana::is_a<member_tag,T2> && !hana::is_a<master_reference_tag,T2> && !std::is_same<exists_t,typename std::decay<OpT>::type>::value),
+                                   (!hana::is_a<member_tag,T2> &&
+                                    !hana::is_a<master_reference_tag,T2> &&
+                                    !std::is_same<exists_t,typename std::decay<OpT>::type>::value),
                                    void*
                                  > =nullptr
                                 )
@@ -710,6 +754,15 @@ struct validate_t
                 );
     }
 
+    /**
+     *  @brief Validate using other member of the same object as a reference argument for validation
+     *  @param a Object to validate
+     *  @param member Member descriptor
+     *  @param prop Property to validate
+     *  @param op Operator for validation
+     *  @param b Descriptor of reference member of the same object
+     *  @return Validation status
+     */
     template <typename T1, typename T2, typename OpT, typename PropT, typename MemberT>
     constexpr static bool invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
                                  std::enable_if_t<
@@ -725,6 +778,15 @@ struct validate_t
                 );
     }
 
+    /**
+     *  @brief Validate using the same member of a reference object
+     *  @param a Object to validate
+     *  @param member Member descriptor
+     *  @param prop Property to validate
+     *  @param op Operator for validation
+     *  @param b Reference object whose member to use as argument passed to validation operator
+     *  @return Validation status
+     */
     template <typename T1, typename T2, typename OpT, typename PropT, typename MemberT>
     constexpr static bool invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
                                  std::enable_if_t<
