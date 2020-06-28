@@ -19,7 +19,15 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_CONFIG_HPP
 #define DRACOSHA_VALIDATOR_CONFIG_HPP
 
+#include <boost/hana.hpp>
+
 #define DRACOSHA_VALIDATOR_NAMESPACE_BEGIN namespace dracosha { namespace validator {
 #define DRACOSHA_VALIDATOR_NAMESPACE_END }}
+
+DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+
+namespace hana=boost::hana;
+
+DRACOSHA_VALIDATOR_NAMESPACE_END
 
 #endif // DRACOSHA_VALIDATOR_CONFIG_HPP

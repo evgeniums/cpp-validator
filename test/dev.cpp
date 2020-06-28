@@ -403,36 +403,36 @@ BOOST_AUTO_TEST_CASE(CheckContainsCompileTime)
     constexpr auto m1_c=hana::make_type(m1);
     constexpr auto m3_c=hana::make_type(m3);
 
-    BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(hana::sfinae(contains_c)(m1_c,hana::front(chain1_c))));
+    BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(hana::sfinae(check_member)(m1_c,hana::front(chain1_c))));
     BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(
-        hana::monadic_fold_left<hana::optional_tag>(chain1_c,m1_c,hana::sfinae(contains_c))
+        hana::monadic_fold_left<hana::optional_tag>(chain1_c,m1_c,hana::sfinae(check_member))
         )
     );
     BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(
-            hana::monadic_fold_left<hana::optional_tag>(chain2_c,m3_c,hana::sfinae(contains_c))
+            hana::monadic_fold_left<hana::optional_tag>(chain2_c,m3_c,hana::sfinae(check_member))
         )
     );
     BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(
-            hana::monadic_fold_left<hana::optional_tag>(chain2_c,m1_c,hana::sfinae(contains_c))
+            hana::monadic_fold_left<hana::optional_tag>(chain2_c,m1_c,hana::sfinae(check_member))
         )
     );
     BOOST_HANA_CONSTANT_CHECK(hana::is_nothing(
-            hana::monadic_fold_left<hana::optional_tag>(chain3_c,m1_c,hana::sfinae(contains_c))
+            hana::monadic_fold_left<hana::optional_tag>(chain3_c,m1_c,hana::sfinae(check_member))
         )
     );
     BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(
-            hana::monadic_fold_left<hana::optional_tag>(chain4_c,m1_c,hana::sfinae(contains_c))
+            hana::monadic_fold_left<hana::optional_tag>(chain4_c,m1_c,hana::sfinae(check_member))
         )
     );
 
     Bbb m4;
     constexpr auto m4_c=hana::make_type(m4);
     BOOST_HANA_CONSTANT_CHECK(hana::is_nothing(
-            hana::monadic_fold_left<hana::optional_tag>(chain4_c,m4_c,hana::sfinae(contains_c))
+            hana::monadic_fold_left<hana::optional_tag>(chain4_c,m4_c,hana::sfinae(check_member))
         )
     );
     BOOST_HANA_CONSTANT_CHECK(hana::is_nothing(
-            hana::monadic_fold_left<hana::optional_tag>(chain1_c,m4_c,hana::sfinae(contains_c))
+            hana::monadic_fold_left<hana::optional_tag>(chain1_c,m4_c,hana::sfinae(check_member))
         )
     );
 

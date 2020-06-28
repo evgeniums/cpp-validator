@@ -43,7 +43,7 @@ Distributed under the Boost Software License, Version 1.0.
 //! Macro expanding to the full version of the library, in hexadecimal
 //! representation.
 #define DRACOSHA_VALIDATOR_VERSION                                                  \
-    DRACOSHA_VALIDATOR_CONFIG_VERSION(DRACOSHA_VALIDATOR_MAJOR_VERSION,                     \
+    DRACOSHA_VALIDATOR_CONFIG_VERSION(DRACOSHA_VALIDATOR_MAJOR_VERSION,             \
                               DRACOSHA_VALIDATOR_MINOR_VERSION,                     \
                               DRACOSHA_VALIDATOR_PATCH_VERSION)                     \
 

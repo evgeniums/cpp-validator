@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/check_has_method.hpp
+/** \file validator/detail/has_method.hpp
 *
 *  Defines utilities to check if class has a specific method.
 *  Supports methods at(key), has(key), contains(key), find(key), isSet(key) and brackets operator [key].
@@ -17,14 +17,10 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_CHECK_HAS_METHOD_HPP
-#define DRACOSHA_VALIDATOR_CHECK_HAS_METHOD_HPP
-
-#include <boost/hana.hpp>
+#ifndef DRACOSHA_VALIDATOR_HAS_METHOD_HPP
+#define DRACOSHA_VALIDATOR_HAS_METHOD_HPP
 
 #include <dracosha/validator/config.hpp>
-
-namespace hana=boost::hana;
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -71,4 +67,4 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto has_isSet_c = hana::is_valid([](auto v, auto x)
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_CHECK_HAS_METHOD_HPP
+#endif // DRACOSHA_VALIDATOR_HAS_METHOD_HPP

@@ -22,11 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <string>
 #include <type_traits>
 
-#include <boost/hana.hpp>
-
 #include <dracosha/validator/config.hpp>
-
-namespace hana=boost::hana;
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

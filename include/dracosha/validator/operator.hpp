@@ -22,15 +22,16 @@ Distributed under the Boost Software License, Version 1.0.
 #include <string>
 #include <type_traits>
 
-#include <boost/hana.hpp>
-
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/scalar_compare.hpp>
 #include <dracosha/validator/adjust_storable_type.hpp>
-#include <dracosha/validator/detail/check_has_method.hpp>
-
-namespace hana=boost::hana;
-using namespace hana::literals;
+#include <dracosha/validator/detail/has_method.hpp>
+#include <dracosha/validator/property.hpp>
+#include <dracosha/validator/can_get.hpp>
+#include <dracosha/validator/get.hpp>
+#include <dracosha/validator/can_check_contains.hpp>
+#include <dracosha/validator/contains.hpp>
+#include <dracosha/validator/check_member.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -54,238 +55,6 @@ struct gte_t : public op
     }
 };
 constexpr gte_t gte{};
-
-//-------------------------------------------------------------
-struct property_tag;
-
-namespace detail
-{
-template <typename T,typename PropT, typename = hana::when<true>>
-struct has_property_t
-{
-};
-template <typename T,typename PropT>
-struct has_property_t<T,PropT,hana::when<hana::is_a<property_tag,PropT>>>
-{
-    constexpr bool operator() () const
-    {
-        return std::decay<PropT>::type::template has<T>();
-    }
-};
-template <typename T,typename PropT>
-struct has_property_t<T,PropT,hana::when<!hana::is_a<property_tag,PropT>>>
-{
-    constexpr bool operator() () const
-    {
-        return false;
-    }
-};
-}
-template <typename T,typename PropT>
-constexpr detail::has_property_t<T,PropT> has_property{};
-
-BOOST_HANA_CONSTEXPR_LAMBDA auto has_property_c=[](auto a, auto b)
-{
-    return has_property<decltype(a),decltype(b)>();
-};
-
-BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> decltype(auto)
-{
-    return std::decay<decltype(prop)>::type::get(std::forward<decltype(val)>(val));
-};
-
-//-------------------------------------------------------------
-
-template <typename T1, typename T2, typename =hana::when<true>>
-struct can_get_t
-{
-};
-template <typename T1, typename T2>
-struct can_get_t<T1,T2,hana::when<!hana::is_a<property_tag,T2>>>
-{
-    constexpr bool operator () () const
-    {
-        return detail::has_at_c(hana::type_c<T1>,hana::type_c<T2>)
-               ||
-               detail::has_brackets_c(hana::type_c<T1>,hana::type_c<T2>);
-    }
-
-    constexpr static bool property()
-    {
-        return false;
-    }
-
-    constexpr static bool brackets()
-    {
-        return detail::has_brackets_c(hana::type_c<T1>,hana::type_c<T2>);
-    }
-
-    constexpr static bool at()
-    {
-        return detail::has_at_c(hana::type_c<T1>,hana::type_c<T2>);
-    }
-};
-
-template <typename T1, typename T2>
-struct can_get_t<T1,T2,hana::when<hana::is_a<property_tag,T2>>>
-{
-    constexpr bool operator () () const
-    {
-        return has_property<T1,T2>();
-    }
-
-    constexpr static bool property()
-    {
-        return has_property<T1,T2>();
-    }
-
-    constexpr static bool brackets()
-    {
-        return false;
-    }
-
-    constexpr static bool at()
-    {
-        return false;
-    }
-};
-template <typename T1, typename T2>
-constexpr can_get_t<T1,T2> can_get{};
-
-namespace detail
-{
-template <typename T1, typename T2, typename=hana::when<true>>
-struct get_t
-{
-};
-template <typename T1, typename T2>
-struct get_t<T1,T2,hana::when<can_get<T1,T2>.property()>>
-{
-    auto operator () (T1&& v, T2&& k) const -> decltype(auto)
-    {
-        return property(std::forward<T1>(v),std::forward<T2>(k));
-    }
-};
-template <typename T1, typename T2>
-struct get_t<T1,T2,hana::when<can_get<T1,T2>.at() && !can_get<T1,T2>.property()>>
-{
-    auto operator () (T1&& v, T2&& k) const -> decltype(auto)
-    {
-      return v.at(std::forward<T2>(k));
-    }
-};
-template <typename T1, typename T2>
-struct get_t<T1,T2,hana::when<can_get<T1,T2>.brackets() && !can_get<T1,T2>.at() && !can_get<T1,T2>.property()>>
-{
-    auto operator () (T1&& v, T2&& k) const -> decltype(auto)
-    {
-      return v[std::forward<T2>(k)];
-    }
-};
-template <typename T1, typename T2>
-constexpr get_t<T1,T2> get_c{};
-}
-
-BOOST_HANA_CONSTEXPR_LAMBDA auto get=[](auto&& v, auto&& k) -> decltype(auto)
-{
-    return detail::get_c<decltype(v),decltype(k)>(std::forward<decltype(v)>(v),std::forward<decltype(k)>(k));
-};
-
-//-------------------------------------------------------------
-
-template <typename T1, typename T2>
-struct can_check_contains_t
-{
-    constexpr bool operator () () const
-    {
-        return detail::has_find_c(hana::type_c<T1>,hana::type_c<T2>)
-                ||
-               detail::has_has_c(hana::type_c<T1>,hana::type_c<T2>)
-                ||
-               detail::has_contains_c(hana::type_c<T1>,hana::type_c<T2>)
-                ||
-               detail::has_isSet_c(hana::type_c<T1>,hana::type_c<T2>)
-                ||
-               (hana::is_a<property_tag,T2> && has_property<T1,T2>());
-    }
-};
-template <typename T1, typename T2>
-constexpr can_check_contains_t<T1,T2> can_check_contains{};
-
-namespace detail
-{
-    template <typename T1, typename T2, typename=hana::when<true>>
-    struct contains_c
-    {
-    };
-    template <typename T1, typename T2>
-    struct contains_c<T1,T2,hana::when<can_check_contains<T1,T2>() && can_get<T1,T2>.property()>>
-    {
-        using type=typename std::decay<decltype(property(std::declval<T1>(),std::declval<T2>()))>::type;
-    };
-    template <typename T1, typename T2>
-    struct contains_c<T1,T2,hana::when<can_check_contains<T1,T2>() && can_get<T1,T2>.at() && !can_get<T1,T2>.property()>>
-    {
-        using type=typename std::decay<decltype(std::declval<T1>().at(std::declval<T2>()))>::type;
-    };
-    template <typename T1, typename T2>
-    struct contains_c<T1,T2,hana::when<can_check_contains<T1,T2>() && can_get<T1,T2>.brackets() && !can_get<T1,T2>.at() && !can_get<T1,T2>.property()>>
-    {
-        using type=typename std::decay<decltype(std::declval<T1>()[std::declval<T2>()])>::type;
-    };
-}
-
-using contains_c_t = hana::metafunction_t<detail::contains_c>;
-contains_c_t contains_c{};
-
-struct contains_t
-{
-    template <typename T1, typename T2>
-    constexpr bool operator () (
-                                const T1&,
-                                const T2&,
-                                std::enable_if_t<has_property<T1,T2>(),
-                                                                    void*> =nullptr
-                             ) const
-    {
-        return true;
-    }
-
-    template <typename T1, typename T2>
-    constexpr bool operator () (
-                                const T1& a,
-                                const T2& b,
-                                std::enable_if_t<!has_property<T1,T2>() && can_check_contains<T1,T2>(),
-                                                                    void*> =nullptr
-                             ) const
-    {
-        return hana::if_(detail::has_find(a,b),
-            [](auto&& a1, auto&& b1) { return a1.find(std::forward<decltype(b1)>(b1))!=a1.end(); },
-            hana::if_(detail::has_has(a,b),
-                [](auto&& a1, auto&& b1) { return a1.has(b1); },
-                hana::if_(detail::has_contains(a,b),
-                    [](auto&& a1, auto&& b1) { return a1.contains(b1); },
-                        hana::if_(detail::has_isSet(a,b),
-                            [](auto&& a1, auto&& b1) { return a1.isSet(b1); },
-                            [](auto&&, auto&&) { return false; }
-                        )
-                    )
-                )
-        )(std::forward<decltype(a)>(a),std::forward<decltype(b)>(b));
-    }
-
-    template <typename T1, typename T2>
-    constexpr bool operator () (
-                                const T1&,
-                                const T2&,
-                                std::enable_if_t<!can_check_contains<T1,T2>(),
-                                                                    void*> =nullptr
-                             ) const
-    {
-        return false;
-    }
-};
-constexpr contains_t contains{};
 
 //-------------------------------------------------------------
 
@@ -357,60 +126,6 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto extract = [](auto&& v) ->decltype(auto)
 
 struct member_tag;
 struct master_reference_tag;
-
-#define DRACOSHA_VALIDATOR_HAS_PROPERTY_FN(val,prop) hana::is_valid([](auto&& v) -> decltype((void)v.prop()){})(val)
-#define DRACOSHA_VALIDATOR_HAS_PROPERTY(val,prop) hana::is_valid([](auto&& v) -> decltype((void)v.prop){})(val)
-
-#define DRACOSHA_VALIDATOR_PROPERTY(prop) \
-    auto try_get_##prop =[](auto&& v) -> decltype(auto) \
-    { \
-      return hana::if_(DRACOSHA_VALIDATOR_HAS_PROPERTY_FN(v,prop), \
-        [](auto&& x) -> decltype(auto) { return x.prop(); }, \
-        [](auto&& vv) -> decltype(auto)  { \
-                return hana::if_(DRACOSHA_VALIDATOR_HAS_PROPERTY(vv,prop), \
-                  [](auto&& x) -> decltype(auto) { return x.prop; }, \
-                  [](auto&& x) -> decltype(auto) { return hana::id(std::forward<decltype(x)>(x)); } \
-                )(std::forward<decltype(vv)>(vv)); \
-            } \
-      )(std::forward<decltype(v)>(v)); \
-    }; \
-    BOOST_HANA_CONSTEXPR_LAMBDA auto has_fn_##prop = hana::is_valid([](auto v) -> decltype( \
-                                                                        (void)hana::traits::declval(v).prop() \
-                                                                    ) \
-                                                                {}); \
-    BOOST_HANA_CONSTEXPR_LAMBDA auto has_##prop = hana::is_valid([](auto v) -> decltype( \
-                                                                        (void)hana::traits::declval(v).prop \
-                                                                    ) \
-                                                                {}); \
-    struct type_p_##prop \
-    { \
-        using hana_tag=property_tag; \
-        template <typename T> \
-        constexpr static auto get(T&& v) -> decltype(auto) \
-        { \
-            return try_get_##prop(std::forward<T>(v)); \
-        } \
-        template <typename ...Args> \
-        constexpr auto operator () (Args&&... args) const -> decltype(auto); \
-        template <typename T> \
-        constexpr static bool has() \
-        { \
-            return hana::if_( \
-                        has_fn_##prop(hana::template type_c<T>), \
-                            true, \
-                            hana::if_( \
-                                has_##prop(hana::template type_c<T>), \
-                                    true, \
-                                    false \
-                        )); \
-        } \
-    }; \
-    constexpr type_p_##prop prop{}; \
-    template <typename ...Args> \
-    constexpr auto type_p_##prop::operator () (Args&&... args) const -> decltype(auto)\
-    { \
-        return prepare_validate(prop,std::forward<Args>(args)...); \
-    }
 
 //-------------------------------------------------------------
 /**
@@ -508,7 +223,7 @@ struct validate_t
         auto path_c=hana::transform(member.path,hana::make_type);
         auto a_c=hana::type_c<decltype(a)>;
 
-        return hana::if_(hana::is_nothing(hana::monadic_fold_left<hana::optional_tag>(path_c,a_c,hana::sfinae(contains_c))),
+        return hana::if_(hana::is_nothing(hana::monadic_fold_left<hana::optional_tag>(path_c,a_c,hana::sfinae(check_member))),
             [&b](auto&&, auto&&)
             {
                 return b==false;

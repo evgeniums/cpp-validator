@@ -23,8 +23,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 
-namespace hana=boost::hana;
-
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
@@ -197,7 +195,7 @@ struct compare<LeftT, RightT,
 };
 
 /**
- * @brief Compare values when at least one of them is of scalar type
+ * @brief Compare two values when at least one of them is of scalar type
  */
 template <typename LeftT, typename RightT>
 struct compare<LeftT, RightT,
