@@ -8,38 +8,35 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operator.hpp
+/** \file validator/make_validator.hpp
 *
-*  Defines base operator
+*  Defines creator of validator implementation instance
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_OPERATOR_HPP
-#define DRACOSHA_VALIDATOR_OPERATOR_HPP
+#ifndef DRACOSHA_VALIDATOR_MAKE_HPP
+#define DRACOSHA_VALIDATOR_MAKE_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/detail/validator_impl.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
 /**
- * @brief Tag for all operator clases
- */
-struct operator_tag;
-
-/**
- * @brief Base operator class
- */
-struct op
+  @brief Create validator implementation instance
+  @param fn Validation handler that will be held in validator instance
+*/
+BOOST_HANA_CONSTEXPR_LAMBDA auto make_validator = [](auto fn)
 {
-    using hana_tag=operator_tag;
+    return detail::validator_impl<decltype(fn)>(std::move(fn));
 };
 
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_OPERATOR_HPP
+#endif // DRACOSHA_VALIDATOR_MAKE_HPP

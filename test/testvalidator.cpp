@@ -12,11 +12,11 @@ namespace hana = boost::hana;
 namespace cppvalidator
 {
 
-struct invokable_tag;
+struct lazy_tag;
 template <typename T>
-struct invokable_t
+struct lazy_t
 {
-    using hana_tag=invokable_tag;
+    using hana_tag=lazy_tag;
     T fn;
 
     auto operator()() const -> decltype(fn())
@@ -26,15 +26,15 @@ struct invokable_t
 };
 
 template <typename T>
-auto invokable(T&& fn) -> invokable_t<T>
+auto lazy(T&& fn) -> lazy_t<T>
 {
-    return invokable_t<T>{std::forward<T>(fn)};
+    return lazy_t<T>{std::forward<T>(fn)};
 }
 
 template <typename T>
 auto val(T&& v)
 {
-  return hana::if_(hana::is_a<invokable_tag,T>,
+  return hana::if_(hana::is_a<lazy_tag,T>,
     [](auto&& x) { return x(); },
     [](auto&& x) { return hana::id(std::forward<decltype(x)>(x)); }
   )(std::forward<T>(v));
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
     BOOST_CHECK(!v1(val2));
     BOOST_CHECK(v1(val3));
     BOOST_CHECK(v1(
-            vld::invokable(
+            vld::lazy(
                 [](){return 30;}
             )
         ));
@@ -193,11 +193,11 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
     auto v2=vld::validator(
                     vld::p_value,
                     vld::gte,
-                    vld::invokable(
+                    vld::lazy(
                         [&count](){return count;}
                     )
                 );
-    auto fn2=vld::invokable(
+    auto fn2=vld::lazy(
                 [&count](){return count+5;}
             );
 
@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
     auto v4=vld::property_validator(
                     vld::p_value,
                     vld::gte,
-                    vld::invokable(
+                    vld::lazy(
                         []()
                         {
                             return std::string("Hi");
@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
     BOOST_CHECK(!v4(hello));
     auto samplestr=std::string("How are you?");
     BOOST_CHECK(v4(
-                    vld::invokable(
+                    vld::lazy(
                         [&samplestr]()
                         {
                             return samplestr;
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
     auto v5=vld::validator(
                     vld::p_size,
                     vld::gte,
-                    vld::invokable(
+                    vld::lazy(
                         [&count]()
                         {
                             return count;
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
                 );
     BOOST_CHECK(!v5(hello));
     BOOST_CHECK(v5(
-                    vld::invokable(
+                    vld::lazy(
                         []()
                         {
                             return std::string("aaaaaaaaaaaaaaaaaaaa");
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE(CheckScalarValue)
                 ));
     count=30;
     BOOST_CHECK(!v5(
-                    vld::invokable(
+                    vld::lazy(
                         []()
                         {
                             return std::string("aaaaaaaaaaaaaaaaaaaa");

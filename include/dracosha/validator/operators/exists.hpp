@@ -8,38 +8,40 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operator.hpp
+/** \file validator/operators/exists.hpp
 *
-*  Defines base operator
+*  Defines operator "exists"
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_OPERATOR_HPP
-#define DRACOSHA_VALIDATOR_OPERATOR_HPP
+#ifndef DRACOSHA_VALIDATOR_EXISTS_HPP
+#define DRACOSHA_VALIDATOR_EXISTS_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/operator.hpp>
+#include <dracosha/validator/check_exists.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
 /**
- * @brief Tag for all operator clases
+ * @brief Operator to check if member exists in object
  */
-struct operator_tag;
-
-/**
- * @brief Base operator class
- */
-struct op
+struct exists_t : public op
 {
-    using hana_tag=operator_tag;
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b) const
+    {
+        return check_exists(a,b);
+    }
 };
+constexpr exists_t exists{};
 
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_OPERATOR_HPP
+#endif // DRACOSHA_VALIDATOR_EXISTS_HPP

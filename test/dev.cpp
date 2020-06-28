@@ -4,7 +4,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/operator.hpp>
+#include <dracosha/validator/validator.hpp>
 
 using namespace dracosha::validator;
 
@@ -47,9 +47,9 @@ BOOST_AUTO_TEST_CASE(CheckGteOperator)
     BOOST_CHECK(validate(10,gte,10));
     BOOST_CHECK(!validate(5,gte,10));
 
-    BOOST_CHECK(validate(invokable([](){return 10;}),gte,invokable([](){return 5;})));
-    BOOST_CHECK(validate(invokable([](){return 10;}),gte,invokable([](){return 10;})));
-    BOOST_CHECK(!validate(invokable([](){return 5;}),gte,invokable([](){return 10;})));
+    BOOST_CHECK(validate(lazy([](){return 10;}),gte,lazy([](){return 5;})));
+    BOOST_CHECK(validate(lazy([](){return 10;}),gte,lazy([](){return 10;})));
+    BOOST_CHECK(!validate(lazy([](){return 5;}),gte,lazy([](){return 10;})));
 }
 
 struct Aaa
@@ -127,16 +127,16 @@ BOOST_AUTO_TEST_CASE(CheckAggregate)
     BOOST_CHECK(apply(str1,v1));
 
     auto and_tuple=hana::make_tuple(v1,v2);
-    BOOST_CHECK(aggregate_and(str1,and_tuple));
-    BOOST_CHECK(aggregate_or(str1,and_tuple));
+    BOOST_CHECK(detail::aggregate_and(str1,and_tuple));
+    BOOST_CHECK(detail::aggregate_or(str1,and_tuple));
 
     std::string str2("00000000");
-    BOOST_CHECK(!aggregate_and(str2,and_tuple));
-    BOOST_CHECK(aggregate_or(str2,and_tuple));
+    BOOST_CHECK(!detail::aggregate_and(str2,and_tuple));
+    BOOST_CHECK(detail::aggregate_or(str2,and_tuple));
 
     std::string str3("000");
-    BOOST_CHECK(!aggregate_and(str3,and_tuple));
-    BOOST_CHECK(!aggregate_or(str3,and_tuple));
+    BOOST_CHECK(!detail::aggregate_and(str3,and_tuple));
+    BOOST_CHECK(!detail::aggregate_or(str3,and_tuple));
 }
 
 BOOST_AUTO_TEST_CASE(CheckLogicalAndOr)

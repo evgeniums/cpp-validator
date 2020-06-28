@@ -8,38 +8,29 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operator.hpp
+/** \file validator/properties/size.hpp
 *
-*  Defines base operator
+*  Defines "empty" property
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_OPERATOR_HPP
-#define DRACOSHA_VALIDATOR_OPERATOR_HPP
+#ifndef DRACOSHA_VALIDATOR_EMPTY_HPP
+#define DRACOSHA_VALIDATOR_EMPTY_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/property.hpp>
+#include <dracosha/validator/prepare_validate.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-/**
- * @brief Tag for all operator clases
- */
-struct operator_tag;
-
-/**
- * @brief Base operator class
- */
-struct op
-{
-    using hana_tag=operator_tag;
-};
+DRACOSHA_VALIDATOR_PROPERTY(empty)
 
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_OPERATOR_HPP
+#endif // DRACOSHA_VALIDATOR_EMPTY_HPP
