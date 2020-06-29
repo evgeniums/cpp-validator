@@ -37,8 +37,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/lazy.hpp>
 #include <dracosha/validator/extract.hpp>
 #include <dracosha/validator/get_member.hpp>
-#include <dracosha/validator/validate.hpp>
-#include <dracosha/validator/prepare_validate.hpp>
+#include <dracosha/validator/dispatcher.hpp>
+#include <dracosha/validator/prepare_dispatcher.hpp>
 #include <dracosha/validator/properties/value.hpp>
 #include <dracosha/validator/properties/empty.hpp>
 #include <dracosha/validator/properties/size.hpp>

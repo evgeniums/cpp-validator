@@ -25,9 +25,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/adjust_storable_type.hpp>
 #include <dracosha/validator/tuple_to_variadic.hpp>
 #include <dracosha/validator/apply.hpp>
-#include <dracosha/validator/validate.hpp>
+#include <dracosha/validator/dispatcher.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+
+struct member_tag;
 
 /**
  * @brief Format a path as string with dot separated levels

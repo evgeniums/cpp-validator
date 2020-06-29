@@ -1,0 +1,90 @@
+/**
+@copyright Evgeny Sidorov 2020
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
+
+*/
+
+/****************************************************************************/
+
+/** \file validator/dispatcher.hpp
+*
+*  Defines validation dispatcher
+*
+*/
+
+/****************************************************************************/
+
+#ifndef DRACOSHA_VALIDATOR_DISPATCHER_HPP
+#define DRACOSHA_VALIDATOR_DISPATCHER_HPP
+
+#include <type_traits>
+
+#include <dracosha/validator/config.hpp>
+#include <dracosha/validator/property.hpp>
+#include <dracosha/validator/extract.hpp>
+#include <dracosha/validator/check_member.hpp>
+#include <dracosha/validator/get_member.hpp>
+#include <dracosha/validator/operators/exists.hpp>
+#include <dracosha/validator/adapter.hpp>
+#include <dracosha/validator/detail/dispatcher_impl.hpp>
+
+DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+
+//-------------------------------------------------------------
+
+/**
+ * @brief Dispatcher that dispatches validating requests to corresponding methods of supplied adapter
+ */
+struct dispatcher_t
+{
+    /**
+     *  @brief Perform validation of object at one level without member nesting
+     *  @param a Object to validate
+     *  @param args Validation arguments
+     *  @return Validation status
+     */
+    template <typename T1, typename ...Args>
+    constexpr bool operator() (T1&& a, Args&&... args) const
+    {
+        return detail::dispatcher_impl<T1>(std::forward<T1>(a),std::forward<Args>(args)...);
+    }
+
+    /**
+     *  @brief Perform validation of object's property at one level without member nesting
+     *  @param prop Property to validate
+     *  @param a Adapter with object to validate
+     *  @param op Operator for validation
+     *  @param b Reference argument for validation
+     *  @return Validation status
+     */
+    template <typename T1, typename T2, typename OpT, typename PropT>
+    constexpr bool operator() (PropT&& prop, T1&& a, OpT&& op, T2&& b) const
+    {
+        return invoke(std::forward<T1>(a),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
+    }
+
+    /**
+     *  @brief Perform validation of object's property at one level without member nesting
+     *  @param prop Property to validate
+     *  @param a Object to validate
+     *  @param args Validation arguments
+     *  @return Validation status
+     */
+    template <typename T1, typename ...Args>
+    constexpr static bool invoke(T1&& a, Args&&... args)
+    {
+        return detail::dispatcher_impl<T1>.invoke(std::forward<T1>(a),std::forward<Args>(args)...);
+    }
+
+    //! \todo validate_and
+    //! \todo validate_or
+};
+constexpr dispatcher_t dispatcher{};
+
+//-------------------------------------------------------------
+
+DRACOSHA_VALIDATOR_NAMESPACE_END
+
+#endif // DRACOSHA_VALIDATOR_DISPATCHER_HPP

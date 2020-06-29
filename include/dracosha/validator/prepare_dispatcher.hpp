@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/prepare_validate.hpp
+/** \file validator/prepare_dispatcher.hpp
 *
 *  Defines helpers for validation preparing
 *
@@ -16,39 +16,39 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_PREPARE_VALIDATE_HPP
-#define DRACOSHA_VALIDATOR_PREPARE_VALIDATE_HPP
+#ifndef DRACOSHA_VALIDATOR_PREPARE_DISPATCHER_HPP
+#define DRACOSHA_VALIDATOR_PREPARE_DISPATCHER_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/validate.hpp>
+#include <dracosha/validator/dispatcher.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
 /**
-  @brief Run validation
+  @brief Dispatch validation
   */
-BOOST_HANA_CONSTEXPR_LAMBDA auto validate_invoke = [](auto&&... args) -> decltype(auto)
+BOOST_HANA_CONSTEXPR_LAMBDA auto dispatch = [](auto&&... args) -> decltype(auto)
 {
-    return validate.invoke(std::forward<decltype(args)>(args)...);
+    return dispatcher.invoke(std::forward<decltype(args)>(args)...);
 };
 
 /**
- * @brief Prepare validation executor
+ * @brief Prepare validation dispatcher
  */
-struct prepare_validate_t
+struct prepare_dispatcher_t
 {
     template <typename ... Args>
     constexpr auto operator() (Args&&... args) const -> decltype(auto)
     {
-        return hana::reverse_partial(validate_invoke,std::forward<Args>(args)...);
+        return hana::reverse_partial(dispatch,std::forward<Args>(args)...);
     }
 };
-constexpr prepare_validate_t prepare_validate{};
+constexpr prepare_dispatcher_t prepare_dispatcher{};
 
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_PREPARE_VALIDATE_HPP
+#endif // DRACOSHA_VALIDATOR_PREPARE_DISPATCHER_HPP

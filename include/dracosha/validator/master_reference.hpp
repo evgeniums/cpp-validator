@@ -22,11 +22,13 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_MASTER_REFERENCE_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/validate.hpp>
+#include <dracosha/validator/dispatcher.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
+
+struct master_reference_tag;
 
 /**
  * @brief Wrapper of master reference object
