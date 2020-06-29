@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(CheckProperty)
     BOOST_CHECK_EQUAL(property(a,size),10);
     BOOST_CHECK(!validate(size,a,gte,100));
 
-    auto check=prepare_validate(size,gte,9);
+    auto check=prepare_dispatcher(size,gte,9);
     BOOST_CHECK(check(a));
 
     auto sz=size(gte,7);
@@ -84,7 +84,6 @@ BOOST_AUTO_TEST_CASE(CheckProperty)
     BOOST_CHECK(val(3));
     BOOST_CHECK(!val(1));
 }
-
 
 BOOST_AUTO_TEST_CASE(CheckGet)
 {
@@ -499,6 +498,7 @@ BOOST_AUTO_TEST_CASE(CheckExistsWithCompileTime)
     Adapter
     Multiple elements
     Check single field
+    Check non copyable objects and keys
 */
 
 BOOST_AUTO_TEST_SUITE_END()

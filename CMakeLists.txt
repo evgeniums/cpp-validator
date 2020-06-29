@@ -19,7 +19,7 @@ SET (HEADERS
     include/dracosha/validator/extract.hpp
     include/dracosha/validator/get_member.hpp
     include/dracosha/validator/validate.hpp
-    include/dracosha/validator/prepare_validate.hpp
+    include/dracosha/validator/prepare_dispatcher.hpp
     include/dracosha/validator/apply.hpp
     include/dracosha/validator/member.hpp
     include/dracosha/validator/master_reference.hpp
@@ -27,6 +27,8 @@ SET (HEADERS
     include/dracosha/validator/or.hpp
     include/dracosha/validator/validator.hpp
     include/dracosha/validator/make_validator.hpp
+    include/dracosha/validator/dispatcher.hpp
+    include/dracosha/validator/adapter.hpp
 
     include/dracosha/validator/operator.hpp
     include/dracosha/validator/operators/exists.hpp
@@ -42,6 +44,7 @@ SET (HEADERS
     include/dracosha/validator/detail/validator_impl.hpp
     include/dracosha/validator/detail/aggregate_and.hpp
     include/dracosha/validator/detail/aggregate_or.hpp
+    include/dracosha/validator/detail/dispatcher_impl.hpp
 
     include/dracosha/validator/impl.hpp
 )
