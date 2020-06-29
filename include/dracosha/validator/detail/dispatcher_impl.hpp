@@ -83,6 +83,13 @@ struct dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>
      */
     template <typename ... Args>
     constexpr static bool validate_or(T1&& obj, Args&&... args);
+
+    /**
+     * @brief Execute validator on object and negate its result using logical NOT
+     * @return Logical NOT of result of intermediate validators
+     */
+    template <typename ... Args>
+    constexpr static bool validate_not(T1&& obj, Args&&... args);
 };
 
 /**
@@ -235,6 +242,16 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     {
         return a.validate_or(std::forward<Args>(args)...);
     }
+
+    /**
+     * @brief Execute validator on object and negate its result using logical NOT
+     * @return Logical NOT of result of intermediate validators
+     */
+    template <typename ... Args>
+    constexpr static bool validate_not(T1&& a, Args&&... args)
+    {
+        return a.validate_not(std::forward<Args>(args)...);
+    }
 };
 
 template <typename T1>
@@ -270,6 +287,14 @@ constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::va
 {
     using adapter_t=adapter<typename std::decay<T1>::type>;
     return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>.validate_or(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
+}
+
+template <typename T1>
+template <typename ...Args>
+constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_not(T1&& obj, Args&&... args)
+{
+    using adapter_t=adapter<typename std::decay<T1>::type>;
+    return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>.validate_not(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
 }
 
 }

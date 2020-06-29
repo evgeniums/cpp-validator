@@ -20,7 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_EXISTS_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/operator.hpp>
+#include <dracosha/validator/operators/operator.hpp>
 #include <dracosha/validator/check_exists.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN

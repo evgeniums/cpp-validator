@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/check_member.hpp>
 #include <dracosha/validator/get_member.hpp>
 #include <dracosha/validator/operators/exists.hpp>
-#include <dracosha/validator/adapter.hpp>
+#include <dracosha/validator/adapters/adapter.hpp>
 #include <dracosha/validator/detail/dispatcher_impl.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -99,6 +99,18 @@ struct dispatcher_t
     constexpr static bool validate_or(T1&& a, Args&&... args)
     {
         return detail::dispatcher_impl<T1>.validate_or(std::forward<T1>(a),std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Execute validator on object and negate its result using logical NOT
+     * @param a Object to validate
+     * @param args Validation arguments
+     * @return Logical NOT of result of intermediate validator
+     */
+    template <typename T1, typename ...Args>
+    constexpr static bool validate_not(T1&& a, Args&&... args)
+    {
+        return detail::dispatcher_impl<T1>.validate_not(std::forward<T1>(a),std::forward<Args>(args)...);
     }
 };
 constexpr dispatcher_t dispatcher{};

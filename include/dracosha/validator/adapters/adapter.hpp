@@ -244,6 +244,29 @@ struct adapter
                     }
                 );
     }
+
+    /**
+     * @brief Execute validator on object and negate the result
+     * @param op Intermediate validator or validation operator
+     * @return Logical NOT of results of intermediate validator
+     */
+    template <typename OpT>
+    bool validate_not(OpT&& op) const
+    {
+        return !apply(obj,std::forward<decltype(op)>(op));
+    }
+
+    /**
+     * @brief Execute validator on object's member and negate the result
+     * @param member Member to process with validator
+     * @param op Intermediate validator or validation operator
+     * @return Logical NOT of results of intermediate validator
+     */
+    template <typename OpT, typename MemberT>
+    bool validate_not(MemberT&& member,OpT&& op) const
+    {
+        return !apply_member(obj,std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
+    }
 };
 
 //-------------------------------------------------------------

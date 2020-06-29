@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operator.hpp
+/** \file validator/operators/operator.hpp
 *
 *  Defines templates to adjust types to be used as storable elements in tuples.
 *

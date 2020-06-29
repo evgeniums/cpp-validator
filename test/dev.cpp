@@ -495,12 +495,76 @@ BOOST_AUTO_TEST_CASE(CheckExistsWithCompileTime)
     );
     BOOST_CHECK(v1.apply(m3));
 
-//    auto v05=_["first_map"][10][size](gte,10);
-//    BOOST_CHECK(!v05.apply(m3));
-
     std::vector<int> vec1={10,20,30,40,50};
     auto v06=_[3](exists,true);
     BOOST_CHECK(!v06.apply(vec1));
+}
+
+BOOST_AUTO_TEST_CASE(CheckNot)
+{
+    auto v1=value(gte,"abcd");
+    auto v2=_[size](gte,5);
+
+    std::string str1("abcdef");
+    std::string str2("012");
+
+    BOOST_CHECK(!detail::logical_not(str1,v1));
+    BOOST_CHECK(!detail::logical_not(str1,v2));
+
+    auto not1=NOT(v1);
+    auto not2=NOT(v2);
+
+    BOOST_CHECK(!not1.apply(str1));
+    BOOST_CHECK(!not2.apply(str1));
+    BOOST_CHECK(not1.apply(str2));
+    BOOST_CHECK(not2.apply(str2));
+
+    std::map<std::string,std::string> m;
+    m["one"]="one_value";
+    m["two"]="two_value";
+    m["three"]="three_value";
+    m["four"]="four_value";
+    m["five"]="five_value";
+
+    auto v03=_["one"](gte,"on");
+    auto v0=NOT(v03);
+    BOOST_CHECK(!v0.apply(m));
+
+    auto v3=validator(
+            _[size](gte,5),
+            _["one"](gte,"one_v"),
+            _["two"](gte,"t"),
+            _["four"](value(gte,"four_val")),
+            _["five"](NOT(size(gte,100)))
+            );
+    BOOST_CHECK(v3.apply(m));
+
+    auto v4=validator(
+            NOT(
+                AND(
+                    _[size](gte,5),
+                    _["one"](gte,"one_v"),
+                    _["two"](gte,"t"),
+                    _["four"](value(gte,"four_val")),
+                    _["five"](NOT(size(gte,100)))
+                )
+            )
+            );
+    BOOST_CHECK(!v4.apply(m));
+
+    auto v5=validator(
+            NOT(
+                _[size](gte,5),
+                _["one"](gte,"one_v"),
+                _["two"](gte,"t"),
+                _["four"](value(gte,"four_val")),
+                _["five"](NOT(size(gte,100)))
+            )
+            );
+    BOOST_CHECK(!v5.apply(m));
+
+    auto v6=NOT(v5);
+    BOOST_CHECK(v6.apply(m));
 }
 
 /**
