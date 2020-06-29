@@ -8,9 +8,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operator.hpp
+/** \file validator/check_exists.hpp
 *
-*  Defines base operator classes
+*  Defines helpers for checking existance of member in an object
 *
 */
 
@@ -21,31 +21,38 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/get.hpp>
-#include <dracosha/validator/contains.hpp>
-#include <dracosha/validator/check_member.hpp>
+#include <dracosha/validator/detail/take_address_of.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-namespace detail
-{
+/**
+  @brief Extract member from object
+  @param obj Object under test
+  @param key Key for member lookup
+  @return Operation result, see comments below.
 
-template <typename T>
-constexpr auto take_address_of(T&& t) -> decltype(&t)
-{
-    return &t;
-}
-
-BOOST_HANA_CONSTEXPR_LAMBDA auto iterate_exists =[](auto&& obj,auto&& key)
+    If member is found and is of lvalue reference type then address of that member will be returned.
+    If member is found and is not of lvalue reference type then address of stub object will be returned to avoid taking addresses of temporary objects.
+    If member is not found then nullptr will be returned.
+*/
+BOOST_HANA_CONSTEXPR_LAMBDA auto get_member_ptr =[](auto&& obj,auto&& key)
 {
     if (obj && contains(*obj,key))
     {
-        return take_address_of(get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key)));
+        return detail::take_address_of<decltype(get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key)))>
+                (
+                        get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key))
+                    );
     }
-    return decltype(take_address_of(get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key))))(nullptr);
+    return decltype(
+                detail::take_address_of<decltype(get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key)))>
+                                (
+                                        get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key))
+                                    )
+                )(nullptr);
 };
-}
 
 /**
   @brief Check if member at a given path exist in the object
@@ -57,23 +64,7 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto iterate_exists =[](auto&& obj,auto&& key)
 */
 BOOST_HANA_CONSTEXPR_LAMBDA auto check_exists =[](auto&& obj,auto&& path)
 {
-    return hana::fold(std::forward<decltype(path)>(path),&obj,detail::iterate_exists)!=nullptr;
-};
-
-/**
-  @brief Check if path of types in member descriptor can exist in the object
-  @param obj Object under validation
-  @param path Member path as a tuple
-  @return Validation status
-
-  This operation is expected to be performed statically at compile time.
-*/
-BOOST_HANA_CONSTEXPR_LAMBDA auto check_member_path =[](auto obj,auto path)
-{
-    auto path_c=hana::transform(path,hana::make_type);
-    auto obj_c=hana::type_c<decltype(obj)>;
-
-    return hana::is_nothing(hana::monadic_fold_left<hana::optional_tag>(path_c,obj_c,hana::sfinae(check_member)));
+    return hana::fold(std::forward<decltype(path)>(path),&obj,get_member_ptr)!=nullptr;
 };
 
 //-------------------------------------------------------------

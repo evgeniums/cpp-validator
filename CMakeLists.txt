@@ -29,6 +29,7 @@ SET (HEADERS
     include/dracosha/validator/make_validator.hpp
     include/dracosha/validator/dispatcher.hpp
     include/dracosha/validator/adapter.hpp
+    include/dracosha/validator/check_member_path.hpp
 
     include/dracosha/validator/operator.hpp
     include/dracosha/validator/operators/exists.hpp
@@ -45,6 +46,7 @@ SET (HEADERS
     include/dracosha/validator/detail/aggregate_and.hpp
     include/dracosha/validator/detail/aggregate_or.hpp
     include/dracosha/validator/detail/dispatcher_impl.hpp
+    include/dracosha/validator/detail/take_address_of.hpp
 
     include/dracosha/validator/impl.hpp
 )
