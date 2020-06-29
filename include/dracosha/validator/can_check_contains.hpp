@@ -30,17 +30,19 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename T1, typename T2>
 struct can_check_contains_t
 {
+    constexpr static const bool value = detail::has_find_c(hana::type_c<T1>, hana::type_c<T2>)
+        ||
+        detail::has_has_c(hana::type_c<T1>, hana::type_c<T2>)
+        ||
+        detail::has_contains_c(hana::type_c<T1>, hana::type_c<T2>)
+        ||
+        detail::has_isSet_c(hana::type_c<T1>, hana::type_c<T2>)
+        ||
+        (hana::is_a<property_tag, T2> && has_property<T1, T2>());
+
     constexpr bool operator () () const
     {
-        return detail::has_find_c(hana::type_c<T1>,hana::type_c<T2>)
-                ||
-               detail::has_has_c(hana::type_c<T1>,hana::type_c<T2>)
-                ||
-               detail::has_contains_c(hana::type_c<T1>,hana::type_c<T2>)
-                ||
-               detail::has_isSet_c(hana::type_c<T1>,hana::type_c<T2>)
-                ||
-               (hana::is_a<property_tag,T2> && has_property<T1,T2>());
+        return value;
     }
 };
 

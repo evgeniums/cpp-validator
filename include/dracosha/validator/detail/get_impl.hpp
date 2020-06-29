@@ -27,6 +27,38 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 namespace detail
 {
+
+namespace get_helpers
+{
+    enum class getter : int
+    {
+        property = 1,
+        at = 2,
+        brackets = 3,
+
+        none = -1
+    };
+
+    template <typename T1, typename T2>
+    struct selector
+    {
+        constexpr static const auto value = hana::if_(
+            can_get<T1, T2>.property(),
+            getter::property,
+            hana::if_(
+                can_get<T1, T2>.at(),
+                getter::at,
+                hana::if_(
+                    can_get<T1, T2>.brackets(),
+                    getter::brackets,
+                    getter::none
+                )
+            )
+        );
+    };
+}
+
+
 template <typename T1, typename T2, typename=hana::when<true>>
 struct get_t
 {
@@ -35,7 +67,8 @@ struct get_t
  * Get as property
  */
 template <typename T1, typename T2>
-struct get_t<T1,T2,hana::when<can_get<T1,T2>.property()>>
+struct get_t<T1,T2,
+            hana::when<get_helpers::selector<T1,T2>::value == get_helpers::getter::property>>
 {
     auto operator () (T1&& v, T2&& k) const -> decltype(auto)
     {
@@ -47,7 +80,8 @@ struct get_t<T1,T2,hana::when<can_get<T1,T2>.property()>>
  * Get using at(key) method
  */
 template <typename T1, typename T2>
-struct get_t<T1,T2,hana::when<can_get<T1,T2>.at() && !can_get<T1,T2>.property()>>
+struct get_t<T1,T2,
+    hana::when<get_helpers::selector<T1, T2>::value == get_helpers::getter::at>>
 {
     auto operator () (T1&& v, T2&& k) const -> decltype(auto)
     {
@@ -59,7 +93,8 @@ struct get_t<T1,T2,hana::when<can_get<T1,T2>.at() && !can_get<T1,T2>.property()>
  * Get using [key] operator
  */
 template <typename T1, typename T2>
-struct get_t<T1,T2,hana::when<can_get<T1,T2>.brackets() && !can_get<T1,T2>.at() && !can_get<T1,T2>.property()>>
+struct get_t<T1,T2,
+    hana::when<get_helpers::selector<T1, T2>::value == get_helpers::getter::brackets>>
 {
     auto operator () (T1&& v, T2&& k) const -> decltype(auto)
     {

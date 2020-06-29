@@ -34,17 +34,20 @@ struct check_member_t
 {
 };
 template <typename T1, typename T2>
-struct check_member_t<T1,T2,hana::when<can_check_contains<T1,T2>() && can_get<T1,T2>.property()>>
+struct check_member_t<T1,T2,hana::when<can_check_contains_t<T1,T2>::value
+    && (detail::get_helpers::selector<T1, T2>::value == detail::get_helpers::getter::property)>>
 {
     using type=typename std::decay<decltype(property(std::declval<T1>(),std::declval<T2>()))>::type;
 };
 template <typename T1, typename T2>
-struct check_member_t<T1,T2,hana::when<can_check_contains<T1,T2>() && can_get<T1,T2>.at() && !can_get<T1,T2>.property()>>
+struct check_member_t<T1,T2,hana::when<can_check_contains_t<T1, T2>::value
+    && (detail::get_helpers::selector<T1, T2>::value == detail::get_helpers::getter::at)>>
 {
     using type=typename std::decay<decltype(std::declval<T1>().at(std::declval<T2>()))>::type;
 };
 template <typename T1, typename T2>
-struct check_member_t<T1,T2,hana::when<can_check_contains<T1,T2>() && can_get<T1,T2>.brackets() && !can_get<T1,T2>.at() && !can_get<T1,T2>.property()>>
+struct check_member_t<T1,T2,hana::when<can_check_contains_t<T1, T2>::value
+    && (detail::get_helpers::selector<T1, T2>::value == detail::get_helpers::getter::brackets)>>
 {
     using type=typename std::decay<decltype(std::declval<T1>()[std::declval<T2>()])>::type;
 };

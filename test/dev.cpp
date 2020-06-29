@@ -33,6 +33,14 @@ BOOST_AUTO_TEST_CASE(CheckGetRef)
 {
     std::map<size_t,TestRefStruct> m;
     m.emplace(std::make_pair(1,TestRefStruct()));
+
+    using T1 = decltype(m);
+    using T2 = decltype(1u);
+
+    static_assert(!can_get<T1, T2>.property(),"");
+    static_assert(can_get<T1, T2>.at(), "");
+    static_assert(can_get<T1, T2>.brackets(), "");
+
     const auto& a=get(m,1u);
     std::ignore=a;
 }
@@ -402,6 +410,10 @@ BOOST_AUTO_TEST_CASE(CheckContainsCompileTime)
     constexpr auto m1_c=hana::make_type(m1);
     constexpr auto m3_c=hana::make_type(m3);
 
+    using type = typename check_member_t<decltype(m1),std::string>::type;
+    auto type_c = check_member(hana::type_c<decltype(m1)>,hana::type_c<std::string>);
+    auto type_c1 = check_member(hana::type_c<decltype(m1)>, hana::front(chain1_c));
+
     BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(hana::sfinae(check_member)(m1_c,hana::front(chain1_c))));
     BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(
         hana::monadic_fold_left<hana::optional_tag>(chain1_c,m1_c,hana::sfinae(check_member))
@@ -495,7 +507,6 @@ BOOST_AUTO_TEST_CASE(CheckExistsWithCompileTime)
 @todo
     Configurable abort if not found
     Translation
-    Adapter
     Multiple elements
     Check single field
     Check non copyable objects and keys
