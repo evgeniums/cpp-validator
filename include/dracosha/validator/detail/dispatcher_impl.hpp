@@ -216,14 +216,16 @@ template <typename T1>
 template <typename ...Args>
 constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::operator() (T1&& obj, Args&&... args) const
 {
-    return dispatcher_impl<decltype(adapter(std::forward<T1>(obj)))>(adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
+    using adapter_t=adapter<typename std::decay<T1>::type>;
+    return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
 }
 
 template <typename T1>
 template <typename ...Args>
 constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::invoke(T1&& obj, Args&&... args)
 {
-    return dispatcher_impl<decltype(adapter(std::forward<T1>(obj)))>.invoke(adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
+    using adapter_t=adapter<typename std::decay<T1>::type>;
+    return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>.invoke(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
 }
 
 }
