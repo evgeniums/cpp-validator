@@ -27,6 +27,14 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+
+#ifdef _MSC_VER
+// disable warning about taking address of temporary variable 
+// because take_address_of() takes address only of lvalue reference 
+// which is safe
+#pragma warning(disable:4172)
+#endif
+
 /**
   @brief Extract member from object
   @param obj Object under test
@@ -53,6 +61,10 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto get_member_ptr =[](auto&& obj,auto&& key)
                                     )
                 )(nullptr);
 };
+
+#ifdef _MSC_VER
+#pragma warning(default:4172)
+#endif
 
 /**
   @brief Check if member at a given path exist in the object
