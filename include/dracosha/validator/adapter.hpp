@@ -27,6 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/check_member.hpp>
 #include <dracosha/validator/get_member.hpp>
 #include <dracosha/validator/operators/exists.hpp>
+#include <dracosha/validator/apply.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -157,8 +158,91 @@ struct adapter
                 );
     }
 
-    //! \todo validate_and
-    //! \todo validate_or
+    /**
+     * @brief Execute validators on object and aggregate their results using logical AND
+     * @param ops List of intermediate validators or validation operators
+     * @return Logical AND of results of intermediate validators
+     */
+    template <typename OpsT>
+    bool validate_and(OpsT&& ops) const
+    {
+        return hana::fold(std::forward<decltype(ops)>(ops),true,
+                    [this](bool prevResult, auto&& op)
+                    {
+                        if (!prevResult)
+                        {
+                            return false;
+                        }
+                        return apply(obj,std::forward<decltype(op)>(op));
+                    }
+                );
+    }
+
+    /**
+     * @brief Execute validators on object's member and aggregate their results using logical AND
+     * @param member Member to process with validators
+     * @param ops List of intermediate validators or validation operators
+     * @return Logical AND of results of intermediate validators
+     */
+    template <typename OpsT, typename MemberT>
+    bool validate_and(MemberT&& member,OpsT&& ops) const
+    {
+        return hana::fold(std::forward<decltype(ops)>(ops),true,
+                    [this,&member](bool prevResult, auto&& op)
+                    {
+                        if (!prevResult)
+                        {
+                            return false;
+                        }
+                        return apply_member(obj,std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
+                    }
+                );
+    }
+
+    /**
+     * @brief Execute validators on object and aggregate their results using logical OR
+     * @param ops List of intermediate validators or validation operators
+     * @return Logical OR of results of intermediate validators
+     */
+    template <typename OpsT>
+    constexpr bool validate_or(OpsT&& ops) const
+    {
+        return hana::value(hana::length(ops))==0
+                ||
+               hana::fold(std::forward<decltype(ops)>(ops),false,
+                    [this](bool prevResult, auto&& op)
+                    {
+                        if (prevResult)
+                        {
+                            return true;
+                        }
+                        return apply(obj,std::forward<decltype(op)>(op));
+                    }
+                );
+    }
+
+    /**
+     * @brief Execute validators on object's member and aggregate their results using logical OR
+     * @param member Member to process with validators
+     * @param ops List of intermediate validators or validation operators
+     * @return Logical OR of results of intermediate validators
+     */
+    template <typename OpsT, typename MemberT>
+    constexpr bool validate_or(MemberT&& member,OpsT&& ops) const
+    {
+        return hana::value(hana::length(ops))==0
+                ||
+               hana::fold(std::forward<decltype(ops)>(ops),false,
+                    [this,&member](bool prevResult, auto&& op)
+                    {
+                        if (prevResult)
+                        {
+                            return true;
+                        }
+                        return apply_member(obj,std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
+                    }
+                );
+    }
 };
 
 //-------------------------------------------------------------

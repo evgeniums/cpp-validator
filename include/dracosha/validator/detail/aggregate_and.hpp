@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/apply.hpp>
 #include <dracosha/validator/make_validator.hpp>
+#include <dracosha/validator/dispatcher.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -44,16 +45,7 @@ struct aggregate_and_t
     template <typename T, typename OpsT>
     constexpr bool operator ()(T&& a,OpsT&& ops) const
     {
-        return hana::fold(std::forward<decltype(ops)>(ops),true,
-                    [&a](bool prevResult, auto&& op)
-                    {
-                        if (!prevResult)
-                        {
-                            return false;
-                        }
-                        return apply(std::forward<decltype(a)>(a),std::forward<decltype(op)>(op));
-                    }
-                );
+        return dispatcher.validate_and(std::forward<decltype(a)>(a),std::forward<decltype(ops)>(ops));
     }
 
     /**
@@ -66,16 +58,7 @@ struct aggregate_and_t
     template <typename T, typename OpsT, typename MemberT>
     constexpr bool operator () (T&& a,MemberT&& member,OpsT&& ops) const
     {
-        return hana::fold(std::forward<decltype(ops)>(ops),true,
-                    [&a,&member](bool prevResult, auto&& op)
-                    {
-                        if (!prevResult)
-                        {
-                            return false;
-                        }
-                        return apply_member(std::forward<decltype(a)>(a),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
-                    }
-                );
+        return dispatcher.validate_and(std::forward<decltype(a)>(a),std::forward<decltype(member)>(member),std::forward<decltype(ops)>(ops));
     }
 };
 aggregate_and_t aggregate_and{};

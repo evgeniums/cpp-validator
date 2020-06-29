@@ -67,7 +67,6 @@ struct dispatcher_t
 
     /**
      *  @brief Perform validation of object's property at one level without member nesting
-     *  @param prop Property to validate
      *  @param a Object to validate
      *  @param args Validation arguments
      *  @return Validation status
@@ -78,8 +77,29 @@ struct dispatcher_t
         return detail::dispatcher_impl<T1>.invoke(std::forward<T1>(a),std::forward<Args>(args)...);
     }
 
-    //! \todo validate_and
-    //! \todo validate_or
+    /**
+     * @brief Execute validators on object and aggregate their results using logical AND
+     * @param a Object to validate
+     * @param args Validation arguments
+     * @return Logical AND of results of intermediate validators
+     */
+    template <typename T1, typename ...Args>
+    constexpr static bool validate_and(T1&& a, Args&&... args)
+    {
+        return detail::dispatcher_impl<T1>.validate_and(std::forward<T1>(a),std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Execute validators on object and aggregate their results using logical OR
+     * @param a Object to validate
+     * @param args Validation arguments
+     * @return Logical OR of results of intermediate validators
+     */
+    template <typename T1, typename ...Args>
+    constexpr static bool validate_or(T1&& a, Args&&... args)
+    {
+        return detail::dispatcher_impl<T1>.validate_or(std::forward<T1>(a),std::forward<Args>(args)...);
+    }
 };
 constexpr dispatcher_t dispatcher{};
 

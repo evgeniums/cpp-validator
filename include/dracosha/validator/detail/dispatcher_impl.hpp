@@ -70,8 +70,19 @@ struct dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>
     template <typename ...Args>
     constexpr static bool invoke(T1&& obj, Args&&... args);
 
-    //! \todo validate_and
-    //! \todo validate_or
+    /**
+     * @brief Execute validators on object and aggregate their results using logical AND
+     * @return Logical AND of results of intermediate validators
+     */
+    template <typename ... Args>
+    constexpr static bool validate_and(T1&& obj, Args&&... args);
+
+    /**
+     * @brief Execute validators on object and aggregate their results using logical OR
+     * @return Logical OR of results of intermediate validators
+     */
+    template <typename ... Args>
+    constexpr static bool validate_or(T1&& obj, Args&&... args);
 };
 
 /**
@@ -205,8 +216,25 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
         return a.validate_with_master_reference(std::forward<MemberT>(member),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
     }
 
-    //! \todo validate_and
-    //! \todo validate_or
+    /**
+     * @brief Execute validators on object and aggregate their results using logical AND
+     * @return Logical AND of results of intermediate validators
+     */
+    template <typename ... Args>
+    constexpr static bool validate_and(T1&& a, Args&&... args)
+    {
+        return a.validate_and(std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Execute validators on object and aggregate their results using logical OR
+     * @return Logical OR of results of intermediate validators
+     */
+    template <typename ... Args>
+    constexpr static bool validate_or(T1&& a, Args&&... args)
+    {
+        return a.validate_or(std::forward<Args>(args)...);
+    }
 };
 
 template <typename T1>
@@ -226,6 +254,22 @@ constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::in
 {
     using adapter_t=adapter<typename std::decay<T1>::type>;
     return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>.invoke(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
+}
+
+template <typename T1>
+template <typename ...Args>
+constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_and(T1&& obj, Args&&... args)
+{
+    using adapter_t=adapter<typename std::decay<T1>::type>;
+    return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>.validate_and(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
+}
+
+template <typename T1>
+template <typename ...Args>
+constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_or(T1&& obj, Args&&... args)
+{
+    using adapter_t=adapter<typename std::decay<T1>::type>;
+    return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>.validate_or(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
 }
 
 }
