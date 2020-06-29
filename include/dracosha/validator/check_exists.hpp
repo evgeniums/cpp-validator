@@ -37,6 +37,13 @@ constexpr auto take_address_of(T&& t) -> decltype(&t)
     return &t;
 }
 
+#ifdef _MSC_VER
+// disable warning about taking address of temporary variable 
+// because take_address_of() takes address only of lvalue reference 
+// which is safe
+#pragma warning(disable:4172)
+#endif
+
 BOOST_HANA_CONSTEXPR_LAMBDA auto iterate_exists =[](auto&& obj,auto&& key)
 {
     if (obj && contains(*obj,key))
@@ -45,6 +52,11 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto iterate_exists =[](auto&& obj,auto&& key)
     }
     return decltype(take_address_of(get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key))))(nullptr);
 };
+
+#ifdef _MSC_VER
+#pragma warning(default:4172)
+#endif
+
 }
 
 /**
