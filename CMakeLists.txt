@@ -50,8 +50,6 @@ SET (HEADERS
     include/dracosha/validator/detail/dispatcher_impl.hpp
     include/dracosha/validator/detail/take_address_of.hpp
     include/dracosha/validator/detail/logical_not.hpp
-
-    include/dracosha/validator/impl.hpp
 )
 
 SET (SOURCES
