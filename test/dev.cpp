@@ -411,8 +411,9 @@ BOOST_AUTO_TEST_CASE(CheckContainsCompileTime)
     constexpr auto m3_c=hana::make_type(m3);
 
     using type = typename check_member_t<decltype(m1),std::string>::type;
-    auto type_c = check_member(hana::type_c<decltype(m1)>,hana::type_c<std::string>);
-    auto type_c1 = check_member(hana::type_c<decltype(m1)>, hana::front(chain1_c));
+    std::ignore = type();
+    std::ignore = check_member(hana::type_c<decltype(m1)>,hana::type_c<std::string>);
+    std::ignore = check_member(hana::type_c<decltype(m1)>, hana::front(chain1_c));
 
     BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(hana::sfinae(check_member)(m1_c,hana::front(chain1_c))));
     BOOST_HANA_CONSTANT_CHECK(!hana::is_nothing(
