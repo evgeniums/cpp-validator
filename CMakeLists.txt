@@ -40,6 +40,10 @@ SET (HEADERS
     include/dracosha/validator/properties/empty.hpp
 
     include/dracosha/validator/adapters/adapter.hpp
+    include/dracosha/validator/adapters/reporting_adapter.hpp
+
+    include/dracosha/validator/reporting/reporter.hpp
+    include/dracosha/validator/reporting/formatter.hpp
 
     include/dracosha/validator/detail/has_method.hpp
     include/dracosha/validator/detail/has_property.hpp

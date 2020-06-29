@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/or.hpp
+/** \file validator/operators/or.hpp
 *
 *  Defines logical pseudo operator OR
 *

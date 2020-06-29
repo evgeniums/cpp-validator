@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/and.hpp
+/** \file validator/operators/and.hpp
 *
 *  Defines logical pseudo operator AND
 *

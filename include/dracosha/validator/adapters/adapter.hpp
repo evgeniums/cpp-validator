@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/adapter.hpp
+/** \file validator/adapters/adapter.hpp
 *
 *  Defines default adapter class.
 *
@@ -206,7 +206,7 @@ struct adapter
      * @return Logical OR of results of intermediate validators
      */
     template <typename OpsT>
-    constexpr bool validate_or(OpsT&& ops) const
+    bool validate_or(OpsT&& ops) const
     {
         return hana::value(hana::length(ops))==0
                 ||
@@ -229,7 +229,7 @@ struct adapter
      * @return Logical OR of results of intermediate validators
      */
     template <typename OpsT, typename MemberT>
-    constexpr bool validate_or(MemberT&& member,OpsT&& ops) const
+    bool validate_or(MemberT&& member,OpsT&& ops) const
     {
         return hana::value(hana::length(ops))==0
                 ||
