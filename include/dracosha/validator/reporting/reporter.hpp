@@ -28,9 +28,11 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct reporter_tag;
 
 /**
- * @brief Reporter constructs a report regading the failure.
+ * @brief Reporter constructs a report regarding the failure.
  *
- * A report will be put to the destination object which is usually a sring.
+ * A report will be put to the destination object which is usually a sring but
+ * formatter backends can also support other container types.
+ *
  * Actual string formatting is performed by the formatter object.
  */
 template <typename DstT, typename FormatterT>
@@ -171,7 +173,7 @@ struct reporter
     /**
      * @brief Reset reporter
      *
-     * Usually it just means clearing the destination object.
+     * Usually it just means clearing the report destination.
      */
     void reset()
     {

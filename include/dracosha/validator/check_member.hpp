@@ -52,7 +52,7 @@ struct check_member_t<T1,T2,hana::when<can_check_contains_t<T1, T2>::value
     using type=typename std::decay<decltype(std::declval<T1>()[std::declval<T2>()])>::type;
 };
 
-hana::metafunction_t<check_member_t> check_member{};
+constexpr hana::metafunction_t<check_member_t> check_member{};
 
 //-------------------------------------------------------------
 

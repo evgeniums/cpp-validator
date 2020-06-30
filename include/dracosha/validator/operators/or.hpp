@@ -45,6 +45,13 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto OR=hana::infix([](auto&& ...xs) -> decltype(aut
 });
 
 //-------------------------------------------------------------
+struct string_or_t : public op<string_or_t>
+{
+    constexpr static const char* description="none of the following conditions are met";
+};
+constexpr string_or_t string_or{};
+
+//-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 

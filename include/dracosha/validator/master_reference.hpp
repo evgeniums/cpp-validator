@@ -58,6 +58,14 @@ struct master_reference
 };
 
 //-------------------------------------------------------------
+struct string_master_reference_t
+{
+    using hana_tag=operator_tag;
+    constexpr static const char* description="sample";
+};
+constexpr string_master_reference_t string_master_reference{};
+
+//-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 

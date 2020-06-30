@@ -30,8 +30,10 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 /**
  * @brief Operator to check if member exists in object
  */
-struct exists_t : public op
+struct exists_t
 {
+    using hana_tag=operator_tag;
+
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
@@ -39,6 +41,20 @@ struct exists_t : public op
     }
 };
 constexpr exists_t exists{};
+
+//-------------------------------------------------------------
+struct string_exists_t : public op<string_exists_t>
+{
+    constexpr static const char* description="exists";
+};
+constexpr string_exists_t string_exists{};
+
+//-------------------------------------------------------------
+struct string_not_exists_t : public op<string_not_exists_t>
+{
+    constexpr static const char* description="does not exist";
+};
+constexpr string_not_exists_t string_not_exists{};
 
 //-------------------------------------------------------------
 

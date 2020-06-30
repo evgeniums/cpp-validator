@@ -60,7 +60,7 @@ struct aggregate_or_t
         return dispatcher.validate_or(std::forward<decltype(a)>(a),std::forward<decltype(member)>(member),std::forward<decltype(ops)>(ops));
     }
 };
-aggregate_or_t aggregate_or{};
+constexpr aggregate_or_t aggregate_or{};
 
 }
 

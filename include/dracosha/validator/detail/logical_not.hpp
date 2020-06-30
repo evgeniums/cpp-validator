@@ -59,7 +59,7 @@ struct logical_not_t
         return dispatcher.validate_not(std::forward<decltype(a)>(a),std::forward<decltype(member)>(member),std::forward<decltype(op)>(op));
     }
 };
-logical_not_t logical_not{};
+constexpr logical_not_t logical_not{};
 }
 
 //-------------------------------------------------------------

@@ -61,7 +61,7 @@ struct aggregate_and_t
         return dispatcher.validate_and(std::forward<decltype(a)>(a),std::forward<decltype(member)>(member),std::forward<decltype(ops)>(ops));
     }
 };
-aggregate_and_t aggregate_and{};
+constexpr aggregate_and_t aggregate_and{};
 }
 
 //-------------------------------------------------------------

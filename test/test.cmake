@@ -1,6 +1,7 @@
 SET(SOURCES
     ${SOURCES}
     ${VALIDATOR_TEST_SRC}/testvalidatorimpl.cpp
+    ${VALIDATOR_TEST_SRC}/testreporting.cpp
 )
 
 SET (HEADERS

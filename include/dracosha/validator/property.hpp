@@ -107,6 +107,10 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> declt
                                     false \
                         )); \
         } \
+        constexpr static const char* name() \
+        {\
+            return #prop; \
+        }\
     }; \
     constexpr type_p_##prop prop{}; \
     template <typename ...Args> \

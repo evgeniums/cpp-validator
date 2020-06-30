@@ -43,6 +43,11 @@ struct type_p_value
     }
     template <typename ... Args> \
     constexpr auto operator () (Args&&... args) const;
+
+    constexpr static const char* name()
+    {
+        return "value";
+    }
 };
 constexpr type_p_value value{};
 template <typename ... Args>

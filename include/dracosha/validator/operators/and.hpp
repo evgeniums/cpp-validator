@@ -45,6 +45,13 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto AND=hana::infix([](auto&& ...xs) -> decltype(au
 });
 
 //-------------------------------------------------------------
+struct string_and_t : public op<string_and_t>
+{
+    constexpr static const char* description="some of the following conditions are not met";
+};
+constexpr string_and_t string_and{};
+
+//-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 

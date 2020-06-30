@@ -8,45 +8,29 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operators/operator.hpp
+/** \file validator/reporting/strings.hpp
 *
-*  Defines base operator
+*
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_OPERATOR_HPP
-#define DRACOSHA_VALIDATOR_OPERATOR_HPP
+#ifndef DRACOSHA_VALIDATOR_STRINGS_HPP
+#define DRACOSHA_VALIDATOR_STRINGS_HPP
 
 #include <string>
+#include <locale>
+
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/property.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-/**
- * @brief Tag for all operator clases
- */
-struct operator_tag;
-
-/**
- * @brief Base operator class
- */
-template <typename DerivedT>
-struct op
-{
-    using hana_tag=operator_tag;
-
-    operator std::string () const
-    {
-        return std::string(DerivedT::description);
-    }
-};
-
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_OPERATOR_HPP
+#endif // DRACOSHA_VALIDATOR_STRINGS_HPP
