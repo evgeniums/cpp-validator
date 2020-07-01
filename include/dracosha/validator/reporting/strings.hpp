@@ -30,6 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/translator_repository.hpp>
 #include <dracosha/validator/operators.hpp>
 #include <dracosha/validator/master_reference.hpp>
+#include <dracosha/validator/detail/to_string.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -64,20 +65,7 @@ struct strings_t
     template <typename T>
     std::string to_string(const T& id) const
     {
-
-        return hana::if_(
-                    hana::is_a<property_tag,T>,
-                    std::string(T::name()),
-                    hana::if_(
-                        std::is_constructible<std::string,T>::value,
-                        id,
-                        hana::if_(
-                                hana::is_valid([](auto&& v) -> decltype((void)std::to_string(v)){})(id),
-                                std::to_string(id),
-                                std::string("<\?\?\?\?\?>")
-                            )
-                    )
-              );
+        return detail::to_string<T>(id);
     }
 
     /**

@@ -26,14 +26,16 @@ BOOST_AUTO_TEST_CASE(CheckFmtString)
 
     fmt::format_to(std::back_inserter(str2),"prepend {} ",2);
     str1.insert(str1.begin(),str2.begin(),str2.end());
-    BOOST_TEST_MESSAGE(str1);
+//    BOOST_TEST_MESSAGE(str1);
+    BOOST_CHECK_EQUAL(str1,std::string("prepend 2 Hello 1"));
 
     fmt::format_to(std::back_inserter(vec2),"prepend vector {} ",2);
     vec1.insert(vec1.begin(),vec2.begin(),vec2.end());
-    BOOST_TEST_MESSAGE(std::string(vec1.data(),vec1.size()));
+//    BOOST_TEST_MESSAGE(std::string(vec1.data(),vec1.size()));
+    BOOST_CHECK_EQUAL(std::string(vec1.data(),vec1.size()),std::string("prepend vector 2 Hello vector 1"));
 
     auto gte_str=std::string(gte);
-    BOOST_TEST_MESSAGE(gte_str);
+//    BOOST_TEST_MESSAGE(gte_str);
     BOOST_CHECK_EQUAL(gte_str,std::string(gte.description));
 }
 

@@ -21,6 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/reporting/strings.hpp>
+#include <dracosha/validator/detail/member_names_traits.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -41,9 +42,6 @@ struct bypass_member_names_traits
  * Member names formatter forwards a name to traits that implement actual name formatting.
  * If traits return empty string then the name is forwarded to strings object.
  *
- * Traits object must implement operator() (const T& name) in such a way that it returns a non-empty string only in case it can process a name,
- * otherwise it must return an empty string, not the name itself.
- *
  */
 template <typename StringsT,typename TraitsT>
 struct member_names_t
@@ -60,7 +58,7 @@ struct member_names_t
     template <typename T>
     std::string operator() (const T& name) const
     {
-        auto res=_traits(name);
+        auto res=detail::member_name_traits<TraitsT,T>(_traits,name);
         if (!res.empty())
         {
             return res;
@@ -131,7 +129,7 @@ auto member_names(TraitsT&& traits,
                 std::enable_if_t<(!hana::is_a<strings_tag,TraitsT> && !hana::is_a<translator_tag,TraitsT>),void*> =nullptr
             )
 {
-    return member_names(default_strings,traits);
+    return member_names(traits,default_strings);
 }
 
 /**

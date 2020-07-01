@@ -30,6 +30,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 namespace detail
 {
+    /**
+     * @brief Append argument to destination object
+     */
     template <typename DstT, typename ...Args>
     void format_append(DstT& dst, Args&&... args)
     {
@@ -40,6 +43,9 @@ namespace detail
         fmt::format_to(std::back_inserter(dst),std::forward<Args>(args)...);
     }
 
+    /**
+     * @brief Prepend argument to destination object
+     */
     template <typename DstT, typename ...Args>
     void format_prepend(DstT& dst, Args&&... args)
     {

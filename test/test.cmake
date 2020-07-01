@@ -5,6 +5,7 @@ SET(SOURCES
     ${VALIDATOR_TEST_SRC}/testtranslator.cpp
     ${VALIDATOR_TEST_SRC}/testfmtformatter.cpp
     ${VALIDATOR_TEST_SRC}/teststdformatter.cpp
+    ${VALIDATOR_TEST_SRC}/teststrings.cpp
 )
 
 SET (HEADERS

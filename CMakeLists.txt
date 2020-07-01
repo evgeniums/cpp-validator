@@ -64,6 +64,8 @@ SET (HEADERS
     include/dracosha/validator/detail/take_address_of.hpp
     include/dracosha/validator/detail/logical_not.hpp
     include/dracosha/validator/detail/string_view.hpp
+    include/dracosha/validator/detail/to_string.hpp
+    include/dracosha/validator/detail/member_names_traits.hpp
 )
 
 SET (SOURCES

@@ -56,7 +56,7 @@ class mapped_translator : public translator
 
         /**
          * @brief Translate a string
-         * @param id Sttring id
+         * @param id String id
          * @return Translated string or id if such string not found
          */
         virtual std::string translate(const std::string& id) const override
