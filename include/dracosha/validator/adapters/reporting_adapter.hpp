@@ -139,11 +139,11 @@ struct reporting_adapter_t
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
-    bool validate_with_master_reference(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
+    bool validate_with_master_sample(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
     {
         if (!_next_adapter.validate(member,prop,op,b))
         {
-            _reporter.validate_with_master_reference(member,prop,op,b);
+            _reporter.validate_with_master_sample(member,prop,op,b);
             return false;
         }
         return true;

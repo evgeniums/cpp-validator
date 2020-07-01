@@ -150,7 +150,7 @@ struct adapter
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
-    bool validate_with_master_reference(MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
+    bool validate_with_master_sample(MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
     {
         auto&& ax=extract(obj);
         return op(

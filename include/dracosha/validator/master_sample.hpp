@@ -8,18 +8,18 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/master_referencer.hpp
+/** \file validator/master_sampler.hpp
 *
-*  Defines wrapper of master reference object that can be used in validation operator
-*  as argument substitution. If such master reference is used as argument then
-*  the same member from master reference object will be forwarded to validation operator.
+*  Defines wrapper of master sample object that can be used in validation operator
+*  as argument substitution. If such master sample is used as argument then
+*  the same member from master sample object will be forwarded to validation operator.
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_MASTER_REFERENCE_HPP
-#define DRACOSHA_VALIDATOR_MASTER_REFERENCE_HPP
+#ifndef DRACOSHA_VALIDATOR_MASTER_SAMPLE_HPP
+#define DRACOSHA_VALIDATOR_MASTER_SAMPLE_HPP
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/dispatcher.hpp>
@@ -28,21 +28,21 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-struct master_reference_tag;
+struct master_sample_tag;
 
 /**
- * @brief Wrapper of master reference object
+ * @brief Wrapper of master sample object
  */
 template <typename T>
-struct master_reference
+struct master_sample
 {
-    using hana_tag=master_reference_tag;
+    using hana_tag=master_sample_tag;
 
     /**
      * @brief Ctor
      * @param Reference object
      */
-    master_reference(const T& obj) : ref(obj)
+    master_sample(const T& obj) : ref(obj)
     {}
 
     /**
@@ -58,15 +58,14 @@ struct master_reference
 };
 
 //-------------------------------------------------------------
-struct string_master_reference_t
+struct string_master_sample_t : public op<string_master_sample_t>
 {
-    using hana_tag=operator_tag;
     constexpr static const char* description="sample";
 };
-constexpr string_master_reference_t string_master_reference{};
+constexpr string_master_sample_t string_master_sample{};
 
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_MASTER_REFERENCE_HPP
+#endif // DRACOSHA_VALIDATOR_MASTER_SAMPLE_HPP

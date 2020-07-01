@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <map>
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/master_sample.hpp>
 #include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/operators.hpp>
 
@@ -40,6 +41,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 inline std::map<std::string,std::string> strings_sample_locale()
 {
     std::map<std::string,std::string> m;
+
+    // specials
+    m[string_master_sample]="sample";
 
     // properties
     m[value.name()]="value";

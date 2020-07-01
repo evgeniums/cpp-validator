@@ -111,9 +111,9 @@ struct reporter
      *  @param b Reference object whose member to use as argument passed to validation operator
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
-    void validate_with_master_reference(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
+    void validate_with_master_sample(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
     {
-        _formatter.validate_with_master_reference(_dst,member,prop,op,b);
+        _formatter.validate_with_master_sample(_dst,member,prop,op,b);
     }
 
     /**

@@ -34,7 +34,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct adapter_tag;
 struct member_tag;
-struct master_reference_tag;
+struct master_sample_tag;
 
 //-------------------------------------------------------------
 namespace detail
@@ -174,7 +174,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     constexpr static bool invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
                                  std::enable_if_t<
                                    (!hana::is_a<member_tag,T2> &&
-                                    !hana::is_a<master_reference_tag,T2> &&
+                                    !hana::is_a<master_sample_tag,T2> &&
                                     !std::is_same<exists_t,typename std::decay<OpT>::type>::value),
                                    void*
                                  > =nullptr
@@ -215,12 +215,12 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     template <typename T2, typename OpT, typename PropT, typename MemberT>
     constexpr static bool invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
                                  std::enable_if_t<
-                                   hana::is_a<master_reference_tag,T2>,
+                                   hana::is_a<master_sample_tag,T2>,
                                    void*
                                  > =nullptr
                                 )
     {
-        return a.validate_with_master_reference(std::forward<MemberT>(member),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
+        return a.validate_with_master_sample(std::forward<MemberT>(member),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
     }
 
     /**

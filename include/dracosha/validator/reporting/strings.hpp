@@ -29,7 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/no_translator.hpp>
 #include <dracosha/validator/reporting/translator_repository.hpp>
 #include <dracosha/validator/operators.hpp>
-#include <dracosha/validator/master_reference.hpp>
+#include <dracosha/validator/master_sample.hpp>
 #include <dracosha/validator/detail/to_string.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN

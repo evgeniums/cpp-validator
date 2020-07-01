@@ -46,7 +46,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/detail/validator_impl.hpp>
 #include <dracosha/validator/make_validator.hpp>
 #include <dracosha/validator/member.hpp>
-#include <dracosha/validator/master_reference.hpp>
+#include <dracosha/validator/master_sample.hpp>
 #include <dracosha/validator/operators/and.hpp>
 #include <dracosha/validator/operators/or.hpp>
 #include <dracosha/validator/operators/not.hpp>
@@ -57,7 +57,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Helper for generating members and master reference wrappers
+ * @brief Helper for generating members and master sample wrappers
  */
 struct _t
 {
@@ -73,14 +73,14 @@ struct _t
     }
 
     /**
-     * @brief Create master reference wrapper
-     * @param masterRefObj Object to use as a master reference
-     * @return Wrapper of master reference object
+     * @brief Create master sample wrapper
+     * @param masterRefObj Object to use as a master sample
+     * @return Wrapper of master sample object
      */
     template <typename T>
     constexpr auto operator () (const T& masterRefObj) const -> decltype(auto)
     {
-        return master_reference<T>(masterRefObj);
+        return master_sample<T>(masterRefObj);
     }
 };
 constexpr _t _{};

@@ -111,9 +111,9 @@ struct formatter_fmt_t
     }
 
     template <typename DstT, typename T2, typename OpT, typename PropT, typename MemberT>
-    void validate_with_master_reference(DstT& dst, const MemberT& member, const PropT& prop, const OpT& op, const T2&) const
+    void validate_with_master_sample(DstT& dst, const MemberT& member, const PropT& prop, const OpT& op, const T2&) const
     {
-        detail::format_append(dst,"{} {} {} {}",_member_names(prop),_member_names(member),_strings(op),_strings(string_master_reference));
+        detail::format_append(dst,"{} {} {} {}",_member_names(prop),_member_names(member),_strings(op),_strings(string_master_sample));
     }
 
     template <typename DstT>
