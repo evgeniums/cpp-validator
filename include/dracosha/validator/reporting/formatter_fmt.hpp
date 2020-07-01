@@ -22,6 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <fmt/format.h>
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/reporting/strings.hpp>
+#include <dracosha/validator/reporting/member_names.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -58,13 +60,13 @@ struct formatter_tag;
  * i.e. it must be suitable for using std::back_inserter(dst), dst.insert(), dst.begin(), dst.end().
  *
  */
-template <typename StringsT, typename MemberNamesT>
+template <typename MemberNamesT, typename StringsT>
 struct formatter_fmt_t
 {
     using hana_tag=formatter_tag;
 
+    MemberNamesT _member_names;
     const StringsT& _strings;
-    const MemberNamesT& _member_names;
 
     template <typename DstT, typename T2, typename OpT>
     void validate_operator(DstT& dst,const OpT& op, const T2& b) const

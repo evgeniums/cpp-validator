@@ -34,6 +34,7 @@ SET (HEADERS
     include/dracosha/validator/operators/and.hpp
     include/dracosha/validator/operators/or.hpp
     include/dracosha/validator/operators/not.hpp
+    include/dracosha/validator/operators.hpp
 
     include/dracosha/validator/properties/value.hpp
     include/dracosha/validator/properties/size.hpp
@@ -48,6 +49,9 @@ SET (HEADERS
     include/dracosha/validator/reporting/member_names.hpp
     include/dracosha/validator/reporting/strings.hpp
     include/dracosha/validator/reporting/translator.hpp
+    include/dracosha/validator/reporting/translator_repository.hpp
+    include/dracosha/validator/reporting/no_translator.hpp
+    include/dracosha/validator/reporting/mapped_translator.hpp
     include/dracosha/validator/reporting/locale/sample_locale.hpp
 
     include/dracosha/validator/detail/has_method.hpp

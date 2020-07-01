@@ -21,6 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/reporting/strings.hpp>
+#include <dracosha/validator/reporting/translator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -28,19 +29,23 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct member_names_tag;
 
-template <typename TraitsT,typename StringsT>
+struct bypass_member_names_traits
+{
+};
+
+template <typename StringsT,typename TraitsT>
 struct member_names_t
 {
     using hana_tag=member_names_tag;
 
-    const TraitsT& _traits;
     const StringsT& _strings;
+    TraitsT _traits;
 
     template <typename T>
-    constexpr const char* operator() (const T& name) const
+    constexpr std::string operator() (const T& name) const
     {
         auto res=_traits(name);
-        if (res!=nullptr)
+        if (!res.empty())
         {
             return res;
         }
@@ -48,40 +53,54 @@ struct member_names_t
     }
 };
 
-struct default_member_names_traits
+template <typename StringsT>
+struct member_names_t<StringsT,bypass_member_names_traits>
 {
+    using hana_tag=member_names_tag;
+
+    const StringsT& _strings;
+
     template <typename T>
-    constexpr const char* operator() (T&&) const
+    constexpr std::string operator() (const T& name) const
     {
-        return nullptr;
+        return _strings(name);
     }
 };
 
 template <typename TraitsT,typename StringsT>
-constexpr auto member_names(TraitsT&& traits, StringsT&& strings) -> decltype(auto)
+constexpr auto member_names(TraitsT&& traits, const StringsT& strings,
+                            std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr)
 {
     return member_names_t<
-                std::decay_t<TraitsT>,
-                std::decay_t<StringsT>
+                std::decay_t<StringsT>,
+                std::decay_t<TraitsT>
             >
-            {std::forward<TraitsT>(traits),std::forward<StringsT>(strings)};
+            {strings,std::forward<TraitsT>(traits)};
+}
+
+template <typename StringsT>
+constexpr auto member_names(const StringsT& strings,
+                                std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr
+                            )
+{
+    return member_names_t<
+                std::decay_t<StringsT>,
+                bypass_member_names_traits
+            >
+            {strings};
 }
 
 template <typename TraitsT>
-constexpr auto member_names(TraitsT&& traits) -> decltype(auto)
+constexpr auto member_names(T&& traits,
+                                std::enable_if_t<(!hana::is_a<strings_tag,TraitsT> && !hana::is_a<translator_tag,TraitsT>),void*> =nullptr
+                            )
 {
-    return member_names(std::forward<TraitsT>(traits),default_strings);
+    return member_names(default_strings,traits);
 }
 
-constexpr auto default_member_names=member_names(default_member_names_traits{});
-
-constexpr auto member_names() -> decltype(std::add_lvalue_reference_t<
-                                        std::add_const_t<
-                                            std::decay_t<decltype(default_member_names)>
-                                        >
-                                >)
+constexpr auto member_names()
 {
-    return default_member_names;
+    return member_names(default_strings);
 }
 
 //-------------------------------------------------------------

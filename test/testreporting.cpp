@@ -2,16 +2,22 @@
 #include <vector>
 
 #include <iterator>
+
+//! \todo move fmt to special file under def
 #include <fmt/format.h>
 
 #include <boost/test/unit_test.hpp>
 
+#include <dracosha/validator/reporting/translator.hpp>
+
+//#include <dracosha/validator/reporting/strings.hpp>
 #include <dracosha/validator/validator.hpp>
 
 using namespace dracosha::validator;
 
 BOOST_AUTO_TEST_SUITE(TestReporting)
 
+//! \todo move fmt to special file under def
 BOOST_AUTO_TEST_CASE(CheckFmtString)
 {
     std::string str1, str2;

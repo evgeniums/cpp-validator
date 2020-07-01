@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/operators/operator.hpp>
+#include <dracosha/validator/reporting/translator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -57,36 +58,21 @@ struct strings_t
               );
     }
 
-#if 0
-    template <typename T>
-    std::string to_string(const T& id) const
-    {
-        return hana::if_(
-                    hana::is_a<property_tag,T>,
-                    std::string(T::name()),
-                    hana::if_(
-                        hana::is_a<operator_tag,T>,
-                        std::string(T::description),
-                        hana::if_(
-                            hana::is_valid([](auto&& v) -> decltype((void)std::to_string(v)){})(id),
-                            std::to_string(id),
-                            hana::if_(
-                                std::is_constructible<std::string,T>::value,
-                                std::string(id),
-                                std::string("<?????>")
-                            )
-                        )
-                    )
-              );
-    }
-#endif
-
     template <typename T>
     std::string operator() (const T& id) const
     {
         return _translator(to_string(id));
     }
 };
+
+constexpr strings_t<no_translator_t> default_strings{no_translator};
+
+using translated_strings=strings_t<translator>;
+
+inline translated_strings make_translated_strings(const translator_factory& factory,const std::locale& loc=std::locale())
+{
+    return translated_strings{*factory.find_translator(loc)};
+}
 
 //-------------------------------------------------------------
 
