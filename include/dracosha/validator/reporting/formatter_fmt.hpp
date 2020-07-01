@@ -23,7 +23,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/reporting/strings.hpp>
-#include <dracosha/validator/reporting/member_names.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -74,7 +73,7 @@ struct formatter_fmt_t
         detail::format_append(dst,"{} {}",_strings(op),b);
     }
 
-    template <typename DstT, typename OpT, typename PropT>
+    template <typename DstT, typename T2, typename OpT, typename PropT>
     void validate_property(DstT& dst,const PropT& prop, const OpT& op, const T2& b) const
     {
         detail::format_append(dst,"{} {} {}",_member_names(prop),_strings(op),b);

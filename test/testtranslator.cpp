@@ -6,6 +6,8 @@
 #include <dracosha/validator/reporting/mapped_translator.hpp>
 #include <dracosha/validator/reporting/translator_repository.hpp>
 
+#include <dracosha/validator/reporting/locale/sample_locale.hpp>
+
 using namespace dracosha::validator;
 
 BOOST_AUTO_TEST_SUITE(TestTranslator)
@@ -203,6 +205,29 @@ BOOST_AUTO_TEST_CASE(CheckTranslatorRepository)
     auto tr2=rep.find_translator("en_US.UTF-8");
     BOOST_REQUIRE(tr2);
     BOOST_CHECK(tr2.get()==def_translator.get());
+}
+
+BOOST_AUTO_TEST_CASE(CheckSampleLocale)
+{
+    //! \todo Add additional strings
+    auto m=strings_sample_locale();
+
+    // existance
+    BOOST_CHECK_EQUAL(m[string_exists],std::string(string_exists));
+    BOOST_CHECK_EQUAL(m[string_not_exists],std::string(string_not_exists));
+
+    // logical
+    BOOST_CHECK_EQUAL(m[string_and],std::string(string_and));
+    BOOST_CHECK_EQUAL(m[string_or],std::string(string_or));
+    BOOST_CHECK_EQUAL(m[string_not],std::string(string_not));
+
+    // comparison
+    BOOST_CHECK_EQUAL(m[eq],std::string(eq));
+    BOOST_CHECK_EQUAL(m[ne],std::string(ne));
+    BOOST_CHECK_EQUAL(m[lt],std::string(lt));
+    BOOST_CHECK_EQUAL(m[lte],std::string(lte));
+    BOOST_CHECK_EQUAL(m[gt],std::string(gt));
+    BOOST_CHECK_EQUAL(m[gte],std::string(gte));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

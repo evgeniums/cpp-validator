@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/member_names.hpp
 *
-*
+* Defines member names formatter.
 *
 */
 
@@ -21,7 +21,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/reporting/strings.hpp>
-#include <dracosha/validator/reporting/translator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -29,10 +28,23 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct member_names_tag;
 
+/**
+ * @brief Traits for member names formatter that do not perform any formatting and just bypass names "as is".
+ */
 struct bypass_member_names_traits
 {
 };
 
+/**
+ * @brief Member names formatter.
+ *
+ * Member names formatter forwards a name to traits that implement actual name formatting.
+ * If traits return empty string then the name is forwarded to strings object.
+ *
+ * Traits object must implement operator() (const T& name) in such a way that it returns a non-empty string only in case it can process a name,
+ * otherwise it must return an empty string, not the name itself.
+ *
+ */
 template <typename StringsT,typename TraitsT>
 struct member_names_t
 {
@@ -41,8 +53,12 @@ struct member_names_t
     const StringsT& _strings;
     TraitsT _traits;
 
+    /**
+     * @brief Format a name
+     * @return Formatted name.
+     */
     template <typename T>
-    constexpr std::string operator() (const T& name) const
+    std::string operator() (const T& name) const
     {
         auto res=_traits(name);
         if (!res.empty())
@@ -53,6 +69,9 @@ struct member_names_t
     }
 };
 
+/**
+ * @brief Member names formatter that does not perform any formatting and forward names "as is" to strings object.
+ */
 template <typename StringsT>
 struct member_names_t<StringsT,bypass_member_names_traits>
 {
@@ -61,15 +80,22 @@ struct member_names_t<StringsT,bypass_member_names_traits>
     const StringsT& _strings;
 
     template <typename T>
-    constexpr std::string operator() (const T& name) const
+    std::string operator() (const T& name) const
     {
         return _strings(name);
     }
 };
 
+/**
+ * @brief Create member names formatter
+ * @param traits Actual implementer of names formatting
+ * @param strings Strings object the unprocessed names will be forwarded to
+ * @return Formatter of member names
+ */
 template <typename TraitsT,typename StringsT>
-constexpr auto member_names(TraitsT&& traits, const StringsT& strings,
-                            std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr)
+auto member_names(TraitsT&& traits, const StringsT& strings,
+                    std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr
+                )
 {
     return member_names_t<
                 std::decay_t<StringsT>,
@@ -78,10 +104,15 @@ constexpr auto member_names(TraitsT&& traits, const StringsT& strings,
             {strings,std::forward<TraitsT>(traits)};
 }
 
+/**
+ * @brief Create member names formatter that bypasses names processing
+ * @param strings Strings object the names will be forwarded to
+ * @return Formatter of member names
+ */
 template <typename StringsT>
-constexpr auto member_names(const StringsT& strings,
-                                std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr
-                            )
+auto member_names(const StringsT& strings,
+                    std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr
+                )
 {
     return member_names_t<
                 std::decay_t<StringsT>,
@@ -90,15 +121,24 @@ constexpr auto member_names(const StringsT& strings,
             {strings};
 }
 
+/**
+ * @brief Create member names formatter with default strings object
+ * @param traits Actual implementer of names formatting
+ * @return Formatter of member names
+ */
 template <typename TraitsT>
-constexpr auto member_names(T&& traits,
-                                std::enable_if_t<(!hana::is_a<strings_tag,TraitsT> && !hana::is_a<translator_tag,TraitsT>),void*> =nullptr
-                            )
+auto member_names(TraitsT&& traits,
+                std::enable_if_t<(!hana::is_a<strings_tag,TraitsT> && !hana::is_a<translator_tag,TraitsT>),void*> =nullptr
+            )
 {
     return member_names(default_strings,traits);
 }
 
-constexpr auto member_names()
+/**
+ * @brief Create member names formatter that just forwards names to default strings object
+ * @return Formatter of member names
+ */
+inline auto member_names()
 {
     return member_names(default_strings);
 }

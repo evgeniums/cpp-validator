@@ -19,6 +19,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_TRANSLATOR_REPOSITORY_HPP
 #define DRACOSHA_VALIDATOR_TRANSLATOR_REPOSITORY_HPP
 
+#include <locale>
 #include <string>
 #include <set>
 #include <map>
@@ -112,14 +113,14 @@ class translator_repository
 
         /**
          * @brief Find translator for locale
-         * @param loc Locale name, examples: "en_US.UTF-8", "en_US", "en"
+         * @param loc Locale name, examples: "en_US.UTF-8", "en_US", "en". Default is name of global locale.
          * @param Translator suitable of this locale.
          *
          * First, it will try to find the most specific name of the locale.
          * The the name will be repeatedly truncated down to the name of language only.
          * If still no translator is found then the default translator will be returned.
          */
-        std::shared_ptr<translator> find_translator(std::string loc=std::string()) const
+        std::shared_ptr<translator> find_translator(std::string loc=std::locale().name()) const
         {
             size_t i=0;
             while(!loc.empty() && i<3)
