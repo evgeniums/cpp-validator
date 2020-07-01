@@ -212,6 +212,12 @@ BOOST_AUTO_TEST_CASE(CheckSampleLocale)
     //! \todo Add additional strings
     auto m=strings_sample_locale();
 
+    // properties
+    BOOST_CHECK_EQUAL(m[value.name()],value.name());
+    BOOST_CHECK_EQUAL(m[empty.name()],empty.name());
+    BOOST_CHECK_EQUAL(m[size.name()],size.name());
+    BOOST_CHECK_EQUAL(m[length.name()],length.name());
+
     // existance
     BOOST_CHECK_EQUAL(m[string_exists],std::string(string_exists));
     BOOST_CHECK_EQUAL(m[string_not_exists],std::string(string_not_exists));

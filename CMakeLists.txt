@@ -38,7 +38,9 @@ SET (HEADERS
 
     include/dracosha/validator/properties/value.hpp
     include/dracosha/validator/properties/size.hpp
+    include/dracosha/validator/properties/length.hpp
     include/dracosha/validator/properties/empty.hpp
+    include/dracosha/validator/properties.hpp
 
     include/dracosha/validator/adapters/adapter.hpp
     include/dracosha/validator/adapters/reporting_adapter.hpp
