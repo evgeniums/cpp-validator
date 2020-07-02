@@ -25,6 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/member_names.hpp>
 #include <dracosha/validator/reporting/values.hpp>
 #include <dracosha/validator/properties/empty.hpp>
+#include <dracosha/validator/detail/if_bool.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -62,7 +63,7 @@ struct apply_reorder_3args_t
     {
         return apply_reorder_fn(std::forward<HandlerT>(fn),
                                 std::forward<FormatterTs>(formatters),
-                                prop,op,b
+                                prop,if_bool<T2,OpT>(std::forward<OpT>(op)),b
                                 );
     }
 };
@@ -129,12 +130,30 @@ struct apply_reorder_4args_t
     {
         return apply_reorder_fn(std::forward<HandlerT>(fn),
                                 std::forward<FormatterTs>(formatters),
-                                prop,member,op,b
+                                prop,member,if_bool<T2,OpT>(std::forward<OpT>(op)),b
                                 );
     }
 };
 template <typename PropT, typename MemberT, typename OpT, typename T2>
 constexpr apply_reorder_4args_t<PropT,MemberT,OpT,T2> apply_reorder_4args{};
+
+template <typename OpT, typename T2>
+struct apply_reorder_2args_t
+{
+    template <typename HandlerT, typename FormatterTs>
+    constexpr auto operator () (
+                                HandlerT&& fn, FormatterTs&& formatters,
+                                const OpT& op, const T2& b
+                                ) const -> decltype(auto)
+    {
+        return apply_reorder_fn(std::forward<HandlerT>(fn),
+                                std::forward<FormatterTs>(formatters),
+                                if_bool<T2,OpT>(std::forward<OpT>(op)),b
+                                );
+    }
+};
+template <typename OpT, typename T2>
+constexpr apply_reorder_2args_t<OpT,T2> apply_reorder_2args{};
 
 template <typename ...Args>
 struct apply_reorder_t
@@ -170,6 +189,19 @@ struct apply_reorder_t<T1,T2,T3>
     constexpr auto operator () (HandlerT&& fn, FormatterTs&& formatters, Args&&... args) const -> decltype(auto)
     {
         return apply_reorder_3args<T1,T2,T3>(std::forward<HandlerT>(fn),
+                                             std::forward<FormatterTs>(formatters),
+                                             std::forward<Args>(args)...
+                                             );
+    }
+};
+
+template <typename T1, typename T2>
+struct apply_reorder_t<T1,T2>
+{
+    template <typename HandlerT, typename FormatterTs, typename ... Args>
+    constexpr auto operator () (HandlerT&& fn, FormatterTs&& formatters, Args&&... args) const -> decltype(auto)
+    {
+        return apply_reorder_2args<T1,T2>(std::forward<HandlerT>(fn),
                                              std::forward<FormatterTs>(formatters),
                                              std::forward<Args>(args)...
                                              );

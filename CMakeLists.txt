@@ -76,6 +76,7 @@ SET (HEADERS
     include/dracosha/validator/detail/formatter_fmt.hpp
     include/dracosha/validator/detail/reorder_strings.hpp
     include/dracosha/validator/detail/extract_cref.hpp
+    include/dracosha/validator/detail/if_bool.hpp
 )
 
 SET (SOURCES

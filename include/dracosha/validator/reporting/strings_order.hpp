@@ -28,6 +28,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct strings_order_tag;
 
+/**
+ * @brief Helper to adjust strings ordering and presentation
+ */
 struct strings_order_t
 {
     using hana_tag=strings_order_tag;
