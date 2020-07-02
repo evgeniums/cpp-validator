@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(CheckBypassNamesDefaultStrings)
 #endif
 
     std::string str6;
-    detail::reorder_strings(
+    detail::reorder_and_present(
                 hana::partial(format_append,hana::type_c<std::string>,std::ref(str6)),
                 make_cref_tuple(member_names(),default_strings,values),
                 empty,eq,false

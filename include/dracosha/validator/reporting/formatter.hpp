@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/strings.hpp>
 #include <dracosha/validator/reporting/member_names.hpp>
 #include <dracosha/validator/reporting/values.hpp>
-#include <dracosha/validator/reporting/strings_order.hpp>
+#include <dracosha/validator/reporting/order_and_presentation.hpp>
 
 #ifdef DRACOSHA_VALIDATOR_FMT
 #include <dracosha/validator/detail/formatter_fmt.hpp>
@@ -54,7 +54,7 @@ struct formatter_tag;
  * i.e. it must be suitable for using std::back_inserter(dst), dst.insert(), dst.begin(), dst.end().
  *
  */
-template <typename MemberNamesT, typename ValuesT, typename StringsT, typename StringsOrderT>
+template <typename MemberNamesT, typename ValuesT, typename StringsT, typename OrderAndPresentationT>
 struct formatter_t
 {
     using hana_tag=formatter_tag;
@@ -62,7 +62,7 @@ struct formatter_t
     MemberNamesT _member_names;
     ValuesT _values;
     const StringsT& _strings;
-    StringsOrderT _reorder_strings;
+    OrderAndPresentationT _order_and_presentation;
 
     template <typename DstT, typename T2, typename OpT>
     void validate_operator(DstT& dst,const OpT& op, const T2& b) const
@@ -187,7 +187,7 @@ struct formatter_t
         template <typename DstT,typename ...Args>
         void append(DstT& dst, Args&&... args) const
         {
-            _reorder_strings(
+            _order_and_presentation(
                         hana::partial(format_append,hana::type_c<DstT>,std::ref(dst)),
                         std::forward<Args>(args)...
                         );
@@ -196,7 +196,7 @@ struct formatter_t
         template <typename DstT,typename ...Args>
         void prepend(DstT& dst, Args&&... args) const
         {
-            _reorder_strings(
+            _order_and_presentation(
                         hana::partial(format_prepend,hana::type_c<DstT>,std::ref(dst)),
                         std::forward<Args>(args)...
                         );
@@ -208,19 +208,19 @@ struct formatter_t
  * @param mn Const reference to formatter of member names
  * @param vs Const reference to formatter of values
  * @param strings Const reference to strings
- * @param order Reordering helper
+ * @param order Reordering and presentation helper
  * @return Formatter
  */
-template <typename MemberNamesT,typename ValuesT,typename StringsT, typename StringsOrderT>
-auto formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const StringsT& strings, StringsOrderT&& order)
+template <typename MemberNamesT,typename ValuesT,typename StringsT, typename OrderAndPresentationT>
+auto formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const StringsT& strings, OrderAndPresentationT&& order)
 {
     return formatter_t<
                 const MemberNamesT&,
                 const ValuesT&,
                 StringsT,
-                std::decay_t<StringsOrderT>
+                std::decay_t<OrderAndPresentationT>
             >
-            {mn,vs,strings,std::forward<StringsOrderT>(order)};
+            {mn,vs,strings,std::forward<OrderAndPresentationT>(order)};
 }
 
 /**
@@ -228,19 +228,19 @@ auto formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const 
  * @param mn Formatter of member names
  * @param vs Formatter of values
  * @param strings Strings
- * @param order Reordering helper
+ * @param order Reordering and presentation helper
  * @return Formatter
  */
-template <typename MemberNamesT,typename ValuesT,typename StringsT, typename StringsOrderT>
-auto formatter(MemberNamesT&& mn, ValuesT&& vs, const StringsT& strings, StringsOrderT&& order)
+template <typename MemberNamesT,typename ValuesT,typename StringsT, typename OrderAndPresentationT>
+auto formatter(MemberNamesT&& mn, ValuesT&& vs, const StringsT& strings, OrderAndPresentationT&& order)
 {
     return formatter_t<
                 std::decay_t<MemberNamesT>,
                 std::decay_t<ValuesT>,
                 StringsT,
-                std::decay_t<StringsOrderT>
+                std::decay_t<OrderAndPresentationT>
             >
-            {std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),strings,std::forward<StringsOrderT>(order)};
+            {std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),strings,std::forward<OrderAndPresentationT>(order)};
 }
 
 /**
@@ -253,7 +253,7 @@ auto formatter(MemberNamesT&& mn, ValuesT&& vs, const StringsT& strings, Strings
 template <typename MemberNamesT,typename ValuesT,typename StringsT>
 auto formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const StringsT& strings)
 {
-    return formatter_with_references(mn,vs,strings,default_strings_order);
+    return formatter_with_references(mn,vs,strings,default_order_and_presentation);
 }
 
 /**
@@ -266,7 +266,7 @@ auto formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const 
 template <typename MemberNamesT,typename ValuesT,typename StringsT>
 auto formatter(MemberNamesT&& mn, ValuesT&& vs, const StringsT& strings)
 {
-    return formatter(std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),strings,default_strings_order);
+    return formatter(std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),strings,default_order_and_presentation);
 }
 
 /**

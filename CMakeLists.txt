@@ -57,7 +57,7 @@ SET (HEADERS
     include/dracosha/validator/reporting/no_translator.hpp
     include/dracosha/validator/reporting/mapped_translator.hpp
     include/dracosha/validator/reporting/values.hpp
-    include/dracosha/validator/reporting/strings_order.hpp
+    include/dracosha/validator/reporting/order_and_presentation.hpp
     include/dracosha/validator/reporting/locale/sample_locale.hpp
 
     include/dracosha/validator/detail/has_method.hpp
@@ -74,7 +74,7 @@ SET (HEADERS
     include/dracosha/validator/detail/member_names_traits.hpp
     include/dracosha/validator/detail/format_value.hpp
     include/dracosha/validator/detail/formatter_fmt.hpp
-    include/dracosha/validator/detail/reorder_strings.hpp
+    include/dracosha/validator/detail/reorder_and_present.hpp
     include/dracosha/validator/detail/extract_cref.hpp
     include/dracosha/validator/detail/if_bool.hpp
 )

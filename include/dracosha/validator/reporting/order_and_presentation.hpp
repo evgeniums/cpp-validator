@@ -8,43 +8,43 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reporting/strings_order.hpp
+/** \file validator/reporting/order_and_presentation.hpp
 *
-*  Defines helper that adjusts strings ordering.
+*  Defines helper that adjusts order and presentation of strings.
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_STRINGS_ORDER_HPP
-#define DRACOSHA_VALIDATOR_STRINGS_ORDER_HPP
+#ifndef DRACOSHA_VALIDATOR_ORDER_AND_PRESENTATION_HPP
+#define DRACOSHA_VALIDATOR_ORDER_AND_PRESENTATION_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/detail/reorder_strings.hpp>
+#include <dracosha/validator/detail/reorder_and_present.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-struct strings_order_tag;
+struct order_and_presentation_tag;
 
 /**
  * @brief Helper to adjust strings ordering and presentation
  */
-struct strings_order_t
+struct order_and_presentation_t
 {
-    using hana_tag=strings_order_tag;
+    using hana_tag=order_and_presentation_tag;
 
     template <typename ...Args>
     constexpr auto operator () (Args&&... args) const -> decltype(auto)
     {
-        return detail::reorder_strings(std::forward<Args>(args)...);
+        return detail::reorder_and_present(std::forward<Args>(args)...);
     }
 };
-constexpr strings_order_t default_strings_order{};
+constexpr order_and_presentation_t default_order_and_presentation{};
 
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_STRINGS_ORDER_HPP
+#endif // DRACOSHA_VALIDATOR_ORDER_AND_PRESENTATION_HPP

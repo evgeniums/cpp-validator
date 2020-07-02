@@ -8,16 +8,16 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/reorder_strings.hpp
+/** \file validator/detail/reorder_and_present.hpp
 *
-*  Defines helpers for strings reordering.
+*  Defines helpers for adjusting strings order and presentation.
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_REORDER_STRINGS_HPP
-#define DRACOSHA_VALIDATOR_REORDER_STRINGS_HPP
+#ifndef DRACOSHA_VALIDATOR_REORDER_AND_PRESENT_HPP
+#define DRACOSHA_VALIDATOR_REORDER_AND_PRESENT_HPP
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/cref.hpp>
@@ -35,7 +35,7 @@ namespace detail
 {
 
 template <typename HandlerT, typename FormatterTs, typename ...Args>
-constexpr auto apply_reorder_fn(HandlerT&& fn, FormatterTs&& formatters, Args&&... args) -> decltype(auto)
+constexpr auto apply_reorder_present_fn(HandlerT&& fn, FormatterTs&& formatters, Args&&... args) -> decltype(auto)
 {
     // the remarkable composition below is about
     // to apply each formatter to its corresponding argument
@@ -53,7 +53,7 @@ constexpr auto apply_reorder_fn(HandlerT&& fn, FormatterTs&& formatters, Args&&.
 }
 
 template <typename PropT, typename OpT, typename T2, typename = hana::when<true>>
-struct apply_reorder_3args_t
+struct apply_reorder_present_3args_t
 {
     template <typename HandlerT, typename FormatterTs>
     constexpr auto operator () (
@@ -61,7 +61,7 @@ struct apply_reorder_3args_t
                                 const PropT& prop, const OpT& op, const T2& b
                                 ) const -> decltype(auto)
     {
-        return apply_reorder_fn(std::forward<HandlerT>(fn),
+        return apply_reorder_present_fn(std::forward<HandlerT>(fn),
                                 std::forward<FormatterTs>(formatters),
                                 prop,if_bool<T2,OpT>(std::forward<OpT>(op)),b
                                 );
@@ -86,7 +86,7 @@ constexpr void format_empty(HandlerT&& fn, FormattersT&& formatters, bool eq, bo
 }
 
 template <typename PropT, typename OpT, typename T2>
-struct apply_reorder_3args_t<
+struct apply_reorder_present_3args_t<
                         PropT,OpT,T2,
                         hana::when<
                             std::is_same<std::decay_t<PropT>,type_p_empty>::value
@@ -117,10 +117,10 @@ struct apply_reorder_3args_t<
     }
 };
 template <typename PropT, typename OpT, typename T2>
-constexpr apply_reorder_3args_t<PropT,OpT,T2> apply_reorder_3args{};
+constexpr apply_reorder_present_3args_t<PropT,OpT,T2> apply_reorder_present_3args{};
 
 template <typename PropT, typename MemberT, typename OpT, typename T2, typename = hana::when<true>>
-struct apply_reorder_4args_t
+struct apply_reorder_present_4args_t
 {
     template <typename HandlerT, typename FormatterTs>
     constexpr auto operator () (
@@ -128,17 +128,17 @@ struct apply_reorder_4args_t
                                 const PropT& prop, const MemberT& member, const OpT& op, const T2& b
                                 ) const -> decltype(auto)
     {
-        return apply_reorder_fn(std::forward<HandlerT>(fn),
+        return apply_reorder_present_fn(std::forward<HandlerT>(fn),
                                 std::forward<FormatterTs>(formatters),
                                 prop,member,if_bool<T2,OpT>(std::forward<OpT>(op)),b
                                 );
     }
 };
 template <typename PropT, typename MemberT, typename OpT, typename T2>
-constexpr apply_reorder_4args_t<PropT,MemberT,OpT,T2> apply_reorder_4args{};
+constexpr apply_reorder_present_4args_t<PropT,MemberT,OpT,T2> apply_reorder_present_4args{};
 
 template <typename OpT, typename T2>
-struct apply_reorder_2args_t
+struct apply_reorder_present_2args_t
 {
     template <typename HandlerT, typename FormatterTs>
     constexpr auto operator () (
@@ -146,22 +146,22 @@ struct apply_reorder_2args_t
                                 const OpT& op, const T2& b
                                 ) const -> decltype(auto)
     {
-        return apply_reorder_fn(std::forward<HandlerT>(fn),
+        return apply_reorder_present_fn(std::forward<HandlerT>(fn),
                                 std::forward<FormatterTs>(formatters),
                                 if_bool<T2,OpT>(std::forward<OpT>(op)),b
                                 );
     }
 };
 template <typename OpT, typename T2>
-constexpr apply_reorder_2args_t<OpT,T2> apply_reorder_2args{};
+constexpr apply_reorder_present_2args_t<OpT,T2> apply_reorder_present_2args{};
 
 template <typename ...Args>
-struct apply_reorder_t
+struct apply_reorder_present_t
 {
     template <typename HandlerT, typename FormatterTs>
     constexpr auto operator () (HandlerT&& fn, FormatterTs&& formatters, Args&&... args) const -> decltype(auto)
     {
-        return apply_reorder_fn(std::forward<HandlerT>(fn),
+        return apply_reorder_present_fn(std::forward<HandlerT>(fn),
                                 std::forward<FormatterTs>(formatters),
                                 std::forward<Args>(args)...
                                 );
@@ -169,12 +169,12 @@ struct apply_reorder_t
 };
 
 template <typename T1, typename T2, typename T3, typename T4>
-struct apply_reorder_t<T1,T2,T3,T4>
+struct apply_reorder_present_t<T1,T2,T3,T4>
 {
     template <typename HandlerT, typename FormatterTs, typename ... Args>
     constexpr auto operator () (HandlerT&& fn, FormatterTs&& formatters, Args&&... args) const -> decltype(auto)
     {
-        return apply_reorder_4args<T1,T2,T3,T4>(
+        return apply_reorder_present_4args<T1,T2,T3,T4>(
                                              std::forward<HandlerT>(fn),
                                              std::forward<FormatterTs>(formatters),
                                              std::forward<Args>(args)...
@@ -183,12 +183,12 @@ struct apply_reorder_t<T1,T2,T3,T4>
 };
 
 template <typename T1, typename T2, typename T3>
-struct apply_reorder_t<T1,T2,T3>
+struct apply_reorder_present_t<T1,T2,T3>
 {
     template <typename HandlerT, typename FormatterTs, typename ... Args>
     constexpr auto operator () (HandlerT&& fn, FormatterTs&& formatters, Args&&... args) const -> decltype(auto)
     {
-        return apply_reorder_3args<T1,T2,T3>(std::forward<HandlerT>(fn),
+        return apply_reorder_present_3args<T1,T2,T3>(std::forward<HandlerT>(fn),
                                              std::forward<FormatterTs>(formatters),
                                              std::forward<Args>(args)...
                                              );
@@ -196,12 +196,12 @@ struct apply_reorder_t<T1,T2,T3>
 };
 
 template <typename T1, typename T2>
-struct apply_reorder_t<T1,T2>
+struct apply_reorder_present_t<T1,T2>
 {
     template <typename HandlerT, typename FormatterTs, typename ... Args>
     constexpr auto operator () (HandlerT&& fn, FormatterTs&& formatters, Args&&... args) const -> decltype(auto)
     {
-        return apply_reorder_2args<T1,T2>(std::forward<HandlerT>(fn),
+        return apply_reorder_present_2args<T1,T2>(std::forward<HandlerT>(fn),
                                              std::forward<FormatterTs>(formatters),
                                              std::forward<Args>(args)...
                                              );
@@ -209,17 +209,17 @@ struct apply_reorder_t<T1,T2>
 };
 
 template <typename ... Args>
-constexpr apply_reorder_t<Args...> apply_reorder{};
+constexpr apply_reorder_present_t<Args...> apply_reorder_present{};
 
-struct reorder_strings_t
+struct reorder_and_present_t
 {
     template <typename HandlerT, typename FormatterTs, typename ...Args>
     constexpr auto operator () (HandlerT&& fn, FormatterTs&& formatters, Args&&... args) const -> decltype(auto)
     {
-        return apply_reorder<Args...>(std::forward<HandlerT>(fn),std::forward<FormatterTs>(formatters),std::forward<Args>(args)...);
+        return apply_reorder_present<Args...>(std::forward<HandlerT>(fn),std::forward<FormatterTs>(formatters),std::forward<Args>(args)...);
     }
 };
-constexpr reorder_strings_t reorder_strings{};
+constexpr reorder_and_present_t reorder_and_present{};
 
 }
 
@@ -227,4 +227,4 @@ constexpr reorder_strings_t reorder_strings{};
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_REORDER_STRINGS_HPP
+#endif // DRACOSHA_VALIDATOR_REORDER_AND_PRESENT_HPP
