@@ -1,7 +1,6 @@
 BOOST_AUTO_TEST_CASE(CheckBypassNamesDefaultStrings)
 {
     auto formatter1=formatter();
-#if 1
     std::string str1;
     formatter1.validate_operator(str1,gte,10);
     BOOST_CHECK_EQUAL(str1,std::string("is greater than or equal to 10"));
@@ -25,7 +24,6 @@ BOOST_AUTO_TEST_CASE(CheckBypassNamesDefaultStrings)
     std::string str5;
     formatter1.validate_property(str5,value,eq,true);
     BOOST_CHECK_EQUAL(str5,std::string("value is equal to true"));
-#endif
 
     std::string str6;
     detail::reorder_and_present(
@@ -33,5 +31,21 @@ BOOST_AUTO_TEST_CASE(CheckBypassNamesDefaultStrings)
                 make_cref_tuple(member_names(),default_strings,values),
                 empty,eq,false
             );
-    BOOST_TEST_MESSAGE(str6);
+    BOOST_CHECK_EQUAL(str6,std::string("is not empty"));
+
+    std::string str7;
+    detail::reorder_and_present(
+                hana::partial(format_append,hana::type_c<std::string>,std::ref(str7)),
+                make_cref_tuple(member_names(),member_names(),default_strings,values),
+                "field1",empty,ne,true
+            );
+    BOOST_CHECK_EQUAL(str7,std::string("field1 is not empty"));
+
+    std::string str8;
+    detail::reorder_and_present(
+                hana::partial(format_append,hana::type_c<std::string>,std::ref(str8)),
+                make_cref_tuple(member_names(),member_names(),default_strings,values),
+                "field2",empty,eq,true
+            );
+    BOOST_CHECK_EQUAL(str8,std::string("field2 is empty"));
 }

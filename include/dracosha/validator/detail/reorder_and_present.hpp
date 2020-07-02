@@ -68,23 +68,6 @@ struct apply_reorder_present_3args_t
     }
 };
 
-template <typename HandlerT,typename FormattersT>
-constexpr void format_empty(HandlerT&& fn, FormattersT&& formatters, bool eq, bool b)
-{
-    if (eq==b)
-    {
-        fn(
-            apply_cref(hana::at(formatters,hana::size_c<1>),string_empty)
-        );
-    }
-    else
-    {
-        fn(
-            apply_cref(hana::at(formatters,hana::size_c<1>),string_not_empty)
-        );
-    }
-}
-
 template <typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_3args_t<
                         PropT,OpT,T2,
@@ -103,39 +86,92 @@ struct apply_reorder_present_3args_t<
                                 const PropT&, const OpT&, const T2& b
                                 ) const -> decltype(auto)
     {
+        auto format_empty=[&](bool eq)
+        {
+            if (eq==b)
+            {
+                fn(
+                    apply_cref(hana::at(formatters,hana::size_c<1>),string_empty)
+                );
+            }
+            else
+            {
+                fn(
+                    apply_cref(hana::at(formatters,hana::size_c<1>),string_not_empty)
+                );
+            }
+        };
+
         hana::eval_if(
             std::is_same<std::decay_t<OpT>,eq_t>::value,
-            [&](auto)
-            {
-                format_empty(std::forward<HandlerT>(fn),std::forward<FormatterTs>(formatters),true,b);
-            },
-            [&](auto)
-            {
-                format_empty(std::forward<HandlerT>(fn),std::forward<FormatterTs>(formatters),false,b);
-            }
+            [&](auto){format_empty(true);},
+            [&](auto){format_empty(false);}
         );
     }
 };
 template <typename PropT, typename OpT, typename T2>
 constexpr apply_reorder_present_3args_t<PropT,OpT,T2> apply_reorder_present_3args{};
 
-template <typename PropT, typename MemberT, typename OpT, typename T2, typename = hana::when<true>>
+template <typename MemberT, typename PropT, typename OpT, typename T2, typename = hana::when<true>>
 struct apply_reorder_present_4args_t
 {
     template <typename HandlerT, typename FormatterTs>
     constexpr auto operator () (
                                 HandlerT&& fn, FormatterTs&& formatters,
-                                const PropT& prop, const MemberT& member, const OpT& op, const T2& b
+                                const MemberT& member, const PropT& prop, const OpT& op, const T2& b
                                 ) const -> decltype(auto)
     {
         return apply_reorder_present_fn(std::forward<HandlerT>(fn),
                                 std::forward<FormatterTs>(formatters),
-                                prop,member,if_bool<T2,OpT>(std::forward<OpT>(op)),b
+                                member,prop,if_bool<T2,OpT>(std::forward<OpT>(op)),b
                                 );
     }
 };
-template <typename PropT, typename MemberT, typename OpT, typename T2>
-constexpr apply_reorder_present_4args_t<PropT,MemberT,OpT,T2> apply_reorder_present_4args{};
+template <typename MemberT, typename PropT, typename OpT, typename T2>
+struct apply_reorder_present_4args_t<
+                        MemberT,PropT,OpT,T2,
+                        hana::when<
+                            std::is_same<std::decay_t<PropT>,type_p_empty>::value
+                            &&
+                            std::is_same<std::decay_t<T2>,bool>::value
+                            &&
+                            (std::is_same<std::decay_t<OpT>,eq_t>::value || std::is_same<std::decay_t<OpT>,ne_t>::value)
+                        >
+                    >
+{
+    template <typename HandlerT, typename FormatterTs>
+    constexpr auto operator () (
+                                HandlerT&& fn, FormatterTs&& formatters,
+                                const MemberT& member, const PropT&, const OpT&, const T2& b
+                                ) const -> decltype(auto)
+    {
+        auto format_empty=[&](bool eq)
+        {
+            if (eq==b)
+            {
+                fn(
+                    apply_cref(hana::at(formatters,hana::size_c<1>),member),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),string_empty)
+                );
+            }
+            else
+            {
+                fn(
+                    apply_cref(hana::at(formatters,hana::size_c<1>),member),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),string_not_empty)
+                );
+            }
+        };
+
+        hana::eval_if(
+            std::is_same<std::decay_t<OpT>,eq_t>::value,
+            [&](auto){format_empty(true);},
+            [&](auto){format_empty(false);}
+        );
+    }
+};
+template <typename MemberT, typename PropT, typename OpT, typename T2>
+constexpr apply_reorder_present_4args_t<MemberT,PropT,OpT,T2> apply_reorder_present_4args{};
 
 template <typename OpT, typename T2>
 struct apply_reorder_present_2args_t

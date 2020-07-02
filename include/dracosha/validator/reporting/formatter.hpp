@@ -87,7 +87,7 @@ struct formatter_t
     {
         append(dst,
                make_cref_tuple(_member_names,_member_names,_strings,_values),
-               prop,member,op,b
+               member,prop,op,b
                );
     }
 
@@ -115,7 +115,7 @@ struct formatter_t
     {
         append(dst,
                make_cref_tuple(_member_names,_member_names,_strings,_member_names),
-               prop,member,op,b
+               member,prop,op,b
                );
     }
 
@@ -124,7 +124,7 @@ struct formatter_t
     {
         append(dst,
                make_cref_tuple(_member_names,_member_names,_strings,_strings),
-               prop,member,op,string_master_sample
+               member,prop,op,string_master_sample
                );
     }
 
