@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/contains.hpp
 *
-*  Defines class to check if object contains a member.
+*  Defines helper to check if object contains a member.
 *
 */
 
@@ -29,6 +29,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Helper for checking if object contains a member
+ */
 struct contains_t
 {
     /**

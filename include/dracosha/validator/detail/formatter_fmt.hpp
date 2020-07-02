@@ -83,7 +83,7 @@ struct fmt_formatter_t
 };
 
 /**
- * @brief Append arguments to string usnig fmt backend
+ * @brief Append arguments to string using fmt backend
  */
 struct fmt_append_t
 {
@@ -96,7 +96,7 @@ struct fmt_append_t
 };
 
 /**
- * @brief Prepend arguments to string usnig fmt backend
+ * @brief Prepend arguments to string using fmt backend
  */
 struct fmt_prepend_t
 {

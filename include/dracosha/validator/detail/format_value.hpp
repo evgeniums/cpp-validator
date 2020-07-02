@@ -34,6 +34,9 @@ struct format_value_t
 {
 };
 
+/**
+ * @brief  Formatter of non-boolean values
+ */
 template <typename T>
 struct format_value_t<T,hana::when<!std::is_same<bool,T>::value>>
 {
@@ -44,6 +47,9 @@ struct format_value_t<T,hana::when<!std::is_same<bool,T>::value>>
     }
 };
 
+/**
+ * @brief  Formatter of boolean values
+ */
 template <typename T>
 struct format_value_t<T,hana::when<std::is_same<bool,T>::value>>
 {
@@ -54,6 +60,9 @@ struct format_value_t<T,hana::when<std::is_same<bool,T>::value>>
     }
 };
 
+/**
+ * @brief Default formatter of values
+ */
 template <typename T>
 constexpr format_value_t<T> format_value{};
 

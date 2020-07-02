@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/check_member.hpp
 *
-*  Defines traits to check if object can be queried if it contains a member and deduce type of that member
+*  Defines helper to check if object can be queried if it contains a member and deduce type of that member
 *
 */
 
@@ -30,6 +30,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
+/**
+ * @brief Helper to check if object can be queried if it contains a member and deduce type of that member
+ */
 template <typename T1, typename T2, typename=hana::when<true>>
 struct check_member_t
 {

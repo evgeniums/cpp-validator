@@ -25,6 +25,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Create instance of variadic template with types pack taken from the tuple
+ */
 template <template <typename...> class V>
 struct tuple_to_variadic
 {

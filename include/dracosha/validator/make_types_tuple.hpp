@@ -25,6 +25,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+  @brief Make tuple of hana::type_c<> from variadic arguments
+ */
 BOOST_HANA_CONSTEXPR_LAMBDA auto make_types_tuple =[](auto&&... args)
 {
     return hana::transform(hana::make_tuple(args...),hana::make_type);

@@ -37,6 +37,10 @@ template <typename T,typename PropT, typename = hana::when<true>>
 struct has_property_t
 {
 };
+
+/**
+ * @brief Hepler for probing property existance when object has a property
+ */
 template <typename T,typename PropT>
 struct has_property_t<T,PropT,hana::when<hana::is_a<property_tag,PropT>>>
 {
@@ -45,6 +49,10 @@ struct has_property_t<T,PropT,hana::when<hana::is_a<property_tag,PropT>>>
         return std::decay<PropT>::type::template has<T>();
     }
 };
+
+/**
+ * @brief Hepler for probing property existance when object does not have a property
+ */
 template <typename T,typename PropT>
 struct has_property_t<T,PropT,hana::when<!hana::is_a<property_tag,PropT>>>
 {

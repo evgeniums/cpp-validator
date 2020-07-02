@@ -50,6 +50,9 @@ struct string_false_t : public enable_to_string<string_false_t>
 };
 constexpr string_false_t string_false{};
 
+/**
+ * @brief Helper for adjusting presentation of operation when operand is not boolean
+ */
 template <typename T2, typename OpT, typename =hana::when<true>>
 struct if_bool_t
 {
@@ -59,6 +62,9 @@ struct if_bool_t
     }
 };
 
+/**
+ * @brief Helper for adjusting presentation of operation when operand is boolean and operation is "eq"
+ */
 template <typename T2, typename OpT>
 struct if_bool_t<T2,OpT,
             hana::when<std::is_same<std::remove_reference_t<T2>,bool>::value
@@ -72,6 +78,9 @@ struct if_bool_t<T2,OpT,
     }
 };
 
+/**
+ * @brief Helper for adjusting presentation of operation when operand is boolean and operation is "ne"
+ */
 template <typename T2, typename OpT>
 struct if_bool_t<T2,OpT,
         hana::when<std::is_same<std::remove_reference_t<T2>,bool>::value
