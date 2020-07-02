@@ -34,6 +34,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 namespace detail
 {
 
+/**
+ * @brief Apply adjusting of order and presentation
+ */
 template <typename HandlerT, typename FormatterTs, typename ...Args>
 constexpr auto apply_reorder_present_fn(HandlerT&& fn, FormatterTs&& formatters, Args&&... args) -> decltype(auto)
 {
@@ -52,6 +55,9 @@ constexpr auto apply_reorder_present_fn(HandlerT&& fn, FormatterTs&& formatters,
                             );
 }
 
+/**
+ * @brief Adjust presentation and order of validation report for 3 arguments with property but without member
+ */
 template <typename PropT, typename OpT, typename T2, typename = hana::when<true>>
 struct apply_reorder_present_3args_t
 {
@@ -68,6 +74,9 @@ struct apply_reorder_present_3args_t
     }
 };
 
+/**
+ * @brief Adjust presentation and order of validation report for property "empty"
+ */
 template <typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_3args_t<
                         PropT,OpT,T2,
@@ -112,6 +121,10 @@ struct apply_reorder_present_3args_t<
 template <typename PropT, typename OpT, typename T2>
 constexpr apply_reorder_present_3args_t<PropT,OpT,T2> apply_reorder_present_3args{};
 
+
+/**
+ * @brief Adjust presentation and order of validation report for 4 arguments with member
+ */
 template <typename MemberT, typename PropT, typename OpT, typename T2, typename = hana::when<true>>
 struct apply_reorder_present_4args_t
 {
@@ -127,6 +140,10 @@ struct apply_reorder_present_4args_t
                                 );
     }
 };
+
+/**
+ * @brief Adjust presentation and order of validation report for property "empty" of a member
+ */
 template <typename MemberT, typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_4args_t<
                         MemberT,PropT,OpT,T2,
@@ -173,6 +190,9 @@ struct apply_reorder_present_4args_t<
 template <typename MemberT, typename PropT, typename OpT, typename T2>
 constexpr apply_reorder_present_4args_t<MemberT,PropT,OpT,T2> apply_reorder_present_4args{};
 
+/**
+ * @brief Adjust presentation and order of validation report for 2 arguments without property and without member
+ */
 template <typename OpT, typename T2>
 struct apply_reorder_present_2args_t
 {
@@ -191,6 +211,9 @@ struct apply_reorder_present_2args_t
 template <typename OpT, typename T2>
 constexpr apply_reorder_present_2args_t<OpT,T2> apply_reorder_present_2args{};
 
+/**
+ * @brief Adjust presentation and order of validation report for arbitrary number of arguments
+ */
 template <typename ...Args>
 struct apply_reorder_present_t
 {
@@ -204,6 +227,9 @@ struct apply_reorder_present_t
     }
 };
 
+/**
+ * @brief Adjust presentation and order of validation report for 4 arguments with member
+ */
 template <typename T1, typename T2, typename T3, typename T4>
 struct apply_reorder_present_t<T1,T2,T3,T4>
 {
@@ -218,6 +244,9 @@ struct apply_reorder_present_t<T1,T2,T3,T4>
     }
 };
 
+/**
+ * @brief Adjust presentation and order of validation report for 3 arguments with property but without member
+ */
 template <typename T1, typename T2, typename T3>
 struct apply_reorder_present_t<T1,T2,T3>
 {
@@ -231,6 +260,9 @@ struct apply_reorder_present_t<T1,T2,T3>
     }
 };
 
+/**
+ * @brief Adjust presentation and order of validation report for 2 arguments without property and without member
+ */
 template <typename T1, typename T2>
 struct apply_reorder_present_t<T1,T2>
 {
@@ -247,6 +279,9 @@ struct apply_reorder_present_t<T1,T2>
 template <typename ... Args>
 constexpr apply_reorder_present_t<Args...> apply_reorder_present{};
 
+/**
+ * @brief Adjust presentation and order of validation report
+ */
 struct reorder_and_present_t
 {
     template <typename HandlerT, typename FormatterTs, typename ...Args>
