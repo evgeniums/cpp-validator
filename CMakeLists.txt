@@ -48,7 +48,6 @@ SET (HEADERS
 
     include/dracosha/validator/reporting/reporter.hpp
     include/dracosha/validator/reporting/formatter.hpp
-    include/dracosha/validator/reporting/formatter_fmt.hpp
     include/dracosha/validator/reporting/member_names.hpp
     include/dracosha/validator/reporting/strings.hpp
     include/dracosha/validator/reporting/translator.hpp
@@ -71,6 +70,7 @@ SET (HEADERS
     include/dracosha/validator/detail/to_string.hpp
     include/dracosha/validator/detail/member_names_traits.hpp
     include/dracosha/validator/detail/format_value.hpp
+    include/dracosha/validator/detail/formatter_fmt.hpp
 )
 
 SET (SOURCES
