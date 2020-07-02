@@ -9,6 +9,7 @@
 #include <dracosha/validator/properties/size.hpp>
 #include <dracosha/validator/reporting/mapped_translator.hpp>
 #include <dracosha/validator/reporting/translator_repository.hpp>
+#include <dracosha/validator/cref.hpp>
 
 using namespace dracosha::validator;
 
@@ -76,6 +77,8 @@ struct NonCopyable
     NonCopyable(NonCopyable&&)=default;
     NonCopyable& operator= (const NonCopyable&)=delete;
     NonCopyable& operator= (NonCopyable&&)=default;
+
+    std::string val;
 };
 
 }
@@ -165,6 +168,48 @@ BOOST_AUTO_TEST_CASE(CheckValues)
     BOOST_CHECK_EQUAL(translate_values(5),5);
     BOOST_CHECK_EQUAL(translate_values(true),std::string("true_translated"));
     BOOST_CHECK_EQUAL(translate_values(false),std::string("false_translated"));
+}
+
+BOOST_AUTO_TEST_CASE(CheckHanaZipTransform)
+{
+    auto fn1=[](const std::string& str)
+    {
+        return str+"+";
+    };
+    auto fn2=[](const std::string& str)
+    {
+        return str+"-";
+    };
+    auto fn3=[](const std::string& str1, const std::string& str2)
+    {
+        return str1+str2;
+    };
+
+    auto t1=hana::make_tuple(fn1,fn2);
+    auto t2=hana::make_tuple(std::string("a"),std::string("b"));
+
+    auto res=hana::unpack(hana::transform(hana::zip(t1,t2),hana::fuse(hana::apply)),fn3);
+    BOOST_CHECK_EQUAL(res,std::string("a+b-"));
+}
+
+BOOST_AUTO_TEST_CASE(CheckCref)
+{
+    NonCopyable ncp{"hello cref"};
+
+    auto fn=[](const NonCopyable& nc)
+    {
+        return nc.val;
+    };
+
+    auto res1=apply_cref(fn,ncp);
+    BOOST_CHECK_EQUAL(res1,ncp.val);
+
+    auto cr=cref(ncp);
+    const auto& ncp1=extract_cref(cr);
+    BOOST_CHECK_EQUAL(ncp1.val,ncp.val);
+
+    auto res2=apply_cref(fn,cr);
+    BOOST_CHECK_EQUAL(res2,ncp.val);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

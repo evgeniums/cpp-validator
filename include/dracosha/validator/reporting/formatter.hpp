@@ -20,10 +20,12 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_FORMATTER_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/cref.hpp>
+#include <dracosha/validator/properties/empty.hpp>
 #include <dracosha/validator/reporting/strings.hpp>
 #include <dracosha/validator/reporting/member_names.hpp>
 #include <dracosha/validator/reporting/values.hpp>
-#include <dracosha/validator/properties/empty.hpp>
+#include <dracosha/validator/reporting/strings_order.hpp>
 
 #ifdef DRACOSHA_VALIDATOR_FMT
 #include <dracosha/validator/detail/formatter_fmt.hpp>
@@ -52,7 +54,7 @@ struct formatter_tag;
  * i.e. it must be suitable for using std::back_inserter(dst), dst.insert(), dst.begin(), dst.end().
  *
  */
-template <typename MemberNamesT, typename ValuesT, typename StringsT>
+template <typename MemberNamesT, typename ValuesT, typename StringsT, typename StringsOrderT>
 struct formatter_t
 {
     using hana_tag=formatter_tag;
@@ -60,57 +62,33 @@ struct formatter_t
     MemberNamesT _member_names;
     ValuesT _values;
     const StringsT& _strings;
+    StringsOrderT _reorder_strings;
 
     template <typename DstT, typename T2, typename OpT>
     void validate_operator(DstT& dst,const OpT& op, const T2& b) const
     {
-        format_append(dst,_strings(op),b);
+        append(dst,
+               make_cref_tuple(_strings,_values),
+               op,b
+               );
     }
 
     template <typename DstT, typename T2, typename OpT, typename PropT>
     void validate_property(DstT& dst,const PropT& prop, const OpT& op, const T2& b) const
     {
-        hana::eval_if(
-            std::is_same<PropT,type_p_empty>::value,
-            [&dst,&b,this](auto)
-            {
-                if (b)
-                {
-                    format_append(dst,_strings(string_empty));
-                }
-                else
-                {
-                    format_append(dst,_strings(string_not_empty));
-                }
-            },
-            [&dst,&b,&prop,&op,this](auto)
-            {
-                format_append(dst,_member_names(prop),_strings(op),_values(b));
-            }
-        );
+        append(dst,
+               make_cref_tuple(_member_names,_strings,_values),
+               prop,op,b
+               );
     }
 
     template <typename DstT, typename T2, typename OpT, typename PropT, typename MemberT>
     void validate(DstT& dst, const MemberT& member, const PropT& prop, const OpT& op, const T2& b) const
     {
-        hana::eval_if(
-            std::is_same<PropT,type_p_empty>::value,
-            [&dst,&b,&member,this](auto)
-            {
-                if (b)
-                {
-                    format_append(dst,_member_names(member),_strings(string_empty));
-                }
-                else
-                {
-                    format_append(dst,_member_names(member),_strings(string_not_empty));
-                }
-            },
-            [&dst,&member,&b,&prop,&op,this](auto)
-            {
-                format_append(dst,_member_names(prop),_member_names(member),_strings(op),_values(b));
-            }
-        );
+        append(dst,
+               make_cref_tuple(_member_names,_member_names,_strings,_values),
+               prop,member,op,b
+               );
     }
 
     template <typename DstT, typename T2, typename MemberT>
@@ -118,62 +96,152 @@ struct formatter_t
     {
         if (b)
         {
-            format_append(dst,_member_names(member),_strings(string_exists));
+            append(dst,
+                   make_cref_tuple(_member_names,_strings),
+                   member,string_exists
+                   );
         }
         else
         {
-            format_append(dst,_member_names(member),_strings(string_not_exists));
+            append(dst,
+                   make_cref_tuple(_member_names,_strings),
+                   member,string_not_exists
+                   );
         }
     }
 
     template <typename DstT, typename T2, typename OpT, typename PropT, typename MemberT>
     void validate_with_other_member(DstT& dst, const MemberT& member, const PropT& prop, const OpT& op, const T2& b) const
     {
-        format_append(dst,_member_names(prop),_member_names(member),_strings(op),_member_names(b));
+        append(dst,
+               make_cref_tuple(_member_names,_member_names,_strings,_member_names),
+               prop,member,op,b
+               );
     }
 
     template <typename DstT, typename T2, typename OpT, typename PropT, typename MemberT>
     void validate_with_master_sample(DstT& dst, const MemberT& member, const PropT& prop, const OpT& op, const T2&) const
     {
-        format_append(dst,_member_names(prop),_member_names(member),_strings(op),_strings(string_master_sample));
+        append(dst,
+               make_cref_tuple(_member_names,_member_names,_strings,_strings),
+               prop,member,op,string_master_sample
+               );
     }
 
     template <typename DstT>
     void validate_and(DstT& dst) const
     {
-        format_prepend(dst,_strings(string_and));
+        prepend(dst,
+                make_cref_tuple(_strings),
+                string_and
+                );
     }
 
     template <typename DstT, typename MemberT>
     void validate_and(DstT& dst, const MemberT& member) const
     {
-        format_prepend(dst,_strings(string_and),_member_names(member));
+        prepend(dst,
+                make_cref_tuple(_strings,_member_names),
+                string_and,member
+                );
     }
 
     template <typename DstT>
     void validate_or(DstT& dst) const
     {
-        format_prepend(dst,_strings(string_or));
+        prepend(dst,
+                make_cref_tuple(_strings),
+                string_or
+                );
     }
 
     template <typename DstT, typename MemberT>
     void validate_or(DstT& dst, const MemberT& member) const
     {
-        format_prepend(dst,_strings(string_or),_member_names(member));
+        prepend(dst,
+                make_cref_tuple(_strings,_member_names),
+                string_or,member
+                );
     }
 
     template <typename DstT>
     void validate_not(DstT& dst) const
     {
-        format_prepend(dst,_strings(string_not));
+        prepend(dst,
+                make_cref_tuple(_strings),
+                string_not
+                );
     }
 
     template <typename DstT, typename MemberT>
     void validate_not(DstT& dst, const MemberT& member) const
     {
-        format_prepend(dst,_strings(string_not),_member_names(member));
+        prepend(dst,
+                make_cref_tuple(_strings,_member_names),
+                string_not,member
+                );
     }
+
+    private:
+
+        template <typename DstT,typename ...Args>
+        void append(DstT& dst, Args&&... args) const
+        {
+            _reorder_strings(
+                        hana::partial(format_append,hana::type_c<DstT>,std::ref(dst)),
+                        std::forward<Args>(args)...
+                        );
+        }
+
+        template <typename DstT,typename ...Args>
+        void prepend(DstT& dst, Args&&... args) const
+        {
+            _reorder_strings(
+                        hana::partial(format_prepend,hana::type_c<DstT>,std::ref(dst)),
+                        std::forward<Args>(args)...
+                        );
+        }
 };
+
+/**
+ * @brief Create formatter that doesn't own member names but holds a const reference instead
+ * @param mn Const reference to formatter of member names
+ * @param vs Const reference to formatter of values
+ * @param strings Const reference to strings
+ * @param order Reordering helper
+ * @return Formatter
+ */
+template <typename MemberNamesT,typename ValuesT,typename StringsT, typename StringsOrderT>
+auto formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const StringsT& strings, StringsOrderT&& order)
+{
+    return formatter_t<
+                const MemberNamesT&,
+                const ValuesT&,
+                StringsT,
+                std::decay_t<StringsOrderT>
+            >
+            {mn,vs,strings,std::forward<StringsOrderT>(order)};
+}
+
+/**
+ * @brief Create formatter that owns member names and value strings
+ * @param mn Formatter of member names
+ * @param vs Formatter of values
+ * @param strings Strings
+ * @param order Reordering helper
+ * @return Formatter
+ */
+template <typename MemberNamesT,typename ValuesT,typename StringsT, typename StringsOrderT>
+auto formatter(MemberNamesT&& mn, ValuesT&& vs, const StringsT& strings, StringsOrderT&& order)
+{
+    return formatter_t<
+                std::decay_t<MemberNamesT>,
+                std::decay_t<ValuesT>,
+                StringsT,
+                std::decay_t<StringsOrderT>
+            >
+            {std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),strings,std::forward<StringsOrderT>(order)};
+}
 
 /**
  * @brief Create formatter that doesn't own member names but holds a const reference instead
@@ -183,14 +251,9 @@ struct formatter_t
  * @return Formatter
  */
 template <typename MemberNamesT,typename ValuesT,typename StringsT>
-auto formatter_reference_strings(const MemberNamesT& mn, const ValuesT& vs, const StringsT& strings)
+auto formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const StringsT& strings)
 {
-    return formatter_t<
-                const MemberNamesT&,
-                const ValuesT&,
-                StringsT
-            >
-            {mn,vs,strings};
+    return formatter_with_references(mn,vs,strings,default_strings_order);
 }
 
 /**
@@ -203,12 +266,7 @@ auto formatter_reference_strings(const MemberNamesT& mn, const ValuesT& vs, cons
 template <typename MemberNamesT,typename ValuesT,typename StringsT>
 auto formatter(MemberNamesT&& mn, ValuesT&& vs, const StringsT& strings)
 {
-    return formatter_t<
-                std::decay_t<MemberNamesT>,
-                std::decay_t<ValuesT>,
-                StringsT
-            >
-            {std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),strings};
+    return formatter(std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),strings,default_strings_order);
 }
 
 /**
@@ -229,7 +287,8 @@ auto formatter(MemberNamesT&& mn, ValuesT&& vs)
  * @return Formatter
  */
 template <typename MemberNamesT>
-auto formatter(MemberNamesT&& mn)
+auto formatter(MemberNamesT&& mn,
+               std::enable_if_t<hana::is_a<member_names_tag,MemberNamesT>,void*> =nullptr)
 {
     return formatter(std::forward<MemberNamesT>(mn),values,default_strings);
 }
@@ -240,7 +299,8 @@ auto formatter(MemberNamesT&& mn)
  * @return Formatter
  */
 template <typename StringsT>
-auto formatter(const StringsT& strings)
+auto formatter(const StringsT& strings,
+               std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr)
 {
     return formatter(member_names(strings),values,strings);
 }

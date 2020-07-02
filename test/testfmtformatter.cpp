@@ -16,7 +16,6 @@ using namespace dracosha::validator;
 
 BOOST_AUTO_TEST_SUITE(TestFmtFormatter)
 
-//! \todo move fmt to special file under def
 BOOST_AUTO_TEST_CASE(CheckFmtString)
 {
     std::string str1, str2;

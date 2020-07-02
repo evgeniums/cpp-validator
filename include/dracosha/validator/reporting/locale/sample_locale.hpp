@@ -49,6 +49,8 @@ inline std::map<std::string,std::string> strings_sample_locale()
     m[string_master_sample]="sample";
     m[string_empty]="is empty";
     m[string_not_empty]="is not empty";
+    m[string_must_be]="must be";
+    m[string_must_not_be]="must not be";
 
     // properties
     m[value.name()]="value";

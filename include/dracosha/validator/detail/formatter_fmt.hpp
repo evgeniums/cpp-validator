@@ -67,35 +67,18 @@ void fmt_prepend_args(DstT& dst, Args&&... args)
 /**
  * @brief Format string from variadic arguments using fmt backend
  */
-template <typename DstT, typename ...Args>
 struct fmt_formatter_t
 {
+    template <typename DstT, typename ...Args>
     static void append(DstT& dst, Args&&... args)
     {
         return fmt_append_args(dst,std::forward<Args>(args)...);
     }
+
+    template <typename DstT, typename ...Args>
     static void prepend(DstT& dst, Args&&... args)
     {
         return fmt_prepend_args(dst,std::forward<Args>(args)...);
-    }
-};
-
-/**
- * @brief Format string from hana tuple using fmt backend
- */
-template <typename DstT, typename Ts>
-struct fmt_formatter_t<DstT,Ts,
-                    hana::when<hana::is_a<hana::tuple_tag,Ts>>
-                    >
-{
-    static void append(DstT& dst, Ts&& ts)
-    {
-        hana::unpack(std::forward<Ts>(ts),hana::partial(fmt_append_args,dst));
-    }
-
-    static void prepend(DstT& dst, Ts&& ts)
-    {
-        hana::unpack(std::forward<Ts>(ts),hana::partial(fmt_prepend_args,dst));
     }
 };
 
@@ -104,10 +87,11 @@ struct fmt_formatter_t<DstT,Ts,
  */
 struct fmt_append_t
 {
-    template <typename ...Args>
-    void operator () (Args&&... args) const
+    template <typename DstC,typename DstT,typename ...Args>
+    void operator () (DstC,DstT&& dst_ref,Args&&... args) const
     {
-        fmt_formatter_t<Args...>::append(std::forward<Args>(args)...);
+        typename DstC::type& dst=dst_ref;
+        fmt_formatter_t::append(dst,std::forward<Args>(args)...);
     }
 };
 
@@ -116,10 +100,11 @@ struct fmt_append_t
  */
 struct fmt_prepend_t
 {
-    template <typename ...Args>
-    void operator () (Args&&... args) const
+    template <typename DstC,typename DstT,typename ...Args>
+    void operator () (DstC,DstT&& dst_ref,Args&&... args) const
     {
-        fmt_formatter_t<Args...>::prepend(std::forward<Args>(args)...);
+        typename DstC::type& dst=dst_ref;
+        fmt_formatter_t::prepend(dst,std::forward<Args>(args)...);
     }
 };
 

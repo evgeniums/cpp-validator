@@ -58,6 +58,12 @@ struct strings_t
 
     const TranslatorT& _translator;
 
+    ~strings_t()=default;
+    strings_t(strings_t&&)=default;
+    strings_t(const strings_t&)=delete;
+    strings_t& operator =(strings_t&&)=default;
+    strings_t& operator =(const strings_t&)=delete;
+
     /**
      * @brief Convert ID to string
      * @param id ID that must be converted to string

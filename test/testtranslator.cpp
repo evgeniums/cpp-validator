@@ -218,6 +218,8 @@ BOOST_AUTO_TEST_CASE(CheckSampleLocale)
     BOOST_CHECK_EQUAL(m[string_master_sample],std::string(string_master_sample));
     BOOST_CHECK_EQUAL(m[string_empty],std::string(string_empty));
     BOOST_CHECK_EQUAL(m[string_not_empty],std::string(string_not_empty));
+    BOOST_CHECK_EQUAL(m[string_must_be],std::string(string_must_be));
+    BOOST_CHECK_EQUAL(m[string_must_not_be],std::string(string_must_not_be));
 
     // properties
     BOOST_CHECK_EQUAL(m[value.name()],value.name());
