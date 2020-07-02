@@ -81,7 +81,7 @@ struct strings_t
 };
 
 /**
-  @brief Default strings object do not perform any translation.
+  @brief Default strings object does not perform any translation.
 */
 constexpr strings_t<no_translator_t> default_strings{no_translator};
 

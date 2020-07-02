@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/operators/operator.hpp>
 #include <dracosha/validator/check_exists.hpp>
+#include <dracosha/validator/enable_to_string.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -43,14 +44,14 @@ struct exists_t
 constexpr exists_t exists{};
 
 //-------------------------------------------------------------
-struct string_exists_t : public op<string_exists_t>
+struct string_exists_t : public enable_to_string<string_exists_t>
 {
     constexpr static const char* description="exists";
 };
 constexpr string_exists_t string_exists{};
 
 //-------------------------------------------------------------
-struct string_not_exists_t : public op<string_not_exists_t>
+struct string_not_exists_t : public enable_to_string<string_not_exists_t>
 {
     constexpr static const char* description="does not exist";
 };

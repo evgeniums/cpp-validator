@@ -8,41 +8,38 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operators/operator.hpp
+/** \file validator/enable_to_string.hpp
 *
-*  Defines base operator
+*  Defines base template for types that can be string convertible using description
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_OPERATOR_HPP
-#define DRACOSHA_VALIDATOR_OPERATOR_HPP
+#ifndef DRACOSHA_VALIDATOR_ENABLE_TO_STRING_HPP
+#define DRACOSHA_VALIDATOR_ENABLE_TO_STRING_HPP
 
 #include <string>
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/enable_to_string.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
 /**
- * @brief Tag for all operator clases
- */
-struct operator_tag;
-
-/**
- * @brief Base operator class
+ * @brief Base template for types that can be string convertible using description
  */
 template <typename DerivedT>
-struct op : public enable_to_string<DerivedT>
+struct enable_to_string
 {
-    using hana_tag=operator_tag;
+    operator std::string () const
+    {
+        return std::string(DerivedT::description);
+    }
 };
 
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_OPERATOR_HPP
+#endif // DRACOSHA_VALIDATOR_ENABLE_TO_STRING_HPP

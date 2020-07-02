@@ -27,6 +27,7 @@ SET (HEADERS
     include/dracosha/validator/make_validator.hpp
     include/dracosha/validator/dispatcher.hpp
     include/dracosha/validator/check_member_path.hpp
+    include/dracosha/validator/enable_to_string.hpp
 
     include/dracosha/validator/operators/operator.hpp
     include/dracosha/validator/operators/exists.hpp
@@ -54,6 +55,7 @@ SET (HEADERS
     include/dracosha/validator/reporting/translator_repository.hpp
     include/dracosha/validator/reporting/no_translator.hpp
     include/dracosha/validator/reporting/mapped_translator.hpp
+    include/dracosha/validator/reporting/values.hpp
     include/dracosha/validator/reporting/locale/sample_locale.hpp
 
     include/dracosha/validator/detail/has_method.hpp
@@ -68,6 +70,7 @@ SET (HEADERS
     include/dracosha/validator/detail/string_view.hpp
     include/dracosha/validator/detail/to_string.hpp
     include/dracosha/validator/detail/member_names_traits.hpp
+    include/dracosha/validator/detail/format_value.hpp
 )
 
 SET (SOURCES

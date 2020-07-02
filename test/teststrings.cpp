@@ -4,6 +4,7 @@
 
 #include <dracosha/validator/reporting/strings.hpp>
 #include <dracosha/validator/reporting/member_names.hpp>
+#include <dracosha/validator/reporting/values.hpp>
 #include <dracosha/validator/properties/value.hpp>
 #include <dracosha/validator/properties/size.hpp>
 #include <dracosha/validator/reporting/mapped_translator.hpp>
@@ -36,7 +37,9 @@ struct translator_env
                             {std::string(string_and),"and_translated"},
                             {value.name(),"value_translated"},
                             {std::string(gte),"gte_translated"},
-                            {std::string("field1"),"field1_translated"}
+                            {std::string("field1"),"field1_translated"},
+                            {std::string("false"),"false_translated"},
+                            {std::string("true"),"true_translated"}
                         }
                       )
     {
@@ -63,6 +66,16 @@ struct translator_env
 
     std::map<std::string,std::string> _m;
     translator_repository _rep;
+};
+
+struct NonCopyable
+{
+    NonCopyable()=default;
+    ~NonCopyable()=default;
+    NonCopyable(const NonCopyable&)=delete;
+    NonCopyable(NonCopyable&&)=default;
+    NonCopyable& operator= (const NonCopyable&)=delete;
+    NonCopyable& operator= (NonCopyable&&)=default;
 };
 
 }
@@ -134,6 +147,24 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
         BOOST_CHECK_EQUAL(mn(10),std::string("10"));
         BOOST_CHECK_EQUAL(mn(Dummy{}),std::string("<\?\?\?\?\?>"));
     }
+}
+
+BOOST_AUTO_TEST_CASE(CheckValues)
+{
+    BOOST_CHECK_EQUAL(std::string(values("hello")),std::string("hello"));
+    BOOST_CHECK_EQUAL(values(5),5);
+    BOOST_CHECK_EQUAL(values(true),std::string("true"));
+    BOOST_CHECK_EQUAL(values(false),std::string("false"));
+    NonCopyable nc;
+    const auto& ncr=values(nc);
+    std::ignore=ncr;
+
+    translator_env env;
+    auto translate_values=make_translated_values(env._rep,"en");
+    BOOST_CHECK_EQUAL(std::string(translate_values("hello")),std::string("hello"));
+    BOOST_CHECK_EQUAL(translate_values(5),5);
+    BOOST_CHECK_EQUAL(translate_values(true),std::string("true_translated"));
+    BOOST_CHECK_EQUAL(translate_values(false),std::string("false_translated"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

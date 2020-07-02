@@ -6,6 +6,7 @@
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/reporting/formatter.hpp>
+#include <dracosha/validator/properties.hpp>
 
 #ifdef DRACOSHA_VALIDATOR_FMT
 

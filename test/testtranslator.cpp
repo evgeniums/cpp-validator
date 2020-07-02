@@ -213,7 +213,11 @@ BOOST_AUTO_TEST_CASE(CheckSampleLocale)
     auto m=strings_sample_locale();
 
     // specials
+    BOOST_CHECK_EQUAL(m[string_true],std::string(string_true));
+    BOOST_CHECK_EQUAL(m[string_false],std::string(string_false));
     BOOST_CHECK_EQUAL(m[string_master_sample],std::string(string_master_sample));
+    BOOST_CHECK_EQUAL(m[string_empty],std::string(string_empty));
+    BOOST_CHECK_EQUAL(m[string_not_empty],std::string(string_not_empty));
 
     // properties
     BOOST_CHECK_EQUAL(m[value.name()],value.name());

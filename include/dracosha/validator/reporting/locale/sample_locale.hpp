@@ -26,6 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/master_sample.hpp>
 #include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/operators.hpp>
+#include <dracosha/validator/reporting/values.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -43,7 +44,11 @@ inline std::map<std::string,std::string> strings_sample_locale()
     std::map<std::string,std::string> m;
 
     // specials
+    m[string_true]="true";
+    m[string_false]="false";
     m[string_master_sample]="sample";
+    m[string_empty]="is empty";
+    m[string_not_empty]="is not empty";
 
     // properties
     m[value.name()]="value";

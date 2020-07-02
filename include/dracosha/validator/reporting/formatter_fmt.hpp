@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/reporting/strings.hpp>
+#include <dracosha/validator/properties/empty.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -53,6 +54,8 @@ namespace detail
         format_append(tmp,std::forward<Args>(args)...);
         dst.insert(dst.begin(),tmp.begin(),tmp.end());
     }
+
+
 }
 
 struct formatter_tag;
@@ -65,12 +68,13 @@ struct formatter_tag;
  * i.e. it must be suitable for using std::back_inserter(dst), dst.insert(), dst.begin(), dst.end().
  *
  */
-template <typename MemberNamesT, typename StringsT>
+template <typename MemberNamesT, typename ValuesT, typename StringsT>
 struct formatter_fmt_t
 {
     using hana_tag=formatter_tag;
 
     MemberNamesT _member_names;
+    ValuesT _values;
     const StringsT& _strings;
 
     template <typename DstT, typename T2, typename OpT>
@@ -82,7 +86,47 @@ struct formatter_fmt_t
     template <typename DstT, typename T2, typename OpT, typename PropT>
     void validate_property(DstT& dst,const PropT& prop, const OpT& op, const T2& b) const
     {
-        detail::format_append(dst,"{} {} {}",_member_names(prop),_strings(op),b);
+        hana::eval_if(
+            std::is_same<PropT,type_p_empty>::value,
+            [&dst,&b,this](auto)
+            {
+                if (b)
+                {
+                    detail::format_append(dst,_strings(string_empty));
+                }
+                else
+                {
+                    detail::format_append(dst,_strings(string_not_empty));
+                }
+            },
+            [&dst,&b,&prop,&op,this](auto)
+            {
+                detail::format_append(dst,"{} {} {}",_member_names(prop),_strings(op),_values(b));
+            }
+        );
+    }
+
+    template <typename DstT, typename T2, typename OpT, typename PropT, typename MemberT>
+    void validate(DstT& dst, const MemberT& member, const PropT& prop, const OpT& op, const T2& b) const
+    {
+        hana::eval_if(
+            std::is_same<PropT,type_p_empty>::value,
+            [&dst,&b,&member,this](auto)
+            {
+                if (b)
+                {
+                    detail::format_append(dst,"{} {}",_member_names(member),_strings(string_empty));
+                }
+                else
+                {
+                    detail::format_append(dst,"{} {}",_member_names(member),_strings(string_not_empty));
+                }
+            },
+            [&dst,&member,&b,&prop,&op,this](auto)
+            {
+                detail::format_append(dst,"{} {} {} {}",_member_names(prop),_member_names(member),_strings(op),_values(b));
+            }
+        );
     }
 
     template <typename DstT, typename T2, typename MemberT>
@@ -96,12 +140,6 @@ struct formatter_fmt_t
         {
             detail::format_append(dst,"{} {}",_member_names(member),_strings(string_not_exists));
         }
-    }
-
-    template <typename DstT, typename T2, typename OpT, typename PropT, typename MemberT>
-    void validate(DstT& dst, const MemberT& member, const PropT& prop, const OpT& op, const T2& b) const
-    {
-        detail::format_append(dst,"{} {} {} {}",_member_names(prop),_member_names(member),_strings(op),b);
     }
 
     template <typename DstT, typename T2, typename OpT, typename PropT, typename MemberT>
