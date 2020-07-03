@@ -33,12 +33,18 @@ namespace detail
 template <char Sep>
 struct fmt_single_element
 {
-    constexpr static const auto value=hana::sum<hana::string_tag>(hana::make_tuple(hana::string_c<Sep>,BOOST_HANA_STRING("{}")));
+    constexpr static auto value()
+    {
+        return hana::sum<hana::string_tag>(hana::make_tuple(hana::string_c<Sep>,BOOST_HANA_STRING("{}")));
+    }
 };
 template <>
 struct fmt_single_element<0>
 {
-    constexpr static const auto value=BOOST_HANA_STRING("{}");
+    constexpr static auto value()
+    {
+        return BOOST_HANA_STRING("{}");
+    }
 };
 
 /**
@@ -47,7 +53,7 @@ struct fmt_single_element<0>
 template <char Sep, typename DstT, typename ...Args>
 void fmt_join_append_args(DstT& dst, Args&&... args)
 {
-    constexpr auto fmt_str_single =fmt_single_element<Sep>::value;
+    constexpr auto fmt_str_single =fmt_single_element<Sep>::value();
 
     constexpr auto fmt_str1 = BOOST_HANA_STRING("{}");
     constexpr auto fmt_str_rest= hana::replicate<hana::tuple_tag>(
