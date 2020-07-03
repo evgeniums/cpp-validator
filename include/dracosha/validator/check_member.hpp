@@ -41,19 +41,19 @@ template <typename T1, typename T2>
 struct check_member_t<T1,T2,hana::when<can_check_contains_t<T1,T2>::value
     && (detail::get_helpers::selector<T1, T2>::value == detail::get_helpers::getter::property)>>
 {
-    using type=typename std::decay<decltype(property(std::declval<T1>(),std::declval<T2>()))>::type;
+    using type=std::decay_t<decltype(property(std::declval<T1>(),std::declval<T2>()))>;
 };
 template <typename T1, typename T2>
 struct check_member_t<T1,T2,hana::when<can_check_contains_t<T1, T2>::value
     && (detail::get_helpers::selector<T1, T2>::value == detail::get_helpers::getter::at)>>
 {
-    using type=typename std::decay<decltype(std::declval<T1>().at(std::declval<T2>()))>::type;
+    using type=std::decay_t<decltype(std::declval<T1>().at(std::declval<T2>()))>;
 };
 template <typename T1, typename T2>
 struct check_member_t<T1,T2,hana::when<can_check_contains_t<T1, T2>::value
     && (detail::get_helpers::selector<T1, T2>::value == detail::get_helpers::getter::brackets)>>
 {
-    using type=typename std::decay<decltype(std::declval<T1>()[std::declval<T2>()])>::type;
+    using type=std::decay_t<decltype(std::declval<T1>()[std::declval<T2>()])>;
 };
 
 constexpr hana::metafunction_t<check_member_t> check_member{};

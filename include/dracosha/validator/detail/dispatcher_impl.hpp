@@ -153,7 +153,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
     constexpr static bool invoke(T1&& a, MemberT&& member, PropT&&, OpT&&, T2&& b,
-                                 std::enable_if_t<std::is_same<exists_t,typename std::decay<OpT>::type>::value,
+                                 std::enable_if_t<std::is_same<exists_t,std::decay_t<OpT>>::value,
                                    void*
                                  > =nullptr
                                 )
@@ -175,7 +175,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
                                  std::enable_if_t<
                                    (!hana::is_a<member_tag,T2> &&
                                     !hana::is_a<master_sample_tag,T2> &&
-                                    !std::is_same<exists_t,typename std::decay<OpT>::type>::value),
+                                    !std::is_same<exists_t,std::decay_t<OpT>>::value),
                                    void*
                                  > =nullptr
                                 )
@@ -261,7 +261,7 @@ template <typename T1>
 template <typename ...Args>
 constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::operator() (T1&& obj, Args&&... args) const
 {
-    using adapter_t=adapter<typename std::decay<T1>::type>;
+    using adapter_t=adapter<std::decay_t<T1>>;
     return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
 }
 
@@ -269,7 +269,7 @@ template <typename T1>
 template <typename ...Args>
 constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::invoke(T1&& obj, Args&&... args)
 {
-    using adapter_t=adapter<typename std::decay<T1>::type>;
+    using adapter_t=adapter<std::decay_t<T1>>;
     return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>.invoke(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
 }
 
@@ -277,7 +277,7 @@ template <typename T1>
 template <typename ...Args>
 constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_and(T1&& obj, Args&&... args)
 {
-    using adapter_t=adapter<typename std::decay<T1>::type>;
+    using adapter_t=adapter<std::decay_t<T1>>;
     return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>.validate_and(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
 }
 
@@ -285,7 +285,7 @@ template <typename T1>
 template <typename ...Args>
 constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_or(T1&& obj, Args&&... args)
 {
-    using adapter_t=adapter<typename std::decay<T1>::type>;
+    using adapter_t=adapter<std::decay_t<T1>>;
     return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>.validate_or(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
 }
 
@@ -293,7 +293,7 @@ template <typename T1>
 template <typename ...Args>
 constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_not(T1&& obj, Args&&... args)
 {
-    using adapter_t=adapter<typename std::decay<T1>::type>;
+    using adapter_t=adapter<std::decay_t<T1>>;
     return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>.validate_not(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
 }
 

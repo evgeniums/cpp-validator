@@ -56,7 +56,7 @@ struct adjust_storable_type<T,
                     hana::when<!std::is_constructible<std::string,T>::value>
                     >
 {
-    using type=typename std::decay<T>::type;
+    using type=std::decay_t<T>;
 };
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

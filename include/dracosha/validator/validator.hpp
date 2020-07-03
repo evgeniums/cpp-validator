@@ -69,7 +69,7 @@ struct _t
     template <typename T>
     constexpr auto operator [] (T&& key) const -> decltype(auto)
     {
-        return member<typename std::decay<T>::type>(std::forward<T>(key));
+        return member<std::decay_t<T>>(std::forward<T>(key));
     }
 
     /**

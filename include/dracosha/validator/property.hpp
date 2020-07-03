@@ -53,7 +53,7 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto has_property_fn=[](auto a, auto b)
 */
 BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> decltype(auto)
 {
-    return std::decay<decltype(prop)>::type::get(std::forward<decltype(val)>(val));
+    return std::decay_t<decltype(prop)>::get(std::forward<decltype(val)>(val));
 };
 
 //-------------------------------------------------------------

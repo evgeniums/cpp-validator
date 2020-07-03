@@ -46,7 +46,7 @@ struct has_property_t<T,PropT,hana::when<hana::is_a<property_tag,PropT>>>
 {
     constexpr bool operator() () const
     {
-        return std::decay<PropT>::type::template has<T>();
+        return std::decay_t<PropT>::template has<T>();
     }
 };
 
