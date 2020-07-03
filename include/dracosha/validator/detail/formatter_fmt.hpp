@@ -33,18 +33,12 @@ namespace detail
 template <char Sep>
 struct fmt_single_element
 {
-    DRACOSHA_VALIDATOR_HANA_STRINGS_CONSTEXPR static auto value()
-    {
-        return hana::sum<hana::string_tag>(hana::make_tuple(hana::string_c<Sep>,BOOST_HANA_STRING("{}")));
-    }
+    constexpr static auto value=hana::sum<hana::string_tag>(hana::make_tuple(hana::string_c<Sep>,hana::string_c<'{', '}'>));
 };
 template <>
 struct fmt_single_element<0>
 {
-    DRACOSHA_VALIDATOR_HANA_STRINGS_CONSTEXPR static auto value()
-    {
-        return BOOST_HANA_STRING("{}");
-    }
+    constexpr static auto value=hana::string_c<'{', '}'>;
 };
 
 /**
@@ -53,15 +47,15 @@ struct fmt_single_element<0>
 template <char Sep, typename DstT, typename ...Args>
 void fmt_join_append_args(DstT& dst, Args&&... args)
 {
-    DRACOSHA_VALIDATOR_HANA_STRINGS_CONSTEXPR auto fmt_str_single =fmt_single_element<Sep>::value();
+    constexpr auto fmt_str_single =fmt_single_element<Sep>::value;
 
-    DRACOSHA_VALIDATOR_HANA_STRINGS_CONSTEXPR auto fmt_str1 = BOOST_HANA_STRING("{}");
-    DRACOSHA_VALIDATOR_HANA_STRINGS_CONSTEXPR auto fmt_str_rest= hana::replicate<hana::tuple_tag>(
+    constexpr auto fmt_str1 = hana::string_c<'{', '}'>;
+    constexpr auto fmt_str_rest= hana::replicate<hana::tuple_tag>(
                     fmt_str_single,
                     hana::size_c<sizeof...(Args)-1>
                 );
-    DRACOSHA_VALIDATOR_HANA_STRINGS_CONSTEXPR auto fmt_str_all=hana::prepend(fmt_str_rest,fmt_str1);
-    DRACOSHA_VALIDATOR_HANA_STRINGS_CONSTEXPR auto fmt_str=hana::sum<hana::string_tag>(fmt_str_all);
+    constexpr auto fmt_str_all=hana::prepend(fmt_str_rest,fmt_str1);
+    constexpr auto fmt_str=hana::sum<hana::string_tag>(fmt_str_all);
 
     fmt::format_to(std::back_inserter(dst),hana::to<const char*>(fmt_str),std::forward<Args>(args)...);
 }

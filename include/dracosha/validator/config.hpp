@@ -23,12 +23,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <boost/hana.hpp>
 
-#if __cplusplus < 201703L
-#define DRACOSHA_VALIDATOR_HANA_STRINGS_CONSTEXPR
-#else
-#define DRACOSHA_VALIDATOR_HANA_STRINGS_CONSTEXPR constexpr
-#endif
-
 #define DRACOSHA_VALIDATOR_NAMESPACE_BEGIN namespace dracosha { namespace validator {
 #define DRACOSHA_VALIDATOR_NAMESPACE_END }}
 
