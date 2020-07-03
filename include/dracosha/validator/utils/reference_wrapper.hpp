@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reference_wrapper.hpp
+/** \file validator/utils/reference_wrapper.hpp
 *
 *  Defines reference wrapper whith hana tag and helpers for that wrapper
 *

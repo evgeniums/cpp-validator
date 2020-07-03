@@ -4,9 +4,12 @@ SET (HEADERS
     include/dracosha/validator/version.hpp
     include/dracosha/validator/config.hpp
 
-    include/dracosha/validator/tuple_to_variadic.hpp
-    include/dracosha/validator/scalar_compare.hpp
-    include/dracosha/validator/adjust_storable_type.hpp
+    include/dracosha/validator/utils/tuple_to_variadic.hpp
+    include/dracosha/validator/utils/scalar_compare.hpp
+    include/dracosha/validator/utils/adjust_storable_type.hpp
+    include/dracosha/validator/utils/enable_to_string.hpp
+    include/dracosha/validator/utils/make_types_tuple.hpp
+    include/dracosha/validator/utils/reference_wrapper.hpp
 
     include/dracosha/validator/property.hpp
     include/dracosha/validator/can_get.hpp
@@ -27,9 +30,6 @@ SET (HEADERS
     include/dracosha/validator/make_validator.hpp
     include/dracosha/validator/dispatcher.hpp
     include/dracosha/validator/check_member_path.hpp
-    include/dracosha/validator/enable_to_string.hpp
-    include/dracosha/validator/make_types_tuple.hpp
-    include/dracosha/validator/reference_wrapper.hpp
 
     include/dracosha/validator/operators/operator.hpp
     include/dracosha/validator/operators/exists.hpp
@@ -69,7 +69,6 @@ SET (HEADERS
     include/dracosha/validator/detail/dispatcher_impl.hpp
     include/dracosha/validator/detail/take_address_of.hpp
     include/dracosha/validator/detail/logical_not.hpp
-    include/dracosha/validator/detail/string_view.hpp
     include/dracosha/validator/detail/to_string.hpp
     include/dracosha/validator/detail/member_names_traits.hpp
     include/dracosha/validator/detail/format_value.hpp

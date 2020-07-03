@@ -20,7 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_IF_BOOL_HPP
 
 #include <dracosha/validator/config.h>
-#include <dracosha/validator/enable_to_string.hpp>
+#include <dracosha/validator/utils/enable_to_string.hpp>
 #include <dracosha/validator/operators/comparison.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN

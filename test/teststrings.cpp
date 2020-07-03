@@ -9,7 +9,7 @@
 #include <dracosha/validator/properties/size.hpp>
 #include <dracosha/validator/reporting/mapped_translator.hpp>
 #include <dracosha/validator/reporting/translator_repository.hpp>
-#include <dracosha/validator/reference_wrapper.hpp>
+#include <dracosha/validator/utils/reference_wrapper.hpp>
 
 using namespace dracosha::validator;
 

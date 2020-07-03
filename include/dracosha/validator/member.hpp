@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <type_traits>
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/adjust_storable_type.hpp>
-#include <dracosha/validator/tuple_to_variadic.hpp>
+#include <dracosha/validator/utils/adjust_storable_type.hpp>
+#include <dracosha/validator/utils/tuple_to_variadic.hpp>
 #include <dracosha/validator/apply.hpp>
 #include <dracosha/validator/dispatcher.hpp>
 

@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/operators/operator.hpp>
 #include <dracosha/validator/check_exists.hpp>
-#include <dracosha/validator/enable_to_string.hpp>
+#include <dracosha/validator/utils/enable_to_string.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
