@@ -161,7 +161,7 @@ struct apply_reorder_present_4args_t
 };
 
 /**
- * @brief Adjust presentation and order of validation report for 4 arguments with member
+ * @brief Adjust presentation and order of validation report for 4 arguments with a member is compared to other member
  */
 template <typename MemberT, typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_4args_t<
@@ -196,6 +196,52 @@ struct apply_reorder_present_4args_t<
                     apply_cref(hana::at(formatters,hana::size_c<1>),prop),
                     apply_cref(hana::at(formatters,hana::size_c<2>),string_property_of_member),
                     apply_cref(hana::at(formatters,hana::size_c<3>),b.get())
+                );
+            }
+        );
+    }
+};
+
+/**
+ * @brief Adjust presentation and order of validation report for 4 arguments with a member is compared to the same member of sample object
+ */
+template <typename MemberT, typename PropT, typename OpT, typename T2>
+struct apply_reorder_present_4args_t<
+                MemberT,PropT,OpT,T2,hana::when<std::is_same<std::decay_t<T2>,string_master_sample_t>::value>
+            >
+{
+    template <typename HandlerT, typename FormatterTs>
+    constexpr auto operator () (
+                                HandlerT&& fn, FormatterTs&& formatters,
+                                const MemberT& member, const PropT& prop, const OpT& op, const T2& b
+                                ) const -> decltype(auto)
+    {
+        return hana::eval_if(
+            std::is_same<std::decay_t<PropT>,type_p_value>::value,
+            [&](auto)
+            {
+                // member op b
+                return fn(
+                    apply_cref(hana::at(formatters,hana::size_c<0>),member),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
+                    apply_cref(hana::at(formatters,hana::size_c<0>),member),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),string_property_of_member),
+                    apply_cref(hana::at(formatters,hana::size_c<3>),b)
+                );
+            },
+            [&](auto)
+            {
+                // prop of member op b
+                return fn(
+                    apply_cref(hana::at(formatters,hana::size_c<1>),prop),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),string_property_of_member),
+                    apply_cref(hana::at(formatters,hana::size_c<0>),member),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
+                    apply_cref(hana::at(formatters,hana::size_c<1>),prop),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),string_property_of_member),
+                    apply_cref(hana::at(formatters,hana::size_c<0>),member),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),string_property_of_member),
+                    apply_cref(hana::at(formatters,hana::size_c<3>),b)
                 );
             }
         );

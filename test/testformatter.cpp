@@ -84,6 +84,14 @@ BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
                 "field2",value,lte,10
             );
     BOOST_CHECK_EQUAL(str9,std::string("field2 is less than or equal to 10"));
+
+    std::string str10;
+    detail::reorder_and_present(
+                hana::partial(format_append,hana::type_c<std::string>,std::ref(str10)),
+                make_cref_tuple(member_names(),member_names(),default_strings,default_strings),
+                "field2",value,lte,string_master_sample
+            );
+    BOOST_CHECK_EQUAL(str10,std::string("field2 is less than or equal to field2 of sample"));
 }
 
 BOOST_AUTO_TEST_CASE(CheckBypassNamesDefaultStrings)
@@ -145,6 +153,13 @@ BOOST_AUTO_TEST_CASE(CheckBypassNamesDefaultStrings)
     std::string str15;
     formatter1.validate_with_other_member(str15,"field1",size,lte,"field2");
     BOOST_CHECK_EQUAL(str15,std::string("size of field1 is less than or equal to size of field2"));
+
+    std::string str16;
+    formatter1.validate_with_master_sample(str16,"field1",value,gt,"");
+    BOOST_CHECK_EQUAL(str16,std::string("field1 is greater than field1 of sample"));
+    std::string str17;
+    formatter1.validate_with_master_sample(str17,"field1",size,lte,"");
+    BOOST_CHECK_EQUAL(str17,std::string("size of field1 is less than or equal to size of field1 of sample"));
 }
 
 #endif
