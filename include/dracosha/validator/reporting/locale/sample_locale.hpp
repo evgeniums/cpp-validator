@@ -51,7 +51,7 @@ inline std::map<std::string,std::string> strings_sample_locale()
     m[string_not_empty]="is not empty";
     m[string_must_be]="must be";
     m[string_must_not_be]="must not be";
-    m[string_property_of_member]="of";
+    m[string_of_conjunction]="of";
 
     // properties
     m[value.name()]="value";

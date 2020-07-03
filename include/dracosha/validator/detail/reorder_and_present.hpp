@@ -150,7 +150,7 @@ struct apply_reorder_present_4args_t
                 // prop of member op b
                 return fn(
                     apply_cref(hana::at(formatters,hana::size_c<1>),prop),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),string_property_of_member),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),string_of_conjunction),
                     apply_cref(hana::at(formatters,hana::size_c<0>),member),
                     apply_cref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
                     apply_cref(hana::at(formatters,hana::size_c<3>),b)
@@ -190,11 +190,11 @@ struct apply_reorder_present_4args_t<
                 // prop of member op b
                 return fn(
                     apply_cref(hana::at(formatters,hana::size_c<1>),prop),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),string_property_of_member),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),string_of_conjunction),
                     apply_cref(hana::at(formatters,hana::size_c<0>),member),
                     apply_cref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
                     apply_cref(hana::at(formatters,hana::size_c<1>),prop),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),string_property_of_member),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),string_of_conjunction),
                     apply_cref(hana::at(formatters,hana::size_c<3>),b.get())
                 );
             }
@@ -220,27 +220,27 @@ struct apply_reorder_present_4args_t<
             std::is_same<std::decay_t<PropT>,type_p_value>::value,
             [&](auto)
             {
-                // member op b
+                // member op member of sample
                 return fn(
                     apply_cref(hana::at(formatters,hana::size_c<0>),member),
                     apply_cref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
                     apply_cref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),string_property_of_member),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),string_of_conjunction),
                     apply_cref(hana::at(formatters,hana::size_c<3>),b)
                 );
             },
             [&](auto)
             {
-                // prop of member op b
+                // prop of member op prop of member of sample
                 return fn(
                     apply_cref(hana::at(formatters,hana::size_c<1>),prop),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),string_property_of_member),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),string_of_conjunction),
                     apply_cref(hana::at(formatters,hana::size_c<0>),member),
                     apply_cref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
                     apply_cref(hana::at(formatters,hana::size_c<1>),prop),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),string_property_of_member),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),string_of_conjunction),
                     apply_cref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),string_property_of_member),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),string_of_conjunction),
                     apply_cref(hana::at(formatters,hana::size_c<3>),b)
                 );
             }
