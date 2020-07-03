@@ -127,7 +127,7 @@ struct fmt_append_t
     template <typename DstT,typename ...Args>
     void operator () (DstT&& dst,Args&&... args) const
     {
-        fmt_formatter_t::append(extract_cref(std::forward<DstT>(dst)),std::forward<Args>(args)...);
+        fmt_formatter_t::append(extract_ref(std::forward<DstT>(dst)),std::forward<Args>(args)...);
     }
 };
 
@@ -139,7 +139,7 @@ struct fmt_prepend_t
     template <typename DstT,typename ...Args>
     void operator () (DstT&& dst,Args&&... args) const
     {
-        fmt_formatter_t::prepend(extract_cref(std::forward<DstT>(dst)),std::forward<Args>(args)...);
+        fmt_formatter_t::prepend(extract_ref(std::forward<DstT>(dst)),std::forward<Args>(args)...);
     }
 };
 
@@ -151,7 +151,7 @@ struct fmt_join_append_t
     template <typename DstT,typename ...Args>
     void operator () (DstT&& dst,Args&&... args) const
     {
-        fmt_formatter_t::join_append(extract_cref(std::forward<DstT>(dst)),std::forward<Args>(args)...);
+        fmt_formatter_t::join_append(extract_ref(std::forward<DstT>(dst)),std::forward<Args>(args)...);
     }
 };
 
@@ -163,7 +163,7 @@ struct fmt_join_prepend_t
     template <typename DstT,typename ...Args>
     void operator () (DstT&& dst,Args&&... args) const
     {
-        fmt_formatter_t::join_prepend(extract_cref(std::forward<DstT>(dst)),std::forward<Args>(args)...);
+        fmt_formatter_t::join_prepend(extract_ref(std::forward<DstT>(dst)),std::forward<Args>(args)...);
     }
 };
 

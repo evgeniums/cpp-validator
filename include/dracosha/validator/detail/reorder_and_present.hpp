@@ -20,7 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_REORDER_AND_PRESENT_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/cref.hpp>
+#include <dracosha/validator/reference_wrapper.hpp>
 #include <dracosha/validator/reporting/strings.hpp>
 #include <dracosha/validator/reporting/member_names.hpp>
 #include <dracosha/validator/reporting/values.hpp>
@@ -64,7 +64,7 @@ constexpr auto apply_reorder_present_fn(DstT& dst, FormatterTs&& formatters, Arg
                                                 std::forward<FormatterTs>(formatters),
                                                 make_cref_tuple(std::forward<Args>(args)...)
                                             ),
-                                            hana::fuse(apply_cref) // for each pair invoke a formatter with the argument from the same pair
+                                            hana::fuse(apply_ref) // for each pair invoke a formatter with the argument from the same pair
                                         ),
                         hana::partial(     // send all formatter(pair) results to join_append handler
                                 formatter_join_append,
@@ -91,8 +91,8 @@ struct apply_reorder_present_1arg_t
         // op:
         return backend_formatter.append(
             dst,
-            apply_cref(hana::at(formatters,hana::size_c<0>),op),
-            apply_cref(hana::at(formatters,hana::size_c<0>),string_conjunction_aggregate)
+            apply_ref(hana::at(formatters,hana::size_c<0>),op),
+            apply_ref(hana::at(formatters,hana::size_c<0>),string_conjunction_aggregate)
         );
     }
 };
@@ -142,13 +142,13 @@ struct apply_reorder_present_2args_t<MemberT,OpT,
         // for member op:
         backend_formatter.join_append(
             dst,
-            apply_cref(hana::at(formatters,hana::size_c<1>),string_conjunction_for),
-            apply_cref(hana::at(formatters,hana::size_c<0>),member),
-            apply_cref(hana::at(formatters,hana::size_c<1>),op)
+            apply_ref(hana::at(formatters,hana::size_c<1>),string_conjunction_for),
+            apply_ref(hana::at(formatters,hana::size_c<0>),member),
+            apply_ref(hana::at(formatters,hana::size_c<1>),op)
         );
         return backend_formatter.append(
             dst,
-            apply_cref(hana::at(formatters,hana::size_c<1>),string_conjunction_aggregate)
+            apply_ref(hana::at(formatters,hana::size_c<1>),string_conjunction_aggregate)
         );
     }
 };
@@ -205,7 +205,7 @@ struct apply_reorder_present_3args_t<
                 // is empty
                 backend_formatter.join_append(
                     dst,
-                    apply_cref(hana::at(formatters,hana::size_c<1>),string_empty)
+                    apply_ref(hana::at(formatters,hana::size_c<1>),string_empty)
                 );
             }
             else
@@ -213,7 +213,7 @@ struct apply_reorder_present_3args_t<
                 // is not empty
                 backend_formatter.join_append(
                     dst,
-                    apply_cref(hana::at(formatters,hana::size_c<1>),string_not_empty)
+                    apply_ref(hana::at(formatters,hana::size_c<1>),string_not_empty)
                 );
             }
         };
@@ -249,9 +249,9 @@ struct apply_reorder_present_4args_t
                 // member op b
                 return backend_formatter.join_append(
                     dst,
-                    apply_cref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
-                    apply_cref(hana::at(formatters,hana::size_c<3>),b)
+                    apply_ref(hana::at(formatters,hana::size_c<0>),member),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
+                    apply_ref(hana::at(formatters,hana::size_c<3>),b)
                 );
             },
             [&](auto)
@@ -259,11 +259,11 @@ struct apply_reorder_present_4args_t
                 // prop of member op b
                 return backend_formatter.join_append(
                     dst,
-                    apply_cref(hana::at(formatters,hana::size_c<1>),prop),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
-                    apply_cref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
-                    apply_cref(hana::at(formatters,hana::size_c<3>),b)
+                    apply_ref(hana::at(formatters,hana::size_c<1>),prop),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
+                    apply_ref(hana::at(formatters,hana::size_c<0>),member),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
+                    apply_ref(hana::at(formatters,hana::size_c<3>),b)
                 );
             }
         );
@@ -291,9 +291,9 @@ struct apply_reorder_present_4args_t<
                 // member op b
                 return backend_formatter.join_append(
                     dst,
-                    apply_cref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
-                    apply_cref(hana::at(formatters,hana::size_c<3>),b.get())
+                    apply_ref(hana::at(formatters,hana::size_c<0>),member),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
+                    apply_ref(hana::at(formatters,hana::size_c<3>),b.get())
                 );
             },
             [&](auto)
@@ -301,13 +301,13 @@ struct apply_reorder_present_4args_t<
                 // prop of member op b
                 return backend_formatter.join_append(
                     dst,
-                    apply_cref(hana::at(formatters,hana::size_c<1>),prop),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
-                    apply_cref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
-                    apply_cref(hana::at(formatters,hana::size_c<1>),prop),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
-                    apply_cref(hana::at(formatters,hana::size_c<3>),b.get())
+                    apply_ref(hana::at(formatters,hana::size_c<1>),prop),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
+                    apply_ref(hana::at(formatters,hana::size_c<0>),member),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
+                    apply_ref(hana::at(formatters,hana::size_c<1>),prop),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
+                    apply_ref(hana::at(formatters,hana::size_c<3>),b.get())
                 );
             }
         );
@@ -335,11 +335,11 @@ struct apply_reorder_present_4args_t<
                 // member op member of sample
                 return backend_formatter.join_append(
                     dst,
-                    apply_cref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
-                    apply_cref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
-                    apply_cref(hana::at(formatters,hana::size_c<3>),b)
+                    apply_ref(hana::at(formatters,hana::size_c<0>),member),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
+                    apply_ref(hana::at(formatters,hana::size_c<0>),member),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
+                    apply_ref(hana::at(formatters,hana::size_c<3>),b)
                 );
             },
             [&](auto)
@@ -347,15 +347,15 @@ struct apply_reorder_present_4args_t<
                 // prop of member op prop of member of sample
                 return backend_formatter.join_append(
                     dst,
-                    apply_cref(hana::at(formatters,hana::size_c<1>),prop),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
-                    apply_cref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
-                    apply_cref(hana::at(formatters,hana::size_c<1>),prop),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
-                    apply_cref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
-                    apply_cref(hana::at(formatters,hana::size_c<3>),b)
+                    apply_ref(hana::at(formatters,hana::size_c<1>),prop),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
+                    apply_ref(hana::at(formatters,hana::size_c<0>),member),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
+                    apply_ref(hana::at(formatters,hana::size_c<1>),prop),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
+                    apply_ref(hana::at(formatters,hana::size_c<0>),member),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
+                    apply_ref(hana::at(formatters,hana::size_c<3>),b)
                 );
             }
         );
@@ -390,8 +390,8 @@ struct apply_reorder_present_4args_t<
                 // member is empty
                 backend_formatter.join_append(
                     dst,
-                    apply_cref(hana::at(formatters,hana::size_c<1>),member),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),string_empty)
+                    apply_ref(hana::at(formatters,hana::size_c<1>),member),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),string_empty)
                 );
             }
             else
@@ -399,8 +399,8 @@ struct apply_reorder_present_4args_t<
                 // member is not empty
                 backend_formatter.join_append(
                     dst,
-                    apply_cref(hana::at(formatters,hana::size_c<1>),member),
-                    apply_cref(hana::at(formatters,hana::size_c<2>),string_not_empty)
+                    apply_ref(hana::at(formatters,hana::size_c<1>),member),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),string_not_empty)
                 );
             }
         };

@@ -29,7 +29,7 @@ SET (HEADERS
     include/dracosha/validator/check_member_path.hpp
     include/dracosha/validator/enable_to_string.hpp
     include/dracosha/validator/make_types_tuple.hpp
-    include/dracosha/validator/cref.hpp
+    include/dracosha/validator/reference_wrapper.hpp
 
     include/dracosha/validator/operators/operator.hpp
     include/dracosha/validator/operators/exists.hpp
@@ -75,7 +75,7 @@ SET (HEADERS
     include/dracosha/validator/detail/format_value.hpp
     include/dracosha/validator/detail/formatter_fmt.hpp
     include/dracosha/validator/detail/reorder_and_present.hpp
-    include/dracosha/validator/detail/extract_cref.hpp
+    include/dracosha/validator/detail/extract_ref.hpp
     include/dracosha/validator/detail/if_bool.hpp
 )
 

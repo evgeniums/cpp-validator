@@ -20,7 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_MEMBER_NAMES_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/cref.hpp>
+#include <dracosha/validator/reference_wrapper.hpp>
 #include <dracosha/validator/reporting/strings.hpp>
 #include <dracosha/validator/detail/member_names_traits.hpp>
 
@@ -52,7 +52,7 @@ struct member_name_t
         return _v.get();
     }
 
-    cref_t<T> _v;
+    reference_wrapper_t<T> _v;
 };
 
 BOOST_HANA_CONSTEXPR_LAMBDA auto member_name =[](const auto& v)

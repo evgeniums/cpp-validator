@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/extract_cref.hpp
+/** \file validator/extract_reference_wrapper.hpp
 *
 *  Defines helper for extracting constant reference from a value
 *
@@ -25,21 +25,21 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-struct cref_tag;
+struct ref_tag;
 
 namespace detail
 {
 template <typename T, typename =hana::when<true>>
-struct extract_cref_t
+struct extract_ref_t
 {
 };
 
 /**
- * @brief Extract constant reference if value is not a cref
+ * @brief Return the value itself if it is not a reference wrapper
  */
 template <typename T>
-struct extract_cref_t<T,
-                    hana::when<!hana::is_a<cref_tag,T>>>
+struct extract_ref_t<T,
+                    hana::when<!hana::is_a<ref_tag,T>>>
 {
     constexpr auto operator() (T&& v) const -> decltype(auto)
     {
@@ -48,11 +48,11 @@ struct extract_cref_t<T,
 };
 
 /**
- * @brief Extract constant reference if value is a cref
+ * @brief Extract reference if value is a reference wrapper
  */
 template <typename T>
-struct extract_cref_t<T,
-                    hana::when<hana::is_a<cref_tag,T>>>
+struct extract_ref_t<T,
+                    hana::when<hana::is_a<ref_tag,T>>>
 {
     constexpr auto operator() (T&& v) const -> decltype(auto)
     {
@@ -60,7 +60,7 @@ struct extract_cref_t<T,
     }
 };
 template <typename T>
-constexpr extract_cref_t<T> extract_cref_impl{};
+constexpr extract_ref_t<T> extract_ref_impl{};
 }
 
 //-------------------------------------------------------------

@@ -9,7 +9,7 @@
 #include <dracosha/validator/properties/size.hpp>
 #include <dracosha/validator/reporting/mapped_translator.hpp>
 #include <dracosha/validator/reporting/translator_repository.hpp>
-#include <dracosha/validator/cref.hpp>
+#include <dracosha/validator/reference_wrapper.hpp>
 
 using namespace dracosha::validator;
 
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(CheckHanaZipTransform)
     BOOST_CHECK_EQUAL(res,std::string("a+b-"));
 }
 
-BOOST_AUTO_TEST_CASE(CheckCref)
+BOOST_AUTO_TEST_CASE(CheckReferenceWrapper)
 {
     NonCopyable ncp{"hello cref"};
 
@@ -201,21 +201,21 @@ BOOST_AUTO_TEST_CASE(CheckCref)
         return nc.val;
     };
 
-    auto res1=apply_cref(fn,ncp);
+    auto res1=apply_ref(fn,ncp);
     BOOST_CHECK_EQUAL(res1,ncp.val);
 
     auto cr=cref(ncp);
-    const auto& ncp1=extract_cref(cr);
+    const auto& ncp1=extract_ref(cr);
     BOOST_CHECK_EQUAL(ncp1.val,ncp.val);
 
-    auto res2=apply_cref(fn,cr);
+    auto res2=apply_ref(fn,cr);
     BOOST_CHECK_EQUAL(res2,ncp.val);
 
     auto mn=member_names();
     auto fn1=[&mn](const auto& v)
     {
         auto vv=cref(v);
-        auto str=apply_cref(mn,vv);
+        auto str=apply_ref(mn,vv);
         BOOST_CHECK_EQUAL(std::string("field1"),str);
     };
     fn1("field1");
