@@ -1,3 +1,6 @@
+//#define DRACOSHA_VALIDATOR_TEST_FORMATTER
+#ifdef DRACOSHA_VALIDATOR_TEST_FORMATTER
+
 #include <string>
 #include <vector>
 #include <iterator>
@@ -5,48 +8,111 @@
 #include <boost/test/unit_test.hpp>
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/reporting/formatter.hpp>
 
-#ifdef DRACOSHA_VALIDATOR_FMT
-#include <fmt/format.h>
-
-using namespace dracosha::validator;
-
-BOOST_AUTO_TEST_SUITE(TestFmtFormatter)
-
-//! \todo move fmt to special file under def
-BOOST_AUTO_TEST_CASE(CheckFmtString)
+BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
 {
-    std::string str1, str2;
-    std::vector<char> vec1, vec2;
+    std::string str1;
+    detail::reorder_and_present(
+                hana::partial(format_append,hana::type_c<std::string>,std::ref(str1)),
+                make_cref_tuple(default_strings,values),
+                gte,10
+            );
+    BOOST_CHECK_EQUAL(str1,std::string("is greater than or equal to 10"));
 
-    fmt::format_to(std::back_inserter(str1),"Hello {}",1);
-    fmt::format_to(std::back_inserter(vec1),"Hello vector {}",1);
+    std::string str2;
+    detail::reorder_and_present(
+                hana::partial(format_append,hana::type_c<std::string>,std::ref(str2)),
+                make_cref_tuple(default_strings,values),
+                eq,true
+            );
+    BOOST_CHECK_EQUAL(str2,std::string("must be true"));
 
-    fmt::format_to(std::back_inserter(str2),"prepend {} ",2);
-    str1.insert(str1.begin(),str2.begin(),str2.end());
-    BOOST_TEST_MESSAGE(str1);
+    std::string str3;
+    detail::reorder_and_present(
+                hana::partial(format_append,hana::type_c<std::string>,std::ref(str3)),
+                make_cref_tuple(default_strings,values),
+                ne,true
+            );
+    BOOST_CHECK_EQUAL(str3,std::string("must not be true"));
 
-    fmt::format_to(std::back_inserter(vec2),"prepend vector {} ",2);
-    vec1.insert(vec1.begin(),vec2.begin(),vec2.end());
-    BOOST_TEST_MESSAGE(std::string(vec1.data(),vec1.size()));
+    auto mn=member_names();
+    std::string str4;
+    detail::reorder_and_present(
+                hana::partial(format_append,hana::type_c<std::string>,std::ref(str4)),
+                make_cref_tuple(mn,mn,default_strings,values),
+                "field1",size,eq,100
+            );
+    BOOST_CHECK_EQUAL(str4,std::string("size of field1 is equal to 100"));
 
-    auto gte_str=std::string(gte);
-    BOOST_TEST_MESSAGE(gte_str);
-    BOOST_CHECK_EQUAL(gte_str,std::string(gte.description));
+    std::string str5;
+    detail::reorder_and_present(
+                hana::partial(format_append,hana::type_c<std::string>,std::ref(str5)),
+                make_cref_tuple(member_names(),member_names(),default_strings,values),
+                "field2",value,eq,true
+            );
+    BOOST_CHECK_EQUAL(str5,std::string("field2 must be true"));
+
+    std::string str6;
+    detail::reorder_and_present(
+                hana::partial(format_append,hana::type_c<std::string>,std::ref(str6)),
+                make_cref_tuple(member_names(),default_strings,values),
+                empty,eq,false
+            );
+    BOOST_CHECK_EQUAL(str6,std::string("is not empty"));
+
+    std::string str7;
+    detail::reorder_and_present(
+                hana::partial(format_append,hana::type_c<std::string>,std::ref(str7)),
+                make_cref_tuple(member_names(),member_names(),default_strings,values),
+                "field1",empty,ne,true
+            );
+    BOOST_CHECK_EQUAL(str7,std::string("field1 is not empty"));
+
+    std::string str8;
+    detail::reorder_and_present(
+                hana::partial(format_append,hana::type_c<std::string>,std::ref(str8)),
+                make_cref_tuple(member_names(),member_names(),default_strings,values),
+                "field2",empty,eq,true
+            );
+    BOOST_CHECK_EQUAL(str8,std::string("field2 is empty"));
+
+    std::string str9;
+    detail::reorder_and_present(
+                hana::partial(format_append,hana::type_c<std::string>,std::ref(str9)),
+                make_cref_tuple(member_names(),member_names(),default_strings,values),
+                "field2",value,lte,10
+            );
+    BOOST_CHECK_EQUAL(str9,std::string("field2 is less than or equal to 10"));
 }
 
-#include "testformatter.ipp"
+BOOST_AUTO_TEST_CASE(CheckBypassNamesDefaultStrings)
+{
+    auto formatter1=formatter();
+    std::string str1;
+    formatter1.validate_operator(str1,gte,10);
+    BOOST_CHECK_EQUAL(str1,std::string("is greater than or equal to 10"));
 
-BOOST_AUTO_TEST_SUITE_END()
+    std::string str2;
+    formatter1.validate_property(str2,empty,eq,false);
+    BOOST_CHECK_EQUAL(str2,std::string("is not empty"));
+    std::string str3;
+    formatter1.validate_property(str3,empty,eq,true);
+    BOOST_CHECK_EQUAL(str3,std::string("is empty"));
+    std::string str2_1;
+    formatter1.validate_property(str2_1,empty,ne,false);
+    BOOST_CHECK_EQUAL(str2_1,std::string("is empty"));
+    std::string str3_1;
+    formatter1.validate_property(str3_1,empty,ne,true);
+    BOOST_CHECK_EQUAL(str3_1,std::string("is not empty"));
+
+    std::string str4;
+    formatter1.validate_property(str4,size,lte,100);
+    BOOST_CHECK_EQUAL(str4,std::string("size is less than or equal to 100"));
+    std::string str5;
+    formatter1.validate_property(str5,value,eq,true);
+    BOOST_CHECK_EQUAL(str5,std::string("value must be true"));
+
+}
 
 #endif
-
-#ifdef DRACOSHA_VALIDATOR_FMT
-#undef DRACOSHA_VALIDATOR_FMT
-#endif
-
-BOOST_AUTO_TEST_SUITE(TestStdFormatter)
-
-#include "testformatter.ipp"
-
-BOOST_AUTO_TEST_SUITE_END()

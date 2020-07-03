@@ -23,5 +23,20 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/properties/size.hpp>
 #include <dracosha/validator/properties/length.hpp>
 #include <dracosha/validator/properties/empty.hpp>
+#include <dracosha/validator/enable_to_string.hpp>
+
+DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+
+//-------------------------------------------------------------
+
+struct string_property_of_member_t : public enable_to_string<string_property_of_member_t>
+{
+    constexpr static const char* description="of";
+};
+constexpr string_property_of_member_t string_property_of_member{};
+
+//-------------------------------------------------------------
+
+DRACOSHA_VALIDATOR_NAMESPACE_END
 
 #endif // DRACOSHA_VALIDATOR_PROPERTIES_HPP

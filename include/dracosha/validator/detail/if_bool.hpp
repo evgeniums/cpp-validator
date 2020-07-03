@@ -67,9 +67,9 @@ struct if_bool_t
  */
 template <typename T2, typename OpT>
 struct if_bool_t<T2,OpT,
-            hana::when<std::is_same<std::remove_reference_t<T2>,bool>::value
+            hana::when<std::is_same<std::decay_t<T2>,bool>::value
             &&
-            std::is_same<std::remove_reference_t<OpT>,eq_t>::value>
+            std::is_same<std::decay_t<OpT>,eq_t>::value>
         >
 {
     auto operator () (OpT&&) const -> decltype(auto)
@@ -83,9 +83,9 @@ struct if_bool_t<T2,OpT,
  */
 template <typename T2, typename OpT>
 struct if_bool_t<T2,OpT,
-        hana::when<std::is_same<std::remove_reference_t<T2>,bool>::value
+        hana::when<std::is_same<std::decay_t<T2>,bool>::value
         &&
-        std::is_same<std::remove_reference_t<OpT>,ne_t>::value>
+        std::is_same<std::decay_t<OpT>,ne_t>::value>
         >
 {
     auto operator () (OpT&&) const -> decltype(auto)

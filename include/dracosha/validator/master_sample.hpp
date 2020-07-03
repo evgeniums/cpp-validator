@@ -58,6 +58,7 @@ struct master_sample
 };
 
 //-------------------------------------------------------------
+
 struct string_master_sample_t : public op<string_master_sample_t>
 {
     constexpr static const char* description="sample";

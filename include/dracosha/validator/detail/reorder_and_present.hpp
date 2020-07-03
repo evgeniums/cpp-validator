@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/strings.hpp>
 #include <dracosha/validator/reporting/member_names.hpp>
 #include <dracosha/validator/reporting/values.hpp>
-#include <dracosha/validator/properties/empty.hpp>
+#include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/detail/if_bool.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -134,10 +134,29 @@ struct apply_reorder_present_4args_t
                                 const MemberT& member, const PropT& prop, const OpT& op, const T2& b
                                 ) const -> decltype(auto)
     {
-        return apply_reorder_present_fn(std::forward<HandlerT>(fn),
-                                std::forward<FormatterTs>(formatters),
-                                member,prop,if_bool<T2,OpT>(std::forward<OpT>(op)),b
-                                );
+        return hana::eval_if(
+            std::is_same<std::decay_t<PropT>,type_p_value>::value,
+            [&](auto)
+            {
+                // member op b
+                return fn(
+                    apply_cref(hana::at(formatters,hana::size_c<0>),member),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
+                    apply_cref(hana::at(formatters,hana::size_c<3>),b)
+                );
+            },
+            [&](auto)
+            {
+                // prop of member op b
+                return fn(
+                    apply_cref(hana::at(formatters,hana::size_c<1>),prop),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),string_property_of_member),
+                    apply_cref(hana::at(formatters,hana::size_c<0>),member),
+                    apply_cref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
+                    apply_cref(hana::at(formatters,hana::size_c<3>),b)
+                );
+            }
+        );
     }
 };
 

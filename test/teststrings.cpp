@@ -210,6 +210,15 @@ BOOST_AUTO_TEST_CASE(CheckCref)
 
     auto res2=apply_cref(fn,cr);
     BOOST_CHECK_EQUAL(res2,ncp.val);
+
+    auto mn=member_names();
+    auto fn1=[&mn](const auto& v)
+    {
+        auto vv=cref(v);
+        auto str=apply_cref(mn,vv);
+        BOOST_CHECK_EQUAL(std::string("field1"),str);
+    };
+    fn1("field1");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

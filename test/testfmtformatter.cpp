@@ -39,7 +39,8 @@ BOOST_AUTO_TEST_CASE(CheckFmtString)
     BOOST_CHECK_EQUAL(gte_str,std::string(gte.description));
 }
 
-#include "testformatter.ipp"
+#define DRACOSHA_VALIDATOR_TEST_FORMATTER
+#include "testformatter.cpp"
 
 BOOST_AUTO_TEST_SUITE_END()
 

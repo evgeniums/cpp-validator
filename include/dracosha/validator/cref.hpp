@@ -35,6 +35,7 @@ template <typename T>
 struct cref_t
 {
     using hana_tag=cref_tag;
+    using type=T;
 
     /**
      * @brief Ctor
