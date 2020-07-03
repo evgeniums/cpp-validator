@@ -70,10 +70,19 @@ struct to_string_t<T,hana::when<hana::is_a<property_tag,T>>>
 /**
  *  @brief Check if sdt::to_string() can be callable with the given type
  */
-template <typename T>
+template <typename T, typename=void>
 struct can_to_string
 {
-    constexpr static const bool value=hana::is_valid([](auto v) -> decltype((void)std::to_string(hana::traits::declval(v))){})(hana::type_c<T>);
+    constexpr static const bool value=false;
+};
+/**
+ *  @brief Check if sdt::to_string() can be callable with the given type
+ */
+template <typename T>
+struct can_to_string<T,
+        decltype((void)std::to_string(std::declval<T>()))>
+{
+    constexpr static const bool value=true;
 };
 
 /**

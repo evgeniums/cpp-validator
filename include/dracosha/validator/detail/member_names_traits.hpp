@@ -30,15 +30,19 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 namespace detail
 {
 
+template <typename TraitsT, typename T, typename=void>
+struct can_member_name
+{
+};
 /**
  * @brief Check if traits have suitable operator ()(const T&) for name transforming
  */
 template <typename TraitsT, typename T>
-struct can_member_name
+struct can_member_name<TraitsT,T,
+            decltype((void)std::declval<TraitsT>()(std::declval<T>()))
+        >
 {
-    constexpr static const bool value=hana::is_valid([](auto v) -> decltype(
-                                                     (void)std::declval<TraitsT>()(hana::traits::declval(v))){}
-                                                  )(hana::type_c<T>);
+    constexpr static const bool value=true;
 };
 
 /**
