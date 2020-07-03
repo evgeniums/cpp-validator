@@ -45,9 +45,9 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto OR=hana::infix([](auto&& ...xs) -> decltype(aut
 });
 
 //-------------------------------------------------------------
-struct string_or_t : public op<string_or_t>
+struct string_or_t : public logical_op<string_or_t>
 {
-    constexpr static const char* description="none of the following conditions are met";
+    constexpr static const char* description="at least one of the following conditions must be satisfied";
 };
 constexpr string_or_t string_or{};
 

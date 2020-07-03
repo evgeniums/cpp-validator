@@ -220,7 +220,9 @@ BOOST_AUTO_TEST_CASE(CheckSampleLocale)
     BOOST_CHECK_EQUAL(m[string_not_empty],std::string(string_not_empty));
     BOOST_CHECK_EQUAL(m[string_must_be],std::string(string_must_be));
     BOOST_CHECK_EQUAL(m[string_must_not_be],std::string(string_must_not_be));
-    BOOST_CHECK_EQUAL(m[string_of_conjunction],std::string(string_of_conjunction));
+    BOOST_CHECK_EQUAL(m[string_conjunction_of],std::string(string_conjunction_of));
+    BOOST_CHECK_EQUAL(m[string_conjunction_aggregate],std::string(string_conjunction_aggregate));
+    BOOST_CHECK_EQUAL(m[string_conjunction_for],std::string(string_conjunction_for));
 
     // properties
     BOOST_CHECK_EQUAL(m[value.name()],value.name());

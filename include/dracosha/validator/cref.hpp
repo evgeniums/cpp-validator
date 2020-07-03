@@ -41,7 +41,7 @@ struct cref_t
      * @brief Ctor
      * @param v Const reference to kepp
      */
-    cref_t(const T& v)
+    cref_t(T& v)
         : _v(v)
     {}
 
@@ -49,7 +49,7 @@ struct cref_t
      * @brief Get constant reference
      * @return Constance reference to value
      */
-    const T& get() const
+    T& get() const
     {
         return _v;
     }
@@ -58,7 +58,7 @@ struct cref_t
      * @brief Get constant reference
      * @return Constance reference to value
      */
-    operator const T& () const
+    operator T& () const
     {
         return _v;
     }
@@ -74,7 +74,7 @@ struct cref_t
 
     private:
 
-        const T& _v;
+        T& _v;
 };
 
 /**
@@ -88,13 +88,23 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto cref =[](const auto& v)
 };
 
 /**
+  @brief Create a ref object
+  @param v Reference to wrap into cref object
+  @return cref object
+*/
+BOOST_HANA_CONSTEXPR_LAMBDA auto ref =[](auto& v)
+{
+    return cref_t<std::remove_reference_t<decltype(v)>>{v};
+};
+
+/**
   @brief Extract const reference from argument
   @param cr Value to extract const reference from.
   @return If cr is of cref type than kept reference is returned, othervise the value itself is returned
 */
 BOOST_HANA_CONSTEXPR_LAMBDA auto extract_cref =[](auto&& cr) -> decltype(auto)
 {
-    return detail::extract_cref<decltype(cr)>(std::forward<decltype(cr)>(cr));
+    return detail::extract_cref_impl<decltype(cr)>(std::forward<decltype(cr)>(cr));
 };
 
 /**

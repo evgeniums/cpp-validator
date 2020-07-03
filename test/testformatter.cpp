@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
 {
     std::string str1;
     detail::reorder_and_present(
-                hana::partial(format_append,hana::type_c<std::string>,std::ref(str1)),
+                str1,
                 make_cref_tuple(default_strings,values),
                 gte,10
             );
@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
 
     std::string str2;
     detail::reorder_and_present(
-                hana::partial(format_append,hana::type_c<std::string>,std::ref(str2)),
+                str2,
                 make_cref_tuple(default_strings,values),
                 eq,true
             );
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
 
     std::string str3;
     detail::reorder_and_present(
-                hana::partial(format_append,hana::type_c<std::string>,std::ref(str3)),
+                str3,
                 make_cref_tuple(default_strings,values),
                 ne,true
             );
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
     auto mn=member_names();
     std::string str4;
     detail::reorder_and_present(
-                hana::partial(format_append,hana::type_c<std::string>,std::ref(str4)),
+                str4,
                 make_cref_tuple(mn,mn,default_strings,values),
                 "field1",size,eq,100
             );
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
 
     std::string str5;
     detail::reorder_and_present(
-                hana::partial(format_append,hana::type_c<std::string>,std::ref(str5)),
+                str5,
                 make_cref_tuple(member_names(),member_names(),default_strings,values),
                 "field2",value,eq,true
             );
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
 
     std::string str6;
     detail::reorder_and_present(
-                hana::partial(format_append,hana::type_c<std::string>,std::ref(str6)),
+                str6,
                 make_cref_tuple(member_names(),default_strings,values),
                 empty,eq,false
             );
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
 
     std::string str7;
     detail::reorder_and_present(
-                hana::partial(format_append,hana::type_c<std::string>,std::ref(str7)),
+                str7,
                 make_cref_tuple(member_names(),member_names(),default_strings,values),
                 "field1",empty,ne,true
             );
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
 
     std::string str8;
     detail::reorder_and_present(
-                hana::partial(format_append,hana::type_c<std::string>,std::ref(str8)),
+                str8,
                 make_cref_tuple(member_names(),member_names(),default_strings,values),
                 "field2",empty,eq,true
             );
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
 
     std::string str9;
     detail::reorder_and_present(
-                hana::partial(format_append,hana::type_c<std::string>,std::ref(str9)),
+                str9,
                 make_cref_tuple(member_names(),member_names(),default_strings,values),
                 "field2",value,lte,10
             );
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
 
     std::string str10;
     detail::reorder_and_present(
-                hana::partial(format_append,hana::type_c<std::string>,std::ref(str10)),
+                str10,
                 make_cref_tuple(member_names(),member_names(),default_strings,default_strings),
                 "field2",value,lte,string_master_sample
             );
@@ -160,6 +160,19 @@ BOOST_AUTO_TEST_CASE(CheckBypassNamesDefaultStrings)
     std::string str17;
     formatter1.validate_with_master_sample(str17,"field1",size,lte,"");
     BOOST_CHECK_EQUAL(str17,std::string("size of field1 is less than or equal to size of field1 of sample"));
-}
 
+    std::string str18;
+    formatter1.validate_and(str18);
+    BOOST_CHECK_EQUAL(str18,std::string(string_and)+std::string(string_conjunction_aggregate));
+    std::string str19;
+    formatter1.validate_or(str19);
+    BOOST_CHECK_EQUAL(str19,std::string(string_or)+std::string(string_conjunction_aggregate));
+    std::string str20;
+    formatter1.validate_not(str20);
+    BOOST_CHECK_EQUAL(str20,std::string(string_not)+std::string(string_conjunction_aggregate));
+
+    std::string str21;
+    formatter1.validate_and(str21,"field1");
+    BOOST_CHECK_EQUAL(str21,std::string("for field1 the following conditions must be satisfied: "));
+}
 #endif

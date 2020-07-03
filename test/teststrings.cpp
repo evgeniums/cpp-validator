@@ -219,6 +219,17 @@ BOOST_AUTO_TEST_CASE(CheckCref)
         BOOST_CHECK_EQUAL(std::string("field1"),str);
     };
     fn1("field1");
+
+    std::string str1;
+    auto r1=ref(str1);
+    std::string& str2=r1;
+    str2="hi";
+    std::ignore=str2;
+
+    std::string str3;
+    auto r2=cref(str3);
+    const std::string& str4=r2;
+    std::ignore=str4;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

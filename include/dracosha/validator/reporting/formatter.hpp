@@ -27,20 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/values.hpp>
 #include <dracosha/validator/reporting/order_and_presentation.hpp>
 
-#ifdef DRACOSHA_VALIDATOR_FMT
-#include <dracosha/validator/detail/formatter_fmt.hpp>
-#else
-//! \todo use std string formatting
-#endif
-
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
-
-#ifdef DRACOSHA_VALIDATOR_FMT
-constexpr detail::fmt_append_t format_append{};
-constexpr detail::fmt_prepend_t format_prepend{};
-#else
-//! \todo use std string formatting
-#endif
 
 //-------------------------------------------------------------
 
@@ -67,7 +54,7 @@ struct formatter_t
     template <typename DstT, typename T2, typename OpT>
     void validate_operator(DstT& dst,const OpT& op, const T2& b) const
     {
-        append(dst,
+        format(dst,
                make_cref_tuple(_strings,_values),
                op,b
                );
@@ -76,7 +63,7 @@ struct formatter_t
     template <typename DstT, typename T2, typename OpT, typename PropT>
     void validate_property(DstT& dst,const PropT& prop, const OpT& op, const T2& b) const
     {
-        append(dst,
+        format(dst,
                make_cref_tuple(_member_names,_strings,_values),
                prop,op,b
                );
@@ -85,7 +72,7 @@ struct formatter_t
     template <typename DstT, typename T2, typename OpT, typename PropT, typename MemberT>
     void validate(DstT& dst, const MemberT& member, const PropT& prop, const OpT& op, const T2& b) const
     {
-        append(dst,
+        format(dst,
                make_cref_tuple(_member_names,_member_names,_strings,_values),
                member,prop,op,b
                );
@@ -96,14 +83,14 @@ struct formatter_t
     {
         if (b)
         {
-            append(dst,
+            format(dst,
                    make_cref_tuple(_member_names,_strings),
                    member,string_exists
                    );
         }
         else
         {
-            append(dst,
+            format(dst,
                    make_cref_tuple(_member_names,_strings),
                    member,string_not_exists
                    );
@@ -113,7 +100,7 @@ struct formatter_t
     template <typename DstT, typename T2, typename OpT, typename PropT, typename MemberT>
     void validate_with_other_member(DstT& dst, const MemberT& member, const PropT& prop, const OpT& op, const T2& b) const
     {
-        append(dst,
+        format(dst,
                make_cref_tuple(_member_names,_member_names,_strings,_member_names),
                member,prop,op,member_name(b)
                );
@@ -122,7 +109,7 @@ struct formatter_t
     template <typename DstT, typename T2, typename OpT, typename PropT, typename MemberT>
     void validate_with_master_sample(DstT& dst, const MemberT& member, const PropT& prop, const OpT& op, const T2&) const
     {
-        append(dst,
+        format(dst,
                make_cref_tuple(_member_names,_member_names,_strings,_strings),
                member,prop,op,string_master_sample
                );
@@ -131,7 +118,7 @@ struct formatter_t
     template <typename DstT>
     void validate_and(DstT& dst) const
     {
-        prepend(dst,
+        format(dst,
                 make_cref_tuple(_strings),
                 string_and
                 );
@@ -140,16 +127,16 @@ struct formatter_t
     template <typename DstT, typename MemberT>
     void validate_and(DstT& dst, const MemberT& member) const
     {
-        prepend(dst,
-                make_cref_tuple(_strings,_member_names),
-                string_and,member
+        format(dst,
+                make_cref_tuple(_member_names,_strings),
+                member,string_and
                 );
     }
 
     template <typename DstT>
     void validate_or(DstT& dst) const
     {
-        prepend(dst,
+        format(dst,
                 make_cref_tuple(_strings),
                 string_or
                 );
@@ -158,16 +145,16 @@ struct formatter_t
     template <typename DstT, typename MemberT>
     void validate_or(DstT& dst, const MemberT& member) const
     {
-        prepend(dst,
-                make_cref_tuple(_strings,_member_names),
-                string_or,member
+        format(dst,
+                make_cref_tuple(_member_names,_strings),
+                member,string_or
                 );
     }
 
     template <typename DstT>
     void validate_not(DstT& dst) const
     {
-        prepend(dst,
+        format(dst,
                 make_cref_tuple(_strings),
                 string_not
                 );
@@ -176,28 +163,19 @@ struct formatter_t
     template <typename DstT, typename MemberT>
     void validate_not(DstT& dst, const MemberT& member) const
     {
-        prepend(dst,
-                make_cref_tuple(_strings,_member_names),
-                string_not,member
+        format(dst,
+                make_cref_tuple(_member_names,_strings),
+                member,string_not
                 );
     }
 
     private:
 
         template <typename DstT,typename ...Args>
-        void append(DstT& dst, Args&&... args) const
+        void format(DstT& dst, Args&&... args) const
         {
             _order_and_presentation(
-                        hana::partial(format_append,hana::type_c<DstT>,std::ref(dst)),
-                        std::forward<Args>(args)...
-                        );
-        }
-
-        template <typename DstT,typename ...Args>
-        void prepend(DstT& dst, Args&&... args) const
-        {
-            _order_and_presentation(
-                        hana::partial(format_prepend,hana::type_c<DstT>,std::ref(dst)),
+                        dst,
                         std::forward<Args>(args)...
                         );
         }

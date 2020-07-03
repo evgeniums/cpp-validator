@@ -56,7 +56,7 @@ struct not_t
 constexpr not_t NOT{};
 
 //-------------------------------------------------------------
-struct string_not_t : public op<string_not_t>
+struct string_not_t : public logical_op<string_not_t>
 {
     constexpr static const char* description="the following condition must be false";
 };

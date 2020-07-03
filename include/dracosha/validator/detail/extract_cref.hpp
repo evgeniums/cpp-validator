@@ -60,7 +60,7 @@ struct extract_cref_t<T,
     }
 };
 template <typename T>
-constexpr extract_cref_t<T> extract_cref{};
+constexpr extract_cref_t<T> extract_cref_impl{};
 }
 
 //-------------------------------------------------------------

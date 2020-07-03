@@ -51,7 +51,9 @@ inline std::map<std::string,std::string> strings_sample_locale()
     m[string_not_empty]="is not empty";
     m[string_must_be]="must be";
     m[string_must_not_be]="must not be";
-    m[string_of_conjunction]="of";
+    m[string_conjunction_of]="of";
+    m[string_conjunction_aggregate]=": ";
+    m[string_conjunction_for]="for";
 
     // properties
     m[value.name()]="value";
@@ -64,8 +66,8 @@ inline std::map<std::string,std::string> strings_sample_locale()
     m[string_not_exists]="does not exist";
 
     // logical
-    m[string_and]="some of the following conditions are not met";
-    m[string_or]="none of the following conditions are met";
+    m[string_and]="the following conditions must be satisfied";
+    m[string_or]="at least one of the following conditions must be satisfied";
     m[string_not]="the following condition must be false";
 
     // comparison

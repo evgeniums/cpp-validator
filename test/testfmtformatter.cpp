@@ -37,6 +37,12 @@ BOOST_AUTO_TEST_CASE(CheckFmtString)
     auto gte_str=std::string(gte);
 //    BOOST_TEST_MESSAGE(gte_str);
     BOOST_CHECK_EQUAL(gte_str,std::string(gte.description));
+
+    detail::fmt_formatter_t formatter{};
+
+    std::string str3;
+    formatter.append(str3,"one",",","two",",","three");
+    BOOST_CHECK_EQUAL(str3,std::string("one,two,three"));
 }
 
 #define DRACOSHA_VALIDATOR_TEST_FORMATTER

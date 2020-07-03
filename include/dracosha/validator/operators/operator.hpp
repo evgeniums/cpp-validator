@@ -43,6 +43,19 @@ struct op : public enable_to_string<DerivedT>
 
 //-------------------------------------------------------------
 
+struct logical_op_tag;
+
+/**
+ * @brief Pseudo logical operator
+ */
+template <typename DerivedT>
+struct logical_op : public enable_to_string<DerivedT>
+{
+    using hana_tag=logical_op_tag;
+};
+
+//-------------------------------------------------------------
+
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
 #endif // DRACOSHA_VALIDATOR_OPERATOR_HPP

@@ -29,11 +29,23 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-struct string_of_conjunction_t : public enable_to_string<string_of_conjunction_t>
+struct string_conjunction_of_t : public enable_to_string<string_conjunction_of_t>
 {
     constexpr static const char* description="of";
 };
-constexpr string_of_conjunction_t string_of_conjunction{};
+constexpr string_conjunction_of_t string_conjunction_of{};
+
+struct string_conjunction_aggregate_t : public enable_to_string<string_conjunction_aggregate_t>
+{
+    constexpr static const char* description=": ";
+};
+constexpr string_conjunction_aggregate_t string_conjunction_aggregate{};
+
+struct string_conjunction_for_t : public enable_to_string<string_conjunction_for_t>
+{
+    constexpr static const char* description="for";
+};
+constexpr string_conjunction_for_t string_conjunction_for{};
 
 //-------------------------------------------------------------
 
