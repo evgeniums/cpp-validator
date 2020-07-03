@@ -20,10 +20,45 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_MEMBER_NAMES_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/cref.hpp>
 #include <dracosha/validator/reporting/strings.hpp>
 #include <dracosha/validator/detail/member_names_traits.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+
+//-------------------------------------------------------------
+struct member_name_tag;
+
+template <typename T>
+struct member_name_t
+{
+    using hana_tag=member_name_tag;
+
+    /**
+     * @brief Get constant reference
+     * @return Constance reference to value
+     */
+    const T& get() const
+    {
+        return _v.get();
+    }
+
+    /**
+     * @brief Get constant reference
+     * @return Constance reference to value
+     */
+    operator const T& () const
+    {
+        return _v.get();
+    }
+
+    cref_t<T> _v;
+};
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto member_name =[](const auto& v)
+{
+    return member_name_t<typename decltype(cref(v))::type>{cref(v)};
+};
 
 //-------------------------------------------------------------
 

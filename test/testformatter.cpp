@@ -113,6 +113,38 @@ BOOST_AUTO_TEST_CASE(CheckBypassNamesDefaultStrings)
     formatter1.validate_property(str5,value,eq,true);
     BOOST_CHECK_EQUAL(str5,std::string("value must be true"));
 
+    std::string str11;
+    formatter1.validate(str11,"field1",value,eq,true);
+    BOOST_CHECK_EQUAL(str11,std::string("field1 must be true"));
+    std::string str6;
+    formatter1.validate(str6,"field1",value,eq,false);
+    BOOST_CHECK_EQUAL(str6,std::string("field1 must be false"));
+    std::string str7;
+    formatter1.validate(str7,"field1",value,gt,15);
+    BOOST_CHECK_EQUAL(str7,std::string("field1 is greater than 15"));
+    std::string str8;
+    formatter1.validate(str8,"field1",size,lt,100);
+    BOOST_CHECK_EQUAL(str8,std::string("size of field1 is less than 100"));
+    std::string str9;
+    formatter1.validate(str9,"field1",empty,eq,true);
+    BOOST_CHECK_EQUAL(str9,std::string("field1 is empty"));
+    std::string str10;
+    formatter1.validate(str10,"field1",empty,ne,true);
+    BOOST_CHECK_EQUAL(str10,std::string("field1 is not empty"));
+
+    std::string str12;
+    formatter1.validate_exists(str12,"field1",true);
+    BOOST_CHECK_EQUAL(str12,std::string("field1 exists"));
+    std::string str13;
+    formatter1.validate_exists(str13,"field1",false);
+    BOOST_CHECK_EQUAL(str13,std::string("field1 does not exist"));
+
+    std::string str14;
+    formatter1.validate_with_other_member(str14,"field1",value,gt,"field2");
+    BOOST_CHECK_EQUAL(str14,std::string("field1 is greater than field2"));
+    std::string str15;
+    formatter1.validate_with_other_member(str15,"field1",size,lte,"field2");
+    BOOST_CHECK_EQUAL(str15,std::string("size of field1 is less than or equal to size of field2"));
 }
 
 #endif

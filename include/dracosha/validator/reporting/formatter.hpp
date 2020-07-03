@@ -115,7 +115,7 @@ struct formatter_t
     {
         append(dst,
                make_cref_tuple(_member_names,_member_names,_strings,_member_names),
-               member,prop,op,b
+               member,prop,op,member_name(b)
                );
     }
 
