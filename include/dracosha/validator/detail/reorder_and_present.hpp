@@ -128,7 +128,7 @@ struct apply_reorder_present_2args_t
  */
 template <typename MemberT,typename OpT>
 struct apply_reorder_present_2args_t<MemberT,OpT,
-                        hana::when<hana::is_a<logical_op_tag,OpT>>
+                        hana::when<hana::is_a<aggregation_op_tag,OpT>>
                     >
 {
     template <typename DstT, typename FormatterTs>

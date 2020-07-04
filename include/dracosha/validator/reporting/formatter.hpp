@@ -26,6 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/member_names.hpp>
 #include <dracosha/validator/reporting/values.hpp>
 #include <dracosha/validator/reporting/order_and_presentation.hpp>
+#include <dracosha/validator/reporting/report_aggregation.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -167,6 +168,18 @@ struct formatter_t
                 make_cref_tuple(_member_names,_strings),
                 member,string_not
                 );
+    }
+
+    template <typename DstT>
+    void aggregate(DstT& dst, const report_aggregation<DstT>& item)
+    {
+        format(dst,_strings,item);
+    }
+
+    template <typename MemberT>
+    std::string member_name(const MemberT& member) const
+    {
+        return _member_names(member);
     }
 
     private:

@@ -59,6 +59,11 @@ constexpr not_t NOT{};
 struct string_not_t : public logical_op<string_not_t>
 {
     constexpr static const char* description="the following condition must be false";
+
+    constexpr static const aggregation id=aggregation::NOT;
+    constexpr static const char* open_tag="(";
+    constexpr static const char* close_tag=")";
+    constexpr static const char* conjunction_tag="not";
 };
 constexpr string_not_t string_not{};
 

@@ -21,6 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/adapters/adapter.hpp>
+#include <dracosha/validator/operators.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -157,12 +158,10 @@ struct reporting_adapter_t
     template <typename OpsT>
     bool validate_and(OpsT&& ops)
     {
-        if (!_next_adapter.validate_and(ops))
-        {
-            _reporter.validate_and();
-            return false;
-        }
-        return true;
+        return aggregate(
+                        string_and,
+                        [this,&ops](){return _next_adapter.validate_and(ops);}
+                    );
     }
 
     /**
@@ -174,12 +173,11 @@ struct reporting_adapter_t
     template <typename OpsT, typename MemberT>
     bool validate_and(MemberT&& member,OpsT&& ops)
     {
-        if (!_next_adapter.validate_and(member,ops))
-        {
-            _reporter.validate_and(member);
-            return false;
-        }
-        return true;
+        return aggregate(
+                        string_and,
+                        [this,&member,&ops](){return _next_adapter.validate_and(member,ops);},
+                        member
+                    );
     }
 
     /**
@@ -190,16 +188,10 @@ struct reporting_adapter_t
     template <typename OpsT>
     bool validate_or(OpsT&& ops)
     {
-        if (!_next_adapter.validate_or(ops))
-        {
-            _reporter.validate_or();
-            return false;
-        }
-        else
-        {
-            _reporter.reset();
-        }
-        return true;
+        return aggregate(
+                        string_or,
+                        [this,&ops](){return _next_adapter.validate_or(ops);}
+                    );
     }
 
     /**
@@ -211,16 +203,11 @@ struct reporting_adapter_t
     template <typename OpsT, typename MemberT>
     bool validate_or(MemberT&& member,OpsT&& ops)
     {
-        if (!_next_adapter.validate_or(member,ops))
-        {
-            _reporter.validate_or(member);
-            return false;
-        }
-        else
-        {
-            _reporter.reset();
-        }
-        return true;
+        return aggregate(
+                        string_or,
+                        [this,&member,&ops](){return _next_adapter.validate_or(member,ops);},
+                        member
+                    );
     }
 
     /**
@@ -231,16 +218,10 @@ struct reporting_adapter_t
     template <typename OpT>
     bool validate_not(OpT&& op)
     {
-        if (!_next_adapter.validate_not(op))
-        {
-            _reporter.validate_not();
-            return false;
-        }
-        else
-        {
-            _reporter.reset();
-        }
-        return true;
+        return aggregate(
+                        string_not,
+                        [this,&op](){return _next_adapter.validate_not(op);}
+                    );
     }
 
     /**
@@ -252,17 +233,23 @@ struct reporting_adapter_t
     template <typename OpT, typename MemberT>
     bool validate_not(MemberT&& member,OpT&& op)
     {
-        if (!_next_adapter.validate_not(member,op))
-        {
-            _reporter.validate_not(member);
-            return false;
-        }
-        else
-        {
-            _reporter.reset();
-        }
-        return true;
+        return aggregate(
+                        string_not,
+                        [this,&member,&op](){return _next_adapter.validate_not(member,op);},
+                        member
+                    );
     }
+
+    private:
+
+        template <typename AgrregationT,typename HandlerT, typename ...Args>
+        bool aggregate(AgrregationT&& aggregation,HandlerT&& handler,Args&&... args)
+        {
+            _reporter.aggregate_begin(std::forward<AgrregationT>(aggregation),std::forward<Args>(args)...);
+            auto ok=handler();
+            _reporter.aggregate_end(ok);
+            return ok;
+        }
 };
 
 //-------------------------------------------------------------

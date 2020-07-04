@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/make_validator.hpp>
 #include <dracosha/validator/detail/aggregate_or.hpp>
+#include <dracosha/validator/operators/aggregation.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -48,6 +49,11 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto OR=hana::infix([](auto&& ...xs) -> decltype(aut
 struct string_or_t : public logical_op<string_or_t>
 {
     constexpr static const char* description="at least one of the following conditions must be satisfied";
+
+    constexpr static const aggregation id=aggregation::OR;
+    constexpr static const char* open_tag="(";
+    constexpr static const char* close_tag=")";
+    constexpr static const char* conjunction_tag="or";
 };
 constexpr string_or_t string_or{};
 

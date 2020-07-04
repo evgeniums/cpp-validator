@@ -21,7 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/make_validator.hpp>
-#include <dracosha/validator/operators/operator.hpp>
+#include <dracosha/validator/operators/aggregation.hpp>
 #include <dracosha/validator/detail/aggregate_and.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -49,6 +49,11 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto AND=hana::infix([](auto&& ...xs) -> decltype(au
 struct string_and_t : public logical_op<string_and_t>
 {
     constexpr static const char* description="the following conditions must be satisfied";
+
+    constexpr static const aggregation id=aggregation::AND;
+    constexpr static const char* open_tag="(";
+    constexpr static const char* close_tag=")";
+    constexpr static const char* conjunction_tag="and";
 };
 constexpr string_and_t string_and{};
 
