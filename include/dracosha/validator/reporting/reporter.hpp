@@ -46,7 +46,7 @@ struct reporter
     /**
      *  @brief Report validation of object at one level without member nesting
      *  @param op Operator for validation
-     *  @param b Reference argument for validation
+     *  @param b Sample argument for validation
      */
     template <typename T2, typename OpT>
     void validate_operator(const OpT& op, const T2& b)
@@ -58,7 +58,7 @@ struct reporter
      *  @brief Report validation of object's property at one level without member nesting
      *  @param prop Property to validate
      *  @param op Operator for validation
-     *  @param b Reference argument for validation
+     *  @param b Sample argument for validation
      */
     template <typename T2, typename OpT, typename PropT>
     void validate_property(const PropT& prop, const OpT& op, const T2& b)
@@ -82,7 +82,7 @@ struct reporter
      *  @param member Member descriptor
      *  @param prop Property to validate
      *  @param op Operator for validation
-     *  @param b Reference argument for validation
+     *  @param b Sample argument for validation
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
     void validate(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
@@ -95,7 +95,7 @@ struct reporter
      *  @param member Member descriptor
      *  @param prop Property to validate
      *  @param op Operator for validation
-     *  @param b Descriptor of reference member of the same object
+     *  @param b Descriptor of sample member of the same object
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
     void validate_with_other_member(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
@@ -104,11 +104,11 @@ struct reporter
     }
 
     /**
-     *  @brief Report validation using the same member of a reference object
+     *  @brief Report validation using the same member of a Sample object
      *  @param member Member descriptor
      *  @param prop Property to validate
      *  @param op Operator for validation
-     *  @param b Reference object whose member to use as argument passed to validation operator
+     *  @param b Sample object whose member to use as argument passed to validation operator
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
     void validate_with_master_sample(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)

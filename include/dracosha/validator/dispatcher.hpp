@@ -56,7 +56,7 @@ struct dispatcher_t
      *  @param prop Property to validate
      *  @param a Adapter with object to validate
      *  @param op Operator for validation
-     *  @param b Reference argument for validation
+     *  @param b Sample argument for validation
      *  @return Validation status
      */
     template <typename T1, typename T2, typename OpT, typename PropT>

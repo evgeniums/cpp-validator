@@ -54,7 +54,7 @@ struct adapter
     /**
      *  @brief Perform validation of object at one level without member nesting
      *  @param op Operator for validation
-     *  @param b Reference argument for validation
+     *  @param b Sample argument for validation
      *  @return Validation status
      */
     template <typename T2, typename OpT>
@@ -70,7 +70,7 @@ struct adapter
      *  @brief Perform validation of object's property at one level without member nesting
      *  @param prop Property to validate
      *  @param op Operator for validation
-     *  @param b Reference argument for validation
+     *  @param b Sample argument for validation
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT>
@@ -110,7 +110,7 @@ struct adapter
      *  @param member Member descriptor
      *  @param prop Property to validate
      *  @param op Operator for validation
-     *  @param b Reference argument for validation
+     *  @param b Sample argument for validation
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
@@ -128,7 +128,7 @@ struct adapter
      *  @param member Member descriptor
      *  @param prop Property to validate
      *  @param op Operator for validation
-     *  @param b Descriptor of reference member of the same object
+     *  @param b Descriptor of sample member of the same object
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
@@ -142,11 +142,11 @@ struct adapter
     }
 
     /**
-     *  @brief Validate using the same member of a reference object
+     *  @brief Validate using the same member of a Sample object
      *  @param member Member descriptor
      *  @param prop Property to validate
      *  @param op Operator for validation
-     *  @param b Reference object whose member to use as argument passed to validation operator
+     *  @param b Sample object whose member to use as argument passed to validation operator
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>

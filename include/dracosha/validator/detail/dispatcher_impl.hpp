@@ -46,7 +46,7 @@ struct dispatcher_impl_t
 };
 
 /**
- * @brief Dispatcher that first wraps object into default adapter and then forward it to actual dispatcher
+ * @brief Dispatcher that first wraps object into default adapter and then forwards it to actual dispatcher
  */
 template <typename T1>
 struct dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>
@@ -102,7 +102,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      *  @brief Perform validation of object at one level without member nesting
      *  @param a Adapter with object to validate
      *  @param op Operator for validation
-     *  @param b Reference argument for validation
+     *  @param b Sample argument for validation
      *  @return Validation status
      */
     template <typename T2, typename OpT>
@@ -116,7 +116,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      *  @param prop Property to validate
      *  @param a Adapter with object to validate
      *  @param op Operator for validation
-     *  @param b Reference argument for validation
+     *  @param b Sample argument for validation
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT>
@@ -130,7 +130,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      *  @param prop Property to validate
      *  @param a Adapter with object to validate
      *  @param op Operator for validation
-     *  @param b Reference argument for validation
+     *  @param b Sample argument for validation
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT>
@@ -167,7 +167,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      *  @param member Member descriptor
      *  @param prop Property to validate
      *  @param op Operator for validation
-     *  @param b Reference argument for validation
+     *  @param b Sample argument for validation
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
@@ -189,7 +189,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      *  @param member Member descriptor
      *  @param prop Property to validate
      *  @param op Operator for validation
-     *  @param b Descriptor of reference member of the same object
+     *  @param b Descriptor of sample member of the same object
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
@@ -204,12 +204,12 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     }
 
     /**
-     *  @brief Validate using the same member of a reference object
+     *  @brief Validate using the same member of a Sample object
      *  @param a Object to validate
      *  @param member Member descriptor
      *  @param prop Property to validate
      *  @param op Operator for validation
-     *  @param b Reference object whose member to use as argument passed to validation operator
+     *  @param b Sample object whose member to use as argument passed to validation operator
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>

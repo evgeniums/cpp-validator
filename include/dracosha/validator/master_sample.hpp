@@ -40,14 +40,14 @@ struct master_sample
 
     /**
      * @brief Ctor
-     * @param Reference object
+     * @param Sample object
      */
     master_sample(const T& obj) : ref(obj)
     {}
 
     /**
-     * @brief Get reference object
-     * @return Reference object
+     * @brief Get Sample object
+     * @return Sample object
      */
     const T& operator() () const
     {
