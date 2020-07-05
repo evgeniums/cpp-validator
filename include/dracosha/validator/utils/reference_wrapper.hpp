@@ -20,13 +20,52 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_REFERENCE_WRAPPER_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/detail/extract_ref.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
 struct ref_tag;
+
+//-------------------------------------------------------------
+
+namespace detail
+{
+template <typename T, typename =hana::when<true>>
+struct extract_ref_t
+{
+};
+
+/**
+ * @brief Return the value itself if it is not a reference wrapper
+ */
+template <typename T>
+struct extract_ref_t<T,
+                    hana::when<!hana::is_a<ref_tag,T>>>
+{
+    constexpr auto operator() (T&& v) const -> decltype(auto)
+    {
+        return hana::id(std::forward<T>(v));
+    }
+};
+
+/**
+ * @brief Extract reference if value is a reference wrapper
+ */
+template <typename T>
+struct extract_ref_t<T,
+                    hana::when<hana::is_a<ref_tag,T>>>
+{
+    constexpr auto operator() (T&& v) const -> decltype(auto)
+    {
+        return v.get();
+    }
+};
+template <typename T>
+constexpr extract_ref_t<T> extract_ref_impl{};
+}
+
+//-------------------------------------------------------------
 
 /**
  * @brief Copyable wrapper of references

@@ -78,7 +78,6 @@ SET (HEADERS
     include/dracosha/validator/detail/format_value.hpp
     include/dracosha/validator/detail/formatter_fmt.hpp
     include/dracosha/validator/detail/reorder_and_present.hpp
-    include/dracosha/validator/detail/extract_ref.hpp
     include/dracosha/validator/detail/if_bool.hpp
     include/dracosha/validator/detail/formatter_std.hpp
 )
