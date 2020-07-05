@@ -110,9 +110,11 @@ BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
     BOOST_CHECK_EQUAL(str12,std::string("size of field2 is less than or equal to size of field1"));
 }
 
-BOOST_AUTO_TEST_CASE(CheckBypassNamesDefaultStrings)
+namespace
 {
-    auto formatter1=formatter();
+template <typename FormatterT>
+void testFormatter(const FormatterT& formatter1)
+{
     std::string str1;
     formatter1.validate_operator(str1,gte,10);
     BOOST_CHECK_EQUAL(str1,std::string("is greater than or equal to 10"));
@@ -205,4 +207,61 @@ BOOST_AUTO_TEST_CASE(CheckBypassNamesDefaultStrings)
     auto str22=formatter1.member_to_string(size);
     BOOST_CHECK_EQUAL(str22,std::string("size"));
 }
+
+auto make_test_strings(translator_repository& rep)
+{
+    std::map<std::string,std::string> m=
+    {
+        {"one","one_translated"},
+        {"two","two_translated"},
+        {"three","three_translated"}
+    };
+    auto translator1=std::make_shared<mapped_translator>(m);
+    std::set<std::string> locales1={"en_US.UTF-8","en_US","en"};
+    rep.add_translator(translator1,locales1);
+    return make_translated_strings(rep,"en");
+}
+}
+
+BOOST_AUTO_TEST_CASE(CheckDefaultFormatter)
+{
+    testFormatter(formatter());
+}
+
+BOOST_AUTO_TEST_CASE(CheckFormatterFromStrings)
+{
+    translator_repository rep;
+    testFormatter(formatter(make_test_strings(rep)));
+}
+
+BOOST_AUTO_TEST_CASE(CheckFormatterFromMemberNames)
+{
+    translator_repository rep;
+    testFormatter(formatter(member_names(make_test_strings(rep))));
+}
+
+BOOST_AUTO_TEST_CASE(CheckFormatterFromMemberNamesAndValues)
+{
+    translator_repository rep;
+    testFormatter(formatter(
+                            member_names(make_test_strings(rep)),
+                            make_translated_values(rep,"en")
+                            )
+                  );
+}
+
+BOOST_AUTO_TEST_CASE(CheckFormatterWithRefs)
+{
+    translator_repository rep;
+    auto st=make_test_strings(rep);
+    auto mn=member_names(st);
+    auto vs=make_translated_values(rep,"en");
+    testFormatter(formatter_with_references(
+                            mn,
+                            vs,
+                            st
+                            )
+                  );
+}
+
 #endif

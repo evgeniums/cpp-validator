@@ -117,7 +117,7 @@ struct formatter_t
     }
 
     template <typename DstT>
-    void aggregate(DstT& dst, const report_aggregation<DstT>& item)
+    void aggregate(DstT& dst, const report_aggregation<DstT>& item) const
     {
         format(dst,_strings,item);
     }
@@ -161,6 +161,19 @@ auto formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const 
 }
 
 /**
+ * @brief Create formatter that doesn't own member names but holds a const reference instead
+ * @param mn Const reference to formatter of member names
+ * @param vs Const reference to formatter of values
+ * @param strings Const reference to strings
+ * @return Formatter
+ */
+template <typename MemberNamesT,typename ValuesT,typename StringsT>
+auto formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const StringsT& strings)
+{
+    return formatter_with_references(mn,vs,strings,default_order_and_presentation);
+}
+
+/**
  * @brief Create formatter that owns member names and value strings
  * @param mn Formatter of member names
  * @param vs Formatter of values
@@ -178,19 +191,6 @@ auto formatter(MemberNamesT&& mn, ValuesT&& vs, const StringsT& strings, OrderAn
                 std::decay_t<OrderAndPresentationT>
             >
             {std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),strings,std::forward<OrderAndPresentationT>(order)};
-}
-
-/**
- * @brief Create formatter that doesn't own member names but holds a const reference instead
- * @param mn Const reference to formatter of member names
- * @param vs Const reference to formatter of values
- * @param strings Const reference to strings
- * @return Formatter
- */
-template <typename MemberNamesT,typename ValuesT,typename StringsT>
-auto formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const StringsT& strings)
-{
-    return formatter_with_references(mn,vs,strings,default_order_and_presentation);
 }
 
 /**

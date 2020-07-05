@@ -7,6 +7,8 @@
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/reporting/formatter.hpp>
 #include <dracosha/validator/properties.hpp>
+#include <dracosha/validator/reporting/mapped_translator.hpp>
+#include <dracosha/validator/reporting/translator_repository.hpp>
 
 #ifdef DRACOSHA_VALIDATOR_FMT
 
