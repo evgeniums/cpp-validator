@@ -26,7 +26,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-enum class aggregation : int
+enum class aggregation_id : int
 {
     AND,
     OR,
@@ -39,10 +39,10 @@ struct aggregation_op
 {
     using hana_tag=aggregation_op_tag;
 
-    aggregation id;
-    const char* open_tag;
-    const char* close_tag;
-    const char* conjunction_tag;
+    aggregation_id id;
+    const char* open_token;
+    const char* close_token;
+    const char* conjunction_token;
 
     aggregation_op()=delete;
     ~aggregation_op()=default;
@@ -54,9 +54,9 @@ struct aggregation_op
     template <typename T>
     aggregation_op(const T& other)
         : id(other.id),
-          open_tag(other.open_tag),
-          close_tag(other.close_tag),
-          conjunction_tag(other.conjunction_tag)
+          open_token(other.open_token),
+          close_token(other.close_token),
+          conjunction_token(other.conjunction_token)
     {}
 };
 

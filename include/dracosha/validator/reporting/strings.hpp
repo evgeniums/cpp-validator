@@ -24,12 +24,13 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/property.hpp>
+#include <dracosha/validator/operators.hpp>
+#include <dracosha/validator/master_sample.hpp>
 #include <dracosha/validator/operators/operator.hpp>
 #include <dracosha/validator/reporting/translator.hpp>
 #include <dracosha/validator/reporting/no_translator.hpp>
 #include <dracosha/validator/reporting/translator_repository.hpp>
-#include <dracosha/validator/operators.hpp>
-#include <dracosha/validator/master_sample.hpp>
+#include <dracosha/validator/reporting/aggregation_strings.hpp>
 #include <dracosha/validator/detail/to_string.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -51,12 +52,13 @@ struct strings_tag;
  *
  * After ID is converted to string the conversion result goes to translator. Translator returns translated or original string.
  */
-template <typename TranslatorT>
+template <typename TranslatorT, typename AggregationStringsT>
 struct strings_t
 {
     using hana_tag=strings_tag;
 
     const TranslatorT& _translator;
+    AggregationStringsT _aggregation_strings;
 
     ~strings_t()=default;
     strings_t(strings_t&&)=default;
@@ -84,25 +86,58 @@ struct strings_t
     {
         return _translator(to_string(id));
     }
+
+    std::string aggregation_open(const aggregation_op& aggregation) const
+    {
+        return _translator(_aggregation_strings.open(aggregation));
+    }
+
+    std::string aggregation_close(const aggregation_op& aggregation) const
+    {
+        return _translator(_aggregation_strings.close(aggregation));
+    }
+
+    std::string aggregation_conjunction(const aggregation_op& aggregation) const
+    {
+        return _translator(_aggregation_strings.conjunction(aggregation));
+    }
 };
 
 /**
   @brief Default strings object does not perform any translation.
 */
-constexpr strings_t<no_translator_t> default_strings{no_translator};
+constexpr strings_t<no_translator_t,aggregation_strings_t> default_strings{no_translator,aggregation_strings};
 
-using translated_strings=strings_t<translator>;
+template <typename AggregationStringsT>
+using translated_strings=strings_t<translator,AggregationStringsT>;
 
-/**
- * @brief Make strings object using translator found in translator repository by locale name
- * @param rep Translator repository
- * @param loc Locale name
- * @return Strings object with translator for given locale name from the repository
- */
-inline translated_strings make_translated_strings(const translator_repository& rep,const std::string& loc=std::locale().name())
+struct make_translated_strings_t
 {
-    return translated_strings{*rep.find_translator(loc)};
-}
+    /**
+     * @brief Make strings object using translator found in translator repository by locale name
+     * @param rep Translator repository
+     * @param loc Locale name
+     * @return Strings object with translator for given locale name from the repository
+     */
+    auto operator() (const translator_repository& rep,const std::string& loc=std::locale().name()) const
+    {
+        return translated_strings<aggregation_strings_t>{*rep.find_translator(loc),aggregation_strings};
+    }
+
+    /**
+     * @brief Make strings object using translator found in translator repository by locale name
+     * @param aggregation_str Formatter of aggregation strings
+     * @param rep Translator repository
+     * @param loc Locale name
+     * @return Strings object with translator for given locale name from the repository
+     */
+    template <typename T>
+    auto operator() (T&& aggregation_str,const translator_repository& rep,const std::string& loc=std::locale().name()) const
+    {
+        return translated_strings<std::decay_t<T>>{*rep.find_translator(loc),std::forward<T>(aggregation_str)};
+    }
+};
+constexpr make_translated_strings_t make_translated_strings{};
 
 //-------------------------------------------------------------
 

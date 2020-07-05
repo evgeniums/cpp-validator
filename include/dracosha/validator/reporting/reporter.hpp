@@ -55,13 +55,21 @@ class reporter
         template <typename AggregationT>
         void aggregate_open(AggregationT&& aggregation)
         {
+            if (!_stack.empty())
+            {
+                _stack.back().single=false;
+            }
             _stack.emplace_back(std::forward<AggregationT>(aggregation));
         }
         template <typename AggregationT, typename MemberT>
         void aggregate_open(AggregationT&& aggregation, MemberT&& member)
         {
+            if (!_stack.empty())
+            {
+                _stack.back().single=false;
+            }
             _stack.emplace_back(std::forward<AggregationT>(aggregation),
-                                _formatter.member_name(std::forward<MemberT>(member)));
+                                _formatter.member_to_string(std::forward<MemberT>(member)));
         }
 
         void aggregate_close(bool ok)

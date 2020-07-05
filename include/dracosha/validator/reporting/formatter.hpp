@@ -117,67 +117,13 @@ struct formatter_t
     }
 
     template <typename DstT>
-    void validate_and(DstT& dst) const
-    {
-        format(dst,
-                make_cref_tuple(_strings),
-                string_and
-                );
-    }
-
-    template <typename DstT, typename MemberT>
-    void validate_and(DstT& dst, const MemberT& member) const
-    {
-        format(dst,
-                make_cref_tuple(_member_names,_strings),
-                member,string_and
-                );
-    }
-
-    template <typename DstT>
-    void validate_or(DstT& dst) const
-    {
-        format(dst,
-                make_cref_tuple(_strings),
-                string_or
-                );
-    }
-
-    template <typename DstT, typename MemberT>
-    void validate_or(DstT& dst, const MemberT& member) const
-    {
-        format(dst,
-                make_cref_tuple(_member_names,_strings),
-                member,string_or
-                );
-    }
-
-    template <typename DstT>
-    void validate_not(DstT& dst) const
-    {
-        format(dst,
-                make_cref_tuple(_strings),
-                string_not
-                );
-    }
-
-    template <typename DstT, typename MemberT>
-    void validate_not(DstT& dst, const MemberT& member) const
-    {
-        format(dst,
-                make_cref_tuple(_member_names,_strings),
-                member,string_not
-                );
-    }
-
-    template <typename DstT>
     void aggregate(DstT& dst, const report_aggregation<DstT>& item)
     {
         format(dst,_strings,item);
     }
 
     template <typename MemberT>
-    std::string member_name(const MemberT& member) const
+    std::string member_to_string(const MemberT& member) const
     {
         return _member_names(member);
     }

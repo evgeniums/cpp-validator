@@ -50,10 +50,10 @@ struct string_or_t : public logical_op<string_or_t>
 {
     constexpr static const char* description="at least one of the following conditions must be satisfied";
 
-    constexpr static const aggregation id=aggregation::OR;
-    constexpr static const char* open_tag="(";
-    constexpr static const char* close_tag=")";
-    constexpr static const char* conjunction_tag="or";
+    constexpr static const aggregation_id id=aggregation_id::OR;
+    constexpr static const char* open_token="(";
+    constexpr static const char* close_token=")";
+    constexpr static const char* conjunction_token=" OR ";
 };
 constexpr string_or_t string_or{};
 

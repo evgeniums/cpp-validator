@@ -50,10 +50,10 @@ struct string_and_t : public logical_op<string_and_t>
 {
     constexpr static const char* description="the following conditions must be satisfied";
 
-    constexpr static const aggregation id=aggregation::AND;
-    constexpr static const char* open_tag="(";
-    constexpr static const char* close_tag=")";
-    constexpr static const char* conjunction_tag="and";
+    constexpr static const aggregation_id id=aggregation_id::AND;
+    constexpr static const char* open_token="(";
+    constexpr static const char* close_token=")";
+    constexpr static const char* conjunction_token=" AND ";
 };
 constexpr string_and_t string_and{};
 

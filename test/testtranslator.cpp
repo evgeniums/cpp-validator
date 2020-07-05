@@ -238,6 +238,9 @@ BOOST_AUTO_TEST_CASE(CheckSampleLocale)
     BOOST_CHECK_EQUAL(m[string_and],std::string(string_and));
     BOOST_CHECK_EQUAL(m[string_or],std::string(string_or));
     BOOST_CHECK_EQUAL(m[string_not],std::string(string_not));
+    BOOST_CHECK_EQUAL(m[string_and_t::conjunction_token],std::string(string_and_t::conjunction_token));
+    BOOST_CHECK_EQUAL(m[string_or_t::conjunction_token],std::string(string_or_t::conjunction_token));
+    BOOST_CHECK_EQUAL(m[string_not_t::open_token],std::string(string_not_t::open_token));
 
     // comparison
     BOOST_CHECK_EQUAL(m[eq],std::string(eq));

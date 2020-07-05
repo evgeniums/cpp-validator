@@ -49,7 +49,7 @@ struct translator_env
         _rep.add_translator(translator1,locales1);
     }
 
-    translated_strings strings()
+    auto strings()
     {
         return make_translated_strings(_rep,"en");
     }

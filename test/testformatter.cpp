@@ -92,6 +92,22 @@ BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
                 "field2",value,lte,string_master_sample
             );
     BOOST_CHECK_EQUAL(str10,std::string("field2 is less than or equal to field2 of sample"));
+
+    std::string str11;
+    detail::reorder_and_present(
+                str11,
+                make_cref_tuple(member_names(),member_names(),default_strings,member_names()),
+                "field2",value,lte,member_name("field1")
+            );
+    BOOST_CHECK_EQUAL(str11,std::string("field2 is less than or equal to field1"));
+
+    std::string str12;
+    detail::reorder_and_present(
+                str12,
+                make_cref_tuple(member_names(),member_names(),default_strings,member_names()),
+                "field2",size,lte,member_name("field1")
+            );
+    BOOST_CHECK_EQUAL(str12,std::string("size of field2 is less than or equal to size of field1"));
 }
 
 BOOST_AUTO_TEST_CASE(CheckBypassNamesDefaultStrings)
@@ -162,17 +178,31 @@ BOOST_AUTO_TEST_CASE(CheckBypassNamesDefaultStrings)
     BOOST_CHECK_EQUAL(str17,std::string("size of field1 is less than or equal to size of field1 of sample"));
 
     std::string str18;
-    formatter1.validate_and(str18);
-    BOOST_CHECK_EQUAL(str18,std::string(string_and)+std::string(string_conjunction_aggregate));
+    report_aggregation<std::string> and_op(string_and);
+    and_op.parts={"one","two","three"};
+    formatter1.aggregate(str18,and_op);
+    BOOST_CHECK_EQUAL(str18,std::string("one AND two AND three"));
+
     std::string str19;
-    formatter1.validate_or(str19);
-    BOOST_CHECK_EQUAL(str19,std::string(string_or)+std::string(string_conjunction_aggregate));
+    report_aggregation<std::string> or_op(string_or);
+    or_op.parts={"one","two","three"};
+    or_op.single=false;
+    formatter1.aggregate(str19,or_op);
+    BOOST_CHECK_EQUAL(str19,std::string("(one OR two OR three)"));
+
     std::string str20;
-    formatter1.validate_not(str20);
-    BOOST_CHECK_EQUAL(str20,std::string(string_not)+std::string(string_conjunction_aggregate));
+    report_aggregation<std::string> not_op(string_not);
+    not_op.parts={"one"};
+    formatter1.aggregate(str20,not_op);
+    BOOST_CHECK_EQUAL(str20,std::string("NOT one"));
 
     std::string str21;
-    formatter1.validate_and(str21,"field1");
-    BOOST_CHECK_EQUAL(str21,std::string("for field1 the following conditions must be satisfied: "));
+    report_aggregation<std::string> not_op1(string_not);
+    not_op1.parts={"two"};
+    formatter1.aggregate(str21,not_op1);
+    BOOST_CHECK_EQUAL(str21,std::string("NOT two"));
+
+    auto str22=formatter1.member_to_string(size);
+    BOOST_CHECK_EQUAL(str22,std::string("size"));
 }
 #endif

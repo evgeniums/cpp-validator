@@ -61,6 +61,7 @@ SET (HEADERS
     include/dracosha/validator/reporting/values.hpp
     include/dracosha/validator/reporting/order_and_presentation.hpp
     include/dracosha/validator/reporting/report_aggregation.hpp
+    include/dracosha/validator/reporting/aggregation_strings.hpp
     include/dracosha/validator/reporting/locale/sample_locale.hpp
 
     include/dracosha/validator/detail/has_method.hpp

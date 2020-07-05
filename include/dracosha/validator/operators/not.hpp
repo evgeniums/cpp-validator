@@ -60,10 +60,10 @@ struct string_not_t : public logical_op<string_not_t>
 {
     constexpr static const char* description="the following condition must be false";
 
-    constexpr static const aggregation id=aggregation::NOT;
-    constexpr static const char* open_tag="(";
-    constexpr static const char* close_tag=")";
-    constexpr static const char* conjunction_tag="not";
+    constexpr static const aggregation_id id=aggregation_id::NOT;
+    constexpr static const char* open_token="NOT ";
+    constexpr static const char* close_token="";
+    constexpr static const char* conjunction_token="";
 };
 constexpr string_not_t string_not{};
 

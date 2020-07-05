@@ -40,13 +40,16 @@ struct report_aggregation
             aggregation_op aggregation,
             DstT member=DstT()
         ) : aggregation(std::move(aggregation)),
-            member(std::move(member))
+            member(std::move(member)),
+            single(true)
     {}
 
     aggregation_op aggregation;
 
     std::string member;
     std::vector<DstT> parts;
+
+    bool single;
 };
 
 //-------------------------------------------------------------

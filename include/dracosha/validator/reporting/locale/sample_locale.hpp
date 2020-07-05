@@ -66,9 +66,13 @@ inline std::map<std::string,std::string> strings_sample_locale()
     m[string_not_exists]="does not exist";
 
     // logical
+    //! \todo remove
     m[string_and]="the following conditions must be satisfied";
     m[string_or]="at least one of the following conditions must be satisfied";
     m[string_not]="the following condition must be false";
+    m[string_and_t::conjunction_token]=" AND ";
+    m[string_or_t::conjunction_token]=" OR ";
+    m[string_not_t::open_token]="NOT ";
 
     // comparison
     m[eq]="is equal to";
