@@ -1,23 +1,46 @@
-#if 0
-#include <string>
-#include <vector>
-#include <iterator>
-
+#include <iostream>
 #include <boost/test/unit_test.hpp>
 
 #include <dracosha/validator/config.hpp>
-
-#ifdef DRACOSHA_VALIDATOR_FMT
-#undef DRACOSHA_VALIDATOR_FMT
-#endif
-
 #include <dracosha/validator/reporting/formatter.hpp>
+#include <dracosha/validator/reporting/mapped_translator.hpp>
+#include <dracosha/validator/reporting/translator_repository.hpp>
 
 using namespace dracosha::validator;
 
 BOOST_AUTO_TEST_SUITE(TestStdFormatter)
 
-#include "testformatter.ipp"
+#define DRACOSHA_VALIDATOR_TEST_FORMATTER
+#include "testformatter.cpp"
+
+BOOST_AUTO_TEST_CASE(CheckFmtOrderAndPresentation)
+{
+    checkOrderAndPresentation();
+}
+
+BOOST_AUTO_TEST_CASE(CheckFmtDefaultFormatter)
+{
+    checkDefaultFormatter();
+}
+
+BOOST_AUTO_TEST_CASE(CheckFmtFormatterFromStrings)
+{
+    checkFormatterFromStrings();
+}
+
+BOOST_AUTO_TEST_CASE(CheckFmtFormatterFromMemberNames)
+{
+    checkFormatterFromMemberNames();
+}
+
+BOOST_AUTO_TEST_CASE(CheckFmtFormatterFromMemberNamesAndValues)
+{
+    checkFormatterFromMemberNamesAndValues();
+}
+
+BOOST_AUTO_TEST_CASE(CheckFmtFormatterWithRefs)
+{
+    checkFormatterWithRefs();
+}
 
 BOOST_AUTO_TEST_SUITE_END()
-#endif

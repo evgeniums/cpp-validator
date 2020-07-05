@@ -31,7 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifdef DRACOSHA_VALIDATOR_FMT
 #include <dracosha/validator/detail/formatter_fmt.hpp>
 #else
-//! \todo use std string formatting
+#include <dracosha/validator/detail/formatter_std.hpp>
 #endif
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -40,7 +40,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 constexpr detail::fmt_formatter_t backend_formatter{};
 constexpr detail::fmt_append_with_separator_t formatter_append_with_separator{};
 #else
-//! \todo use std string formatting
+constexpr detail::std_formatter_t backend_formatter{};
+constexpr detail::std_append_with_separator_t formatter_append_with_separator{};
 #endif
 
 //-------------------------------------------------------------
@@ -118,8 +119,8 @@ struct apply_reorder_present_1arg_t<AggregationItemT,
         }
         backend_formatter.append_join(
             dst,
-            aggregation_item.parts,
-            strings.aggregation_conjunction(aggregation_item.aggregation)
+            strings.aggregation_conjunction(aggregation_item.aggregation),
+            aggregation_item.parts
         );
         if (!aggregation_item.single)
         {

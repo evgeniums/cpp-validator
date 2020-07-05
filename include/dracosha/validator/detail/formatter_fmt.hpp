@@ -60,8 +60,8 @@ void fmt_append_with_separator_args(DstT& dst, Args&&... args)
     fmt::format_to(std::back_inserter(dst),hana::to<const char*>(fmt_str),std::forward<Args>(args)...);
 }
 
-template <typename DstT, typename PartsT, typename SepT>
-void fmt_append_join(DstT& dst, PartsT&& parts, SepT&& sep)
+template <typename DstT, typename SepT, typename PartsT>
+void fmt_append_join(DstT& dst, SepT&& sep, PartsT&& parts)
 {
     fmt::format_to(std::back_inserter(dst),"{}",fmt::join(std::forward<PartsT>(parts),std::forward<SepT>(sep)));
 }
@@ -92,10 +92,10 @@ struct fmt_formatter_t
         return fmt_append_with_separator_args<' '>(dst,std::forward<Args>(args)...);
     }
 
-    template <typename DstT, typename PartsT, typename SepT>
-    static void append_join(DstT& dst, PartsT&& parts, SepT&& sep)
+    template <typename DstT,  typename SepT, typename PartsT>
+    static void append_join(DstT& dst, SepT&& sep, PartsT&& parts)
     {
-        fmt_append_join(dst,std::forward<PartsT>(parts),std::forward<SepT>(sep));
+        fmt_append_join(dst,std::forward<SepT>(sep),std::forward<PartsT>(parts));
     }
 };
 

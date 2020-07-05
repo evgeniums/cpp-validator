@@ -38,7 +38,7 @@ struct format_value_t
  * @brief  Formatter of non-boolean values
  */
 template <typename T>
-struct format_value_t<T,hana::when<!std::is_same<bool,T>::value>>
+struct format_value_t<T,hana::when<!std::is_same<bool,std::decay_t<T>>::value>>
 {
     template <typename T1, typename TranslatorT>
     auto operator () (T1&& val, const TranslatorT&) const -> decltype(auto)
@@ -51,7 +51,7 @@ struct format_value_t<T,hana::when<!std::is_same<bool,T>::value>>
  * @brief  Formatter of boolean values
  */
 template <typename T>
-struct format_value_t<T,hana::when<std::is_same<bool,T>::value>>
+struct format_value_t<T,hana::when<std::is_same<bool,std::decay_t<T>>::value>>
 {
     template <typename T1, typename TranslatorT>
     auto operator () (T1&& val, const TranslatorT& translator) const -> decltype(auto)

@@ -1,16 +1,10 @@
 //#define DRACOSHA_VALIDATOR_TEST_FORMATTER
 #ifdef DRACOSHA_VALIDATOR_TEST_FORMATTER
 
-#include <string>
-#include <vector>
-#include <iterator>
+namespace
+{
 
-#include <boost/test/unit_test.hpp>
-
-#include <dracosha/validator/config.hpp>
-#include <dracosha/validator/reporting/formatter.hpp>
-
-BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
+void checkOrderAndPresentation()
 {
     std::string str1;
     detail::reorder_and_present(
@@ -24,7 +18,7 @@ BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
     detail::reorder_and_present(
                 str2,
                 make_cref_tuple(default_strings,values),
-                eq,true
+                eq,bool(true)
             );
     BOOST_CHECK_EQUAL(str2,std::string("must be true"));
 
@@ -110,8 +104,6 @@ BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
     BOOST_CHECK_EQUAL(str12,std::string("size of field2 is less than or equal to size of field1"));
 }
 
-namespace
-{
 template <typename FormatterT>
 void testFormatter(const FormatterT& formatter1)
 {
@@ -221,26 +213,25 @@ auto make_test_strings(translator_repository& rep)
     rep.add_translator(translator1,locales1);
     return make_translated_strings(rep,"en");
 }
-}
 
-BOOST_AUTO_TEST_CASE(CheckDefaultFormatter)
+void checkDefaultFormatter()
 {
     testFormatter(formatter());
 }
 
-BOOST_AUTO_TEST_CASE(CheckFormatterFromStrings)
+void checkFormatterFromStrings()
 {
     translator_repository rep;
     testFormatter(formatter(make_test_strings(rep)));
 }
 
-BOOST_AUTO_TEST_CASE(CheckFormatterFromMemberNames)
+void checkFormatterFromMemberNames()
 {
     translator_repository rep;
     testFormatter(formatter(member_names(make_test_strings(rep))));
 }
 
-BOOST_AUTO_TEST_CASE(CheckFormatterFromMemberNamesAndValues)
+void checkFormatterFromMemberNamesAndValues()
 {
     translator_repository rep;
     testFormatter(formatter(
@@ -250,7 +241,7 @@ BOOST_AUTO_TEST_CASE(CheckFormatterFromMemberNamesAndValues)
                   );
 }
 
-BOOST_AUTO_TEST_CASE(CheckFormatterWithRefs)
+void checkFormatterWithRefs()
 {
     translator_repository rep;
     auto st=make_test_strings(rep);
@@ -262,6 +253,7 @@ BOOST_AUTO_TEST_CASE(CheckFormatterWithRefs)
                             st
                             )
                   );
+}
 }
 
 #endif
