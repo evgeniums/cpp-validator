@@ -47,9 +47,14 @@ struct formatter
 {
     using hana_tag=formatter_tag;
 
+    using member_names_type=MemberNamesT;
+    using values_type=ValuesT;
+    using strings_type=StringsT;
+    using order_and_presentation_type=OrderAndPresentationT;
+
     MemberNamesT _member_names;
     ValuesT _values;
-    const StringsT& _strings;
+    StringsT _strings;
     OrderAndPresentationT _order_and_presentation;
 
     template <typename DstT, typename T2, typename OpT>
@@ -141,39 +146,6 @@ struct formatter
 };
 
 /**
- * @brief Create formatter that doesn't own member names but holds a const reference instead
- * @param mn Const reference to formatter of member names
- * @param vs Const reference to formatter of values
- * @param strings Const reference to strings
- * @param order Reordering and presentation helper
- * @return Formatter
- */
-template <typename MemberNamesT,typename ValuesT,typename StringsT, typename OrderAndPresentationT>
-auto make_formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const StringsT& strings, OrderAndPresentationT&& order)
-{
-    return formatter<
-                const MemberNamesT&,
-                const ValuesT&,
-                StringsT,
-                std::decay_t<OrderAndPresentationT>
-            >
-            {mn,vs,strings,std::forward<OrderAndPresentationT>(order)};
-}
-
-/**
- * @brief Create formatter that doesn't own member names but holds a const reference instead
- * @param mn Const reference to formatter of member names
- * @param vs Const reference to formatter of values
- * @param strings Const reference to strings
- * @return Formatter
- */
-template <typename MemberNamesT,typename ValuesT,typename StringsT>
-auto make_formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const StringsT& strings)
-{
-    return make_formatter_with_references(mn,vs,strings,default_order_and_presentation);
-}
-
-/**
  * @brief Create formatter that owns member names and value strings
  * @param mn Formatter of member names
  * @param vs Formatter of values
@@ -182,15 +154,15 @@ auto make_formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, c
  * @return Formatter
  */
 template <typename MemberNamesT,typename ValuesT,typename StringsT, typename OrderAndPresentationT>
-auto make_formatter(MemberNamesT&& mn, ValuesT&& vs, const StringsT& strings, OrderAndPresentationT&& order)
+auto make_formatter(MemberNamesT&& mn, ValuesT&& vs, StringsT&& strings, OrderAndPresentationT&& order)
 {
     return formatter<
-                std::decay_t<MemberNamesT>,
-                std::decay_t<ValuesT>,
+                MemberNamesT,
+                ValuesT,
                 StringsT,
-                std::decay_t<OrderAndPresentationT>
+                OrderAndPresentationT
             >
-            {std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),strings,std::forward<OrderAndPresentationT>(order)};
+            {std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),std::forward<StringsT>(strings),std::forward<OrderAndPresentationT>(order)};
 }
 
 /**
@@ -201,9 +173,9 @@ auto make_formatter(MemberNamesT&& mn, ValuesT&& vs, const StringsT& strings, Or
  * @return Formatter
  */
 template <typename MemberNamesT,typename ValuesT,typename StringsT>
-auto make_formatter(MemberNamesT&& mn, ValuesT&& vs, const StringsT& strings)
+auto make_formatter(MemberNamesT&& mn, ValuesT&& vs, StringsT&& strings)
 {
-    return make_formatter(std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),strings,default_order_and_presentation);
+    return make_formatter(std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),std::forward<StringsT>(strings),default_order_and_presentation);
 }
 
 /**
@@ -248,10 +220,10 @@ auto make_formatter(const StringsT& strings,
  */
 inline auto get_default_formatter() ->
     std::add_lvalue_reference_t<
-        std::add_const_t<decltype(make_formatter_with_references(get_default_member_names(),default_values,default_strings))>
+        std::add_const_t<decltype(make_formatter(get_default_member_names(),default_values,default_strings))>
     >
 {
-    static const auto default_formatter=make_formatter_with_references(get_default_member_names(),default_values,default_strings);
+    static const auto default_formatter=make_formatter(get_default_member_names(),default_values,default_strings);
     return default_formatter;
 }
 

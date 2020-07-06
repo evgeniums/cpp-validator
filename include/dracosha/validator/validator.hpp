@@ -39,17 +39,13 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/dispatcher.hpp>
 #include <dracosha/validator/adapters/adapter.hpp>
 #include <dracosha/validator/prepare_dispatcher.hpp>
-#include <dracosha/validator/properties/value.hpp>
-#include <dracosha/validator/properties/empty.hpp>
-#include <dracosha/validator/properties/size.hpp>
 #include <dracosha/validator/apply.hpp>
 #include <dracosha/validator/detail/validator_impl.hpp>
 #include <dracosha/validator/make_validator.hpp>
 #include <dracosha/validator/member.hpp>
 #include <dracosha/validator/master_sample.hpp>
-#include <dracosha/validator/operators/and.hpp>
-#include <dracosha/validator/operators/or.hpp>
-#include <dracosha/validator/operators/not.hpp>
+#include <dracosha/validator/properties.hpp>
+#include <dracosha/validator/operators.hpp>
 #include <dracosha/validator/validate.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN

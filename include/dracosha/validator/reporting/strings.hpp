@@ -57,7 +57,7 @@ struct strings
 {
     using hana_tag=strings_tag;
 
-    const TranslatorT& _translator;
+    TranslatorT _translator;
     AggregationStringsT _aggregation_strings;
 
     ~strings()=default;
@@ -106,10 +106,10 @@ struct strings
 /**
   @brief Default strings object does not perform any translation.
 */
-constexpr strings<no_translator_t,aggregation_strings_t> default_strings{no_translator,aggregation_strings};
+constexpr strings<const no_translator_t&,const aggregation_strings_t&> default_strings{no_translator,aggregation_strings};
 
 template <typename AggregationStringsT>
-using translated_strings=strings<translator,AggregationStringsT>;
+using translated_strings=strings<const translator&,AggregationStringsT>;
 
 struct make_translated_strings_t
 {
@@ -121,7 +121,7 @@ struct make_translated_strings_t
      */
     auto operator() (const translator_repository& rep,const std::string& loc=std::locale().name()) const
     {
-        return translated_strings<aggregation_strings_t>{*rep.find_translator(loc),aggregation_strings};
+        return translated_strings<const aggregation_strings_t&>{*rep.find_translator(loc),aggregation_strings};
     }
 
     /**
@@ -134,7 +134,7 @@ struct make_translated_strings_t
     template <typename T>
     auto operator() (T&& aggregation_str,const translator_repository& rep,const std::string& loc=std::locale().name()) const
     {
-        return translated_strings<std::decay_t<T>>{*rep.find_translator(loc),std::forward<T>(aggregation_str)};
+        return translated_strings<T>{*rep.find_translator(loc),std::forward<T>(aggregation_str)};
     }
 };
 constexpr make_translated_strings_t make_translated_strings{};

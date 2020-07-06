@@ -105,7 +105,7 @@ class reporter
         template <typename T2, typename OpT, typename PropT>
         void validate_property(const PropT& prop, const OpT& op, const T2& b)
         {
-            _formatter.validate_property(current(),prop,op);
+            _formatter.validate_property(current(),prop,op,b);
         }
 
         /**

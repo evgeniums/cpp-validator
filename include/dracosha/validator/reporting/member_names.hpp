@@ -83,7 +83,10 @@ struct member_names
 {
     using hana_tag=member_names_tag;
 
-    const StringsT& _strings;
+    using strings_type=StringsT;
+    using traits_type=TraitsT;
+
+    StringsT _strings;
     TraitsT _traits;
 
     /**
@@ -110,7 +113,10 @@ struct member_names<StringsT,bypass_member_names_traits>
 {
     using hana_tag=member_names_tag;
 
-    const StringsT& _strings;
+    StringsT _strings;
+
+    using strings_type=StringsT;
+    using traits_type=bypass_member_names_traits;
 
     template <typename T>
     std::string operator() (const T& name) const
@@ -126,15 +132,15 @@ struct member_names<StringsT,bypass_member_names_traits>
  * @return Formatter of member names
  */
 template <typename TraitsT,typename StringsT>
-auto make_member_names(TraitsT&& traits, const StringsT& strings,
+auto make_member_names(TraitsT&& traits, StringsT&& strings,
                     std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr
                 )
 {
     return member_names<
-                std::decay_t<StringsT>,
-                std::decay_t<TraitsT>
+                StringsT,
+                TraitsT
             >
-            {strings,std::forward<TraitsT>(traits)};
+            {std::forward<StringsT>(strings),std::forward<TraitsT>(traits)};
 }
 
 /**
@@ -143,15 +149,15 @@ auto make_member_names(TraitsT&& traits, const StringsT& strings,
  * @return Formatter of member names
  */
 template <typename StringsT>
-auto make_member_names(const StringsT& strings,
+auto make_member_names(StringsT&& strings,
                     std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr
                 )
 {
     return member_names<
-                std::decay_t<StringsT>,
+                StringsT,
                 bypass_member_names_traits
             >
-            {strings};
+            {std::forward<StringsT>(strings)};
 }
 
 /**
@@ -164,7 +170,7 @@ auto make_member_names(TraitsT&& traits,
                 std::enable_if_t<(!hana::is_a<strings_tag,TraitsT> && !hana::is_a<translator_tag,TraitsT>),void*> =nullptr
             )
 {
-    return make_member_names(traits,default_strings);
+    return make_member_names(std::forward<TraitsT>(traits),default_strings);
 }
 
 /**

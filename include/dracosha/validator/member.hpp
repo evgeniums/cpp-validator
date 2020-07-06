@@ -26,6 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/tuple_to_variadic.hpp>
 #include <dracosha/validator/apply.hpp>
 #include <dracosha/validator/dispatcher.hpp>
+#include <dracosha/validator/properties.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

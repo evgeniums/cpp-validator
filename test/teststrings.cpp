@@ -101,19 +101,34 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
 {
     BOOST_TEST_CONTEXT("Dummy traits")
     {
-        check_bypass(make_member_names(Dummy()));
+        auto mn=make_member_names(Dummy());
+        using mn_type=decltype(mn);
+        static_assert(std::is_lvalue_reference<typename mn_type::strings_type>::value,"");
+        static_assert(!std::is_lvalue_reference<typename mn_type::traits_type>::value,"");
+        static_assert(std::is_same<typename mn_type::traits_type,Dummy>::value,"");
+
+        check_bypass(mn);
     }
 
     BOOST_TEST_CONTEXT("Default member names")
     {
-        check_bypass(get_default_member_names());
+        const auto& mn=get_default_member_names();
+        using mn_type=decltype(mn);
+        static_assert(std::is_lvalue_reference<typename std::decay_t<mn_type>::strings_type>::value,"");
+        static_assert(std::is_same<typename std::decay_t<mn_type>::traits_type,bypass_member_names_traits>::value,"");
+
+        check_bypass(mn);
     }
 
     BOOST_TEST_CONTEXT("Strings with bypass member names")
     {
         translator_env env;
-        auto strings=env.strings();
-        env.check(make_member_names(strings));
+        auto mn=make_member_names(env.strings());
+        using mn_type=decltype(mn);
+        static_assert(!std::is_lvalue_reference<typename mn_type::strings_type>::value,"");
+        static_assert(std::is_same<typename mn_type::traits_type,bypass_member_names_traits>::value,"");
+
+        env.check(mn);
     }
 
     BOOST_TEST_CONTEXT("Strings with dummy traits of member names")
@@ -126,10 +141,14 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
     BOOST_TEST_CONTEXT("Strings with mapped translator as traits")
     {
         translator_env env;
-        auto strings=env.strings();
         mapped_translator tr;
         tr.strings()["field2"]="filed2_translated";
-        auto mn=make_member_names(tr,strings);
+
+        auto mn=make_member_names(std::move(tr),env.strings());
+        using mn_type=decltype(mn);
+        static_assert(!std::is_lvalue_reference<typename mn_type::strings_type>::value,"");
+        static_assert(!std::is_lvalue_reference<typename mn_type::traits_type>::value,"");
+
         env.check(mn);
         BOOST_CHECK_EQUAL(mn("field2"),std::string("filed2_translated"));
     }
@@ -142,6 +161,10 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
         tr.strings()["field1"]="other translation of field1";
 
         auto mn=make_member_names(tr,strings);
+        using mn_type=decltype(mn);
+        static_assert(std::is_lvalue_reference<typename mn_type::strings_type>::value,"");
+        static_assert(std::is_lvalue_reference<typename mn_type::traits_type>::value,"");
+
         BOOST_CHECK_EQUAL(mn(string_and),env._m[std::string(string_and)]);
         BOOST_CHECK_EQUAL(mn(value),env._m[value.name()]);
         BOOST_CHECK_EQUAL(mn(gte),env._m[std::string(gte)]);

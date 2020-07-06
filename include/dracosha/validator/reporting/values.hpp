@@ -49,7 +49,9 @@ struct values
 {
     using hana_tag=values_tag;
 
-    const TranslatorT& _translator;
+    using translator_type=TranslatorT;
+
+    TranslatorT _translator;
 
     /**
      * @brief Format a value
@@ -70,7 +72,7 @@ struct values
 */
 constexpr values<no_translator_t> default_values{no_translator};
 
-using translated_values=values<translator>;
+using translated_values=values<const translator&>;
 
 /**
  * @brief Make values formatter using translator found in translator repository by locale name

@@ -216,29 +216,58 @@ auto make_test_strings(translator_repository& rep)
 
 void checkDefaultFormatter()
 {
-    testFormatter(get_default_formatter());
+    const auto& fm=get_default_formatter();
+
+    using fm_type=decltype(fm);
+    static_assert(std::is_lvalue_reference<typename std::decay_t<fm_type>::member_names_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename std::decay_t<fm_type>::values_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename std::decay_t<fm_type>::strings_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename std::decay_t<fm_type>::order_and_presentation_type>::value,"");
+
+    testFormatter(fm);
 }
 
 void checkFormatterFromStrings()
 {
     translator_repository rep;
-    testFormatter(make_formatter(make_test_strings(rep)));
+    auto fm=make_formatter(make_test_strings(rep));
+
+    using fm_type=decltype(fm);
+    static_assert(!std::is_lvalue_reference<typename fm_type::member_names_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::values_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
+
+    testFormatter(fm);
 }
 
 void checkFormatterFromMemberNames()
 {
     translator_repository rep;
-    testFormatter(make_formatter(make_member_names(make_test_strings(rep))));
+    auto fm=make_formatter(make_member_names(make_test_strings(rep)));
+
+    using fm_type=decltype(fm);
+    static_assert(!std::is_lvalue_reference<typename fm_type::member_names_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::values_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
+
+    testFormatter(fm);
 }
 
 void checkFormatterFromMemberNamesAndValues()
 {
     translator_repository rep;
-    testFormatter(make_formatter(
-                            make_member_names(make_test_strings(rep)),
-                            make_translated_values(rep,"en")
-                            )
-                  );
+
+    auto fm=make_formatter(make_member_names(make_test_strings(rep)),make_translated_values(rep,"en"));
+
+    using fm_type=decltype(fm);
+    static_assert(!std::is_lvalue_reference<typename fm_type::member_names_type>::value,"");
+    static_assert(!std::is_lvalue_reference<typename fm_type::values_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
+
+    testFormatter(fm);
 }
 
 void checkFormatterWithRefs()
@@ -247,13 +276,39 @@ void checkFormatterWithRefs()
     auto st=make_test_strings(rep);
     auto mn=make_member_names(st);
     auto vs=make_translated_values(rep,"en");
-    testFormatter(make_formatter_with_references(
-                            mn,
-                            vs,
-                            st
-                            )
-                  );
+    auto fm=make_formatter(
+                mn,
+                vs,
+                st
+                );
+
+    using fm_type=decltype(fm);
+    static_assert(std::is_lvalue_reference<typename fm_type::member_names_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::values_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
+
+    testFormatter(fm);
 }
+
+void checkFormatterWithRvals()
+{
+    translator_repository rep;
+    auto fm=make_formatter(
+                make_member_names(make_test_strings(rep)),
+                make_translated_values(rep,"en"),
+                make_test_strings(rep)
+                );
+
+    using fm_type=decltype(fm);
+    static_assert(!std::is_lvalue_reference<typename fm_type::member_names_type>::value,"");
+    static_assert(!std::is_lvalue_reference<typename fm_type::values_type>::value,"");
+    static_assert(!std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
+
+    testFormatter(fm);
+}
+
 }
 
 #endif
