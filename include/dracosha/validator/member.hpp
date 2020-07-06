@@ -33,27 +33,6 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct member_tag;
 
 /**
- * @brief Format a path as string with dot separated levels
- * @param path Path as hana::tuple object
- * @return Formatted path
- *
- * @note Only string keys can be formatted using this method
- */
-BOOST_HANA_CONSTEXPR_LAMBDA auto format_path_str= [](auto&& path) -> decltype(auto)
-{
-    return hana::fold(std::forward<decltype(path)>(path),std::string(),
-            [](auto&& str, auto&& key) -> decltype(auto)
-            {
-                if (!str.empty())
-                {
-                    str+=".";
-                }
-                return str+key;
-            }
-        );
-};
-
-/**
  *  @brief Generic descriptor of a member that must be validated.
  *
  * Descriptor defines the path for extracting specific member/subobject from the object under validation.
@@ -143,7 +122,7 @@ struct member
      */
     std::string path_str() const
     {
-        return format_path_str(path);
+        return formatpath_str(path);
     }
 
     /**

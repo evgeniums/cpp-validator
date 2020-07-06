@@ -42,6 +42,15 @@ BOOST_AUTO_TEST_CASE(CheckFmtString)
     std::string str3;
     formatter.append(str3,"one",",","two",",","three");
     BOOST_CHECK_EQUAL(str3,std::string("one,two,three"));
+
+    std::string str4;
+//    detail::fmt_append_join(str4,std::string(" , "),hana::make_tuple("one","two","three"));
+//    auto t=std::make_tuple("one","two","three");
+//    fmt::join(t,std::string(","));
+//    std::tuple<int, char> t = {1, 'a'};
+//     Prints "1, a"
+//    fmt::print("{}", fmt::join(t, ", "));
+//    BOOST_TEST_MESSAGE(str4);
 }
 
 #define DRACOSHA_VALIDATOR_TEST_FORMATTER

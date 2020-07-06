@@ -55,6 +55,29 @@ BOOST_AUTO_TEST_CASE(CheckReportingAdapter)
     using adapter_type5=decltype(ra5);
     static_assert(std::is_lvalue_reference<typename adapter_type5::reporter_type>::value,"");
     static_assert(std::is_lvalue_reference<typename adapter_type5::next_adapter_type>::value,"");
+
+    BOOST_CHECK(true);
+}
+
+BOOST_AUTO_TEST_CASE(CheckReporter)
+{
+    std::string rep1;
+    auto r1=make_reporter(rep1);
+    r1.validate("field1",value,gte,10);
+    BOOST_TEST_MESSAGE(rep1);
+}
+
+BOOST_AUTO_TEST_CASE(CheckReportOp)
+{
+    std::map<std::string,size_t> m1={{"field1",1}};
+    auto v1=validator(
+                _["field1"](gte,10)
+            );
+
+    std::string rep1;
+    auto ra1=make_reporting_adapter(rep1,m1);
+    BOOST_CHECK(!v1.apply(ra1));
+    BOOST_TEST_MESSAGE(rep1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

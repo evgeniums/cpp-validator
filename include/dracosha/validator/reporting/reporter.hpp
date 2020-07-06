@@ -169,7 +169,8 @@ class reporter
         {
             if (!_stack.empty())
             {
-                return _stack.back().parts.emplace_back();
+                _stack.back().parts.emplace_back();
+                return _stack.back().parts.back();
             }
             return _dst;
         }

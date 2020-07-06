@@ -27,40 +27,6 @@ Distributed under the Boost Software License, Version 1.0.
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
-struct member_name_tag;
-
-template <typename T>
-struct member_name
-{
-    using hana_tag=member_name_tag;
-
-    /**
-     * @brief Get constant reference
-     * @return Constance reference to value
-     */
-    const T& get() const
-    {
-        return _v.get();
-    }
-
-    /**
-     * @brief Get constant reference
-     * @return Constance reference to value
-     */
-    operator const T& () const
-    {
-        return _v.get();
-    }
-
-    reference_wrapper_t<T> _v;
-};
-
-BOOST_HANA_CONSTEXPR_LAMBDA auto make_member_name =[](const auto& v)
-{
-    return member_name<typename decltype(cref(v))::type>{cref(v)};
-};
-
-//-------------------------------------------------------------
 
 struct member_names_tag;
 

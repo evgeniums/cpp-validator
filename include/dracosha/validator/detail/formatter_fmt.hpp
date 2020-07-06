@@ -19,9 +19,11 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_FORMATTER_FMT_HPP
 #define DRACOSHA_VALIDATOR_FORMATTER_FMT_HPP
 
+#include <fmt/ranges.h>
 #include <fmt/format.h>
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/utils/tuple_to_variadic.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -61,9 +63,19 @@ void fmt_append_with_separator_args(DstT& dst, Args&&... args)
 }
 
 template <typename DstT, typename SepT, typename PartsT>
-void fmt_append_join(DstT& dst, SepT&& sep, PartsT&& parts)
+void fmt_append_join(DstT& dst, SepT&& sep, PartsT&& parts,
+                     std::enable_if_t<!hana::is_a<hana::tuple_tag,PartsT>,void*> =nullptr)
 {
     fmt::format_to(std::back_inserter(dst),"{}",fmt::join(std::forward<PartsT>(parts),std::forward<SepT>(sep)));
+}
+
+template <typename DstT, typename SepT, typename PartsT>
+void fmt_append_join(DstT& dst, SepT&& sep, PartsT&& parts,
+                     std::enable_if_t<hana::is_a<hana::tuple_tag,PartsT>,void*> =nullptr)
+{
+    fmt::format_to(std::back_inserter(dst),"{}",fmt::join(
+                       tuple_to_variadic<std::tuple>::to_template(std::forward<PartsT>(parts)),
+                       std::forward<SepT>(sep)));
 }
 
 /**
