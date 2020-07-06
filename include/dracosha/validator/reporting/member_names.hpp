@@ -30,7 +30,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct member_name_tag;
 
 template <typename T>
-struct member_name_t
+struct member_name
 {
     using hana_tag=member_name_tag;
 
@@ -55,9 +55,9 @@ struct member_name_t
     reference_wrapper_t<T> _v;
 };
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto member_name =[](const auto& v)
+BOOST_HANA_CONSTEXPR_LAMBDA auto make_member_name =[](const auto& v)
 {
-    return member_name_t<typename decltype(cref(v))::type>{cref(v)};
+    return member_name<typename decltype(cref(v))::type>{cref(v)};
 };
 
 //-------------------------------------------------------------
@@ -79,7 +79,7 @@ struct bypass_member_names_traits
  *
  */
 template <typename StringsT,typename TraitsT>
-struct member_names_t
+struct member_names
 {
     using hana_tag=member_names_tag;
 
@@ -106,7 +106,7 @@ struct member_names_t
  * @brief Member names formatter that does not perform any formatting and forward names "as is" to strings object.
  */
 template <typename StringsT>
-struct member_names_t<StringsT,bypass_member_names_traits>
+struct member_names<StringsT,bypass_member_names_traits>
 {
     using hana_tag=member_names_tag;
 
@@ -126,11 +126,11 @@ struct member_names_t<StringsT,bypass_member_names_traits>
  * @return Formatter of member names
  */
 template <typename TraitsT,typename StringsT>
-auto member_names(TraitsT&& traits, const StringsT& strings,
+auto make_member_names(TraitsT&& traits, const StringsT& strings,
                     std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr
                 )
 {
-    return member_names_t<
+    return member_names<
                 std::decay_t<StringsT>,
                 std::decay_t<TraitsT>
             >
@@ -143,11 +143,11 @@ auto member_names(TraitsT&& traits, const StringsT& strings,
  * @return Formatter of member names
  */
 template <typename StringsT>
-auto member_names(const StringsT& strings,
+auto make_member_names(const StringsT& strings,
                     std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr
                 )
 {
-    return member_names_t<
+    return member_names<
                 std::decay_t<StringsT>,
                 bypass_member_names_traits
             >
@@ -160,20 +160,24 @@ auto member_names(const StringsT& strings,
  * @return Formatter of member names
  */
 template <typename TraitsT>
-auto member_names(TraitsT&& traits,
+auto make_member_names(TraitsT&& traits,
                 std::enable_if_t<(!hana::is_a<strings_tag,TraitsT> && !hana::is_a<translator_tag,TraitsT>),void*> =nullptr
             )
 {
-    return member_names(traits,default_strings);
+    return make_member_names(traits,default_strings);
 }
 
 /**
- * @brief Create member names formatter that just forwards names to default strings object
- * @return Formatter of member names
+ * @brief Get default member names formatter that just forwards names to default strings object
+ * @return Default formatter of member names
  */
-inline auto member_names()
+inline auto get_default_member_names()
+    -> std::add_lvalue_reference_t<
+            std::add_const_t<decltype(make_member_names(default_strings))>
+        >
 {
-    return member_names(default_strings);
+    static const auto default_member_names=make_member_names(default_strings);
+    return default_member_names;
 }
 
 //-------------------------------------------------------------

@@ -53,18 +53,18 @@ struct strings_tag;
  * After ID is converted to string the conversion result goes to translator. Translator returns translated or original string.
  */
 template <typename TranslatorT, typename AggregationStringsT>
-struct strings_t
+struct strings
 {
     using hana_tag=strings_tag;
 
     const TranslatorT& _translator;
     AggregationStringsT _aggregation_strings;
 
-    ~strings_t()=default;
-    strings_t(strings_t&&)=default;
-    strings_t(const strings_t&)=delete;
-    strings_t& operator =(strings_t&&)=default;
-    strings_t& operator =(const strings_t&)=delete;
+    ~strings()=default;
+    strings(strings&&)=default;
+    strings(const strings&)=delete;
+    strings& operator =(strings&&)=default;
+    strings& operator =(const strings&)=delete;
 
     /**
      * @brief Convert ID to string
@@ -106,10 +106,10 @@ struct strings_t
 /**
   @brief Default strings object does not perform any translation.
 */
-constexpr strings_t<no_translator_t,aggregation_strings_t> default_strings{no_translator,aggregation_strings};
+constexpr strings<no_translator_t,aggregation_strings_t> default_strings{no_translator,aggregation_strings};
 
 template <typename AggregationStringsT>
-using translated_strings=strings_t<translator,AggregationStringsT>;
+using translated_strings=strings<translator,AggregationStringsT>;
 
 struct make_translated_strings_t
 {

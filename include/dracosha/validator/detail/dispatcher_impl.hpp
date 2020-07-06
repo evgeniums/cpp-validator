@@ -261,40 +261,40 @@ template <typename T1>
 template <typename ...Args>
 constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::operator() (T1&& obj, Args&&... args) const
 {
-    using adapter_t=adapter<std::decay_t<T1>>;
-    return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
+    using type=decltype(make_adapter(std::forward<T1>(obj)));
+    return dispatcher_impl<type>(make_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
 }
 
 template <typename T1>
 template <typename ...Args>
 constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::invoke(T1&& obj, Args&&... args)
 {
-    using adapter_t=adapter<std::decay_t<T1>>;
-    return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>.invoke(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
+    using type=decltype(make_adapter(std::forward<T1>(obj)));
+    return dispatcher_impl<type>.invoke(make_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
 }
 
 template <typename T1>
 template <typename ...Args>
 constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_and(T1&& obj, Args&&... args)
 {
-    using adapter_t=adapter<std::decay_t<T1>>;
-    return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>.validate_and(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
+    using type=decltype(make_adapter(std::forward<T1>(obj)));
+    return dispatcher_impl<type>.validate_and(make_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
 }
 
 template <typename T1>
 template <typename ...Args>
 constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_or(T1&& obj, Args&&... args)
 {
-    using adapter_t=adapter<std::decay_t<T1>>;
-    return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>.validate_or(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
+    using type=decltype(make_adapter(std::forward<T1>(obj)));
+    return dispatcher_impl<type>.validate_or(make_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
 }
 
 template <typename T1>
 template <typename ...Args>
 constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_not(T1&& obj, Args&&... args)
 {
-    using adapter_t=adapter<std::decay_t<T1>>;
-    return dispatcher_impl<decltype(adapter_t(std::forward<T1>(obj)))>.validate_not(adapter_t(std::forward<T1>(obj)),std::forward<Args>(args)...);
+    using type=decltype(make_adapter(std::forward<T1>(obj)));
+    return dispatcher_impl<type>.validate_not(make_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
 }
 
 }

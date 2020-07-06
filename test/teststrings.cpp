@@ -101,26 +101,26 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
 {
     BOOST_TEST_CONTEXT("Dummy traits")
     {
-        check_bypass(member_names(Dummy()));
+        check_bypass(make_member_names(Dummy()));
     }
 
     BOOST_TEST_CONTEXT("Default member names")
     {
-        check_bypass(member_names());
+        check_bypass(get_default_member_names());
     }
 
     BOOST_TEST_CONTEXT("Strings with bypass member names")
     {
         translator_env env;
         auto strings=env.strings();
-        env.check(member_names(strings));
+        env.check(make_member_names(strings));
     }
 
     BOOST_TEST_CONTEXT("Strings with dummy traits of member names")
     {
         translator_env env;
         auto strings=env.strings();
-        env.check(member_names(Dummy(),strings));
+        env.check(make_member_names(Dummy(),strings));
     }
 
     BOOST_TEST_CONTEXT("Strings with mapped translator as traits")
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
         auto strings=env.strings();
         mapped_translator tr;
         tr.strings()["field2"]="filed2_translated";
-        auto mn=member_names(tr,strings);
+        auto mn=make_member_names(tr,strings);
         env.check(mn);
         BOOST_CHECK_EQUAL(mn("field2"),std::string("filed2_translated"));
     }
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
         tr.strings()["field2"]="filed2_translated";
         tr.strings()["field1"]="other translation of field1";
 
-        auto mn=member_names(tr,strings);
+        auto mn=make_member_names(tr,strings);
         BOOST_CHECK_EQUAL(mn(string_and),env._m[std::string(string_and)]);
         BOOST_CHECK_EQUAL(mn(value),env._m[value.name()]);
         BOOST_CHECK_EQUAL(mn(gte),env._m[std::string(gte)]);
@@ -154,12 +154,12 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
 
 BOOST_AUTO_TEST_CASE(CheckValues)
 {
-    BOOST_CHECK_EQUAL(std::string(values("hello")),std::string("hello"));
-    BOOST_CHECK_EQUAL(values(5),5);
-    BOOST_CHECK_EQUAL(values(true),std::string("true"));
-    BOOST_CHECK_EQUAL(values(false),std::string("false"));
+    BOOST_CHECK_EQUAL(std::string(default_values("hello")),std::string("hello"));
+    BOOST_CHECK_EQUAL(default_values(5),5);
+    BOOST_CHECK_EQUAL(default_values(true),std::string("true"));
+    BOOST_CHECK_EQUAL(default_values(false),std::string("false"));
     NonCopyable nc;
-    const auto& ncr=values(nc);
+    const auto& ncr=default_values(nc);
     std::ignore=ncr;
 
     translator_env env;
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE(CheckReferenceWrapper)
     auto res2=apply_ref(fn,cr);
     BOOST_CHECK_EQUAL(res2,ncp.val);
 
-    auto mn=member_names();
+    auto mn=get_default_member_names();
     auto fn1=[&mn](const auto& v)
     {
         auto vv=cref(v);

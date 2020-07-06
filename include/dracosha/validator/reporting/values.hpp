@@ -45,7 +45,7 @@ struct values_tag;
  * all the rest types are bypassed "as is" without changing the original type.
  */
 template <typename TranslatorT>
-struct values_t
+struct values
 {
     using hana_tag=values_tag;
 
@@ -68,9 +68,9 @@ struct values_t
 /**
   @brief Default values formatter does not perform any translation.
 */
-constexpr values_t<no_translator_t> values{no_translator};
+constexpr values<no_translator_t> default_values{no_translator};
 
-using translated_values=values_t<translator>;
+using translated_values=values<translator>;
 
 /**
  * @brief Make values formatter using translator found in translator repository by locale name

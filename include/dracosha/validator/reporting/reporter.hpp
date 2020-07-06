@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/reporting/report_aggregation.hpp>
+#include <dracosha/validator/reporting/formatter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -47,9 +48,9 @@ class reporter
 
         reporter(
                     DstT& dst,
-                    const FormatterT& formatter
+                    FormatterT&& formatter
                 ) : _dst(dst),
-                    _formatter(formatter)
+                    _formatter(std::forward<FormatterT>(formatter))
         {}
 
         template <typename AggregationT>
@@ -157,6 +158,11 @@ class reporter
             _formatter.validate_with_master_sample(current(),member,prop,op,b);
         }
 
+        DstT& destination()
+        {
+            return _dst;
+        }
+
     private:
 
         DstT& current()
@@ -178,9 +184,21 @@ class reporter
         }
 
         DstT& _dst;
-        const FormatterT& _formatter;
+        FormatterT _formatter;
         std::vector<report_aggregation<DstT>> _stack;
 };
+
+template <typename DstT, typename FormatterT>
+auto make_reporter(DstT& dst, FormatterT&& formatter)
+{
+    return reporter<DstT,FormatterT>(dst,std::forward<FormatterT>(formatter));
+}
+
+template <typename DstT>
+auto make_reporter(DstT& dst)
+{
+    return make_reporter(dst,get_default_formatter());
+}
 
 //-------------------------------------------------------------
 

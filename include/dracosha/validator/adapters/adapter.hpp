@@ -269,6 +269,16 @@ struct adapter
     }
 };
 
+/**
+  @brief Make default validation adapter wrapping the object
+  @param v Object to wrap into adapter
+  @return Validation adapter
+  */
+BOOST_HANA_CONSTEXPR_LAMBDA auto make_adapter = [](auto&& v)
+{
+    return adapter<std::decay_t<decltype(v)>>(std::forward<decltype(v)>(v));
+};
+
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

@@ -43,7 +43,7 @@ struct formatter_tag;
  *
  */
 template <typename MemberNamesT, typename ValuesT, typename StringsT, typename OrderAndPresentationT>
-struct formatter_t
+struct formatter
 {
     using hana_tag=formatter_tag;
 
@@ -103,7 +103,7 @@ struct formatter_t
     {
         format(dst,
                make_cref_tuple(_member_names,_member_names,_strings,_member_names),
-               member,prop,op,member_name(b)
+               member,prop,op,make_member_name(b)
                );
     }
 
@@ -149,9 +149,9 @@ struct formatter_t
  * @return Formatter
  */
 template <typename MemberNamesT,typename ValuesT,typename StringsT, typename OrderAndPresentationT>
-auto formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const StringsT& strings, OrderAndPresentationT&& order)
+auto make_formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const StringsT& strings, OrderAndPresentationT&& order)
 {
-    return formatter_t<
+    return formatter<
                 const MemberNamesT&,
                 const ValuesT&,
                 StringsT,
@@ -168,9 +168,9 @@ auto formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const 
  * @return Formatter
  */
 template <typename MemberNamesT,typename ValuesT,typename StringsT>
-auto formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const StringsT& strings)
+auto make_formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const StringsT& strings)
 {
-    return formatter_with_references(mn,vs,strings,default_order_and_presentation);
+    return make_formatter_with_references(mn,vs,strings,default_order_and_presentation);
 }
 
 /**
@@ -182,9 +182,9 @@ auto formatter_with_references(const MemberNamesT& mn, const ValuesT& vs, const 
  * @return Formatter
  */
 template <typename MemberNamesT,typename ValuesT,typename StringsT, typename OrderAndPresentationT>
-auto formatter(MemberNamesT&& mn, ValuesT&& vs, const StringsT& strings, OrderAndPresentationT&& order)
+auto make_formatter(MemberNamesT&& mn, ValuesT&& vs, const StringsT& strings, OrderAndPresentationT&& order)
 {
-    return formatter_t<
+    return formatter<
                 std::decay_t<MemberNamesT>,
                 std::decay_t<ValuesT>,
                 StringsT,
@@ -201,9 +201,9 @@ auto formatter(MemberNamesT&& mn, ValuesT&& vs, const StringsT& strings, OrderAn
  * @return Formatter
  */
 template <typename MemberNamesT,typename ValuesT,typename StringsT>
-auto formatter(MemberNamesT&& mn, ValuesT&& vs, const StringsT& strings)
+auto make_formatter(MemberNamesT&& mn, ValuesT&& vs, const StringsT& strings)
 {
-    return formatter(std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),strings,default_order_and_presentation);
+    return make_formatter(std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),strings,default_order_and_presentation);
 }
 
 /**
@@ -213,9 +213,9 @@ auto formatter(MemberNamesT&& mn, ValuesT&& vs, const StringsT& strings)
  * @return Formatter
  */
 template <typename MemberNamesT,typename ValuesT>
-auto formatter(MemberNamesT&& mn, ValuesT&& vs)
+auto make_formatter(MemberNamesT&& mn, ValuesT&& vs)
 {
-    return formatter(std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),default_strings);
+    return make_formatter(std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),default_strings);
 }
 
 /**
@@ -224,10 +224,10 @@ auto formatter(MemberNamesT&& mn, ValuesT&& vs)
  * @return Formatter
  */
 template <typename MemberNamesT>
-auto formatter(MemberNamesT&& mn,
+auto make_formatter(MemberNamesT&& mn,
                std::enable_if_t<hana::is_a<member_names_tag,MemberNamesT>,void*> =nullptr)
 {
-    return formatter(std::forward<MemberNamesT>(mn),values,default_strings);
+    return make_formatter(std::forward<MemberNamesT>(mn),default_values,default_strings);
 }
 
 /**
@@ -236,19 +236,23 @@ auto formatter(MemberNamesT&& mn,
  * @return Formatter
  */
 template <typename StringsT>
-auto formatter(const StringsT& strings,
+auto make_formatter(const StringsT& strings,
                std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr)
 {
-    return formatter(member_names(strings),values,strings);
+    return make_formatter(make_member_names(strings),default_values,strings);
 }
 
 /**
- * @brief Create formatter that bypasses member names and uses default strings
- * @return Formatter
+ * @brief Get defautt formatter that bypasses member names and uses default strings
+ * @return Default formatter
  */
-inline auto formatter()
+inline auto get_default_formatter() ->
+    std::add_lvalue_reference_t<
+        std::add_const_t<decltype(make_formatter_with_references(get_default_member_names(),default_values,default_strings))>
+    >
 {
-    return formatter(member_names(),values,default_strings);
+    static const auto default_formatter=make_formatter_with_references(get_default_member_names(),default_values,default_strings);
+    return default_formatter;
 }
 
 //-------------------------------------------------------------

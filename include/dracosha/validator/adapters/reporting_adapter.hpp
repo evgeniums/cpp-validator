@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/adapters/adapter.hpp>
 #include <dracosha/validator/operators.hpp>
+#include <dracosha/validator/reporting/reporter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -32,13 +33,13 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  *
  *  Adaper first tries to perform validation and if validation fails the adapter then calls reporter to construct a report describing the failure.
  */
-template <typename AdapterT, typename ReporterT>
-struct reporting_adapter_t
+template <typename ReporterT, typename AdapterT>
+struct reporting_adapter
 {
     using hana_tag=adapter_tag;
 
-    const AdapterT& _next_adapter;
-    ReporterT& _reporter;
+    ReporterT _reporter;
+    AdapterT _next_adapter;
 
     /**
      *  @brief Perform validation of object at one level without member nesting
@@ -251,6 +252,52 @@ struct reporting_adapter_t
             return ok;
         }
 };
+
+template <typename ReporterT, typename AdapterT>
+auto make_reporting_adapter(ReporterT&& reporter, AdapterT&& next_adapter,
+                            std::enable_if_t<
+                                    (hana::is_a<reporter_tag,ReporterT> && hana::is_a<adapter_tag,ObjT>),
+                                    void*>
+                            =nullptr)
+{
+    return reporting_adapter<ReporterT,AdapterT>{
+                                std::forward<ReporterT>(reporter),
+                                std::forward<AdapterT>(next_adapter)
+                            };
+}
+
+template <typename ReporterT, typename ObjT>
+auto make_reporting_adapter(ReporterT&& reporter,
+                            const ObjT& obj,
+                            std::enable_if_t<
+                                    (hana::is_a<reporter_tag,ReporterT> && !hana::is_a<adapter_tag,ObjT>),
+                                    void*>
+                            =nullptr)
+{
+    return make_reporting_adapter(std::forward<ReporterT>(reporter),make_adapter(obj));
+}
+
+template <typename DstT, typename AdapterT>
+auto make_reporting_adapter(DstT& dst,
+                            AdapterT&& next_adapter,
+                            std::enable_if_t<
+                                    (!hana::is_a<reporter_tag,DstT> && hana::is_a<adapter_tag,AdapterT>),
+                                    void*>
+                            =nullptr)
+{
+    return make_reporting_adapter(make_reporter(dst),std::forward<AdapterT>(next_adapter));
+}
+
+template <typename DstT, typename ObjT>
+auto make_reporting_adapter(DstT& dst,
+                            const ObjT& obj,
+                            std::enable_if_t<
+                                    (!hana::is_a<reporter_tag,DstT> && !hana::is_a<adapter_tag,ObjT>),
+                                    void*>
+                            =nullptr)
+{
+    return make_reporting_adapter(make_reporter(dst),make_adapter(obj));
+}
 
 //-------------------------------------------------------------
 
