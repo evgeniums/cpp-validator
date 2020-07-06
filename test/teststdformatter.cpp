@@ -6,6 +6,8 @@
 #include <dracosha/validator/reporting/mapped_translator.hpp>
 #include <dracosha/validator/reporting/translator_repository.hpp>
 
+#ifndef DRACOSHA_VALIDATOR_FMT
+
 using namespace dracosha::validator;
 
 BOOST_AUTO_TEST_SUITE(TestStdFormatter)
@@ -44,3 +46,5 @@ BOOST_AUTO_TEST_CASE(CheckFmtFormatterWithRefs)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+#endif
