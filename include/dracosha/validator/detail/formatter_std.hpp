@@ -36,37 +36,11 @@ namespace detail
  * @brief Append arguments to destination string
  * @param dst Destination string
  * @param sep Separator for joining arguments
- * @param args Arguments to join and append to string
- */
-template <typename ...Args>
-void std_append(std::string& dst, char sep, Args&&... args)
-{
-    std::stringstream ss;
-    ss<<dst;
-    hana::fold(
-        make_cref_tuple(std::forward<Args>(args)...),
-        0u,
-        [&ss,&sep](size_t i,auto v)
-        {
-            if (sep!=char(0) && i!=0u)
-            {
-                ss<<sep;
-            }
-            ss<<extract_ref(v);
-            return i+1;
-        }
-    );
-    dst=ss.str();
-}
-
-/**
- * @brief Append arguments to destination string
- * @param dst Destination string
- * @param sep Separator for joining arguments
  * @param parts Vector to join and append to string
  */
 template <typename PartsT, typename SepT>
-void std_append_join(std::string& dst, SepT&& sep, PartsT&& parts)
+void std_append_join(std::string& dst, SepT&& sep, PartsT&& parts,
+                     std::enable_if_t<!hana::is_a<hana::tuple_tag,PartsT>,void*> =nullptr)
 {
     size_t i=0;
     std::stringstream ss;
@@ -83,6 +57,46 @@ void std_append_join(std::string& dst, SepT&& sep, PartsT&& parts)
 }
 
 /**
+ * @brief Append arguments to destination string
+ * @param dst Destination string
+ * @param sep Separator for joining arguments
+ * @param parts Hana tuple to join and append to string
+ */
+template <typename PartsT, typename SepT>
+void std_append_join(std::string& dst, SepT&& sep, PartsT&& parts,
+                     std::enable_if_t<hana::is_a<hana::tuple_tag,PartsT>,void*> =nullptr)
+{
+    std::stringstream ss;
+    ss<<dst;
+    hana::fold(
+        std::forward<PartsT>(parts),
+        0u,
+        [&ss,&sep](size_t i,auto v)
+        {
+            if (i!=0u)
+            {
+                ss<<sep;
+            }
+            ss<<extract_ref(v);
+            return i+1;
+        }
+    );
+    dst=ss.str();
+}
+
+/**
+ * @brief Append arguments to destination string
+ * @param dst Destination string
+ * @param sep Separator for joining arguments
+ * @param args Arguments to join and append to string
+ */
+template <typename SepT, typename ...Args>
+void std_append(std::string& dst, SepT&& sep, Args&&... args)
+{
+    std_append_join(dst,std::forward<SepT>(sep),make_cref_tuple(std::forward<Args>(args)...));
+}
+
+/**
  * @brief Format string from variadic arguments using std::stringstream backend
  */
 struct std_formatter_t
@@ -90,13 +104,13 @@ struct std_formatter_t
     template <typename ...Args>
     static void append(std::string& dst, Args&&... args)
     {
-        return std_append(dst,char(0),std::forward<Args>(args)...);
+        return std_append(dst,"",std::forward<Args>(args)...);
     }
 
-    template <typename ...Args>
-    static void append_with_separator(std::string& dst, Args&&... args)
+    template <typename SepT, typename ...Args>
+    static void append_join_args(std::string& dst, SepT&& sep, Args&&... args)
     {
-        return std_append(dst,char(' '),std::forward<Args>(args)...);
+        return std_append(dst,std::forward<SepT>(sep),std::forward<Args>(args)...);
     }
 
     template <typename SepT, typename PartsT>
@@ -111,8 +125,8 @@ struct std_formatter_t
  */
 struct std_append_t
 {
-    template <typename DstT,typename ...Args>
-    void operator () (DstT&& dst,Args&&... args) const
+    template <typename DstT, typename ...Args>
+    void operator () (DstT&& dst, Args&&... args) const
     {
         std_formatter_t::append(extract_ref(std::forward<DstT>(dst)),std::forward<Args>(args)...);
     }
@@ -121,12 +135,12 @@ struct std_append_t
 /**
  * @brief Append arguments to string using std::stringstream backend
  */
-struct std_append_with_separator_t
+struct std_append_join_args_t
 {
-    template <typename DstT,typename ...Args>
-    void operator () (DstT&& dst,Args&&... args) const
+    template <typename DstT, typename SepT, typename ...Args>
+    void operator () (DstT&& dst, SepT&& sep, Args&&... args) const
     {
-        std_formatter_t::append_with_separator(extract_ref(std::forward<DstT>(dst)),std::forward<Args>(args)...);
+        std_formatter_t::append_join_args(extract_ref(std::forward<DstT>(dst)),std::forward<SepT>(sep),std::forward<Args>(args)...);
     }
 };
 
