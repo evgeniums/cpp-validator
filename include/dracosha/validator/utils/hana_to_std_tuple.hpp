@@ -8,33 +8,36 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/make_types_tuple.hpp
+/** \file validator/utils/hana_to_std_tuple.hpp
 *
-*  Defines helper to create a tuple of types from variadic arguments
+*  Defines converter of hana::tuple to std::tuple
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_MAKE_TYPES_TUPLE_HPP
-#define DRACOSHA_VALIDATOR_MAKE_TYPES_TUPLE_HPP
+#ifndef DRACOSHA_VALIDATOR_HANA_TO_STD_TUPLE_HPP
+#define DRACOSHA_VALIDATOR_HANA_TO_STD_TUPLE_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/utils/make_types_tuple.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-/**
-  @brief Make tuple of hana::type_c<> from variadic arguments
- */
-BOOST_HANA_CONSTEXPR_LAMBDA auto make_types_tuple =[](auto&&... args)
+BOOST_HANA_CONSTEXPR_LAMBDA auto make_std_tuple= [] (auto&&... args)
 {
-    return hana::transform(hana::make_tuple(std::forward<decltype(args)>(args)...),hana::make_type);
+    return std::make_tuple(std::forward<decltype(args)>(args)...);
+};
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto hana_to_std_tuple= [] (auto&& ts)
+{
+    return hana::unpack(std::forward<decltype(ts)>(ts),make_std_tuple);
 };
 
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_MAKE_TYPES_TUPLE_HPP
+#endif // DRACOSHA_VALIDATOR_HANA_TO_STD_TUPLE_HPP

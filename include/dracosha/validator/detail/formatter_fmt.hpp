@@ -23,7 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <fmt/format.h>
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/utils/tuple_to_variadic.hpp>
+#include <dracosha/validator/utils/hana_to_std_tuple.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -43,25 +43,6 @@ struct fmt_single_element<0>
     constexpr static auto value=hana::string_c<'{', '}'>;
 };
 
-/**
- * @brief Append arguments to destination object
- */
-template <char Sep, typename DstT, typename ...Args>
-void fmt_append_with_separator_args(DstT& dst, Args&&... args)
-{
-    constexpr auto fmt_str_single =fmt_single_element<Sep>::value;
-
-    constexpr auto fmt_str1 = hana::string_c<'{', '}'>;
-    constexpr auto fmt_str_rest= hana::replicate<hana::tuple_tag>(
-                    fmt_str_single,
-                    hana::size_c<sizeof...(Args)-1>
-                );
-    constexpr auto fmt_str_all=hana::prepend(fmt_str_rest,fmt_str1);
-    constexpr auto fmt_str=hana::sum<hana::string_tag>(fmt_str_all);
-
-    fmt::format_to(std::back_inserter(dst),hana::to<const char*>(fmt_str),std::forward<Args>(args)...);
-}
-
 template <typename DstT, typename SepT, typename PartsT>
 void fmt_append_join(DstT& dst, SepT&& sep, PartsT&& parts,
                      std::enable_if_t<!hana::is_a<hana::tuple_tag,PartsT>,void*> =nullptr)
@@ -73,9 +54,16 @@ template <typename DstT, typename SepT, typename PartsT>
 void fmt_append_join(DstT& dst, SepT&& sep, PartsT&& parts,
                      std::enable_if_t<hana::is_a<hana::tuple_tag,PartsT>,void*> =nullptr)
 {
-    fmt::format_to(std::back_inserter(dst),"{}",fmt::join(
-                       tuple_to_variadic<std::tuple>::to_template(std::forward<PartsT>(parts)),
-                       std::forward<SepT>(sep)));
+    fmt::format_to(std::back_inserter(dst),"{}",fmt::join(hana_to_std_tuple(std::forward<PartsT>(parts)),std::forward<SepT>(sep)));
+}
+
+/**
+ * @brief Append arguments to destination object
+ */
+template <typename DstT, typename SepT, typename ...Args>
+void fmt_append_join_args(DstT& dst, SepT&& sep, Args&&... args)
+{
+    fmt::format_to(std::back_inserter(dst),"{}",fmt::join(std::make_tuple(std::forward<Args>(args)...),std::forward<SepT>(sep)));
 }
 
 /**
@@ -84,7 +72,7 @@ void fmt_append_join(DstT& dst, SepT&& sep, PartsT&& parts,
 template <typename DstT, typename ...Args>
 void fmt_append_args(DstT& dst, Args&&... args)
 {
-    fmt_append_with_separator_args<static_cast<char>(0)>(dst,std::forward<Args>(args)...);
+    fmt_append_join_args(dst,"",std::forward<Args>(args)...);
 }
 
 /**
@@ -98,10 +86,10 @@ struct fmt_formatter_t
         return fmt_append_args(dst,std::forward<Args>(args)...);
     }
 
-    template <typename DstT, typename ...Args>
-    static void append_with_separator(DstT& dst, Args&&... args)
+    template <typename DstT, typename SepT, typename ...Args>
+    static void append_join_args(DstT& dst, SepT&& sep, Args&&... args)
     {
-        return fmt_append_with_separator_args<' '>(dst,std::forward<Args>(args)...);
+        return fmt_append_join_args(dst,std::forward<SepT>(sep),std::forward<Args>(args)...);
     }
 
     template <typename DstT,  typename SepT, typename PartsT>
@@ -117,7 +105,7 @@ struct fmt_formatter_t
 struct fmt_append_t
 {
     template <typename DstT,typename ...Args>
-    void operator () (DstT&& dst,Args&&... args) const
+    void operator () (DstT&& dst, Args&&... args) const
     {
         fmt_formatter_t::append(extract_ref(std::forward<DstT>(dst)),std::forward<Args>(args)...);
     }
@@ -126,12 +114,12 @@ struct fmt_append_t
 /**
  * @brief Append arguments to string using fmt backend
  */
-struct fmt_append_with_separator_t
+struct fmt_append_join_args_t
 {
-    template <typename DstT,typename ...Args>
-    void operator () (DstT&& dst,Args&&... args) const
+    template <typename DstT, typename SepT,typename ...Args>
+    void operator () (DstT&& dst, SepT&& sep, Args&&... args) const
     {
-        fmt_formatter_t::append_with_separator(extract_ref(std::forward<DstT>(dst)),std::forward<Args>(args)...);
+        fmt_formatter_t::append_join_args(extract_ref(std::forward<DstT>(dst)),std::forward<SepT>(sep),std::forward<Args>(args)...);
     }
 };
 

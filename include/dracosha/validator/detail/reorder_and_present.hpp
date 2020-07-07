@@ -38,10 +38,10 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 #ifdef DRACOSHA_VALIDATOR_FMT
 constexpr detail::fmt_formatter_t backend_formatter{};
-constexpr detail::fmt_append_with_separator_t formatter_append_with_separator{};
+constexpr detail::fmt_append_join_args_t formatter_append_join_args{};
 #else
 constexpr detail::std_formatter_t backend_formatter{};
-constexpr detail::std_append_with_separator_t formatter_append_with_separator{};
+constexpr detail::std_append_join_args_t formatter_append_join_args{};
 #endif
 
 //-------------------------------------------------------------
@@ -59,7 +59,7 @@ constexpr auto apply_reorder_present_fn(DstT& dst, FormatterTs&& formatters, Arg
 {
     // the remarkable composition below is about
     // to apply each formatter to its corresponding argument
-    // and then forward the results to formatter_append_with_separator handler
+    // and then forward the results to formatter_append_join_args handler
 
     return hana::unpack(hana::transform( // transform all {formatter,arg} pairs to results of formatter(arg)
                                             hana::zip( // pair each formatter with its argument
@@ -69,8 +69,9 @@ constexpr auto apply_reorder_present_fn(DstT& dst, FormatterTs&& formatters, Arg
                                             hana::fuse(apply_ref) // for each pair invoke a formatter with the argument from the same pair
                                         ),
                         hana::partial(     // send all formatter(pair) results to append_with_separator handler
-                                formatter_append_with_separator,
-                                ref(dst)
+                                formatter_append_join_args,
+                                ref(dst),
+                                " "
                             )
                        );
 }
@@ -176,8 +177,9 @@ struct apply_reorder_present_2args_t<MemberT,OpT,
                                 ) const -> decltype(auto)
     {
         // for member op:
-        backend_formatter.append_with_separator(
+        backend_formatter.append_join_args(
             dst,
+            " ",
             apply_ref(hana::at(formatters,hana::size_c<1>),string_conjunction_for),
             apply_ref(hana::at(formatters,hana::size_c<0>),member),
             apply_ref(hana::at(formatters,hana::size_c<1>),op)
@@ -239,16 +241,18 @@ struct apply_reorder_present_3args_t<
             if (eq==b)
             {
                 // is empty
-                backend_formatter.append_with_separator(
+                backend_formatter.append_join_args(
                     dst,
+                    " ",
                     apply_ref(hana::at(formatters,hana::size_c<1>),string_empty)
                 );
             }
             else
             {
                 // is not empty
-                backend_formatter.append_with_separator(
+                backend_formatter.append_join_args(
                     dst,
+                    " ",
                     apply_ref(hana::at(formatters,hana::size_c<1>),string_not_empty)
                 );
             }
@@ -283,8 +287,9 @@ struct apply_reorder_present_4args_t
             [&](auto)
             {
                 // member op b
-                return backend_formatter.append_with_separator(
+                return backend_formatter.append_join_args(
                     dst,
+                    " ",
                     apply_ref(hana::at(formatters,hana::size_c<0>),member),
                     apply_ref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
                     apply_ref(hana::at(formatters,hana::size_c<3>),b)
@@ -293,8 +298,9 @@ struct apply_reorder_present_4args_t
             [&](auto)
             {
                 // prop of member op b
-                return backend_formatter.append_with_separator(
+                return backend_formatter.append_join_args(
                     dst,
+                    " ",
                     apply_ref(hana::at(formatters,hana::size_c<1>),prop),
                     apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
                     apply_ref(hana::at(formatters,hana::size_c<0>),member),
@@ -325,8 +331,9 @@ struct apply_reorder_present_4args_t<
             [&](auto)
             {
                 // member op b
-                return backend_formatter.append_with_separator(
+                return backend_formatter.append_join_args(
                     dst,
+                    " ",
                     apply_ref(hana::at(formatters,hana::size_c<0>),member),
                     apply_ref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
                     apply_ref(hana::at(formatters,hana::size_c<3>),b.get())
@@ -335,8 +342,9 @@ struct apply_reorder_present_4args_t<
             [&](auto)
             {
                 // prop of member op b
-                return backend_formatter.append_with_separator(
+                return backend_formatter.append_join_args(
                     dst,
+                    " ",
                     apply_ref(hana::at(formatters,hana::size_c<1>),prop),
                     apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
                     apply_ref(hana::at(formatters,hana::size_c<0>),member),
@@ -369,8 +377,9 @@ struct apply_reorder_present_4args_t<
             [&](auto)
             {
                 // member op member of sample
-                return backend_formatter.append_with_separator(
+                return backend_formatter.append_join_args(
                     dst,
+                    " ",
                     apply_ref(hana::at(formatters,hana::size_c<0>),member),
                     apply_ref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
                     apply_ref(hana::at(formatters,hana::size_c<0>),member),
@@ -381,8 +390,9 @@ struct apply_reorder_present_4args_t<
             [&](auto)
             {
                 // prop of member op prop of member of sample
-                return backend_formatter.append_with_separator(
+                return backend_formatter.append_join_args(
                     dst,
+                    " ",
                     apply_ref(hana::at(formatters,hana::size_c<1>),prop),
                     apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
                     apply_ref(hana::at(formatters,hana::size_c<0>),member),
@@ -424,8 +434,9 @@ struct apply_reorder_present_4args_t<
             if (eq==b)
             {
                 // member is empty
-                backend_formatter.append_with_separator(
+                backend_formatter.append_join_args(
                     dst,
+                    " ",
                     apply_ref(hana::at(formatters,hana::size_c<1>),member),
                     apply_ref(hana::at(formatters,hana::size_c<2>),string_empty)
                 );
@@ -433,8 +444,9 @@ struct apply_reorder_present_4args_t<
             else
             {
                 // member is not empty
-                backend_formatter.append_with_separator(
+                backend_formatter.append_join_args(
                     dst,
+                    " ",
                     apply_ref(hana::at(formatters,hana::size_c<1>),member),
                     apply_ref(hana::at(formatters,hana::size_c<2>),string_not_empty)
                 );

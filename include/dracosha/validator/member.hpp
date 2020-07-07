@@ -23,7 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/adjust_storable_type.hpp>
-#include <dracosha/validator/utils/tuple_to_variadic.hpp>
+#include <dracosha/validator/utils/make_types_tuple.hpp>
 #include <dracosha/validator/apply.hpp>
 #include <dracosha/validator/dispatcher.hpp>
 #include <dracosha/validator/properties.hpp>
@@ -115,25 +115,16 @@ struct member
     }
 
     /**
-     * @brief Format a path as string with dot separated levels
-     * @return Formatted path
-     *
-     * @note Only string keys can be formatted using this method
-     */
-    std::string path_str() const
-    {
-        return formatpath_str(path);
-    }
-
-    /**
      * @brief Append next level to member
      * @param key Member key
      */
     template <typename T1>
     constexpr auto operator [] (T1&& key) const -> decltype(auto)
     {
-        auto tmpl=tuple_to_variadic<member>::to_template(path,typename adjust_storable_type<T1>::type(key));
-        return typename decltype(tmpl)::type(std::forward<T1>(key),path);
+        auto path_types=hana::transform(path,hana::make_type);
+        auto key_and_path_types=hana::prepend(path_types,hana::type_c<typename adjust_storable_type<T1>::type>);
+        auto next_member_tmpl=hana::unpack(key_and_path_types,hana::template_<member>);
+        return typename decltype(next_member_tmpl)::type(std::forward<T1>(key),path);
     }
 };
 
