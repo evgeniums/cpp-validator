@@ -85,34 +85,39 @@ BOOST_AUTO_TEST_CASE(CheckFmtString)
 #define DRACOSHA_VALIDATOR_TEST_FORMATTER
 #include "testformatter.cpp"
 
-BOOST_AUTO_TEST_CASE(CheckStdOrderAndPresentation)
+BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
 {
     checkOrderAndPresentation();
 }
 
-BOOST_AUTO_TEST_CASE(CheckStdDefaultFormatter)
+BOOST_AUTO_TEST_CASE(CheckDefaultFormatter)
 {
     checkDefaultFormatter();
 }
 
-BOOST_AUTO_TEST_CASE(CheckStdFormatterFromStrings)
+BOOST_AUTO_TEST_CASE(CheckFormatterFromStrings)
 {
     checkFormatterFromStrings();
 }
 
-BOOST_AUTO_TEST_CASE(CheckStdFormatterFromMemberNames)
+BOOST_AUTO_TEST_CASE(CheckFormatterFromMemberNames)
 {
     checkFormatterFromMemberNames();
 }
 
-BOOST_AUTO_TEST_CASE(CheckStdFormatterFromMemberNamesAndValues)
+BOOST_AUTO_TEST_CASE(CheckFormatterFromMemberNamesAndValues)
 {
     checkFormatterFromMemberNamesAndValues();
 }
 
-BOOST_AUTO_TEST_CASE(CheckStdFormatterWithRefs)
+BOOST_AUTO_TEST_CASE(CheckFormatterWithRefs)
 {
     checkFormatterWithRefs();
+}
+
+BOOST_AUTO_TEST_CASE(CheckFormatterWithRvals)
+{
+    checkFormatterWithRvals();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

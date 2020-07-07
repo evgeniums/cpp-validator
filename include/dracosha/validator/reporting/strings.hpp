@@ -118,6 +118,11 @@ using translated_strings=strings<const translator&,AggregationStringsT>;
 
 struct make_translated_strings_t
 {
+    auto operator() (const translator& tr) const
+    {
+        return translated_strings<const aggregation_strings_t&>{tr,aggregation_strings};
+    }
+
     /**
      * @brief Make strings object using translator found in translator repository by locale name
      * @param rep Translator repository

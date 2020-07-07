@@ -85,6 +85,11 @@ inline translated_values make_translated_values(const translator_repository& rep
     return translated_values{*rep.find_translator(loc)};
 }
 
+inline translated_values make_translated_values(const translator& tr)
+{
+    return translated_values{tr};
+}
+
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

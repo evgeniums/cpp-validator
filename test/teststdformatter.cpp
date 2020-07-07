@@ -25,24 +25,29 @@ BOOST_AUTO_TEST_CASE(CheckFmtDefaultFormatter)
     checkDefaultFormatter();
 }
 
-BOOST_AUTO_TEST_CASE(CheckFmtFormatterFromStrings)
+BOOST_AUTO_TEST_CASE(CheckFormatterFromStrings)
 {
     checkFormatterFromStrings();
 }
 
-BOOST_AUTO_TEST_CASE(CheckFmtFormatterFromMemberNames)
+BOOST_AUTO_TEST_CASE(CheckFormatterFromMemberNames)
 {
     checkFormatterFromMemberNames();
 }
 
-BOOST_AUTO_TEST_CASE(CheckFmtFormatterFromMemberNamesAndValues)
+BOOST_AUTO_TEST_CASE(CheckFormatterFromMemberNamesAndValues)
 {
     checkFormatterFromMemberNamesAndValues();
 }
 
-BOOST_AUTO_TEST_CASE(CheckFmtFormatterWithRefs)
+BOOST_AUTO_TEST_CASE(CheckFormatterWithRefs)
 {
     checkFormatterWithRefs();
+}
+
+BOOST_AUTO_TEST_CASE(CheckStdFormatterWithRvals)
+{
+    checkFormatterWithRvals();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -208,7 +208,7 @@ auto make_test_strings(translator_repository& rep)
         {"two","two_translated"},
         {"three","three_translated"}
     };
-    auto translator1=std::make_shared<mapped_translator>(m);
+    auto translator1=std::make_shared<mapped_translator>(std::move(m));
     std::set<std::string> locales1={"en_US.UTF-8","en_US","en"};
     rep.add_translator(translator1,locales1);
     return make_translated_strings(rep,"en");
@@ -293,11 +293,11 @@ void checkFormatterWithRefs()
 
 void checkFormatterWithRvals()
 {
-    translator_repository rep;
+    mapped_translator tr1;
     auto fm=make_formatter(
-                make_member_names(make_test_strings(rep)),
-                make_translated_values(rep,"en"),
-                make_test_strings(rep)
+                make_member_names(make_translated_strings(tr1)),
+                make_translated_values(tr1),
+                make_translated_strings(tr1)
                 );
 
     using fm_type=decltype(fm);
@@ -305,6 +305,10 @@ void checkFormatterWithRvals()
     static_assert(!std::is_lvalue_reference<typename fm_type::values_type>::value,"");
     static_assert(!std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
     static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
+
+    static_assert(!std::is_rvalue_reference<typename fm_type::member_names_type>::value,"");
+    static_assert(!std::is_rvalue_reference<typename fm_type::values_type>::value,"");
+    static_assert(!std::is_rvalue_reference<typename fm_type::strings_type>::value,"");
 
     testFormatter(fm);
 }
