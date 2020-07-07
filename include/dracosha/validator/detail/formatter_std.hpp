@@ -71,13 +71,13 @@ void std_append_join(std::string& dst, SepT&& sep, PartsT&& parts,
     hana::fold(
         std::forward<PartsT>(parts),
         0u,
-        [&ss,&sep](size_t i,auto v)
+        [&ss,&sep](size_t i,auto&& v)
         {
             if (i!=0u)
             {
                 ss<<sep;
             }
-            ss<<extract_ref(v);
+            ss<<extract_ref(std::forward<decltype(v)>(v));
             return i+1;
         }
     );
