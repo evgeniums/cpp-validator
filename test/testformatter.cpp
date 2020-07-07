@@ -202,6 +202,7 @@ void testFormatter(const FormatterT& formatter1)
 
 auto make_test_strings(translator_repository& rep)
 {
+    // don't call it twice with the same rep because references to previous translators will be invalidated
     std::map<std::string,std::string> m=
     {
         {"one","one_translated"},
