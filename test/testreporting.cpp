@@ -64,12 +64,13 @@ BOOST_AUTO_TEST_CASE(CheckReporter)
     std::string rep1;
     auto r1=make_reporter(rep1);
     r1.validate("field1",value,gte,10);
-    BOOST_TEST_MESSAGE(rep1);
+    BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to 10"));
 }
 
 BOOST_AUTO_TEST_CASE(CheckReportOp)
 {
     std::map<std::string,size_t> m1={{"field1",1}};
+
     auto v1=validator(
                 _["field1"](gte,10)
             );
@@ -77,7 +78,14 @@ BOOST_AUTO_TEST_CASE(CheckReportOp)
     std::string rep1;
     auto ra1=make_reporting_adapter(rep1,m1);
     BOOST_CHECK(!v1.apply(ra1));
-    BOOST_TEST_MESSAGE(rep1);
+    BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to 10"));
+
+    auto v2=validator(
+                _["field1"](length(gte,10))
+            );
+    rep1.clear();
+    BOOST_CHECK(!v2.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string("length of field1 is greater than or equal to 10"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

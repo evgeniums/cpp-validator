@@ -26,23 +26,10 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/values.hpp>
 #include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/reporting/report_aggregation.hpp>
+#include <dracosha/validator/reporting/backend_formatter.hpp>
 #include <dracosha/validator/detail/if_bool.hpp>
 
-#ifdef DRACOSHA_VALIDATOR_FMT
-#include <dracosha/validator/detail/formatter_fmt.hpp>
-#else
-#include <dracosha/validator/detail/formatter_std.hpp>
-#endif
-
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
-
-#ifdef DRACOSHA_VALIDATOR_FMT
-constexpr detail::fmt_formatter_t backend_formatter{};
-constexpr detail::fmt_append_join_args_t formatter_append_join_args{};
-#else
-constexpr detail::std_formatter_t backend_formatter{};
-constexpr detail::std_append_join_args_t formatter_append_join_args{};
-#endif
 
 //-------------------------------------------------------------
 

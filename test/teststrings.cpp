@@ -10,6 +10,7 @@
 #include <dracosha/validator/reporting/mapped_translator.hpp>
 #include <dracosha/validator/reporting/translator_repository.hpp>
 #include <dracosha/validator/utils/reference_wrapper.hpp>
+#include <dracosha/validator/validator.hpp>
 
 using namespace dracosha::validator;
 
@@ -115,7 +116,7 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
         const auto& mn=get_default_member_names();
         using mn_type=decltype(mn);
         static_assert(std::is_lvalue_reference<typename std::decay_t<mn_type>::strings_type>::value,"");
-        static_assert(std::is_same<typename std::decay_t<mn_type>::traits_type,bypass_member_names_traits>::value,"");
+        static_assert(std::is_same<typename std::decay_t<mn_type>::traits_type,bypass_member_names_traits_t>::value,"");
 
         check_bypass(mn);
     }
@@ -126,7 +127,7 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
         auto mn=make_member_names(env.strings());
         using mn_type=decltype(mn);
         static_assert(!std::is_lvalue_reference<typename mn_type::strings_type>::value,"");
-        static_assert(std::is_same<typename mn_type::traits_type,bypass_member_names_traits>::value,"");
+        static_assert(std::is_same<typename mn_type::traits_type,bypass_member_names_traits_t>::value,"");
 
         env.check(mn);
     }
@@ -253,6 +254,23 @@ BOOST_AUTO_TEST_CASE(CheckReferenceWrapper)
     auto r2=cref(str3);
     const std::string& str4=r2;
     std::ignore=str4;
+}
+
+BOOST_AUTO_TEST_CASE(CheckNestedMember)
+{
+    auto mn=get_default_member_names();
+
+    auto member1=_["field1"];
+    auto str1=mn(member1);
+    BOOST_CHECK_EQUAL(str1,std::string("field1"));
+
+    auto member2=_["field1"]["field2"];
+    auto str2=mn(member2);
+    BOOST_CHECK_EQUAL(str2,std::string("field2 of field1"));
+
+    auto member3=_["field1"]["field2"][size];
+    auto str3=mn(member3);
+    BOOST_CHECK_EQUAL(str3,std::string("size of field2 of field1"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

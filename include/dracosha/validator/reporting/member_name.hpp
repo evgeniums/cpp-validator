@@ -69,6 +69,13 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto make_member_name =[](const auto& v)
 };
 
 //-------------------------------------------------------------
+struct string_member_name_conjunction_t : public enable_to_string<string_member_name_conjunction_t>
+{
+    constexpr static const char* description=" of ";
+};
+constexpr string_member_name_conjunction_t string_member_name_conjunction{};
+
+//-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 

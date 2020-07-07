@@ -64,6 +64,10 @@ SET (HEADERS
     include/dracosha/validator/reporting/report_aggregation.hpp
     include/dracosha/validator/reporting/aggregation_strings.hpp
     include/dracosha/validator/reporting/format_member.hpp
+    include/dracosha/validator/reporting/single_member_name.hpp
+    include/dracosha/validator/reporting/nested_member_name.hpp
+    include/dracosha/validator/reporting/backend_formatter.hpp
+
     include/dracosha/validator/reporting/locale/sample_locale.hpp
 
     include/dracosha/validator/detail/has_method.hpp
@@ -76,7 +80,6 @@ SET (HEADERS
     include/dracosha/validator/detail/take_address_of.hpp
     include/dracosha/validator/detail/logical_not.hpp
     include/dracosha/validator/detail/to_string.hpp
-    include/dracosha/validator/detail/member_names_traits.hpp
     include/dracosha/validator/detail/format_value.hpp
     include/dracosha/validator/detail/formatter_fmt.hpp
     include/dracosha/validator/detail/reorder_and_present.hpp

@@ -32,17 +32,6 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 namespace detail
 {
 
-template <char Sep>
-struct fmt_single_element
-{
-    constexpr static auto value=hana::sum<hana::string_tag>(hana::make_tuple(hana::string_c<Sep>,hana::string_c<'{', '}'>));
-};
-template <>
-struct fmt_single_element<0>
-{
-    constexpr static auto value=hana::string_c<'{', '}'>;
-};
-
 template <typename DstT, typename SepT, typename PartsT>
 void fmt_append_join(DstT& dst, SepT&& sep, PartsT&& parts,
                      std::enable_if_t<!hana::is_a<hana::tuple_tag,PartsT>,void*> =nullptr)

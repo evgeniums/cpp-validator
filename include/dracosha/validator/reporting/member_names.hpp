@@ -22,7 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/reference_wrapper.hpp>
 #include <dracosha/validator/reporting/strings.hpp>
-#include <dracosha/validator/detail/member_names_traits.hpp>
+#include <dracosha/validator/reporting/single_member_name.hpp>
+#include <dracosha/validator/reporting/nested_member_name.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -33,9 +34,16 @@ struct member_names_tag;
 /**
  * @brief Traits for member names formatter that do not perform any formatting and just bypass names "as is".
  */
-struct bypass_member_names_traits
+struct bypass_member_names_traits_t
 {
+    template <typename T>
+    std::string operator() (const T&) const
+    {
+        return std::string();
+    }
 };
+constexpr bypass_member_names_traits_t bypass_member_names_traits{};
+
 
 /**
  * @brief Member names formatter.
@@ -44,7 +52,7 @@ struct bypass_member_names_traits
  * If traits return empty string then the name is forwarded to strings object.
  *
  */
-template <typename StringsT,typename TraitsT>
+template <typename StringsT, typename TraitsT>
 struct member_names
 {
     using hana_tag=member_names_tag;
@@ -55,39 +63,20 @@ struct member_names
     StringsT _strings;
     TraitsT _traits;
 
-    /**
-     * @brief Format a name
-     * @return Formatted name.
-     */
     template <typename T>
-    std::string operator() (const T& name) const
+    std::string operator() (const T& name,
+                            std::enable_if_t<hana::is_a<member_tag,T>,void*> =nullptr
+                            ) const
     {
-        auto res=detail::member_name_traits<TraitsT,T>(_traits,name);
-        if (!res.empty())
-        {
-            return res;
-        }
-        return _strings(name);
+        return nested_member_name<T,TraitsT,StringsT>(name,_traits,_strings);
     }
-};
-
-/**
- * @brief Member names formatter that does not perform any formatting and forward names "as is" to strings object.
- */
-template <typename StringsT>
-struct member_names<StringsT,bypass_member_names_traits>
-{
-    using hana_tag=member_names_tag;
-
-    StringsT _strings;
-
-    using strings_type=StringsT;
-    using traits_type=bypass_member_names_traits;
 
     template <typename T>
-    std::string operator() (const T& name) const
+    std::string operator() (const T& name,
+                            std::enable_if_t<!hana::is_a<member_tag,T>,void*> =nullptr
+                            ) const
     {
-        return _strings(name);
+        return single_member_name<T,TraitsT>(name,_traits,_strings);
     }
 };
 
@@ -121,9 +110,9 @@ auto make_member_names(StringsT&& strings,
 {
     return member_names<
                 StringsT,
-                bypass_member_names_traits
+                bypass_member_names_traits_t
             >
-            {std::forward<StringsT>(strings)};
+            {std::forward<StringsT>(strings),bypass_member_names_traits};
 }
 
 /**

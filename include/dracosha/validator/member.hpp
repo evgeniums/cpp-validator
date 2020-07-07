@@ -48,21 +48,21 @@ struct member
     /**
      * @brief Ctor of nested member
      * @param key Key of current member
-     * @param parent Parent member which is of previous (upper) level
+     * @param parent_path Path to parent member which is of previous (upper) level
      */
-    template <typename T1, typename MemberT>
-    member(T1&& key, MemberT&& parent)
-         : path(hana::append(std::forward<MemberT>(parent),std::forward<T1>(key)))
+    template <typename T1, typename ParentPathTs>
+    member(T1&& key, ParentPathTs&& parent_path)
+         : path(hana::append(std::forward<ParentPathTs>(parent_path),std::forward<T1>(key)))
     {}
 
     /**
      * @brief Ctor of nested member
      * @param key Key of current member
-     * @param parent Parent member which is of previous (upper) level
+     * @param parent_path Path to parent member which is of previous (upper) level
      */
-    template <typename MemberT>
-    member(type key, MemberT&& parent)
-         : path(hana::append(std::forward<MemberT>(parent),std::move(key)))
+    template <typename ParentPathTs>
+    member(type key, ParentPathTs&& parent_path)
+         : path(hana::append(std::forward<ParentPathTs>(parent_path),std::move(key)))
     {}
 
     /**

@@ -101,6 +101,11 @@ struct strings
     {
         return _translator(_aggregation_strings.conjunction(aggregation));
     }
+
+    std::string member_names_conjunction() const
+    {
+        return _translator(_aggregation_strings.member_names_conjunction());
+    }
 };
 
 /**
