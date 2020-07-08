@@ -83,7 +83,7 @@ struct formatter_append_join_args_t
 constexpr formatter_append_join_args_t formatter_append_join_args{};
 
 /**
- * @brief Wrap destination object into backend formatter
+ * @brief Wrap destination object into backend formatter using default backend formatter
  * @param dsr Destination object
  * @return Backend formatter wrapping destination object
  */
@@ -91,6 +91,17 @@ template <typename DstT>
 auto wrap_backend_formatter(DstT& dst)
 {
     return detail::backend_formatter_helper<DstT>::wrap(dst);
+}
+
+/**
+ * @brief Wrap destination object into backend formatter
+ * @param dsr Destination object
+ * @return Backend formatter wrapping destination object
+ */
+template <typename DstT, typename BackendFormatterSampleT>
+auto wrap_backend_formatter(DstT& dst, BackendFormatterSampleT& fm)
+{
+    return fm.clone(dst);
 }
 
 //-------------------------------------------------------------

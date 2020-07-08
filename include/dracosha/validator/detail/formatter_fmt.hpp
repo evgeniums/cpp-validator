@@ -111,6 +111,11 @@ struct fmt_backend_formatter
     {
         return _dst;
     }
+
+    static fmt_backend_formatter<DstT> clone(DstT& dst)
+    {
+        return fmt_backend_formatter<DstT>{dst};
+    }
 };
 
 }

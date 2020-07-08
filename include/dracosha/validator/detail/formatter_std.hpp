@@ -130,6 +130,11 @@ struct std_backend_formatter
     {
         return _dst;
     }
+
+    static std_backend_formatter clone(std::string& dst)
+    {
+        return std_backend_formatter{dst};
+    }
 };
 
 }

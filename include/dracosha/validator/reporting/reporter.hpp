@@ -107,7 +107,8 @@ class reporter
             {
                 if (!ok || current_not())
                 {
-                    _formatter.aggregate(report_dst(),_stack.back());
+                    auto wrapper=wrap_backend_formatter(report_dst(),_dst);
+                    _formatter.aggregate(wrapper,_stack.back());
                 }
                 if (_stack.back().aggregation.id==aggregation_id::NOT)
                 {
@@ -125,7 +126,8 @@ class reporter
         template <typename T2, typename OpT>
         void validate_operator(const OpT& op, const T2& b)
         {
-            _formatter.validate_operator(current(),op,b);
+             auto wrapper=wrap_backend_formatter(current(),_dst);
+            _formatter.validate_operator(wrapper,op,b);
         }
 
         /**
@@ -137,7 +139,8 @@ class reporter
         template <typename T2, typename OpT, typename PropT>
         void validate_property(const PropT& prop, const OpT& op, const T2& b)
         {
-            _formatter.validate_property(current(),prop,op,b);
+            auto wrapper=wrap_backend_formatter(current(),_dst);
+            _formatter.validate_property(wrapper,prop,op,b);
         }
 
         /**
@@ -148,7 +151,8 @@ class reporter
         template <typename T2, typename MemberT>
         void validate_exists(const MemberT& member, const T2& b)
         {
-            _formatter.validate_exists(current(),member,b);
+            auto wrapper=wrap_backend_formatter(current(),_dst);
+            _formatter.validate_exists(wrapper,member,b);
         }
 
         /**
@@ -161,7 +165,8 @@ class reporter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
         {
-            _formatter.validate(current(),member,prop,op,b);
+            auto wrapper=wrap_backend_formatter(current(),_dst);
+            _formatter.validate(wrapper,member,prop,op,b);
         }
 
         /**
@@ -174,7 +179,8 @@ class reporter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate_with_other_member(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
         {
-            _formatter.validate_with_other_member(current(),member,prop,op,b);
+            auto wrapper=wrap_backend_formatter(current(),_dst);
+            _formatter.validate_with_other_member(wrapper,member,prop,op,b);
         }
 
         /**
@@ -187,7 +193,8 @@ class reporter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate_with_master_sample(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
         {
-            _formatter.validate_with_master_sample(current(),member,prop,op,b);
+            auto wrapper=wrap_backend_formatter(current(),_dst);
+            _formatter.validate_with_master_sample(wrapper,member,prop,op,b);
         }
 
         /**
