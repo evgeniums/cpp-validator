@@ -47,7 +47,8 @@ class reporting_adapter
             ReporterT&& reporter,
             AdapterT&& next_adapter
         ) : _reporter(std::forward<ReporterT>(reporter)),
-            _next_adapter(std::forward<AdapterT>(next_adapter))
+            _next_adapter(std::forward<AdapterT>(next_adapter)),
+            _log_all(false)
         {}
 
         /**
@@ -59,12 +60,12 @@ class reporting_adapter
         template <typename T2, typename OpT>
         bool validate_operator(OpT&& op, T2&& b)
         {
-            if (!_next_adapter.validate_operator(op,b))
+            auto ok=_next_adapter.validate_operator(op,b);
+            if (!ok || _reporter.current_not())
             {
                 _reporter.validate_operator(op,b);
-                return false;
             }
-            return true;
+            return ok;
         }
 
         /**
@@ -77,12 +78,12 @@ class reporting_adapter
         template <typename T2, typename OpT, typename PropT>
         bool validate_property(PropT&& prop, OpT&& op, T2&& b)
         {
-            if (!_next_adapter.validate_property(prop,op,b))
+            auto ok=_next_adapter.validate_property(prop,op,b);
+            if (!ok || _reporter.current_not())
             {
                 _reporter.validate_property(prop,op,b);
-                return false;
             }
-            return true;
+            return ok;
         }
 
         /**
@@ -95,12 +96,12 @@ class reporting_adapter
         template <typename T2, typename MemberT>
         bool validate_exists(MemberT&& member, T2&& b)
         {
-            if (!_next_adapter.validate_exists(member,b))
+            auto ok=_next_adapter.validate_exists(member,b);
+            if (!ok || _reporter.current_not())
             {
                 _reporter.validate_exists(member,b);
-                return false;
             }
-            return true;
+            return ok;
         }
 
         /**
@@ -114,12 +115,12 @@ class reporting_adapter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         bool validate(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
         {
-            if (!_next_adapter.validate(member,prop,op,b))
+            auto ok=_next_adapter.validate(member,prop,op,b);
+            if (!ok || _reporter.current_not())
             {
                 _reporter.validate(member,prop,op,b);
-                return false;
             }
-            return true;
+            return ok;
         }
 
         /**
@@ -133,12 +134,12 @@ class reporting_adapter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         bool validate_with_other_member(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
         {
-            if (!_next_adapter.validate(member,prop,op,b))
+            auto ok=_next_adapter.validate(member,prop,op,b);
+            if (!ok || _reporter.current_not())
             {
                 _reporter.validate_with_other_member(member,prop,op,b);
-                return false;
             }
-            return true;
+            return ok;
         }
 
         /**
@@ -152,12 +153,12 @@ class reporting_adapter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         bool validate_with_master_sample(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
         {
-            if (!_next_adapter.validate(member,prop,op,b))
+            auto ok=_next_adapter.validate(member,prop,op,b);
+            if (!ok || _reporter.current_not())
             {
                 _reporter.validate_with_master_sample(member,prop,op,b);
-                return false;
             }
-            return true;
+            return ok;
         }
 
         /**
@@ -239,6 +240,9 @@ class reporting_adapter
          * @param member Member to process with validator
          * @param op Intermediate validator or validation operator
          * @return Logical NOT of results of intermediate validator
+         *
+         * @note The validator will report all matched conditions for nested AND operator
+         *       but only the first matched condition for nested OR operator
          */
         template <typename OpT, typename MemberT>
         bool validate_not(MemberT&& member,OpT&& op)
@@ -263,6 +267,7 @@ class reporting_adapter
 
         ReporterT _reporter;
         AdapterT _next_adapter;
+        bool _log_all;
 };
 
 template <typename ReporterT, typename AdapterT>

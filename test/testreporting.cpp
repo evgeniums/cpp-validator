@@ -168,25 +168,47 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportAggregation)
     rep1.clear();
 }
 
-//BOOST_AUTO_TEST_CASE(CheckValidationReportNot)
-//{
-//    std::map<std::string,std::string> m1={{"field1","value1"}};
-//    std::string rep1;
-//    auto ra1=make_reporting_adapter(rep1,m1);
+BOOST_AUTO_TEST_CASE(CheckValidationReportNot)
+{
+    std::map<std::string,size_t> m1={{"field1",10}};
+    std::string rep1;
+    auto ra1=make_reporting_adapter(rep1,m1);
 
-//    auto v4=validator(
-//                NOT(_["field1"](gte,"v"))
-//            );
-//    BOOST_CHECK(!v4.apply(ra1));
-//    BOOST_CHECK_EQUAL(rep1,std::string("size of field1 is greater than or equal to 100"));
-//    rep1.clear();
+    auto v1=validator(
+                NOT(_["field1"](eq,10))
+            );
+    BOOST_CHECK(!v1.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string("NOT field1 is equal to 10"));
+    rep1.clear();
 
-//    auto v5=validator(
-//                _["field1"](NOT(value(gte,"v")))
-//            );
-//    BOOST_CHECK(!v5.apply(ra1));
-//    BOOST_CHECK_EQUAL(rep1,std::string("size of field1 is greater than or equal to 100"));
-//    rep1.clear();
-//}
+    auto v2=validator(
+                _["field1"](NOT(value(gte,1)))
+            );
+    BOOST_CHECK(!v2.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string("NOT field1 is greater than or equal to 1"));
+    rep1.clear();
+
+    auto v3=validator(
+                NOT(
+                    _["field1"](eq,10),
+                    _["field1"](gte,8)
+                )
+            );
+    BOOST_CHECK(!v3.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string("NOT (field1 is equal to 10 AND field1 is greater than or equal to 8)"));
+    rep1.clear();
+
+    // validator reports only the first matched condition for nested OR operator
+    auto v4=validator(
+                NOT(
+                    _["field1"](eq,10)
+                    ^OR^
+                    _["field1"](gte,100)
+                )
+            );
+    BOOST_CHECK(!v4.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string("NOT (field1 is equal to 10)"));
+    rep1.clear();
+}
 
 BOOST_AUTO_TEST_SUITE_END()

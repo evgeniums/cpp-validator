@@ -50,12 +50,17 @@ class reporter
                     DstT& dst,
                     FormatterT&& formatter
                 ) : _dst(dst),
-                    _formatter(std::forward<FormatterT>(formatter))
+                    _formatter(std::forward<FormatterT>(formatter)),
+                    _not_count(0)
         {}
 
         template <typename AggregationT>
         void aggregate_open(AggregationT&& aggregation)
         {
+            if (aggregation.id==aggregation_id::NOT)
+            {
+                ++_not_count;
+            }
             _stack.emplace_back(std::forward<AggregationT>(aggregation));
             if (_stack.size()>1)
             {
@@ -65,6 +70,10 @@ class reporter
         template <typename AggregationT, typename MemberT>
         void aggregate_open(AggregationT&& aggregation, MemberT&& member)
         {
+            if (aggregation.id==aggregation_id::NOT)
+            {
+                ++_not_count;
+            }
             _stack.emplace_back(std::forward<AggregationT>(aggregation),
                                 _formatter.member_to_string(std::forward<MemberT>(member)));
             if (_stack.size()>1)
@@ -77,9 +86,13 @@ class reporter
         {
             if (!_stack.empty())
             {
-                if (!ok)
+                if (!ok || current_not())
                 {
                     _formatter.aggregate(report_dst(),_stack.back());
+                }
+                if (_stack.back().aggregation.id==aggregation_id::NOT)
+                {
+                    --_not_count;
                 }
                 _stack.pop_back();
             }
@@ -163,6 +176,11 @@ class reporter
             return _dst;
         }
 
+        bool current_not() const
+        {
+            return _not_count!=0;
+        }
+
     private:
 
         DstT& current()
@@ -188,6 +206,7 @@ class reporter
         DstT& _dst;
         FormatterT _formatter;
         std::vector<report_aggregation<DstT>> _stack;
+        size_t _not_count;
 };
 
 template <typename DstT, typename FormatterT>
