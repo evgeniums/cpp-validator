@@ -26,6 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/master_sample.hpp>
 #include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/operators.hpp>
+#include <dracosha/validator/reporting/member_name.hpp>
 #include <dracosha/validator/reporting/values.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -54,6 +55,7 @@ inline std::map<std::string,std::string> strings_sample_locale()
     m[string_conjunction_of]="of";
     m[string_conjunction_aggregate]=": ";
     m[string_conjunction_for]="for";
+    m[string_member_name_conjunction]=" of ";
 
     // properties
     m[value.name()]="value";
@@ -66,10 +68,6 @@ inline std::map<std::string,std::string> strings_sample_locale()
     m[string_not_exists]="does not exist";
 
     // logical
-    //! \todo remove
-    m[string_and]="the following conditions must be satisfied";
-    m[string_or]="at least one of the following conditions must be satisfied";
-    m[string_not]="the following condition must be false";
     m[string_and_t::conjunction_token]=" AND ";
     m[string_or_t::conjunction_token]=" OR ";
     m[string_not_t::open_token]="NOT ";

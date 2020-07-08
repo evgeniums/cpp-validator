@@ -23,7 +23,6 @@ struct Dummy
 template <typename T>
 void check_bypass(const T& proc)
 {
-    BOOST_CHECK_EQUAL(proc(string_and),std::string(string_and));
     BOOST_CHECK_EQUAL(proc(value),value.name());
     BOOST_CHECK_EQUAL(proc(size),size.name());
     BOOST_CHECK_EQUAL(proc(gte),std::string(gte));
@@ -36,7 +35,6 @@ struct translator_env
 {
     translator_env():_m(
                         {
-                            {std::string(string_and),"and_translated"},
                             {value.name(),"value_translated"},
                             {std::string(gte),"gte_translated"},
                             {std::string("field1"),"field1_translated"},
@@ -58,7 +56,6 @@ struct translator_env
     template <typename T>
     void check(const T& strings)
     {
-        BOOST_CHECK_EQUAL(strings(string_and),_m[std::string(string_and)]);
         BOOST_CHECK_EQUAL(strings(value),_m[value.name()]);
         BOOST_CHECK_EQUAL(strings(gte),_m[std::string(gte)]);
         BOOST_CHECK_EQUAL(strings("field1"),_m[std::string("field1")]);
@@ -166,7 +163,6 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
         static_assert(std::is_lvalue_reference<typename mn_type::strings_type>::value,"");
         static_assert(std::is_lvalue_reference<typename mn_type::traits_type>::value,"");
 
-        BOOST_CHECK_EQUAL(mn(string_and),env._m[std::string(string_and)]);
         BOOST_CHECK_EQUAL(mn(value),env._m[value.name()]);
         BOOST_CHECK_EQUAL(mn(gte),env._m[std::string(gte)]);
         BOOST_CHECK_EQUAL(mn("field1"),std::string("other translation of field1"));

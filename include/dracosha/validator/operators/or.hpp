@@ -48,8 +48,6 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto OR=hana::infix([](auto&& ...xs) -> decltype(aut
 //-------------------------------------------------------------
 struct string_or_t : public logical_op<string_or_t>
 {
-    constexpr static const char* description="at least one of the following conditions must be satisfied";
-
     constexpr static const aggregation_id id=aggregation_id::OR;
     constexpr static const char* open_token="(";
     constexpr static const char* close_token=")";

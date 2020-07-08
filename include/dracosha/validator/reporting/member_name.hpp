@@ -21,8 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/reference_wrapper.hpp>
-#include <dracosha/validator/reporting/strings.hpp>
-#include <dracosha/validator/detail/member_names_traits.hpp>
+#include <dracosha/validator/utils/enable_to_string.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -69,6 +68,9 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto make_member_name =[](const auto& v)
 };
 
 //-------------------------------------------------------------
+/**
+ * @brief String to use for joining nested member names in member's path
+ */
 struct string_member_name_conjunction_t : public enable_to_string<string_member_name_conjunction_t>
 {
     constexpr static const char* description=" of ";

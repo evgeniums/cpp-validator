@@ -48,8 +48,6 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto AND=hana::infix([](auto&& ...xs) -> decltype(au
 //-------------------------------------------------------------
 struct string_and_t : public logical_op<string_and_t>
 {
-    constexpr static const char* description="the following conditions must be satisfied";
-
     constexpr static const aggregation_id id=aggregation_id::AND;
     constexpr static const char* open_token="(";
     constexpr static const char* close_token=")";

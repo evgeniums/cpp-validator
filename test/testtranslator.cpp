@@ -5,6 +5,7 @@
 #include <dracosha/validator/reporting/no_translator.hpp>
 #include <dracosha/validator/reporting/mapped_translator.hpp>
 #include <dracosha/validator/reporting/translator_repository.hpp>
+#include <dracosha/validator/reporting/member_name.hpp>
 
 #include <dracosha/validator/reporting/locale/sample_locale.hpp>
 
@@ -223,6 +224,7 @@ BOOST_AUTO_TEST_CASE(CheckSampleLocale)
     BOOST_CHECK_EQUAL(m[string_conjunction_of],std::string(string_conjunction_of));
     BOOST_CHECK_EQUAL(m[string_conjunction_aggregate],std::string(string_conjunction_aggregate));
     BOOST_CHECK_EQUAL(m[string_conjunction_for],std::string(string_conjunction_for));
+    BOOST_CHECK_EQUAL(m[string_member_name_conjunction],std::string(string_member_name_conjunction));
 
     // properties
     BOOST_CHECK_EQUAL(m[value.name()],value.name());
@@ -235,9 +237,6 @@ BOOST_AUTO_TEST_CASE(CheckSampleLocale)
     BOOST_CHECK_EQUAL(m[string_not_exists],std::string(string_not_exists));
 
     // logical
-    BOOST_CHECK_EQUAL(m[string_and],std::string(string_and));
-    BOOST_CHECK_EQUAL(m[string_or],std::string(string_or));
-    BOOST_CHECK_EQUAL(m[string_not],std::string(string_not));
     BOOST_CHECK_EQUAL(m[string_and_t::conjunction_token],std::string(string_and_t::conjunction_token));
     BOOST_CHECK_EQUAL(m[string_or_t::conjunction_token],std::string(string_or_t::conjunction_token));
     BOOST_CHECK_EQUAL(m[string_not_t::open_token],std::string(string_not_t::open_token));

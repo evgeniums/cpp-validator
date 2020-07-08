@@ -66,7 +66,7 @@ struct aggregation_op
  * @brief Pseudo logical operator
  */
 template <typename DerivedT>
-struct logical_op : public enable_to_string<DerivedT>
+struct logical_op
 {
     using hana_tag=aggregation_op_tag;
 };
