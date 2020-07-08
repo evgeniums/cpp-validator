@@ -35,7 +35,7 @@ struct eq_t : public op<eq_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return compare<T2,T1>::equal(a,b);
+        return compare<T1,T2>::equal(a,b);
     }
 
     constexpr static const char* description="is equal to";
@@ -50,7 +50,7 @@ struct ne_t : public op<ne_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return !compare<T2,T1>::equal(a,b);
+        return !compare<T1,T2>::equal(a,b);
     }
 
     constexpr static const char* description="is not equal to";
@@ -65,7 +65,7 @@ struct lt_t : public op<lt_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return compare<T2,T1>::less(a,b);
+        return compare<T1,T2>::less(a,b);
     }
 
     constexpr static const char* description="is less than";
@@ -80,7 +80,7 @@ struct lte_t : public op<lte_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return compare<T2,T1>::less_equal(a,b);
+        return compare<T1,T2>::less_equal(a,b);
     }
 
     constexpr static const char* description="is less than or equal to";
