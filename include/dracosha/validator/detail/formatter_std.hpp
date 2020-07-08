@@ -98,6 +98,9 @@ void std_append(std::string& dst, SepT&& sep, Args&&... args)
 
 struct backend_formatter_tag;
 
+/**
+ * @brief Backend formatter that uses std::stringstream fot formatting
+ */
 struct std_backend_formatter
 {
     using hana_tag=backend_formatter_tag;

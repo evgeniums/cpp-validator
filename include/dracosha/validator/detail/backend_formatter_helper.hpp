@@ -31,6 +31,11 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 #ifdef DRACOSHA_VALIDATOR_FMT
 
+/**
+ * @brief Wrap destination object into fmt formatter
+ * @param dst Destination object
+ * @return fmt backend formatter
+ */
 template <typename DstT>
 auto default_backend_formatter(DstT& dst)
 {
@@ -39,6 +44,11 @@ auto default_backend_formatter(DstT& dst)
 
 #else
 
+/**
+ * @brief Wrap destination object into std::stringstream formatter
+ * @param dst Destination object
+ * @return std::stringstream backend formatter
+ */
 auto default_backend_formatter(std::string& dst)
 {
     return detail::std_backend_formatter{dst};
@@ -49,6 +59,11 @@ auto default_backend_formatter(std::string& dst)
 namespace detail
 {
 
+/**
+ * @brief Helper used when destination object is not a backend formatter.
+ *
+ * The helper first wraps the destination object into backend formatter and then calls corresponding method.
+ */
 template <typename DstT, typename =hana::when<true>>
 struct backend_formatter_helper
 {
@@ -76,6 +91,11 @@ struct backend_formatter_helper
     }
 };
 
+/**
+ * @brief Helper used when destination object is a backend formatter.
+ *
+ * The helper forwards calls to corresponding methods of backend formatter.
+ */
 template <typename DstT>
 struct backend_formatter_helper<DstT,
             hana::when<hana::is_a<backend_formatter_tag,DstT>>

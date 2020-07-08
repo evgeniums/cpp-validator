@@ -24,20 +24,40 @@ Distributed under the Boost Software License, Version 1.0.
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
+/**
+ * @brief Backend formatter
+ */
 struct backend_formatter_t
 {
+    /**
+     * @brief Append arguments to destination object
+     * @param dst Destination object
+     * @param args Arguments to append
+     */
     template <typename DstT, typename ...Args>
     static void append(DstT& dst, Args&&... args)
     {
         detail::backend_formatter_helper<DstT>::append(dst,std::forward<Args>(args)...);
     }
 
+    /**
+     * @brief Join arguments and append to destination object
+     * @param dst Destination object
+     * @param sep Separator for joining
+     * @param args Arguments to join and append
+     */
     template <typename DstT, typename SepT, typename ...Args>
     static void append_join_args(DstT& dst, SepT&& sep, Args&&... args)
     {
         detail::backend_formatter_helper<DstT>::append_join_args(dst,std::forward<SepT>(sep),std::forward<Args>(args)...);
     }
 
+    /**
+     * @brief Join parts and append to destination object
+     * @param dst Destination object
+     * @param sep Separator for joining
+     * @param parts Parts to join and append, can be either std::vector or hana::tuple
+     */
     template <typename DstT,  typename SepT, typename PartsT>
     static void append_join(DstT& dst, SepT&& sep, PartsT&& parts)
     {
@@ -46,6 +66,12 @@ struct backend_formatter_t
 };
 constexpr backend_formatter_t backend_formatter{};
 
+/**
+ * @brief Join arguments and append to destination object
+ * @param dst Destination object
+ * @param sep Separator for joining
+ * @param args Arguments to join and append
+ */
 struct formatter_append_join_args_t
 {
     template <typename DstT, typename SepT,typename ...Args>
@@ -56,6 +82,11 @@ struct formatter_append_join_args_t
 };
 constexpr formatter_append_join_args_t formatter_append_join_args{};
 
+/**
+ * @brief Wrap destination object into backend formatter
+ * @param dsr Destination object
+ * @return Backend formatter wrapping destination object
+ */
 template <typename DstT>
 auto wrap_backend_formatter(DstT& dst)
 {

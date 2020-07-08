@@ -32,6 +32,12 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 namespace detail
 {
 
+/**
+ * @brief Join vector of parts and append to destination object
+ * @param dst Destination object
+ * @param sep Separator for joining
+ * @param parts Vector of parts to join and append
+ */
 template <typename DstT, typename SepT, typename PartsT>
 void fmt_append_join(DstT& dst, SepT&& sep, PartsT&& parts,
                      std::enable_if_t<!hana::is_a<hana::tuple_tag,PartsT>,void*> =nullptr)
@@ -39,6 +45,12 @@ void fmt_append_join(DstT& dst, SepT&& sep, PartsT&& parts,
     fmt::format_to(std::back_inserter(dst),"{}",fmt::join(std::forward<PartsT>(parts),std::forward<SepT>(sep)));
 }
 
+/**
+ * @brief Join hana::tuple of parts and append to destination object
+ * @param dst Destination object
+ * @param sep Separator for joining
+ * @param parts hana::tuple of parts to join and append
+ */
 template <typename DstT, typename SepT, typename PartsT>
 void fmt_append_join(DstT& dst, SepT&& sep, PartsT&& parts,
                      std::enable_if_t<hana::is_a<hana::tuple_tag,PartsT>,void*> =nullptr)
@@ -66,6 +78,9 @@ void fmt_append_args(DstT& dst, Args&&... args)
 
 struct backend_formatter_tag;
 
+/**
+ * @brief Backend formatter that uses libfmt fot formatting
+ */
 template <typename DstT>
 struct fmt_backend_formatter
 {
