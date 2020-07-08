@@ -65,6 +65,21 @@ BOOST_AUTO_TEST_CASE(CheckReporter)
     auto r1=make_reporter(rep1);
     r1.validate("field1",value,gte,10);
     BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to 10"));
+
+    std::string rep2;
+    auto w2=wrap_backend_formatter(rep2);
+    auto r2=make_reporter(w2);
+    r2.validate("field1",value,gte,10);
+    BOOST_CHECK_EQUAL(rep2,std::string("field1 is greater than or equal to 10"));
+
+    auto& dst2_f=r2.destination<decltype(w2)>();
+    std::string& s2_1=dst2_f;
+    std::string& s2_2=w2;
+    BOOST_CHECK(&s2_1==&s2_2);
+    BOOST_CHECK_EQUAL(std::string(dst2_f),std::string(w2));
+
+    auto& dst2_s=r2.destination<std::string>();
+    BOOST_CHECK_EQUAL(dst2_s,rep2);
 }
 
 BOOST_AUTO_TEST_CASE(CheckReporterAggregate)

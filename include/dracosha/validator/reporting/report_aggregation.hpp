@@ -38,7 +38,7 @@ struct report_aggregation
 
     report_aggregation(
             aggregation_op aggregation,
-            DstT member=DstT()
+            std::string member=std::string()
         ) : aggregation(std::move(aggregation)),
             member(std::move(member)),
             single(true)

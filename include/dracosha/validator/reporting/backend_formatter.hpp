@@ -20,22 +20,47 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_BACKEND_FORMATTER_HPP
 
 #include <dracosha/validator/config.hpp>
-
-#ifdef DRACOSHA_VALIDATOR_FMT
-#include <dracosha/validator/detail/formatter_fmt.hpp>
-#else
-#include <dracosha/validator/detail/formatter_std.hpp>
-#endif
+#include <dracosha/validator/detail/backend_formatter_helper.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
-#ifdef DRACOSHA_VALIDATOR_FMT
-constexpr detail::fmt_formatter_t backend_formatter{};
-constexpr detail::fmt_append_join_args_t formatter_append_join_args{};
-#else
-constexpr detail::std_formatter_t backend_formatter{};
-constexpr detail::std_append_join_args_t formatter_append_join_args{};
-#endif
+struct backend_formatter_t
+{
+    template <typename DstT, typename ...Args>
+    static void append(DstT& dst, Args&&... args)
+    {
+        detail::backend_formatter_helper<DstT>::append(dst,std::forward<Args>(args)...);
+    }
+
+    template <typename DstT, typename SepT, typename ...Args>
+    static void append_join_args(DstT& dst, SepT&& sep, Args&&... args)
+    {
+        detail::backend_formatter_helper<DstT>::append_join_args(dst,std::forward<SepT>(sep),std::forward<Args>(args)...);
+    }
+
+    template <typename DstT,  typename SepT, typename PartsT>
+    static void append_join(DstT& dst, SepT&& sep, PartsT&& parts)
+    {
+        detail::backend_formatter_helper<DstT>::append_join(dst,std::forward<SepT>(sep),std::forward<PartsT>(parts));
+    }
+};
+constexpr backend_formatter_t backend_formatter{};
+
+struct formatter_append_join_args_t
+{
+    template <typename DstT, typename SepT,typename ...Args>
+    void operator () (DstT&& dst, SepT&& sep, Args&&... args) const
+    {
+        backend_formatter.append_join_args(extract_ref(std::forward<DstT>(dst)),std::forward<SepT>(sep),std::forward<Args>(args)...);
+    }
+};
+constexpr formatter_append_join_args_t formatter_append_join_args{};
+
+template <typename DstT>
+auto wrap_backend_formatter(DstT& dst)
+{
+    return detail::backend_formatter_helper<DstT>::wrap(dst);
+}
 
 //-------------------------------------------------------------
 DRACOSHA_VALIDATOR_NAMESPACE_END

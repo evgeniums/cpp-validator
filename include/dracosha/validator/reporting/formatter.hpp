@@ -122,8 +122,8 @@ struct formatter
                );
     }
 
-    template <typename DstT>
-    void aggregate(DstT& dst, const report_aggregation<DstT>& item) const
+    template <typename DstT, typename ItemT>
+    void aggregate(DstT& dst, const ItemT& item) const
     {
         format(dst,_strings,item);
     }

@@ -1,12 +1,13 @@
-#include <iostream>
 #include <boost/test/unit_test.hpp>
 
 #include <dracosha/validator/config.hpp>
+#ifdef DRACOSHA_VALIDATOR_FMT
+#undef DRACOSHA_VALIDATOR_FMT
+#endif
+
 #include <dracosha/validator/reporting/formatter.hpp>
 #include <dracosha/validator/reporting/mapped_translator.hpp>
 #include <dracosha/validator/reporting/translator_repository.hpp>
-
-#ifndef DRACOSHA_VALIDATOR_FMT
 
 using namespace dracosha::validator;
 
@@ -15,41 +16,47 @@ BOOST_AUTO_TEST_SUITE(TestStdFormatter)
 #define DRACOSHA_VALIDATOR_TEST_FORMATTER
 #include "testformatter.cpp"
 
-BOOST_AUTO_TEST_CASE(CheckFmtOrderAndPresentation)
+namespace
 {
-    checkOrderAndPresentation();
+auto make_backend_formatter(std::string& dst)
+{
+    return detail::std_backend_formatter{dst};
+}
 }
 
-BOOST_AUTO_TEST_CASE(CheckFmtDefaultFormatter)
+BOOST_AUTO_TEST_CASE(CheckStdOrderAndPresentation)
 {
-    checkDefaultFormatter();
+    checkOrderAndPresentation(make_backend_formatter);
 }
 
-BOOST_AUTO_TEST_CASE(CheckFormatterFromStrings)
+BOOST_AUTO_TEST_CASE(CheckStdDefaultFormatter)
 {
-    checkFormatterFromStrings();
+    checkDefaultFormatter(make_backend_formatter);
 }
 
-BOOST_AUTO_TEST_CASE(CheckFormatterFromMemberNames)
+BOOST_AUTO_TEST_CASE(CheckStdFormatterFromStrings)
 {
-    checkFormatterFromMemberNames();
+    checkFormatterFromStrings(make_backend_formatter);
 }
 
-BOOST_AUTO_TEST_CASE(CheckFormatterFromMemberNamesAndValues)
+BOOST_AUTO_TEST_CASE(CheckStdFormatterFromMemberNames)
 {
-    checkFormatterFromMemberNamesAndValues();
+    checkFormatterFromMemberNames(make_backend_formatter);
 }
 
-BOOST_AUTO_TEST_CASE(CheckFormatterWithRefs)
+BOOST_AUTO_TEST_CASE(CheckStdFormatterFromMemberNamesAndValues)
 {
-    checkFormatterWithRefs();
+    checkFormatterFromMemberNamesAndValues(make_backend_formatter);
+}
+
+BOOST_AUTO_TEST_CASE(CheckStdFormatterWithRefs)
+{
+    checkFormatterWithRefs(make_backend_formatter);
 }
 
 BOOST_AUTO_TEST_CASE(CheckStdFormatterWithRvals)
 {
-    checkFormatterWithRvals();
+    checkFormatterWithRvals(make_backend_formatter);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
-#endif

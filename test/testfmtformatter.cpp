@@ -53,10 +53,9 @@ BOOST_AUTO_TEST_CASE(CheckFmtString)
     auto gte_str=std::string(gte);
     BOOST_CHECK_EQUAL(gte_str,std::string(gte.description));
 
-    detail::fmt_formatter_t formatter{};
-
     std::string str3;
-    formatter.append(str3,"one",",","two",",","three");
+    detail::fmt_backend_formatter<std::string> formatter{str3};
+    formatter.append("one",",","two",",","three");
     BOOST_CHECK_EQUAL(str3,std::string("one,two,three"));
 
     auto mt= [] (auto&&... args)
@@ -85,39 +84,47 @@ BOOST_AUTO_TEST_CASE(CheckFmtString)
 #define DRACOSHA_VALIDATOR_TEST_FORMATTER
 #include "testformatter.cpp"
 
-BOOST_AUTO_TEST_CASE(CheckOrderAndPresentation)
+namespace
 {
-    checkOrderAndPresentation();
+auto make_backend_formatter(std::string& dst)
+{
+    return detail::fmt_backend_formatter<std::string>{dst};
+}
 }
 
-BOOST_AUTO_TEST_CASE(CheckDefaultFormatter)
+BOOST_AUTO_TEST_CASE(CheckFmtOrderAndPresentation)
 {
-    checkDefaultFormatter();
+    checkOrderAndPresentation(make_backend_formatter);
 }
 
-BOOST_AUTO_TEST_CASE(CheckFormatterFromStrings)
+BOOST_AUTO_TEST_CASE(CheckFmtDefaultFormatter)
 {
-    checkFormatterFromStrings();
+    checkDefaultFormatter(make_backend_formatter);
 }
 
-BOOST_AUTO_TEST_CASE(CheckFormatterFromMemberNames)
+BOOST_AUTO_TEST_CASE(CheckFmtFormatterFromStrings)
 {
-    checkFormatterFromMemberNames();
+    checkFormatterFromStrings(make_backend_formatter);
 }
 
-BOOST_AUTO_TEST_CASE(CheckFormatterFromMemberNamesAndValues)
+BOOST_AUTO_TEST_CASE(CheckFmtFormatterFromMemberNames)
 {
-    checkFormatterFromMemberNamesAndValues();
+    checkFormatterFromMemberNames(make_backend_formatter);
 }
 
-BOOST_AUTO_TEST_CASE(CheckFormatterWithRefs)
+BOOST_AUTO_TEST_CASE(CheckFmtFormatterFromMemberNamesAndValues)
 {
-    checkFormatterWithRefs();
+    checkFormatterFromMemberNamesAndValues(make_backend_formatter);
 }
 
-BOOST_AUTO_TEST_CASE(CheckFormatterWithRvals)
+BOOST_AUTO_TEST_CASE(CheckFmtFormatterWithRefs)
 {
-    checkFormatterWithRvals();
+    checkFormatterWithRefs(make_backend_formatter);
+}
+
+BOOST_AUTO_TEST_CASE(CheckFmtFormatterWithRvals)
+{
+    checkFormatterWithRvals(make_backend_formatter);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

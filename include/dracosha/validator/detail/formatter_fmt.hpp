@@ -64,51 +64,37 @@ void fmt_append_args(DstT& dst, Args&&... args)
     fmt_append_join_args(dst,"",std::forward<Args>(args)...);
 }
 
-/**
- * @brief Format string from variadic arguments using fmt backend
- */
-struct fmt_formatter_t
+struct backend_formatter_tag;
+
+template <typename DstT>
+struct fmt_backend_formatter
 {
-    template <typename DstT, typename ...Args>
-    static void append(DstT& dst, Args&&... args)
+    using hana_tag=backend_formatter_tag;
+    using type=DstT;
+
+    DstT& _dst;
+
+    template <typename ...Args>
+    void append(Args&&... args)
     {
-        return fmt_append_args(dst,std::forward<Args>(args)...);
+        fmt_append_args(_dst,std::forward<Args>(args)...);
     }
 
-    template <typename DstT, typename SepT, typename ...Args>
-    static void append_join_args(DstT& dst, SepT&& sep, Args&&... args)
+    template <typename SepT, typename ...Args>
+    void append_join_args(SepT&& sep, Args&&... args)
     {
-        return fmt_append_join_args(dst,std::forward<SepT>(sep),std::forward<Args>(args)...);
+        fmt_append_join_args(_dst,std::forward<SepT>(sep),std::forward<Args>(args)...);
     }
 
-    template <typename DstT,  typename SepT, typename PartsT>
-    static void append_join(DstT& dst, SepT&& sep, PartsT&& parts)
+    template <typename SepT, typename PartsT>
+    void append_join(SepT&& sep, PartsT&& parts)
     {
-        fmt_append_join(dst,std::forward<SepT>(sep),std::forward<PartsT>(parts));
+        fmt_append_join(_dst,std::forward<SepT>(sep),std::forward<PartsT>(parts));
     }
-};
 
-/**
- * @brief Append arguments to string using fmt backend
- */
-struct fmt_append_t
-{
-    template <typename DstT,typename ...Args>
-    void operator () (DstT&& dst, Args&&... args) const
+    operator DstT& ()
     {
-        fmt_formatter_t::append(extract_ref(std::forward<DstT>(dst)),std::forward<Args>(args)...);
-    }
-};
-
-/**
- * @brief Append arguments to string using fmt backend
- */
-struct fmt_append_join_args_t
-{
-    template <typename DstT, typename SepT,typename ...Args>
-    void operator () (DstT&& dst, SepT&& sep, Args&&... args) const
-    {
-        fmt_formatter_t::append_join_args(extract_ref(std::forward<DstT>(dst)),std::forward<SepT>(sep),std::forward<Args>(args)...);
+        return _dst;
     }
 };
 

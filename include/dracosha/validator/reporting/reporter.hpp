@@ -52,9 +52,9 @@ class reporter
          * @param formatter Formatter to use for reports formatting
          */
         reporter(
-                    DstT& dst,
+                    DstT dst,
                     FormatterT&& formatter
-                ) : _dst(dst),
+                ) : _dst(std::move(dst)),
                     _formatter(std::forward<FormatterT>(formatter)),
                     _not_count(0)
         {}
@@ -194,7 +194,8 @@ class reporter
          * @brief Get object where the reports go to
          * @return Reference to destination object
          */
-        DstT& destination()
+        template <typename T>
+        T& destination()
         {
             return _dst;
         }
@@ -210,7 +211,7 @@ class reporter
 
     private:
 
-        DstT& current()
+        typename DstT::type& current()
         {
             if (!_stack.empty())
             {
@@ -220,7 +221,7 @@ class reporter
             return _dst;
         }
 
-        DstT& report_dst()
+        typename DstT::type& report_dst()
         {
             if (_stack.size()>1)
             {
@@ -230,9 +231,9 @@ class reporter
             return _dst;
         }
 
-        DstT& _dst;
+        DstT _dst;
         FormatterT _formatter;
-        std::vector<report_aggregation<DstT>> _stack;
+        std::vector<report_aggregation<typename DstT::type>> _stack;
         size_t _not_count;
 };
 
@@ -245,7 +246,8 @@ class reporter
 template <typename DstT, typename FormatterT>
 auto make_reporter(DstT& dst, FormatterT&& formatter)
 {
-    return reporter<DstT,FormatterT>(dst,std::forward<FormatterT>(formatter));
+    auto wrapper=wrap_backend_formatter(dst);
+    return reporter<decltype(wrapper),FormatterT>(std::move(wrapper),std::forward<FormatterT>(formatter));
 }
 
 /**

@@ -4,27 +4,31 @@
 namespace
 {
 
-void checkOrderAndPresentation()
+template <typename WrapStringFn>
+void checkOrderAndPresentation(const WrapStringFn& wrapper)
 {
     std::string str1;
+    auto w1=wrapper(str1);
     detail::reorder_and_present(
-                str1,
+                w1,
                 make_cref_tuple(default_strings,default_values),
                 gte,10
             );
     BOOST_CHECK_EQUAL(str1,std::string("is greater than or equal to 10"));
 
     std::string str2;
+    auto w2=wrapper(str2);
     detail::reorder_and_present(
-                str2,
+                w2,
                 make_cref_tuple(default_strings,default_values),
                 eq,bool(true)
             );
     BOOST_CHECK_EQUAL(str2,std::string("must be true"));
 
     std::string str3;
+    auto w3=wrapper(str3);
     detail::reorder_and_present(
-                str3,
+                w3,
                 make_cref_tuple(default_strings,default_values),
                 ne,true
             );
@@ -32,168 +36,200 @@ void checkOrderAndPresentation()
 
     auto mn=get_default_member_names();
     std::string str4;
+    auto w4=wrapper(str4);
     detail::reorder_and_present(
-                str4,
+                w4,
                 make_cref_tuple(mn,mn,default_strings,default_values),
                 "field1",size,eq,100
             );
     BOOST_CHECK_EQUAL(str4,std::string("size of field1 is equal to 100"));
 
     std::string str5;
+    auto w5=wrapper(str5);
     detail::reorder_and_present(
-                str5,
+                w5,
                 make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_values),
                 "field2",value,eq,true
             );
     BOOST_CHECK_EQUAL(str5,std::string("field2 must be true"));
 
     std::string str6;
+    auto w6=wrapper(str6);
     detail::reorder_and_present(
-                str6,
+                w6,
                 make_cref_tuple(get_default_member_names(),default_strings,default_values),
                 empty,eq,false
             );
     BOOST_CHECK_EQUAL(str6,std::string("is not empty"));
 
     std::string str7;
+    auto w7=wrapper(str7);
     detail::reorder_and_present(
-                str7,
+                w7,
                 make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_values),
                 "field1",empty,ne,true
             );
     BOOST_CHECK_EQUAL(str7,std::string("field1 is not empty"));
 
     std::string str8;
+    auto w8=wrapper(str8);
     detail::reorder_and_present(
-                str8,
+                w8,
                 make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_values),
                 "field2",empty,eq,true
             );
     BOOST_CHECK_EQUAL(str8,std::string("field2 is empty"));
 
     std::string str9;
+    auto w9=wrapper(str9);
     detail::reorder_and_present(
-                str9,
+                w9,
                 make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_values),
                 "field2",value,lte,10
             );
     BOOST_CHECK_EQUAL(str9,std::string("field2 is less than or equal to 10"));
 
     std::string str10;
+    auto w10=wrapper(str10);
     detail::reorder_and_present(
-                str10,
+                w10,
                 make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_strings),
                 "field2",value,lte,string_master_sample
             );
     BOOST_CHECK_EQUAL(str10,std::string("field2 is less than or equal to field2 of sample"));
 
     std::string str11;
+    auto w11=wrapper(str11);
     detail::reorder_and_present(
-                str11,
+                w11,
                 make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,get_default_member_names()),
                 "field2",value,lte,make_member_name("field1")
             );
     BOOST_CHECK_EQUAL(str11,std::string("field2 is less than or equal to field1"));
 
     std::string str12;
+    auto w12=wrapper(str12);
     detail::reorder_and_present(
-                str12,
+                w12,
                 make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,get_default_member_names()),
                 "field2",size,lte,make_member_name("field1")
             );
     BOOST_CHECK_EQUAL(str12,std::string("size of field2 is less than or equal to size of field1"));
 }
 
-template <typename FormatterT>
-void testFormatter(const FormatterT& formatter1)
+template <typename FormatterT, typename WrapStringFn>
+void testFormatter(const FormatterT& formatter1, const WrapStringFn& wrapper)
 {
     std::string str1;
-    formatter1.validate_operator(str1,gte,10);
+    auto w1=wrapper(str1);
+    formatter1.validate_operator(w1,gte,10);
     BOOST_CHECK_EQUAL(str1,std::string("is greater than or equal to 10"));
 
     std::string str2;
-    formatter1.validate_property(str2,empty,eq,false);
+    auto w2=wrapper(str2);
+    formatter1.validate_property(w2,empty,eq,false);
     BOOST_CHECK_EQUAL(str2,std::string("is not empty"));
     std::string str3;
-    formatter1.validate_property(str3,empty,eq,true);
+    auto w3=wrapper(str3);
+    formatter1.validate_property(w3,empty,eq,true);
     BOOST_CHECK_EQUAL(str3,std::string("is empty"));
     std::string str2_1;
-    formatter1.validate_property(str2_1,empty,ne,false);
+    auto w2_1=wrapper(str2_1);
+    formatter1.validate_property(w2_1,empty,ne,false);
     BOOST_CHECK_EQUAL(str2_1,std::string("is empty"));
     std::string str3_1;
-    formatter1.validate_property(str3_1,empty,ne,true);
+    auto w3_1=wrapper(str3_1);
+    formatter1.validate_property(w3_1,empty,ne,true);
     BOOST_CHECK_EQUAL(str3_1,std::string("is not empty"));
 
     std::string str4;
-    formatter1.validate_property(str4,size,lte,100);
+    auto w4=wrapper(str4);
+    formatter1.validate_property(w4,size,lte,100);
     BOOST_CHECK_EQUAL(str4,std::string("size is less than or equal to 100"));
     std::string str5;
-    formatter1.validate_property(str5,value,eq,true);
+    auto w5=wrapper(str5);
+    formatter1.validate_property(w5,value,eq,true);
     BOOST_CHECK_EQUAL(str5,std::string("value must be true"));
 
     std::string str11;
-    formatter1.validate(str11,"field1",value,eq,true);
+    auto w11=wrapper(str11);
+    formatter1.validate(w11,"field1",value,eq,true);
     BOOST_CHECK_EQUAL(str11,std::string("field1 must be true"));
     std::string str6;
-    formatter1.validate(str6,"field1",value,eq,false);
+    auto w6=wrapper(str6);
+    formatter1.validate(w6,"field1",value,eq,false);
     BOOST_CHECK_EQUAL(str6,std::string("field1 must be false"));
     std::string str7;
-    formatter1.validate(str7,"field1",value,gt,15);
+    auto w7=wrapper(str7);
+    formatter1.validate(w7,"field1",value,gt,15);
     BOOST_CHECK_EQUAL(str7,std::string("field1 is greater than 15"));
     std::string str8;
-    formatter1.validate(str8,"field1",size,lt,100);
+    auto w8=wrapper(str8);
+    formatter1.validate(w8,"field1",size,lt,100);
     BOOST_CHECK_EQUAL(str8,std::string("size of field1 is less than 100"));
     std::string str9;
-    formatter1.validate(str9,"field1",empty,eq,true);
+    auto w9=wrapper(str9);
+    formatter1.validate(w9,"field1",empty,eq,true);
     BOOST_CHECK_EQUAL(str9,std::string("field1 is empty"));
     std::string str10;
-    formatter1.validate(str10,"field1",empty,ne,true);
+    auto w10=wrapper(str10);
+    formatter1.validate(w10,"field1",empty,ne,true);
     BOOST_CHECK_EQUAL(str10,std::string("field1 is not empty"));
 
     std::string str12;
-    formatter1.validate_exists(str12,"field1",true);
+    auto w12=wrapper(str12);
+    formatter1.validate_exists(w12,"field1",true);
     BOOST_CHECK_EQUAL(str12,std::string("field1 exists"));
     std::string str13;
-    formatter1.validate_exists(str13,"field1",false);
+    auto w13=wrapper(str13);
+    formatter1.validate_exists(w13,"field1",false);
     BOOST_CHECK_EQUAL(str13,std::string("field1 does not exist"));
 
     std::string str14;
-    formatter1.validate_with_other_member(str14,"field1",value,gt,"field2");
+    auto w14=wrapper(str14);
+    formatter1.validate_with_other_member(w14,"field1",value,gt,"field2");
     BOOST_CHECK_EQUAL(str14,std::string("field1 is greater than field2"));
     std::string str15;
-    formatter1.validate_with_other_member(str15,"field1",size,lte,"field2");
+    auto w15=wrapper(str15);
+    formatter1.validate_with_other_member(w15,"field1",size,lte,"field2");
     BOOST_CHECK_EQUAL(str15,std::string("size of field1 is less than or equal to size of field2"));
 
     std::string str16;
-    formatter1.validate_with_master_sample(str16,"field1",value,gt,"");
+    auto w16=wrapper(str16);
+    formatter1.validate_with_master_sample(w16,"field1",value,gt,"");
     BOOST_CHECK_EQUAL(str16,std::string("field1 is greater than field1 of sample"));
     std::string str17;
-    formatter1.validate_with_master_sample(str17,"field1",size,lte,"");
+    auto w17=wrapper(str17);
+    formatter1.validate_with_master_sample(w17,"field1",size,lte,"");
     BOOST_CHECK_EQUAL(str17,std::string("size of field1 is less than or equal to size of field1 of sample"));
 
     std::string str18;
+    auto w18=wrapper(str18);
     report_aggregation<std::string> and_op(string_and);
     and_op.parts={"one","two","three"};
-    formatter1.aggregate(str18,and_op);
+    formatter1.aggregate(w18,and_op);
     BOOST_CHECK_EQUAL(str18,std::string("one AND two AND three"));
 
     std::string str19;
+    auto w19=wrapper(str19);
     report_aggregation<std::string> or_op(string_or);
     or_op.parts={"one","two","three"};
     or_op.single=false;
-    formatter1.aggregate(str19,or_op);
+    formatter1.aggregate(w19,or_op);
     BOOST_CHECK_EQUAL(str19,std::string("(one OR two OR three)"));
 
     std::string str20;
+    auto w20=wrapper(str20);
     report_aggregation<std::string> not_op(string_not);
     not_op.parts={"one"};
-    formatter1.aggregate(str20,not_op);
+    formatter1.aggregate(w20,not_op);
     BOOST_CHECK_EQUAL(str20,std::string("NOT one"));
 
     std::string str21;
+    auto w21=wrapper(str21);
     report_aggregation<std::string> not_op1(string_not);
     not_op1.parts={"two"};
-    formatter1.aggregate(str21,not_op1);
+    formatter1.aggregate(w21,not_op1);
     BOOST_CHECK_EQUAL(str21,std::string("NOT two"));
 
     auto str22=formatter1.member_to_string(size);
@@ -215,7 +251,8 @@ auto make_test_strings(translator_repository& rep)
     return make_translated_strings(rep,"en");
 }
 
-void checkDefaultFormatter()
+template <typename WrapStringFn>
+void checkDefaultFormatter(const WrapStringFn& wrapper)
 {
     const auto& fm=get_default_formatter();
 
@@ -225,10 +262,11 @@ void checkDefaultFormatter()
     static_assert(std::is_lvalue_reference<typename std::decay_t<fm_type>::strings_type>::value,"");
     static_assert(std::is_lvalue_reference<typename std::decay_t<fm_type>::order_and_presentation_type>::value,"");
 
-    testFormatter(fm);
+    testFormatter(fm,wrapper);
 }
 
-void checkFormatterFromStrings()
+template <typename WrapStringFn>
+void checkFormatterFromStrings(const WrapStringFn& wrapper)
 {
     translator_repository rep;
     auto fm=make_formatter(make_test_strings(rep));
@@ -239,10 +277,11 @@ void checkFormatterFromStrings()
     static_assert(std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
     static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
 
-    testFormatter(fm);
+    testFormatter(fm,wrapper);
 }
 
-void checkFormatterFromMemberNames()
+template <typename WrapStringFn>
+void checkFormatterFromMemberNames(const WrapStringFn& wrapper)
 {
     translator_repository rep;
     auto fm=make_formatter(make_member_names(make_test_strings(rep)));
@@ -253,10 +292,11 @@ void checkFormatterFromMemberNames()
     static_assert(std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
     static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
 
-    testFormatter(fm);
+    testFormatter(fm,wrapper);
 }
 
-void checkFormatterFromMemberNamesAndValues()
+template <typename WrapStringFn>
+void checkFormatterFromMemberNamesAndValues(const WrapStringFn& wrapper)
 {
     translator_repository rep;
 
@@ -268,10 +308,11 @@ void checkFormatterFromMemberNamesAndValues()
     static_assert(std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
     static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
 
-    testFormatter(fm);
+    testFormatter(fm,wrapper);
 }
 
-void checkFormatterWithRefs()
+template <typename WrapStringFn>
+void checkFormatterWithRefs(const WrapStringFn& wrapper)
 {
     translator_repository rep;
     auto st=make_test_strings(rep);
@@ -289,10 +330,11 @@ void checkFormatterWithRefs()
     static_assert(std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
     static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
 
-    testFormatter(fm);
+    testFormatter(fm,wrapper);
 }
 
-void checkFormatterWithRvals()
+template <typename WrapStringFn>
+void checkFormatterWithRvals(const WrapStringFn& wrapper)
 {
     mapped_translator tr1;
     auto fm=make_formatter(
@@ -311,7 +353,7 @@ void checkFormatterWithRvals()
     static_assert(!std::is_rvalue_reference<typename fm_type::values_type>::value,"");
     static_assert(!std::is_rvalue_reference<typename fm_type::strings_type>::value,"");
 
-    testFormatter(fm);
+    testFormatter(fm,wrapper);
 }
 
 }

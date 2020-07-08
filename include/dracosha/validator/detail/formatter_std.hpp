@@ -96,51 +96,36 @@ void std_append(std::string& dst, SepT&& sep, Args&&... args)
     std_append_join(dst,std::forward<SepT>(sep),make_cref_tuple(std::forward<Args>(args)...));
 }
 
-/**
- * @brief Format string from variadic arguments using std::stringstream backend
- */
-struct std_formatter_t
+struct backend_formatter_tag;
+
+struct std_backend_formatter
 {
+    using hana_tag=backend_formatter_tag;
+    using type=std::string;
+
+    std::string& _dst;
+
     template <typename ...Args>
-    static void append(std::string& dst, Args&&... args)
+    void append(Args&&... args)
     {
-        return std_append(dst,"",std::forward<Args>(args)...);
+        return std_append(_dst,"",std::forward<Args>(args)...);
     }
 
     template <typename SepT, typename ...Args>
-    static void append_join_args(std::string& dst, SepT&& sep, Args&&... args)
+    void append_join_args(SepT&& sep, Args&&... args)
     {
-        return std_append(dst,std::forward<SepT>(sep),std::forward<Args>(args)...);
+        return std_append(_dst,std::forward<SepT>(sep),std::forward<Args>(args)...);
     }
 
     template <typename SepT, typename PartsT>
-    static void append_join(std::string& dst, SepT&& sep, PartsT&& parts)
+    void append_join(SepT&& sep, PartsT&& parts)
     {
-        return std_append_join(dst,std::forward<SepT>(sep),std::forward<PartsT>(parts));
+        return std_append_join(_dst,std::forward<SepT>(sep),std::forward<PartsT>(parts));
     }
-};
 
-/**
- * @brief Append arguments to string using std::stringstream backend
- */
-struct std_append_t
-{
-    template <typename DstT, typename ...Args>
-    void operator () (DstT&& dst, Args&&... args) const
+    operator std::string& ()
     {
-        std_formatter_t::append(extract_ref(std::forward<DstT>(dst)),std::forward<Args>(args)...);
-    }
-};
-
-/**
- * @brief Append arguments to string using std::stringstream backend
- */
-struct std_append_join_args_t
-{
-    template <typename DstT, typename SepT, typename ...Args>
-    void operator () (DstT&& dst, SepT&& sep, Args&&... args) const
-    {
-        std_formatter_t::append_join_args(extract_ref(std::forward<DstT>(dst)),std::forward<SepT>(sep),std::forward<Args>(args)...);
+        return _dst;
     }
 };
 
