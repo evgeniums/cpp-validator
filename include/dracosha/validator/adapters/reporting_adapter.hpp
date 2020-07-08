@@ -170,7 +170,7 @@ class reporting_adapter
         {
             return aggregate(
                             string_and,
-                            [this,&ops](){return _next_adapter.validate_and(ops);}
+                            [this,&ops](){return _next_adapter.validate_and(*this,ops);}
                         );
         }
 
@@ -185,7 +185,7 @@ class reporting_adapter
         {
             return aggregate(
                             string_and,
-                            [this,&member,&ops](){return _next_adapter.validate_and(member,ops);},
+                            [this,&member,&ops](){return _next_adapter.validate_and(*this,member,ops);},
                             member
                         );
         }
@@ -200,7 +200,7 @@ class reporting_adapter
         {
             return aggregate(
                             string_or,
-                            [this,&ops](){return _next_adapter.validate_or(ops);}
+                            [this,&ops](){return _next_adapter.validate_or(*this,ops);}
                         );
         }
 
@@ -215,7 +215,7 @@ class reporting_adapter
         {
             return aggregate(
                             string_or,
-                            [this,&member,&ops](){return _next_adapter.validate_or(member,ops);},
+                            [this,&member,&ops](){return _next_adapter.validate_or(*this,member,ops);},
                             member
                         );
         }
@@ -230,7 +230,7 @@ class reporting_adapter
         {
             return aggregate(
                             string_not,
-                            [this,&op](){return _next_adapter.validate_not(op);}
+                            [this,&op](){return _next_adapter.validate_not(*this,op);}
                         );
         }
 
@@ -245,7 +245,7 @@ class reporting_adapter
         {
             return aggregate(
                             string_not,
-                            [this,&member,&op](){return _next_adapter.validate_not(member,op);},
+                            [this,&member,&op](){return _next_adapter.validate_not(*this,member,op);},
                             member
                         );
         }
@@ -255,9 +255,9 @@ class reporting_adapter
         template <typename AgrregationT,typename HandlerT, typename ...Args>
         bool aggregate(AgrregationT&& aggregation,HandlerT&& handler,Args&&... args)
         {
-            _reporter.aggregate_begin(std::forward<AgrregationT>(aggregation),std::forward<Args>(args)...);
+            _reporter.aggregate_open(std::forward<AgrregationT>(aggregation),std::forward<Args>(args)...);
             auto ok=handler();
-            _reporter.aggregate_end(ok);
+            _reporter.aggregate_close(ok);
             return ok;
         }
 

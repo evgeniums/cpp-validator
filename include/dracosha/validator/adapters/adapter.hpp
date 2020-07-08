@@ -33,7 +33,7 @@ Distributed under the Boost Software License, Version 1.0.
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
-
+struct member_tag;
 struct adapter_tag;
 
 /**
@@ -46,13 +46,13 @@ template <typename T>
 struct adapter
 {
     using hana_tag=adapter_tag;
-    const T& obj;
+    const T& _obj;
 
-    adapter(const T& a):obj(a)
+    adapter(const T& a):_obj(a)
     {}
 
     /**
-     *  @brief Perform validation of object at one level without member nesting
+     *  @brief Perform validation of embedded object at one level without member nesting
      *  @param op Operator for validation
      *  @param b Sample argument for validation
      *  @return Validation status
@@ -61,13 +61,13 @@ struct adapter
     bool validate_operator(OpT&& op, T2&& b) const
     {
         return op(
-                    extract(obj),
+                    extract(_obj),
                     extract(std::forward<T2>(b))
                 );
     }
 
     /**
-     *  @brief Perform validation of object's property at one level without member nesting
+     *  @brief Perform validation of embedded object's property at one level without member nesting
      *  @param prop Property to validate
      *  @param op Operator for validation
      *  @param b Sample argument for validation
@@ -77,7 +77,7 @@ struct adapter
     bool validate_property(PropT&& prop, OpT&& op, T2&& b) const
     {
         return op(
-                    property(extract(obj),std::forward<PropT>(prop)),
+                    property(extract(_obj),std::forward<PropT>(prop)),
                     extract(std::forward<T2>(b))
                 );
     }
@@ -92,14 +92,14 @@ struct adapter
     template <typename T2, typename MemberT>
     bool validate_exists(MemberT&& member, T2&& b) const
     {
-        return hana::if_(check_member_path(obj,member.path),
+        return hana::if_(check_member_path(_obj,member.path),
             [&b](auto&&)
             {
                 return b==false;
             },
             [this,&b](auto&& path)
             {
-                auto&& ax=extract(obj);
+                auto&& ax=extract(_obj);
                 return exists(ax,std::forward<decltype(path)>(path))==b;
             }
         )(member.path);
@@ -116,7 +116,7 @@ struct adapter
     template <typename T2, typename OpT, typename PropT, typename MemberT>
     bool validate(MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
     {
-        auto&& ax=extract(obj);
+        auto&& ax=extract(_obj);
         return op(
                     property(get_member(ax,member.path),std::forward<PropT>(prop)),
                     extract(std::forward<T2>(b))
@@ -124,17 +124,17 @@ struct adapter
     }
 
     /**
-     *  @brief Validate using other member of the same object as a reference argument for validation
+     *  @brief Validate using other member of the same embedded object as a reference argument for validation
      *  @param member Member descriptor
      *  @param prop Property to validate
      *  @param op Operator for validation
-     *  @param b Descriptor of sample member of the same object
+     *  @param b Descriptor of sample member of the same embedded object
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
     bool validate_with_other_member(MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
     {
-        auto&& ax=extract(obj);
+        auto&& ax=extract(_obj);
         return op(
                     property(get_member(ax,member.path),prop),
                     property(get_member(ax,b.path),prop)
@@ -142,17 +142,17 @@ struct adapter
     }
 
     /**
-     *  @brief Validate using the same member of a Sample object
+     *  @brief Validate using the same member of a Sample embedded object
      *  @param member Member descriptor
      *  @param prop Property to validate
      *  @param op Operator for validation
-     *  @param b Sample object whose member to use as argument passed to validation operator
+     *  @param b Sample embedded object whose member to use as argument passed to validation operator
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
     bool validate_with_master_sample(MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
     {
-        auto&& ax=extract(obj);
+        auto&& ax=extract(_obj);
         return op(
                     property(get_member(ax,member.path),prop),
                     property(get_member(b(),member.path),prop)
@@ -160,117 +160,154 @@ struct adapter
     }
 
     /**
-     * @brief Execute validators on object and aggregate their results using logical AND
+     * @brief Execute validators on embedded object and aggregate their results using logical AND
      * @param ops List of intermediate validators or validation operators
      * @return Logical AND of results of intermediate validators
      */
+    template <typename ObjT, typename OpsT>
+    static bool validate_and(ObjT&& obj, OpsT&& ops,
+                             std::enable_if_t<!hana::is_a<member_tag,ObjT>,void*> =nullptr)
+    {
+        return hana::fold(std::forward<decltype(ops)>(ops),true,
+                    [&obj](bool prevResult, auto&& op)
+                    {
+                        if (!prevResult)
+                        {
+                            return false;
+                        }
+                        return apply(std::forward<ObjT>(obj),std::forward<decltype(op)>(op));
+                    }
+                );
+    }
+
     template <typename OpsT>
     bool validate_and(OpsT&& ops) const
     {
+        return validate_and(_obj,std::forward<OpsT>(ops));
+    }
+
+    template <typename ObjT, typename OpsT, typename MemberT>
+    static bool validate_and(ObjT&& obj, MemberT&& member, OpsT&& ops)
+    {
         return hana::fold(std::forward<decltype(ops)>(ops),true,
-                    [this](bool prevResult, auto&& op)
+                    [&member,&obj](bool prevResult, auto&& op)
                     {
                         if (!prevResult)
                         {
                             return false;
                         }
-                        return apply(obj,std::forward<decltype(op)>(op));
+                        return apply_member(std::forward<ObjT>(obj),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
                     }
                 );
     }
 
     /**
-     * @brief Execute validators on object's member and aggregate their results using logical AND
+     * @brief Execute validators on embedded object's member and aggregate their results using logical AND
      * @param member Member to process with validators
      * @param ops List of intermediate validators or validation operators
      * @return Logical AND of results of intermediate validators
      */
     template <typename OpsT, typename MemberT>
-    bool validate_and(MemberT&& member,OpsT&& ops) const
+    bool validate_and(MemberT&& member, OpsT&& ops,
+                      std::enable_if_t<hana::is_a<member_tag,MemberT>,void*> =nullptr) const
     {
-        return hana::fold(std::forward<decltype(ops)>(ops),true,
-                    [this,&member](bool prevResult, auto&& op)
-                    {
-                        if (!prevResult)
-                        {
-                            return false;
-                        }
-                        return apply_member(obj,std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
-                    }
-                );
+        return validate_and(_obj,std::forward<MemberT>(member),std::forward<OpsT>(ops));
     }
 
-    /**
-     * @brief Execute validators on object and aggregate their results using logical OR
-     * @param ops List of intermediate validators or validation operators
-     * @return Logical OR of results of intermediate validators
-     */
-    template <typename OpsT>
-    bool validate_or(OpsT&& ops) const
+    template <typename ObjT, typename OpsT>
+    static bool validate_or(ObjT&& obj, OpsT&& ops,
+                     std::enable_if_t<!hana::is_a<member_tag,ObjT>,void*> =nullptr)
     {
         return hana::value(hana::length(ops))==0
                 ||
                hana::fold(std::forward<decltype(ops)>(ops),false,
-                    [this](bool prevResult, auto&& op)
+                    [&obj](bool prevResult, auto&& op)
                     {
                         if (prevResult)
                         {
                             return true;
                         }
-                        return apply(obj,std::forward<decltype(op)>(op));
+                        return apply(std::forward<ObjT>(obj),std::forward<decltype(op)>(op));
+                    }
+                );
+    }
+
+    template <typename OpsT>
+    bool validate_or(OpsT&& ops) const
+    {
+        return validate_or(_obj,std::forward<OpsT>(ops));
+    }
+
+    template <typename ObjT, typename OpsT, typename MemberT>
+    static bool validate_or(ObjT&& obj, MemberT&& member, OpsT&& ops)
+    {
+        return hana::value(hana::length(ops))==0
+                ||
+               hana::fold(std::forward<decltype(ops)>(ops),false,
+                    [&obj,&member](bool prevResult, auto&& op)
+                    {
+                        if (prevResult)
+                        {
+                            return true;
+                        }
+                        return apply_member(std::forward<ObjT>(obj),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
                     }
                 );
     }
 
     /**
-     * @brief Execute validators on object's member and aggregate their results using logical OR
+     * @brief Execute validators on embedded object's member and aggregate their results using logical OR
      * @param member Member to process with validators
      * @param ops List of intermediate validators or validation operators
      * @return Logical OR of results of intermediate validators
      */
     template <typename OpsT, typename MemberT>
-    bool validate_or(MemberT&& member,OpsT&& ops) const
+    bool validate_or(MemberT&& member, OpsT&& ops,
+                     std::enable_if_t<hana::is_a<member_tag,MemberT>,void*> =nullptr) const
     {
-        return hana::value(hana::length(ops))==0
-                ||
-               hana::fold(std::forward<decltype(ops)>(ops),false,
-                    [this,&member](bool prevResult, auto&& op)
-                    {
-                        if (prevResult)
-                        {
-                            return true;
-                        }
-                        return apply_member(obj,std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
-                    }
-                );
+        return validate_or(_obj,std::forward<decltype(member)>(member),std::forward<decltype(ops)>(ops));
+    }
+
+    template <typename ObjT, typename OpT>
+    static bool validate_not(ObjT&& obj, OpT&& op,
+                             std::enable_if_t<!hana::is_a<member_tag,ObjT>,void*> =nullptr)
+    {
+        return !apply(std::forward<ObjT>(obj),std::forward<decltype(op)>(op));
     }
 
     /**
-     * @brief Execute validator on object and negate the result
+     * @brief Execute validator on embedded object and negate the result
      * @param op Intermediate validator or validation operator
      * @return Logical NOT of results of intermediate validator
      */
     template <typename OpT>
     bool validate_not(OpT&& op) const
     {
-        return !apply(obj,std::forward<decltype(op)>(op));
+        return validate_not(_obj,std::forward<decltype(op)>(op));
+    }
+
+    template <typename ObjT, typename OpT, typename MemberT>
+    static bool validate_not(ObjT&& obj, MemberT&& member, OpT&& op)
+    {
+        return !apply_member(std::forward<ObjT>(obj),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
     }
 
     /**
-     * @brief Execute validator on object's member and negate the result
+     * @brief Execute validator on embedded object's member and negate the result
      * @param member Member to process with validator
      * @param op Intermediate validator or validation operator
      * @return Logical NOT of results of intermediate validator
      */
     template <typename OpT, typename MemberT>
-    bool validate_not(MemberT&& member,OpT&& op) const
+    bool validate_not(MemberT&& member, OpT&& op,
+                      std::enable_if_t<hana::is_a<member_tag,MemberT>,void*> =nullptr) const
     {
-        return !apply_member(obj,std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
+        return validate_not(_obj,std::forward<decltype(member)>(member),std::forward<decltype(op)>(op));
     }
 };
 
 /**
-  @brief Make default validation adapter wrapping the object
+  @brief Make default validation adapter wrapping the embedded object
   @param v Object to wrap into adapter
   @return Validation adapter
   */
