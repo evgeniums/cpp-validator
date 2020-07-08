@@ -46,6 +46,11 @@ class reporter
 
         using hana_tag=reporter_tag;
 
+        /**
+         * @brief Constructor
+         * @param dst Destination object where to put reports
+         * @param formatter Formatter to use for reports formatting
+         */
         reporter(
                     DstT& dst,
                     FormatterT&& formatter
@@ -54,6 +59,10 @@ class reporter
                     _not_count(0)
         {}
 
+        /**
+         * @brief Open validation step for aggregation operator
+         * @param aggregation Descriptor of aggregation operator
+         */
         template <typename AggregationT>
         void aggregate_open(AggregationT&& aggregation)
         {
@@ -67,6 +76,12 @@ class reporter
                 _stack.back().single=false;
             }
         }
+
+        /**
+         * @brief Open validation step for aggregation operator with member
+         * @param aggregation Descriptor of aggregation operator
+         * @param member Member the validation operation is performed for
+         */
         template <typename AggregationT, typename MemberT>
         void aggregate_open(AggregationT&& aggregation, MemberT&& member)
         {
@@ -82,6 +97,10 @@ class reporter
             }
         }
 
+        /**
+         * @brief Close validation step for aggregation operator
+         * @param ok Validation status of the aggregation operator
+         */
         void aggregate_close(bool ok)
         {
             if (!_stack.empty())
@@ -171,11 +190,19 @@ class reporter
             _formatter.validate_with_master_sample(current(),member,prop,op,b);
         }
 
+        /**
+         * @brief Get object where the reports go to
+         * @return Reference to destination object
+         */
         DstT& destination()
         {
             return _dst;
         }
 
+        /**
+         * @brief Check if current validation step is within NOT operator
+         * @return True if NOT aggregation operator is opened at any parent level
+         */
         bool current_not() const
         {
             return _not_count!=0;
@@ -209,12 +236,23 @@ class reporter
         size_t _not_count;
 };
 
+/**
+ * @brief Make a reporter with formatter
+ * @param dst Destination object where to put reports
+ * @param formatter Formatter to use for reports formatting
+ * @return Reporter wrapping the destination object
+ */
 template <typename DstT, typename FormatterT>
 auto make_reporter(DstT& dst, FormatterT&& formatter)
 {
     return reporter<DstT,FormatterT>(dst,std::forward<FormatterT>(formatter));
 }
 
+/**
+ * @brief Make a reporter with default formatter
+ * @param dst Destination object where to put reports
+ * @return Reporter wrapping the destination object
+ */
 template <typename DstT>
 auto make_reporter(DstT& dst)
 {

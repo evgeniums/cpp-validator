@@ -85,6 +85,11 @@ inline translated_values make_translated_values(const translator_repository& rep
     return translated_values{*rep.find_translator(loc)};
 }
 
+/**
+ * @brief Make values formatter using translator
+ * @param tr Translator to use
+ * @return Values formatter
+ */
 inline translated_values make_translated_values(const translator& tr)
 {
     return translated_values{tr};

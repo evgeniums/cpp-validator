@@ -160,7 +160,8 @@ struct adapter
     }
 
     /**
-     * @brief Execute validators on embedded object and aggregate their results using logical AND
+     * @brief Execute validators on given object and aggregate their results using logical AND
+     * @param obj Object to validate
      * @param ops List of intermediate validators or validation operators
      * @return Logical AND of results of intermediate validators
      */
@@ -180,12 +181,24 @@ struct adapter
                 );
     }
 
+    /**
+     * @brief Execute validators on embedded object and aggregate their results using logical AND
+     * @param ops List of intermediate validators or validation operators
+     * @return Logical AND of results of intermediate validators
+     */
     template <typename OpsT>
     bool validate_and(OpsT&& ops) const
     {
         return validate_and(_obj,std::forward<OpsT>(ops));
     }
 
+    /**
+     * @brief Execute validators on the member of a given object and aggregate their results using logical AND
+     * @param obj Object to validate
+     * @param member Member to process with validators
+     * @param ops List of intermediate validators or validation operators
+     * @return Logical AND of results of intermediate validators
+     */
     template <typename ObjT, typename OpsT, typename MemberT>
     static bool validate_and(ObjT&& obj, MemberT&& member, OpsT&& ops)
     {
@@ -202,7 +215,7 @@ struct adapter
     }
 
     /**
-     * @brief Execute validators on embedded object's member and aggregate their results using logical AND
+     * @brief Execute validators on the member of embedded object and aggregate their results using logical AND
      * @param member Member to process with validators
      * @param ops List of intermediate validators or validation operators
      * @return Logical AND of results of intermediate validators
@@ -232,12 +245,24 @@ struct adapter
                 );
     }
 
+    /**
+     * @brief Execute validators on embedded object and aggregate their results using logical OR
+     * @param ops List of intermediate validators or validation operators
+     * @return Logical OR of results of intermediate validators
+     */
     template <typename OpsT>
     bool validate_or(OpsT&& ops) const
     {
         return validate_or(_obj,std::forward<OpsT>(ops));
     }
 
+    /**
+     * @brief Execute validators on the member of a given object and aggregate their results using logical OR
+     * @param obj Object to validate
+     * @param member Member to process with validators
+     * @param ops List of intermediate validators or validation operators
+     * @return Logical OR of results of intermediate validators
+     */
     template <typename ObjT, typename OpsT, typename MemberT>
     static bool validate_or(ObjT&& obj, MemberT&& member, OpsT&& ops)
     {
@@ -256,7 +281,7 @@ struct adapter
     }
 
     /**
-     * @brief Execute validators on embedded object's member and aggregate their results using logical OR
+     * @brief Execute validators on the member of embedded object and aggregate their results using logical OR
      * @param member Member to process with validators
      * @param ops List of intermediate validators or validation operators
      * @return Logical OR of results of intermediate validators
@@ -268,6 +293,11 @@ struct adapter
         return validate_or(_obj,std::forward<decltype(member)>(member),std::forward<decltype(ops)>(ops));
     }
 
+    /**
+     * @brief Execute validator on given object and negate the result
+     * @param op Intermediate validator or validation operator
+     * @return Logical NOT of results of intermediate validator
+     */
     template <typename ObjT, typename OpT>
     static bool validate_not(ObjT&& obj, OpT&& op,
                              std::enable_if_t<!hana::is_a<member_tag,ObjT>,void*> =nullptr)
@@ -286,6 +316,13 @@ struct adapter
         return validate_not(_obj,std::forward<decltype(op)>(op));
     }
 
+    /**
+     * @brief Execute validator on the member of a given object and negate the result
+     * @param obj Object to validate
+     * @param member Member to process with validator
+     * @param op Intermediate validator or validation operator
+     * @return Logical NOT of results of intermediate validator
+     */
     template <typename ObjT, typename OpT, typename MemberT>
     static bool validate_not(ObjT&& obj, MemberT&& member, OpT&& op)
     {
@@ -293,7 +330,7 @@ struct adapter
     }
 
     /**
-     * @brief Execute validator on embedded object's member and negate the result
+     * @brief Execute validator on the member of embedded object and negate the result
      * @param member Member to process with validator
      * @param op Intermediate validator or validation operator
      * @return Logical NOT of results of intermediate validator

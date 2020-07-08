@@ -87,21 +87,40 @@ struct strings
         return _translator(to_string(id));
     }
 
+    /**
+     * @brief Get string for step that opens aggregation operator
+     * @param aggregation Aggregation descriptor
+     * @return String to use for opening aggregation operator
+     */
     std::string aggregation_open(const aggregation_op& aggregation) const
     {
         return _translator(_aggregation_strings.open(aggregation));
     }
 
+    /**
+     * @brief Get string for step that closes aggregation operator
+     * @param aggregation Aggregation descriptor
+     * @return String to use for closing aggregation operator
+     */
     std::string aggregation_close(const aggregation_op& aggregation) const
     {
         return _translator(_aggregation_strings.close(aggregation));
     }
 
+    /**
+     * @brief Get string for conjunction of intermediate validators within aggregation operator
+     * @param aggregation Aggregation descriptor
+     * @return String to use to join intermediate validators within aggregation operator
+     */
     std::string aggregation_conjunction(const aggregation_op& aggregation) const
     {
         return _translator(_aggregation_strings.conjunction(aggregation));
     }
 
+    /**
+     * @brief Get string for conjunction of nested member names
+     * @return String to use to join nested member names in the member's path
+     */
     std::string member_names_conjunction() const
     {
         return _translator(_aggregation_strings.member_names_conjunction());
@@ -116,8 +135,16 @@ constexpr strings<const no_translator_t&,const aggregation_strings_t&> default_s
 template <typename AggregationStringsT>
 using translated_strings=strings<const translator&,AggregationStringsT>;
 
+/**
+ * @brief Helper for making translated strings
+ */
 struct make_translated_strings_t
 {
+    /**
+     * @brief Make strings object using a given translator
+     * @param tr Translator to use
+     * @return Strings object
+     */
     auto operator() (const translator& tr) const
     {
         return translated_strings<const aggregation_strings_t&>{tr,aggregation_strings};
