@@ -34,8 +34,8 @@ struct aggregation_strings_tag;
 /**
  * @brief Traits for aggregation strings.
  *
- * The traits are used by strings object in formatting aggreagation operators.
- * In order to other aggregation strings another aggregation strings traits must be implemented
+ * The traits are used by strings object in formatting of aggreagation operators.
+ * If customization of such strings is needed then another aggregation strings traits must be implemented
  * with the same methods signatures as in aggregation_strings_t.
  */
 struct aggregation_strings_t

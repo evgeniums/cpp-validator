@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/member.hpp
 *
-*  Defines generic descriptor of a member that must be validated in objects
+*  Defines generic descriptor of a member to be validated in objects.
 *
 */
 
@@ -33,9 +33,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct member_tag;
 
 /**
- *  @brief Generic descriptor of a member that must be validated.
+ *  @brief Generic descriptor of a member to be validated.
  *
- * Descriptor defines the path for extracting specific member/subobject from the object under validation.
+ * Member descriptor defines a path for extracting specific member/subobject from the object under validation.
  */
 template <typename T, typename ...ParentPathT>
 struct member

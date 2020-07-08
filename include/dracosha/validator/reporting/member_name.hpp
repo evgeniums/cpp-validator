@@ -47,7 +47,7 @@ struct member_name
 
     /**
      * @brief Get constant reference
-     * @return Constance reference to value
+     * @return Constant reference to value
      */
     operator const T& () const
     {

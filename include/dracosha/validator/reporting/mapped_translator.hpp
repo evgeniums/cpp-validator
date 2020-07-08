@@ -29,7 +29,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Mapped translator uses map of translated strings
+ * @brief Mapped translator uses map of translated strings.
  *
  * Translator can be constructed with prepared map as mapped_translator{map};
  */

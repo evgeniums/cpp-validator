@@ -90,7 +90,7 @@ struct can_get_t<T1,T2,hana::when<hana::is_a<property_tag,T2>>>
 };
 
 /**
- * Traits to check if member can be got from object of type T1 using key of type T2.
+ * Helper to check if member can be got from object of type T1 using key of type T2.
  */
 template <typename T1, typename T2>
 constexpr can_get_t<T1,T2> can_get{};

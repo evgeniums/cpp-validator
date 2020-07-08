@@ -94,7 +94,7 @@ auto wrap_backend_formatter(DstT& dst)
 }
 
 /**
- * @brief Wrap destination object into backend formatter
+ * @brief Wrap destination object into backend formatter using sample backend formatter
  * @param dsr Destination object
  * @return Backend formatter wrapping destination object
  */

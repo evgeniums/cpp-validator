@@ -32,6 +32,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 namespace detail
 {
 
+/**
+ * @brief Check if traits do not implement method nested(id,traits,string)
+ */
 template <typename T, typename TraitsT, typename StringsT,
           typename =void>
 struct has_nested
@@ -39,6 +42,9 @@ struct has_nested
     constexpr static const bool value=false;
 };
 
+/**
+ * @brief Check if traits implement method nested(id,traits,string)
+ */
 template <typename T, typename TraitsT, typename StringsT>
 struct has_nested<T,TraitsT,StringsT,
                   decltype(
@@ -54,6 +60,9 @@ struct has_nested<T,TraitsT,StringsT,
 
 }
 
+/**
+ * @brief Default formatter of a nested member name used when traits do not implement method nested(id,traits,string)
+ */
 template <typename T, typename TraitsT, typename StringsT, typename =hana::when<true>>
 struct nested_member_name_t
 {
@@ -75,6 +84,9 @@ struct nested_member_name_t
     }
 };
 
+/**
+ * @brief Formatter of a nested member name that calls method nested(id,traits,string) of traits object
+ */
 template <typename T, typename TraitsT, typename StringsT>
 struct nested_member_name_t<T,TraitsT,StringsT,
         hana::when<detail::has_nested<T,TraitsT,StringsT>::value>>

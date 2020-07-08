@@ -27,7 +27,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
-  @brief Dispatch validation
+  @brief Dispatch validation.
   */
 BOOST_HANA_CONSTEXPR_LAMBDA auto dispatch = [](auto&&... args) -> decltype(auto)
 {
@@ -35,7 +35,7 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto dispatch = [](auto&&... args) -> decltype(auto)
 };
 
 /**
- * @brief Prepare validation dispatcher
+ * @brief Prepare validation dispatcher.
  */
 struct prepare_dispatcher_t
 {

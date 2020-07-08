@@ -35,7 +35,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 /**
  * @brief Translator repository is a repository of translators mapped to names of locales.
  *
- * A name of locale can be either in more generic form like "en" or in more spicific form like "en_US.UTF-8".
+ * A name of locale can be either in more generic form like "en" or in more specific form like "en_US.UTF-8".
  * When looking for a translator the repository will first try to use the most specific name of locale,
  * and then if it is not found the repository will try to use further less specific names down to the name of language only.
  * If still no translator is found then the default translator will be returned.

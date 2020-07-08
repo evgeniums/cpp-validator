@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/strings.hpp
 *
-* Defines helper for strings formatting.
+* Defines traits for strings formatting.
 *
 */
 
@@ -40,7 +40,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct strings_tag;
 
 /**
- * @brief Helper for strings formatting.
+ * @brief Traits for strings formatting.
  *
  * Strings formatting is used in failuire reporting and may also be used in logging.
  *
@@ -50,7 +50,7 @@ struct strings_tag;
  *   - If string ID is of some scalar type that can be forwarded to std::to_string(id) then std::to_string() is used.
  *   - Otherwise <?????> token is used.
  *
- * After ID is converted to string the conversion result goes to translator. Translator returns translated or original string.
+ * After ID is converted to string the conversion result goes to translator. Translator returns either translated or original string.
  */
 template <typename TranslatorT, typename AggregationStringsT>
 struct strings

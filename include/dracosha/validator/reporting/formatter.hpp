@@ -36,11 +36,19 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct formatter_tag;
 
 /**
- *  @brief Formatter that uses fmt library as backend.
+ *  @brief Formatter that formats report and puts it to destination object.
  *
- * Destination object is normally a std::string.
- * Also it can be a container of chars that can deal with inserter iterators,
- * i.e. it must be suitable for using std::back_inserter(dst), dst.insert(), dst.begin(), dst.end().
+ *  Formatter uses four different traits objects that can be customized:
+ *  - formatter of member names (MemberNamesT);
+ *  - formatter of values (ValuesT);
+ *  - formatter of miscellaneous strings such as operator descriptions, etc. (StringsT);
+ *  - traits that perform final ordering and presentation (OrderAndPresentationT).
+ *
+ * Actual string formatting is performed by a backend formatter that wraps destination object which
+ * is given as the first argument to formatting methods of this formatter (i.e., DstT& dst). By default
+ * either std::stringstream or libfmt backend formatter is used depending on the configuration. Libfmt is
+ * a preferred backend formatter but it requires a fmt library available in include paths and DRACOSHA_VALIDATOR_FMT
+ * macro defined.
  *
  */
 template <typename MemberNamesT, typename ValuesT, typename StringsT, typename OrderAndPresentationT>
@@ -147,11 +155,11 @@ struct formatter
 };
 
 /**
- * @brief Create formatter that owns member names and value strings
+ * @brief Create formatter
  * @param mn Formatter of member names
  * @param vs Formatter of values
- * @param strings Strings
- * @param order Reordering and presentation helper
+ * @param strings Strings traits
+ * @param order Reordering and presentation traits
  * @return Formatter
  */
 template <typename MemberNamesT,typename ValuesT,typename StringsT, typename OrderAndPresentationT>
@@ -167,10 +175,10 @@ auto make_formatter(MemberNamesT&& mn, ValuesT&& vs, StringsT&& strings, OrderAn
 }
 
 /**
- * @brief Create formatter that owns member names and value strings
+ * @brief Create formatter with default order and presentation traits
  * @param mn Formatter of member names
  * @param vs Formatter of values
- * @param strings Strings
+ * @param strings Strings traits
  * @return Formatter
  */
 template <typename MemberNamesT,typename ValuesT,typename StringsT>
@@ -180,7 +188,7 @@ auto make_formatter(MemberNamesT&& mn, ValuesT&& vs, StringsT&& strings)
 }
 
 /**
- * @brief Create formatter that owns member names and uses default strings
+ * @brief Create formatter with default strings traits and order and presentation traits
  * @param mn Formatter of member names
  * @param vs Formatter of values
  * @return Formatter
@@ -192,7 +200,7 @@ auto make_formatter(MemberNamesT&& mn, ValuesT&& vs)
 }
 
 /**
- * @brief Create formatter that owns member names and uses default strings and value strings
+ * @brief Create formatter with default values formatter, strings traits and order and presentation traits
  * @param mn Formatter of member names
  * @return Formatter
  */
@@ -204,8 +212,8 @@ auto make_formatter(MemberNamesT&& mn,
 }
 
 /**
- * @brief Create formatter that bypasses member names and uses default value strings
- * @param strings Strings
+ * @brief Create formatter with default values formatter, member names formatter and order and presentation traits
+ * @param strings Strings traits
  * @return Formatter
  */
 template <typename StringsT>
@@ -216,7 +224,7 @@ auto make_formatter(const StringsT& strings,
 }
 
 /**
- * @brief Get defautt formatter that bypasses member names and uses default strings
+ * @brief Get defautt formatter with default traits
  * @return Default formatter
  */
 inline auto get_default_formatter() ->

@@ -49,7 +49,6 @@ constexpr bypass_member_names_traits_t bypass_member_names_traits{};
  * @brief Member names formatter.
  *
  * Member names formatter forwards a name to traits that implement actual name formatting.
- * If traits return empty string then the name is forwarded to strings object.
  *
  */
 template <typename StringsT, typename TraitsT>

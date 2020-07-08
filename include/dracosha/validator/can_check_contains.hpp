@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/can_check_contains.hpp
 *
-*  Defines traits for checking if object can be queried if it contains a member
+*  Defines helper for checking if object can be queried if it contains a member
 *
 */
 
@@ -27,6 +27,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ *  Helper to check if object of type T1 can be queried if it contains a member accessible by key of type T2
+ */
 template <typename T1, typename T2>
 struct can_check_contains_t
 {
@@ -46,9 +49,6 @@ struct can_check_contains_t
     }
 };
 
-/**
- *  Traits to check if object of type T1 can be queried if it contains a member accessible by key of type T2
- */
 template <typename T1, typename T2>
 constexpr can_check_contains_t<T1,T2> can_check_contains{};
 

@@ -26,11 +26,17 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+  @brief Wrapper for making std::tuple
+*/
 BOOST_HANA_CONSTEXPR_LAMBDA auto make_std_tuple= [] (auto&&... args)
 {
     return std::make_tuple(std::forward<decltype(args)>(args)...);
 };
 
+/**
+  @brief Create std::tuple from hana::tuple
+  */
 BOOST_HANA_CONSTEXPR_LAMBDA auto hana_to_std_tuple= [] (auto&& ts)
 {
     return hana::unpack(std::forward<decltype(ts)>(ts),make_std_tuple);

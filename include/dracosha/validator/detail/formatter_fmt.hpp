@@ -80,6 +80,10 @@ struct backend_formatter_tag;
 
 /**
  * @brief Backend formatter that uses libfmt fot formatting
+ *
+ * Destination object is normally a std::string.
+ * Also it can be a container of chars that can deal with inserter iterators,
+ * i.e. it must be suitable for using std::back_inserter(dst), dst.insert(), dst.begin(), dst.end().
  */
 template <typename DstT>
 struct fmt_backend_formatter

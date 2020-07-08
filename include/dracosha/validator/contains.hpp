@@ -94,7 +94,7 @@ struct contains_t
     }
 };
 /**
-  Instance to use as contains() operator.
+  Instance to be used as contains() operator.
 */
 constexpr contains_t contains{};
 

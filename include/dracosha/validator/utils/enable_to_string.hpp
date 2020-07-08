@@ -27,7 +27,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Base template for types that can be string convertible using description
+ * @brief Base template for types that can be string convertible using static description
  */
 template <typename DerivedT>
 struct enable_to_string

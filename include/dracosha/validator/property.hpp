@@ -29,7 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 /**
- *  Traits to check at compile time if object has a property
+ *  Helper to check at compile time if object has a property.
  */
 template <typename T,typename PropT>
 constexpr detail::has_property_t<T,PropT> has_property{};

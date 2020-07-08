@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/values.hpp
 *
-* Defines helper for value formatting.
+* Defines traits for value formatting.
 *
 */
 
@@ -35,14 +35,14 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct values_tag;
 
 /**
- * @brief Helper for value formatting.
+ * @brief Traits for value formatting.
  *
  * Sometimes values require special formatting.
  * The obvious example is a boolean value which can be displayed
  * in different ways, e.g. as 1/0, true/false, yes/not, checked/unchecked, etc.
  *
  * Default implementation of value formatting handles only boolean types in special manner,
- * all the rest types are bypassed "as is" without changing the original type.
+ * all the rest types are bypassed "as is".
  */
 template <typename TranslatorT>
 struct values
@@ -86,7 +86,7 @@ inline translated_values make_translated_values(const translator_repository& rep
 }
 
 /**
- * @brief Make values formatter using translator
+ * @brief Make values formatter using a given translator
  * @param tr Translator to use
  * @return Values formatter
  */

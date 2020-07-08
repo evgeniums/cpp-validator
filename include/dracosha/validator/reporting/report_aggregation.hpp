@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/report_aggregation.hpp
 *
-*  Defines report aggregation.
+*  Defines descriptor of report aggregation.
 *
 */
 
@@ -31,6 +31,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct report_aggregation_tag;
 
+/**
+ * @brief Descriptor of aggregation operator used in validation report
+ */
 template <typename DstT>
 struct report_aggregation
 {

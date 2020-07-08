@@ -35,9 +35,10 @@ struct reporter_tag;
  * @brief Reporter constructs a report regarding the failure.
  *
  * A report will be put to the destination object which is usually a sring but
- * formatter backends can also support other container types.
+ * formatter backends can also support other container types. Destination object
+ * is wrapped into backend formatter that knows how to format data to that object.
  *
- * Actual string formatting is performed by the formatter object.
+ * Actual formatting is performed by the formatter object.
  */
 template <typename DstT, typename FormatterT>
 class reporter
@@ -48,7 +49,7 @@ class reporter
 
         /**
          * @brief Constructor
-         * @param dst Destination object where to put reports
+         * @param dst Destination object wrapped into backend formatter
          * @param formatter Formatter to use for reports formatting
          */
         reporter(
