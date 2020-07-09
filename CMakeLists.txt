@@ -66,6 +66,7 @@ SET (HEADERS
     include/dracosha/validator/reporting/single_member_name.hpp
     include/dracosha/validator/reporting/nested_member_name.hpp
     include/dracosha/validator/reporting/backend_formatter.hpp
+    include/dracosha/validator/reporting/decorator.hpp
 
     include/dracosha/validator/reporting/locale/sample_locale.hpp
 

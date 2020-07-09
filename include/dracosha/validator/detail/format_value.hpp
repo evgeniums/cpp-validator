@@ -40,10 +40,10 @@ struct format_value_t
 template <typename T>
 struct format_value_t<T,hana::when<!std::is_same<bool,std::decay_t<T>>::value>>
 {
-    template <typename T1, typename TranslatorT>
-    auto operator () (T1&& val, const TranslatorT&) const -> decltype(auto)
+    template <typename T1, typename TranslatorT, typename DecoratorT>
+    auto operator () (T1&& val, const TranslatorT&, const DecoratorT& decorator) const -> decltype(auto)
     {
-        return hana::id(val);
+        return decorator(std::forward<T1>(val));
     }
 };
 
@@ -53,10 +53,10 @@ struct format_value_t<T,hana::when<!std::is_same<bool,std::decay_t<T>>::value>>
 template <typename T>
 struct format_value_t<T,hana::when<std::is_same<bool,std::decay_t<T>>::value>>
 {
-    template <typename T1, typename TranslatorT>
-    auto operator () (T1&& val, const TranslatorT& translator) const -> decltype(auto)
+    template <typename T1, typename TranslatorT, typename DecoratorT>
+    auto operator () (T1&& val, const TranslatorT& translator, const DecoratorT& decorator) const -> decltype(auto)
     {
-        return translator(val?std::string(string_true):std::string(string_false));
+        return decorator(translator(val?std::string(string_true):std::string(string_false)));
     }
 };
 

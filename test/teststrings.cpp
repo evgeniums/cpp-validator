@@ -172,6 +172,39 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
     }
 }
 
+namespace
+{
+template <typename T, typename = hana::when<true>>
+struct quotes_decorator_traits
+{
+    static auto f(T&& val) -> decltype(auto)
+    {
+        return hana::id(std::forward<T>(val));
+    }
+};
+template <typename T>
+struct quotes_decorator_traits<T,
+        hana::when<std::is_constructible<std::string,T>::value>>
+{
+    static auto f(T&& val) -> decltype(auto)
+    {
+        return std::string("\"")+std::string(std::forward<T>(val))+std::string("\"");
+    }
+};
+
+struct quotes_decorator
+{
+    using hana_tag=decorator_tag;
+
+    template <typename T>
+    auto operator() (T&& val) const -> decltype(auto)
+    {
+        return quotes_decorator_traits<T>::f(std::forward<T>(val));
+    }
+};
+
+}
+
 BOOST_AUTO_TEST_CASE(CheckValues)
 {
     BOOST_CHECK_EQUAL(std::string(default_values("hello")),std::string("hello"));
@@ -188,6 +221,27 @@ BOOST_AUTO_TEST_CASE(CheckValues)
     BOOST_CHECK_EQUAL(translate_values(5),5);
     BOOST_CHECK_EQUAL(translate_values(true),std::string("true_translated"));
     BOOST_CHECK_EQUAL(translate_values(false),std::string("false_translated"));
+
+    auto decorator=[](const std::string& val)
+    {
+        return std::string("\"")+val+std::string("\"");
+    };
+    auto vals2=make_values(decorator);
+    BOOST_CHECK_EQUAL(vals2("hi"),"\"hi\"");
+
+    mapped_translator tr3;
+    auto vals3=make_translated_values(tr3,decorator);
+    BOOST_CHECK_EQUAL(vals3("hello"),"\"hello\"");
+
+    mapped_translator tr4;
+    auto vals4=make_translated_values(env._rep,"en",std::move(decorator));
+    BOOST_CHECK_EQUAL(vals4(true),"\"true_translated\"");
+
+    mapped_translator tr5;
+    auto vals5=make_translated_values(env._rep,"en",quotes_decorator());
+    BOOST_CHECK_EQUAL(vals5(true),"\"true_translated\"");
+    BOOST_CHECK_EQUAL(vals5(100),100);
+    BOOST_CHECK_EQUAL(vals5("Hello"),"\"Hello\"");
 }
 
 BOOST_AUTO_TEST_CASE(CheckHanaZipTransform)
