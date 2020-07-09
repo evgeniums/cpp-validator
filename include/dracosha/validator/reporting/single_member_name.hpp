@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <string>
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/reporting/decorator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -43,15 +44,15 @@ struct can_single_member_name<T,TraitsT,
 };
 
 /**
- * @brief Default traits with operator forwarding id to strings
+ * @brief Default helper that forwards ID to strings and then decorates the result
  */
 template <typename T, typename TraitsT, typename =hana::when<true>>
 struct single_member_name_t
 {
     template <typename StringsT>
-    std::string operator() (const T& id, const TraitsT&, const StringsT& strings) const
+    std::string operator() (const T& id, const TraitsT& traits, const StringsT& strings) const
     {
-        return strings(id);
+        return decorate<TraitsT,decltype(strings(id))>(traits,strings(id));
     }
 };
 
@@ -70,9 +71,9 @@ struct single_member_name_t<T,TraitsT,hana::when<can_single_member_name<T,Traits
         auto str=traits(id);
         if (!str.empty() && str!=std::string(id))
         {
-            return str;
+            return decorate<TraitsT,decltype(str)>(traits,str);
         }
-        return strings(id);
+        return decorate<TraitsT,decltype(strings(id))>(traits,strings(id));
     }
 };
 
@@ -91,9 +92,9 @@ struct single_member_name_t<T,TraitsT,hana::when<can_single_member_name<T,Traits
         auto str=traits(id);
         if (!str.empty())
         {
-            return str;
+            return decorate<TraitsT,decltype(str)>(traits,str);
         }
-        return strings(id);
+        return decorate<TraitsT,decltype(strings(id))>(traits,strings(id));
     }
 };
 

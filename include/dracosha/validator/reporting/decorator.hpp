@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/decorator.hpp
 *
-* Defines default decorator.
+* Defines decorator.
 *
 */
 
@@ -43,6 +43,44 @@ struct no_decorator_t
     }
 };
 constexpr no_decorator_t no_decorator{};
+
+/**
+ * @brief Helper to work with object that can optionally have or not have decorators
+ *
+ * Version for object that does not have decorator
+ */
+template <typename T, typename Arg, typename =void>
+struct decorate_t
+{
+    template <typename T1, typename Arg1>
+    auto operator() (T1&&, Arg1&& arg) const -> decltype(auto)
+    {
+        return hana::id(std::forward<Arg1>(arg));
+    }
+};
+/**
+ * @brief Helper to work with object that can optionally have or not have decorators
+ *
+ * Version for object that has decorator
+ */
+template <typename T, typename Arg>
+struct decorate_t<T,Arg,
+        decltype(
+            (void)std::declval<std::decay_t<T>>().decorator(std::declval<std::decay_t<Arg>>())
+        )>
+{
+    template <typename T1, typename Arg1>
+    auto operator() (T1&& obj, Arg1&& arg) const -> decltype(auto)
+    {
+        return obj.decorator(std::forward<Arg1>(arg));
+    }
+};
+
+/**
+ * @brief Helper to work with object that can optionally have or not have decorators
+ */
+template <typename T, typename Arg>
+constexpr decorate_t<T,Arg> decorate{};
 
 //-------------------------------------------------------------
 

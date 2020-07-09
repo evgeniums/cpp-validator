@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/reference_wrapper.hpp>
 #include <dracosha/validator/reporting/strings.hpp>
+#include <dracosha/validator/reporting/decorator.hpp>
 #include <dracosha/validator/reporting/single_member_name.hpp>
 #include <dracosha/validator/reporting/nested_member_name.hpp>
 
@@ -34,7 +35,7 @@ struct member_names_tag;
 /**
  * @brief Traits for member names formatter that do not perform any formatting and just bypass names "as is".
  */
-struct bypass_member_names_traits_t
+struct bypass_member_names_t
 {
     template <typename T>
     std::string operator() (const T&) const
@@ -42,8 +43,7 @@ struct bypass_member_names_traits_t
         return std::string();
     }
 };
-constexpr bypass_member_names_traits_t bypass_member_names_traits{};
-
+constexpr bypass_member_names_t bypass_member_names{};
 
 /**
  * @brief Member names formatter.
@@ -109,9 +109,9 @@ auto make_member_names(StringsT&& strings,
 {
     return member_names<
                 StringsT,
-                bypass_member_names_traits_t
+                const bypass_member_names_t&
             >
-            {std::forward<StringsT>(strings),bypass_member_names_traits};
+            {std::forward<StringsT>(strings),bypass_member_names};
 }
 
 /**
@@ -138,6 +138,39 @@ inline auto get_default_member_names()
 {
     static const auto default_member_names=make_member_names(default_strings);
     return default_member_names;
+}
+
+/**
+ * @brief Traits for member names formatter that decorates member name.
+ */
+template <typename TraitsT, typename DecoratorT>
+struct decorate_member_names_traits : public TraitsT
+{
+    decorate_member_names_traits(
+                TraitsT&& traits,
+                DecoratorT&& decorator
+            ) : TraitsT(std::move(traits)),
+                decorator(std::forward<DecoratorT>(decorator))
+    {}
+
+    DecoratorT decorator;
+};
+/**
+ * @brief Make decorated member names from other member names using decorator
+ * @param original_mn Original member names formatter
+ * @param decorator Decorator
+ * @return Member names formatter that first uses original formatter and then decorates member names
+ */
+template <typename OriginalMemberNamesT, typename DecoratorT>
+auto decorate_member_names(OriginalMemberNamesT&& original_mn, DecoratorT&& decorator)
+{
+    return make_member_names(
+                decorate_member_names_traits<typename OriginalMemberNamesT::traits_type,DecoratorT>(
+                    std::move(original_mn._traits),
+                    std::forward<DecoratorT>(decorator)
+                ),
+                std::move(original_mn._strings)
+            );
 }
 
 //-------------------------------------------------------------

@@ -9,6 +9,7 @@
 #include <dracosha/validator/properties/size.hpp>
 #include <dracosha/validator/reporting/mapped_translator.hpp>
 #include <dracosha/validator/reporting/translator_repository.hpp>
+#include <dracosha/validator/reporting/quotes_decorator.hpp>
 #include <dracosha/validator/utils/reference_wrapper.hpp>
 #include <dracosha/validator/validator.hpp>
 
@@ -113,7 +114,7 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
         const auto& mn=get_default_member_names();
         using mn_type=decltype(mn);
         static_assert(std::is_lvalue_reference<typename std::decay_t<mn_type>::strings_type>::value,"");
-        static_assert(std::is_same<typename std::decay_t<mn_type>::traits_type,bypass_member_names_traits_t>::value,"");
+        static_assert(std::is_same<typename std::decay_t<mn_type>::traits_type,const bypass_member_names_t&>::value,"");
 
         check_bypass(mn);
     }
@@ -124,7 +125,7 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
         auto mn=make_member_names(env.strings());
         using mn_type=decltype(mn);
         static_assert(!std::is_lvalue_reference<typename mn_type::strings_type>::value,"");
-        static_assert(std::is_same<typename mn_type::traits_type,bypass_member_names_traits_t>::value,"");
+        static_assert(std::is_same<typename mn_type::traits_type,const bypass_member_names_t&>::value,"");
 
         env.check(mn);
     }
@@ -170,39 +171,22 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
         BOOST_CHECK_EQUAL(mn(10),std::string("10"));
         BOOST_CHECK_EQUAL(mn(Dummy{}),std::string("<\?\?\?\?\?>"));
     }
-}
 
-namespace
-{
-template <typename T, typename = hana::when<true>>
-struct quotes_decorator_traits
-{
-    static auto f(T&& val) -> decltype(auto)
     {
-        return hana::id(std::forward<T>(val));
-    }
-};
-template <typename T>
-struct quotes_decorator_traits<T,
-        hana::when<std::is_constructible<std::string,T>::value>>
-{
-    static auto f(T&& val) -> decltype(auto)
-    {
-        return std::string("\"")+std::string(std::forward<T>(val))+std::string("\"");
-    }
-};
+        translator_env env;
+        mapped_translator tr;
+        tr.strings()["field2"]="filed2_translated";
+        tr.strings()["field1"]="other translation of field1";
 
-struct quotes_decorator
-{
-    using hana_tag=decorator_tag;
+        auto mn=decorate_member_names(make_member_names(std::move(tr),env.strings()),quotes_decorator);
 
-    template <typename T>
-    auto operator() (T&& val) const -> decltype(auto)
-    {
-        return quotes_decorator_traits<T>::f(std::forward<T>(val));
+        BOOST_CHECK_EQUAL(mn(value),"\"value_translated\"");
+        BOOST_CHECK_EQUAL(mn(gte),"\"gte_translated\"");
+        BOOST_CHECK_EQUAL(mn("field1"),std::string("\"other translation of field1\""));
+        BOOST_CHECK_EQUAL(mn("field2"),std::string("\"filed2_translated\""));
+        BOOST_CHECK_EQUAL(mn(10),std::string("\"10\""));
+        BOOST_CHECK_EQUAL(mn(Dummy{}),std::string("\"<\?\?\?\?\?>\""));
     }
-};
-
 }
 
 BOOST_AUTO_TEST_CASE(CheckValues)
@@ -238,7 +222,7 @@ BOOST_AUTO_TEST_CASE(CheckValues)
     BOOST_CHECK_EQUAL(vals4(true),"\"true_translated\"");
 
     mapped_translator tr5;
-    auto vals5=make_translated_values(env._rep,"en",quotes_decorator());
+    auto vals5=make_translated_values(env._rep,"en",quotes_decorator);
     BOOST_CHECK_EQUAL(vals5(true),"\"true_translated\"");
     BOOST_CHECK_EQUAL(vals5(100),100);
     BOOST_CHECK_EQUAL(vals5("Hello"),"\"Hello\"");
