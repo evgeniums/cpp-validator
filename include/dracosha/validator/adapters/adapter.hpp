@@ -199,7 +199,7 @@ struct adapter
      * @param ops List of intermediate validators or validation operators
      * @return Logical AND of results of intermediate validators
      */
-    template <typename ObjT, typename OpsT, typename MemberT>
+    template <typename ObjT, typename MemberT, typename OpsT>
     static bool validate_and(ObjT&& obj, MemberT&& member, OpsT&& ops)
     {
         return hana::fold(std::forward<decltype(ops)>(ops),true,
@@ -220,7 +220,7 @@ struct adapter
      * @param ops List of intermediate validators or validation operators
      * @return Logical AND of results of intermediate validators
      */
-    template <typename OpsT, typename MemberT>
+    template <typename MemberT, typename OpsT>
     bool validate_and(MemberT&& member, OpsT&& ops,
                       std::enable_if_t<hana::is_a<member_tag,MemberT>,void*> =nullptr) const
     {
@@ -263,7 +263,7 @@ struct adapter
      * @param ops List of intermediate validators or validation operators
      * @return Logical OR of results of intermediate validators
      */
-    template <typename ObjT, typename OpsT, typename MemberT>
+    template <typename ObjT, typename MemberT, typename OpsT>
     static bool validate_or(ObjT&& obj, MemberT&& member, OpsT&& ops)
     {
         return hana::value(hana::length(ops))==0
@@ -286,7 +286,7 @@ struct adapter
      * @param ops List of intermediate validators or validation operators
      * @return Logical OR of results of intermediate validators
      */
-    template <typename OpsT, typename MemberT>
+    template <typename MemberT, typename OpsT>
     bool validate_or(MemberT&& member, OpsT&& ops,
                      std::enable_if_t<hana::is_a<member_tag,MemberT>,void*> =nullptr) const
     {
@@ -323,7 +323,7 @@ struct adapter
      * @param op Intermediate validator or validation operator
      * @return Logical NOT of results of intermediate validator
      */
-    template <typename ObjT, typename OpT, typename MemberT>
+    template <typename ObjT, typename MemberT, typename OpT>
     static bool validate_not(ObjT&& obj, MemberT&& member, OpT&& op)
     {
         return !apply_member(std::forward<ObjT>(obj),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
@@ -335,7 +335,7 @@ struct adapter
      * @param op Intermediate validator or validation operator
      * @return Logical NOT of results of intermediate validator
      */
-    template <typename OpT, typename MemberT>
+    template <typename MemberT, typename OpT>
     bool validate_not(MemberT&& member, OpT&& op,
                       std::enable_if_t<hana::is_a<member_tag,MemberT>,void*> =nullptr) const
     {

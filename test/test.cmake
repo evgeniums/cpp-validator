@@ -7,6 +7,7 @@ SET(SOURCES
     ${VALIDATOR_TEST_SRC}/teststdformatter.cpp
     ${VALIDATOR_TEST_SRC}/teststrings.cpp
     ${VALIDATOR_TEST_SRC}/testformatter.cpp
+    ${VALIDATOR_TEST_SRC}/testsinglemember.cpp
 )
 
 SET (HEADERS

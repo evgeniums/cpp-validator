@@ -47,8 +47,7 @@ class reporting_adapter
             ReporterT&& reporter,
             AdapterT&& next_adapter
         ) : _reporter(std::forward<ReporterT>(reporter)),
-            _next_adapter(std::forward<AdapterT>(next_adapter)),
-            _log_all(false)
+            _next_adapter(std::forward<AdapterT>(next_adapter))
         {}
 
         /**
@@ -161,6 +160,16 @@ class reporting_adapter
             return ok;
         }
 
+        template <typename ObjT, typename OpsT>
+        bool validate_and(ObjT&& obj, OpsT&& ops,
+                                 std::enable_if_t<!hana::is_a<member_tag,ObjT>,void*> =nullptr)
+        {
+            return aggregate(
+                            string_and,
+                            [this,&obj,&ops](){return _next_adapter.validate_and(std::forward<ObjT>(obj),std::forward<OpsT>(ops));}
+                        );
+        }
+
         /**
          * @brief Execute validators on object and aggregate their results using logical AND
          * @param ops List of intermediate validators or validation operators
@@ -169,9 +178,16 @@ class reporting_adapter
         template <typename OpsT>
         bool validate_and(OpsT&& ops)
         {
+            return validate_and(*this,std::forward<OpsT>(ops));
+        }
+
+        template <typename ObjT, typename MemberT, typename OpsT>
+        bool validate_and(ObjT&& obj, MemberT&& member, OpsT&& ops)
+        {
             return aggregate(
                             string_and,
-                            [this,&ops](){return _next_adapter.validate_and(*this,ops);}
+                            [this,&obj,&member,&ops](){return _next_adapter.validate_and(std::forward<ObjT>(obj),member,std::forward<OpsT>(ops));},
+                            member
                         );
         }
 
@@ -181,13 +197,20 @@ class reporting_adapter
          * @param ops List of intermediate validators or validation operators
          * @return Logical AND of results of intermediate validators
          */
-        template <typename OpsT, typename MemberT>
-        bool validate_and(MemberT&& member,OpsT&& ops)
+        template <typename MemberT, typename OpsT>
+        bool validate_and(MemberT&& member,OpsT&& ops,
+                          std::enable_if_t<hana::is_a<member_tag,MemberT>,void*> =nullptr)
+        {
+            return validate_and(*this,std::forward<MemberT>(member),std::forward<OpsT>(ops));
+        }
+
+        template <typename ObjT, typename OpsT>
+        bool validate_or(ObjT&& obj, OpsT&& ops,
+                                 std::enable_if_t<!hana::is_a<member_tag,ObjT>,void*> =nullptr)
         {
             return aggregate(
-                            string_and,
-                            [this,&member,&ops](){return _next_adapter.validate_and(*this,member,ops);},
-                            member
+                            string_or,
+                            [this,&obj,&ops](){return _next_adapter.validate_or(std::forward<ObjT>(obj),std::forward<OpsT>(ops));}
                         );
         }
 
@@ -199,9 +222,16 @@ class reporting_adapter
         template <typename OpsT>
         bool validate_or(OpsT&& ops)
         {
+            return validate_or(*this,std::forward<OpsT>(ops));
+        }
+
+        template <typename ObjT,typename MemberT, typename OpsT>
+        bool validate_or(ObjT&& obj, MemberT&& member, OpsT&& ops)
+        {
             return aggregate(
                             string_or,
-                            [this,&ops](){return _next_adapter.validate_or(*this,ops);}
+                            [this,&obj,&member,&ops](){return _next_adapter.validate_or(std::forward<ObjT>(obj),member,std::forward<OpsT>(ops));},
+                            member
                         );
         }
 
@@ -211,13 +241,20 @@ class reporting_adapter
          * @param ops List of intermediate validators or validation operators
          * @return Logical OR of results of intermediate validators
          */
-        template <typename OpsT, typename MemberT>
-        bool validate_or(MemberT&& member,OpsT&& ops)
+        template <typename MemberT, typename OpsT>
+        bool validate_or(MemberT&& member, OpsT&& ops,
+                         std::enable_if_t<hana::is_a<member_tag,MemberT>,void*> =nullptr)
+        {
+            return validate_or(*this,std::forward<MemberT>(member),std::forward<OpsT>(ops));
+        }
+
+        template <typename ObjT, typename OpT>
+        bool validate_not(ObjT&& obj, OpT&& op,
+                                 std::enable_if_t<!hana::is_a<member_tag,ObjT>,void*> =nullptr)
         {
             return aggregate(
-                            string_or,
-                            [this,&member,&ops](){return _next_adapter.validate_or(*this,member,ops);},
-                            member
+                            string_not,
+                            [this,&obj,&op](){return _next_adapter.validate_not(std::forward<ObjT>(obj),std::forward<OpT>(op));}
                         );
         }
 
@@ -229,9 +266,16 @@ class reporting_adapter
         template <typename OpT>
         bool validate_not(OpT&& op)
         {
+            return validate_not(*this,std::forward<OpT>(op));
+        }
+
+        template <typename ObjT, typename MemberT, typename OpT>
+        bool validate_not(ObjT&& obj, MemberT&& member, OpT&& op)
+        {
             return aggregate(
                             string_not,
-                            [this,&op](){return _next_adapter.validate_not(*this,op);}
+                            [this,&obj,&member,&op](){return _next_adapter.validate_not(std::forward<ObjT>(obj),member,std::forward<OpT>(op));},
+                            member
                         );
         }
 
@@ -244,14 +288,11 @@ class reporting_adapter
          * @note The validator will report all matched conditions for nested AND operator
          *       but only the first matched condition for nested OR operator
          */
-        template <typename OpT, typename MemberT>
-        bool validate_not(MemberT&& member,OpT&& op)
+        template <typename MemberT, typename OpT>
+        bool validate_not(MemberT&& member, OpT&& op,
+                          std::enable_if_t<hana::is_a<member_tag,MemberT>,void*> =nullptr)
         {
-            return aggregate(
-                            string_not,
-                            [this,&member,&op](){return _next_adapter.validate_not(*this,member,op);},
-                            member
-                        );
+            return validate_not(*this,std::forward<MemberT>(member),std::forward<OpT>(op));
         }
 
     private:
@@ -267,7 +308,6 @@ class reporting_adapter
 
         ReporterT _reporter;
         AdapterT _next_adapter;
-        bool _log_all;
 };
 
 template <typename ReporterT, typename AdapterT>

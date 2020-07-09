@@ -222,7 +222,30 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportNot)
                 )
             );
     BOOST_CHECK(!v4.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,std::string("NOT (field1 is equal to 10)"));
+    BOOST_CHECK_EQUAL(rep1,std::string("NOT field1 is equal to 10"));
+    rep1.clear();
+}
+
+BOOST_AUTO_TEST_CASE(CheckNestedValidationReportOp)
+{
+    std::map<std::string,std::map<size_t,size_t>> m1={
+            {"field1",{{1,10}}}
+        };
+    std::string rep1;
+    auto ra1=make_reporting_adapter(rep1,m1);
+
+    auto v1=validator(
+                _[size](gte,0),
+                _["field1"][1](gte,10)
+            );
+    BOOST_CHECK(v1.apply(ra1));
+    rep1.clear();
+
+    auto v2=validator(
+                _["field1"][1](lt,5)
+            );
+    BOOST_CHECK(!v2.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"1 of field1 is less than 5");
     rep1.clear();
 }
 

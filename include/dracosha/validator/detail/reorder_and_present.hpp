@@ -98,7 +98,7 @@ struct apply_reorder_present_1arg_t<AggregationItemT,
                                     const AggregationItemT& aggregation_item
                                 ) const -> decltype(auto)
     {
-        if (!aggregation_item.single || aggregation_item.aggregation.id==aggregation_id::NOT)
+        if ((!aggregation_item.single && aggregation_item.parts.size()>1) || aggregation_item.aggregation.id==aggregation_id::NOT)
         {
             backend_formatter.append(
                 dst,
@@ -110,7 +110,7 @@ struct apply_reorder_present_1arg_t<AggregationItemT,
             strings.aggregation_conjunction(aggregation_item.aggregation),
             aggregation_item.parts
         );
-        if (!aggregation_item.single)
+        if (!aggregation_item.single && aggregation_item.parts.size()>1)
         {
             backend_formatter.append(
                 dst,

@@ -83,6 +83,16 @@ struct member
     {}
 
     /**
+     * @brief Check if path of this member is equal to path of other member
+     * @param other Other member
+     */
+    template <typename T1>
+    bool isEqual(const T1& other) const
+    {
+        return hana::equal(path,other.path);
+    }
+
+    /**
      * @brief Bind compound validator to current member
      * @param v Prepared partial validator
      * @return Prepared partial validator bound to current member
