@@ -20,8 +20,8 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_REPORTING_ADAPTER_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/adapters/adapter.hpp>
 #include <dracosha/validator/operators.hpp>
+#include <dracosha/validator/adapters/chained_adapter.hpp>
 #include <dracosha/validator/reporting/reporter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -34,34 +34,23 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  *  Adaper first tries to perform validation and if validation fails the adapter then calls reporter to construct a report describing the failure.
  */
 template <typename ReporterT, typename AdapterT>
-class reporting_adapter
+class reporting_adapter : public chained_adapter<AdapterT>
 {
     public:
 
-        using hana_tag=adapter_tag;
-
         using reporter_type=ReporterT;
-        using next_adapter_type=AdapterT;
 
+        /**
+         * @brief Constructor
+         * @param reporter Reporter to construct reports
+         * @param next_adapter Next adapter in chain
+         */
         reporting_adapter(
             ReporterT&& reporter,
             AdapterT&& next_adapter
-        ) : _reporter(std::forward<ReporterT>(reporter)),
-            _next_adapter(std::forward<AdapterT>(next_adapter))
+        ) : chained_adapter<AdapterT>(std::forward<AdapterT>(next_adapter)),
+            _reporter(std::forward<ReporterT>(reporter))
         {}
-
-        void set_unknown_member_mode(if_member_not_found mode) noexcept
-        {
-            _next_adapter.set(mode);
-        }
-        if_member_not_found unknown_member_mode() const noexcept
-        {
-            return _next_adapter.unknown_member_mode();
-        }
-        auto object() const -> decltype(auto)
-        {
-            return _next_adapter.object();
-        }
 
         /**
          *  @brief Perform validation of object at one level without member nesting
@@ -72,7 +61,7 @@ class reporting_adapter
         template <typename T2, typename OpT>
         bool validate_operator(OpT&& op, T2&& b)
         {
-            auto ok=_next_adapter.validate_operator(op,b);
+            auto ok=this->next_adapter().validate_operator(op,b);
             if (!ok || _reporter.current_not())
             {
                 _reporter.validate_operator(op,b);
@@ -90,7 +79,7 @@ class reporting_adapter
         template <typename T2, typename OpT, typename PropT>
         bool validate_property(PropT&& prop, OpT&& op, T2&& b)
         {
-            auto ok=_next_adapter.validate_property(prop,op,b);
+            auto ok=this->next_adapter().validate_property(prop,op,b);
             if (!ok || _reporter.current_not())
             {
                 _reporter.validate_property(prop,op,b);
@@ -108,7 +97,7 @@ class reporting_adapter
         template <typename T2, typename MemberT>
         bool validate_exists(MemberT&& member, T2&& b)
         {
-            auto ok=_next_adapter.validate_exists(member,b);
+            auto ok=this->next_adapter().validate_exists(member,b);
             if (!ok || _reporter.current_not())
             {
                 _reporter.validate_exists(member,b);
@@ -127,7 +116,7 @@ class reporting_adapter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         bool validate(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
         {
-            auto ok=_next_adapter.validate(member,prop,op,b);
+            auto ok=this->next_adapter().validate(member,prop,op,b);
             if (!ok || _reporter.current_not())
             {
                 _reporter.validate(member,prop,op,b);
@@ -146,7 +135,7 @@ class reporting_adapter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         bool validate_with_other_member(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
         {
-            auto ok=_next_adapter.validate(member,prop,op,b);
+            auto ok=this->next_adapter().validate(member,prop,op,b);
             if (!ok || _reporter.current_not())
             {
                 _reporter.validate_with_other_member(member,prop,op,b);
@@ -165,7 +154,7 @@ class reporting_adapter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         bool validate_with_master_sample(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
         {
-            auto ok=_next_adapter.validate(member,prop,op,b);
+            auto ok=this->next_adapter().validate(member,prop,op,b);
             if (!ok || _reporter.current_not())
             {
                 _reporter.validate_with_master_sample(member,prop,op,b);
@@ -179,7 +168,7 @@ class reporting_adapter
         {
             return aggregate(
                             string_and,
-                            [this,&obj,&ops](){return _next_adapter.validate_and(std::forward<ObjT>(obj),std::forward<OpsT>(ops));}
+                            [this,&obj,&ops](){return this->next_adapter().validate_and(std::forward<ObjT>(obj),std::forward<OpsT>(ops));}
                         );
         }
 
@@ -199,7 +188,7 @@ class reporting_adapter
         {
             return aggregate(
                             string_and,
-                            [this,&obj,&member,&ops](){return _next_adapter.validate_and(std::forward<ObjT>(obj),member,std::forward<OpsT>(ops));},
+                            [this,&obj,&member,&ops](){return this->next_adapter().validate_and(std::forward<ObjT>(obj),member,std::forward<OpsT>(ops));},
                             member
                         );
         }
@@ -223,7 +212,7 @@ class reporting_adapter
         {
             return aggregate(
                             string_or,
-                            [this,&obj,&ops](){return _next_adapter.validate_or(std::forward<ObjT>(obj),std::forward<OpsT>(ops));}
+                            [this,&obj,&ops](){return this->next_adapter().validate_or(std::forward<ObjT>(obj),std::forward<OpsT>(ops));}
                         );
         }
 
@@ -243,7 +232,7 @@ class reporting_adapter
         {
             return aggregate(
                             string_or,
-                            [this,&obj,&member,&ops](){return _next_adapter.validate_or(std::forward<ObjT>(obj),member,std::forward<OpsT>(ops));},
+                            [this,&obj,&member,&ops](){return this->next_adapter().validate_or(std::forward<ObjT>(obj),member,std::forward<OpsT>(ops));},
                             member
                         );
         }
@@ -267,7 +256,7 @@ class reporting_adapter
         {
             return aggregate(
                             string_not,
-                            [this,&obj,&op](){return _next_adapter.validate_not(std::forward<ObjT>(obj),std::forward<OpT>(op));}
+                            [this,&obj,&op](){return this->next_adapter().validate_not(std::forward<ObjT>(obj),std::forward<OpT>(op));}
                         );
         }
 
@@ -287,7 +276,7 @@ class reporting_adapter
         {
             return aggregate(
                             string_not,
-                            [this,&obj,&member,&op](){return _next_adapter.validate_not(std::forward<ObjT>(obj),member,std::forward<OpT>(op));},
+                            [this,&obj,&member,&op](){return this->next_adapter().validate_not(std::forward<ObjT>(obj),member,std::forward<OpT>(op));},
                             member
                         );
         }
@@ -320,9 +309,14 @@ class reporting_adapter
         }
 
         ReporterT _reporter;
-        AdapterT _next_adapter;
 };
 
+/**
+ * @brief Create reporting adapter
+ * @param reporter Reporter
+ * @param next_adapter Next adapter in chain
+ * @return Reporting adapter
+ */
 template <typename ReporterT, typename AdapterT>
 auto make_reporting_adapter(ReporterT&& reporter, AdapterT&& next_adapter,
                             std::enable_if_t<
@@ -336,6 +330,12 @@ auto make_reporting_adapter(ReporterT&& reporter, AdapterT&& next_adapter,
                             };
 }
 
+/**
+ * @brief Create reporting adapter using default adapter
+ * @param reporter Reporter
+ * @param obj Object to validate
+ * @return Reporting adapter
+ */
 template <typename ReporterT, typename ObjT>
 auto make_reporting_adapter(ReporterT&& reporter,
                             const ObjT& obj,
@@ -347,6 +347,12 @@ auto make_reporting_adapter(ReporterT&& reporter,
     return make_reporting_adapter(std::forward<ReporterT>(reporter),make_adapter(obj));
 }
 
+/**
+ * @brief Create reporting adapter using default reporter
+ * @param dst Destination object where to put report
+ * @param next_adapter Next adapter in chain
+ * @return Reporting adapter
+ */
 template <typename DstT, typename AdapterT>
 auto make_reporting_adapter(DstT& dst,
                             AdapterT&& next_adapter,
@@ -358,6 +364,12 @@ auto make_reporting_adapter(DstT& dst,
     return make_reporting_adapter(make_reporter(dst),std::forward<AdapterT>(next_adapter));
 }
 
+/**
+ * @brief Create reporting adapter using default reporter and default adapter
+ * @param dst Destination object where to put report
+ * @param obj Object to validate
+ * @return Reporting adapter
+ */
 template <typename DstT, typename ObjT>
 auto make_reporting_adapter(DstT& dst,
                             const ObjT& obj,

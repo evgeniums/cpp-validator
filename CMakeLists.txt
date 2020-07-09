@@ -48,6 +48,7 @@ SET (HEADERS
     include/dracosha/validator/properties.hpp
 
     include/dracosha/validator/adapters/adapter.hpp
+    include/dracosha/validator/adapters/chained_adapter.hpp
     include/dracosha/validator/adapters/reporting_adapter.hpp
     include/dracosha/validator/adapters/single_member_adapter.hpp
 

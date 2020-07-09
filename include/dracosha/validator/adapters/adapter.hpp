@@ -29,6 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/get_member.hpp>
 #include <dracosha/validator/operators/exists.hpp>
 #include <dracosha/validator/apply.hpp>
+#include <dracosha/validator/detail/adapter_helper.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -87,7 +88,7 @@ struct adapter
      * @brief Get reference to wrapped object
      * @return Wrapped object under validation
      */
-    const T& object() const
+    const T& object() const noexcept
     {
         return _obj;
     }

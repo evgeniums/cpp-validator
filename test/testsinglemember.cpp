@@ -66,9 +66,10 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAggregationReport)
 
 BOOST_AUTO_TEST_CASE(CheckNestedSingleMember)
 {
+    std::vector<float> vec1;
     auto v1=validator(
                 _[size](eq,1),
-                _["field1"]["field5"](gte,"value1"),
+                _["field1"][vec1](gte,"value1"),
                 _["field10"]["field20"](value(gte,"0") ^AND^ size(lt,3))
             );
     std::string rep1;

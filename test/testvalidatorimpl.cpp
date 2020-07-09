@@ -576,6 +576,8 @@ BOOST_AUTO_TEST_CASE(CheckNot)
 @todo
     Configurable abort if not found
     Multiple elements
+    Test processing of not existing members, add runtime check for member existence
+    Validator with shorter member path than map object
 */
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -21,6 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/adapters/adapter.hpp>
+#include <dracosha/validator/adapters/chained_adapter.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -32,34 +33,23 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  *
  */
 template <typename MemberT, typename AdapterT>
-class single_member_adapter
+class single_member_adapter : public chained_adapter<AdapterT>
 {
     public:
 
-        using hana_tag=adapter_tag;
-
         using member_type=MemberT;
-        using next_adapter_type=AdapterT;
 
+        /**
+         * @brief Constructor
+         * @param member Member to validate
+         * @param next_adapter Next adapter in chain
+         */
         single_member_adapter(
             MemberT&& member,
             AdapterT&& next_adapter
-        ) : _member(std::forward<MemberT>(member)),
-            _next_adapter(std::forward<AdapterT>(next_adapter))
+        ) : chained_adapter<AdapterT>(std::forward<AdapterT>(next_adapter)),
+            _member(std::forward<MemberT>(member))
         {}
-
-        void set_unknown_member_mode(if_member_not_found mode) noexcept
-        {
-            _next_adapter.set(mode);
-        }
-        if_member_not_found unknown_member_mode() const noexcept
-        {
-            return _next_adapter.unknown_member_mode();
-        }
-        auto object() const -> decltype(auto)
-        {
-            return _next_adapter.object();
-        }
 
         /**
          *  @brief Perform validation of object at one level without member nesting
@@ -70,7 +60,7 @@ class single_member_adapter
         template <typename T2, typename OpT>
         bool validate_operator(OpT&& op, T2&& b)
         {
-            return _next_adapter.validate_operator(op,b);
+            return this->next_adapter().validate_operator(op,b);
         }
 
         /**
@@ -83,7 +73,7 @@ class single_member_adapter
         template <typename T2, typename OpT, typename PropT>
         bool validate_property(PropT&& prop, OpT&& op, T2&& b)
         {
-            return _next_adapter.validate_property(prop,op,b);
+            return this->next_adapter().validate_property(prop,op,b);
         }
 
         /**
@@ -100,7 +90,7 @@ class single_member_adapter
             {
                 return true;
             }
-            return _next_adapter.validate_exists(member,b);
+            return this->next_adapter().validate_exists(member,b);
         }
 
         /**
@@ -118,7 +108,7 @@ class single_member_adapter
             {
                 return true;
             }
-            return _next_adapter.validate(member,prop,op,b);
+            return this->next_adapter().validate(member,prop,op,b);
         }
 
         /**
@@ -136,7 +126,7 @@ class single_member_adapter
             {
                 return true;
             }
-            return _next_adapter.validate(member,prop,op,b);
+            return this->next_adapter().validate(member,prop,op,b);
         }
 
         /**
@@ -154,7 +144,7 @@ class single_member_adapter
             {
                 return true;
             }
-            return _next_adapter.validate(member,prop,op,b);
+            return this->next_adapter().validate(member,prop,op,b);
         }
 
         /**
@@ -165,7 +155,7 @@ class single_member_adapter
         template <typename OpsT>
         bool validate_and(OpsT&& ops)
         {
-            return _next_adapter.validate_and(*this,std::forward<OpsT>(ops));
+            return this->next_adapter().validate_and(*this,std::forward<OpsT>(ops));
         }
 
         /**
@@ -181,7 +171,7 @@ class single_member_adapter
             {
                 return true;
             }
-            return _next_adapter.validate_and(*this,member,std::forward<OpsT>(ops));
+            return this->next_adapter().validate_and(*this,member,std::forward<OpsT>(ops));
         }
 
         /**
@@ -192,7 +182,7 @@ class single_member_adapter
         template <typename OpsT>
         bool validate_or(OpsT&& ops)
         {
-            return _next_adapter.validate_or(*this,std::forward<OpsT>(ops));
+            return this->next_adapter().validate_or(*this,std::forward<OpsT>(ops));
         }
 
         /**
@@ -208,7 +198,7 @@ class single_member_adapter
             {
                 return true;
             }
-            return _next_adapter.validate_or(*this,member,std::forward<OpsT>(ops));
+            return this->next_adapter().validate_or(*this,member,std::forward<OpsT>(ops));
         }
 
         /**
@@ -219,7 +209,7 @@ class single_member_adapter
         template <typename OpT>
         bool validate_not(OpT&& op)
         {
-            return _next_adapter.validate_not(*this,std::forward<OpT>(op));
+            return this->next_adapter().validate_not(*this,std::forward<OpT>(op));
         }
 
         /**
@@ -238,13 +228,12 @@ class single_member_adapter
             {
                 return true;
             }
-            return _next_adapter.validate_not(*this,member,std::forward<OpT>(op));
+            return this->next_adapter().validate_not(*this,member,std::forward<OpT>(op));
         }
 
     private:
 
         MemberT _member;
-        AdapterT _next_adapter;
 };
 
 /**
