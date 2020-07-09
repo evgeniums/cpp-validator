@@ -115,6 +115,11 @@ BOOST_AUTO_TEST_CASE(CheckSingleValidatorValueOp)
     std::vector<int> vec1={1,2,3,4,5};
     std::vector<int> vec2={10,20,30};
 
+    auto vv=get(vec1,2);
+    BOOST_CHECK_EQUAL(vv,3);
+    auto v0=_[2](exists,true);
+    BOOST_CHECK(v0.apply(vec1));
+
     auto v1=_[2](gte,30);
     BOOST_CHECK(!v1.apply(vec1));
     BOOST_CHECK(v1.apply(vec2));
@@ -496,7 +501,7 @@ BOOST_AUTO_TEST_CASE(CheckExistsWithCompileTime)
 
     std::vector<int> vec1={10,20,30,40,50};
     auto v06=_[3](exists,true);
-    BOOST_CHECK(!v06.apply(vec1));
+    BOOST_CHECK(v06.apply(vec1));
 }
 
 BOOST_AUTO_TEST_CASE(CheckNot)
@@ -571,8 +576,6 @@ BOOST_AUTO_TEST_CASE(CheckNot)
 @todo
     Configurable abort if not found
     Multiple elements
-    Check single field
-    Check non copyable objects and keys
 */
 
 BOOST_AUTO_TEST_SUITE_END()

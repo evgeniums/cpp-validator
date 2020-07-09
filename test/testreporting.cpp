@@ -247,6 +247,13 @@ BOOST_AUTO_TEST_CASE(CheckNestedValidationReportOp)
     BOOST_CHECK(!v2.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"1 of field1 is less than 5");
     rep1.clear();
+
+    auto v3=validator(
+                _[100](lt,5)
+            );
+    BOOST_CHECK(v3.apply(ra1));
+    BOOST_TEST_MESSAGE(rep1);
+    rep1.clear();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

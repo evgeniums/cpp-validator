@@ -88,6 +88,7 @@ SET (HEADERS
     include/dracosha/validator/detail/if_bool.hpp
     include/dracosha/validator/detail/formatter_std.hpp
     include/dracosha/validator/detail/backend_formatter_helper.hpp
+    include/dracosha/validator/detail/adapter_helper.hpp
 )
 
 SET (SOURCES

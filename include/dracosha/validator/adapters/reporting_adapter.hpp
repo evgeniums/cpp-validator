@@ -50,6 +50,19 @@ class reporting_adapter
             _next_adapter(std::forward<AdapterT>(next_adapter))
         {}
 
+        void set_unknown_member_mode(if_member_not_found mode) noexcept
+        {
+            _next_adapter.set(mode);
+        }
+        if_member_not_found unknown_member_mode() const noexcept
+        {
+            return _next_adapter.unknown_member_mode();
+        }
+        auto object() const -> decltype(auto)
+        {
+            return _next_adapter.object();
+        }
+
         /**
          *  @brief Perform validation of object at one level without member nesting
          *  @param op Operator for validation

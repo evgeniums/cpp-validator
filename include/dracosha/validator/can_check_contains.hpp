@@ -41,7 +41,13 @@ struct can_check_contains_t
         ||
         detail::has_isSet_c(hana::type_c<T1>, hana::type_c<T2>)
         ||
-        (hana::is_a<property_tag, T2> && has_property<T1, T2>());
+        (hana::is_a<property_tag, T2> && has_property<T1, T2>())
+        ||
+        (
+                (detail::has_at_c(hana::type_c<T1>, hana::type_c<T2>) || detail::has_brackets_c(hana::type_c<T1>, hana::type_c<T2>))
+                &&
+                detail::has_size_c(hana::type_c<T1>)
+         );
 
     constexpr bool operator () () const
     {

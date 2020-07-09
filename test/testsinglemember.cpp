@@ -9,6 +9,14 @@ BOOST_AUTO_TEST_SUITE(TestSingleMember)
 
 BOOST_AUTO_TEST_CASE(CheckSingleMemberReport)
 {
+    std::map<std::string,std::string> m1;
+    auto p1=hana::make_tuple(size);
+    auto p2=hana::make_tuple("field10");
+    auto p3=hana::make_tuple("field1");
+    BOOST_CHECK(check_member_path(m1,p1));
+    BOOST_CHECK(check_member_path(m1,p2));
+    BOOST_CHECK(check_member_path(m1,p3));
+
     auto v1=validator(
                 _[size](ne,100),
                 _["field10"](value(gte,"0") ^AND^ size(lt,3)),

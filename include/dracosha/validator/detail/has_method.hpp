@@ -34,6 +34,8 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto has_has = hana::is_valid([](auto&& v, auto&& x)
 BOOST_HANA_CONSTEXPR_LAMBDA auto has_contains = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.contains(std::forward<decltype(x)>(x))){});
 BOOST_HANA_CONSTEXPR_LAMBDA auto has_find = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.find(std::forward<decltype(x)>(x))){});
 BOOST_HANA_CONSTEXPR_LAMBDA auto has_isSet = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.isSet(std::forward<decltype(x)>(x))){});
+BOOST_HANA_CONSTEXPR_LAMBDA auto has_brackets = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v[std::forward<decltype(x)>(x)]){});
+BOOST_HANA_CONSTEXPR_LAMBDA auto has_size = hana::is_valid([](auto&& v) -> decltype((void)v.size()){});
 
 BOOST_HANA_CONSTEXPR_LAMBDA auto has_at_c = hana::is_valid([](auto&& v, auto&& x) -> decltype(
                                                             (void)hana::traits::declval(v).at(hana::traits::declval(x))
@@ -58,6 +60,11 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto has_contains_c = hana::is_valid([](auto v, auto
                                                             {});
 BOOST_HANA_CONSTEXPR_LAMBDA auto has_isSet_c = hana::is_valid([](auto v, auto x) -> decltype(
                                                                     (void)hana::traits::declval(v).isSet(hana::traits::declval(x))
+                                                                )
+                                                            {});
+
+BOOST_HANA_CONSTEXPR_LAMBDA auto has_size_c = hana::is_valid([](auto v) -> decltype(
+                                                                    (void)hana::traits::declval(v).size()
                                                                 )
                                                             {});
 

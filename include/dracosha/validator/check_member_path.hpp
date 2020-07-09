@@ -39,7 +39,7 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto check_member_path =[](auto obj,auto path)
     auto path_c=hana::transform(path,hana::make_type);
     auto obj_c=hana::type_c<decltype(obj)>;
 
-    return hana::is_nothing(hana::monadic_fold_left<hana::optional_tag>(path_c,obj_c,hana::sfinae(check_member)));
+    return !hana::is_nothing(hana::monadic_fold_left<hana::optional_tag>(path_c,obj_c,hana::sfinae(check_member)));
 };
 
 //-------------------------------------------------------------

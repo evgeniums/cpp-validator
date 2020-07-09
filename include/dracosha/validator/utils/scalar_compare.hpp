@@ -204,6 +204,12 @@ struct compare<LeftT, RightT,
 {
 };
 
+template <typename LeftT, typename RightT>
+constexpr bool compare_less(const LeftT& a, const RightT& b)
+{
+    return compare<LeftT,RightT>::less(a,b);
+}
+
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
