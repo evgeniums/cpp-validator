@@ -134,7 +134,7 @@ class single_member_adapter : public chained_adapter<AdapterT>
          *  @param member Member descriptor
          *  @param prop Property to validate
          *  @param op Operator for validation
-         *  @param b Sample object whose member to use as argument passed to validation operator
+         *  @param b Sample object whose member must be used as argument passed to validation operator
          *  @return Validation status
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT1>

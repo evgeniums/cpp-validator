@@ -59,13 +59,36 @@ struct adapter
 
     const T& _obj;
     if_member_not_found _unknown_member_mode;
+    bool _check_member_exists;
 
     /**
      * @brief Constructor
      * @param a Object to wrap into adapter
      */
-    adapter(const T& a):_obj(a),_unknown_member_mode(if_member_not_found::ignore)
+    adapter(const T& a):_obj(a),_unknown_member_mode(if_member_not_found::ignore),_check_member_exists(false)
     {}
+
+    /**
+     * @brief Enable/disable checking if a member exists before validating the member
+     * @param enabled Flag
+     *
+     * Disabling checking of member existance improves validation performance but can sometimes cause
+     * exceptions or other undefined errors.
+     * Some basic checking if a member can be found for given object type is performed statically at compile time
+     * regardless of this flag.
+     */
+    void set_check_member_exists_before_validation(bool enable) noexcept
+    {
+        _check_member_exists=enable;
+    }
+    /**
+     * @brief Get flag of checking if member exists befor validation
+     * @return Flag
+     */
+    bool is_check_member_exists_before_validation() const noexcept
+    {
+        return _check_member_exists;
+    }
 
     /**
      * @brief Set mode to use if member is not found
@@ -134,15 +157,57 @@ struct adapter
     template <typename T2, typename MemberT>
     bool validate_exists(MemberT&& member, T2&& b) const
     {
-        return hana::if_(check_member_path(_obj,member.path),
-            [this,&b](auto&& path)
+        const auto& obj=extract(_obj);
+        return hana::if_(check_member_path(obj,member.path),
+            [&obj,&b](auto&& path)
             {
-                auto&& ax=extract(_obj);
-                return exists(ax,std::forward<decltype(path)>(path))==b;
+                return exists(obj,std::forward<decltype(path)>(path))==b;
             },
             [&b](auto&&)
             {
                 return b==false;
+            }
+        )(member.path);
+    }
+
+    template <typename AdapterT, typename MemberT>
+    bool check_member_exists(AdapterT&& adpt, MemberT&& member) const
+    {
+        if (!check_member_path(extract(adpt.object()),member.path))
+        {
+            return false;
+        }
+        if (adpt.is_check_member_exists_before_validation())
+        {
+            if (adpt.unknown_member_mode()==if_member_not_found::ignore)
+            {
+                return validate_exists(member,true);
+            }
+            return adpt.validate_exists(member,true);
+        }
+        return true;
+    }
+
+    template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
+    bool validate(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
+    {
+        if (!check_member_exists(adpt,member))
+        {
+            return _unknown_member_mode==if_member_not_found::ignore;
+        }
+
+        const auto& obj=extract(adpt.object());
+        return hana::if_(check_member_path(obj,member.path),
+            [&obj,&prop,&op,&b](auto&& path)
+            {
+                return op(
+                            property(get_member(obj,std::forward<decltype(path)>(path)),std::forward<PropT>(prop)),
+                            extract(std::forward<T2>(b))
+                        );
+            },
+            [](auto&&)
+            {
+                return true;
             }
         )(member.path);
     }
@@ -158,20 +223,32 @@ struct adapter
     template <typename T2, typename OpT, typename PropT, typename MemberT>
     bool validate(MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
     {
-        return hana::if_(check_member_path(_obj,member.path),
-            [this,&prop,&op,&b](auto&& path)
+        return validate(*this,std::forward<MemberT>(member),std::forward<PropT>(prop),std::forward<OpT>(op),
+                        std::forward<T2>(b));
+    }
+
+    template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
+    bool validate_with_other_member(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
+    {
+        if (!check_member_exists(adpt,member) || !check_member_exists(adpt,b))
+        {
+            return _unknown_member_mode==if_member_not_found::ignore;
+        }
+
+        const auto& obj=extract(adpt.object());
+        return hana::if_(check_member_path(obj,member.path),
+            [&obj,&prop,&op](auto&& path, auto&& b_path)
             {
-                auto&& ax=extract(_obj);
                 return op(
-                            property(get_member(ax,std::forward<decltype(path)>(path)),std::forward<PropT>(prop)),
-                            extract(std::forward<T2>(b))
+                            property(get_member(obj,path),prop),
+                            property(get_member(obj,b_path),prop)
                         );
             },
-            [this](auto&&)
+            [](auto&&, auto&&)
             {
-                return _unknown_member_mode==if_member_not_found::ignore;
+                return true;
             }
-        )(member.path);
+        )(member.path,b.path);
     }
 
     /**
@@ -185,11 +262,32 @@ struct adapter
     template <typename T2, typename OpT, typename PropT, typename MemberT>
     bool validate_with_other_member(MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
     {
-        auto&& ax=extract(_obj);
-        return op(
-                    property(get_member(ax,member.path),prop),
-                    property(get_member(ax,b.path),prop)
-                );
+        return validate_with_other_member(*this,std::forward<MemberT>(member),std::forward<PropT>(prop),std::forward<OpT>(op),
+                                          std::forward<T2>(b));
+    }
+
+    template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
+    bool validate_with_master_sample(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
+    {
+        if (!check_member_exists(adpt,member))
+        {
+            return _unknown_member_mode==if_member_not_found::ignore;
+        }
+
+        const auto& obj=extract(adpt.object());
+        return hana::if_(check_member_path(obj,member.path),
+            [&obj,&prop,&op,&b](auto&& path)
+            {
+                return op(
+                            property(get_member(obj,path),prop),
+                            property(get_member(b(),path),prop)
+                        );
+            },
+            [](auto&&)
+            {
+                return true;
+            }
+        )(member.path);
     }
 
     /**
@@ -197,17 +295,14 @@ struct adapter
      *  @param member Member descriptor
      *  @param prop Property to validate
      *  @param op Operator for validation
-     *  @param b Sample embedded object whose member to use as argument passed to validation operator
+     *  @param b Sample embedded object whose member must be used as argument passed to validation operator
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
     bool validate_with_master_sample(MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
     {
-        auto&& ax=extract(_obj);
-        return op(
-                    property(get_member(ax,member.path),prop),
-                    property(get_member(b(),member.path),prop)
-                );
+        return validate_with_master_sample(*this,std::forward<MemberT>(member),std::forward<PropT>(prop),std::forward<OpT>(op),
+                                          std::forward<T2>(b));
     }
 
     /**
@@ -245,31 +340,37 @@ struct adapter
 
     /**
      * @brief Execute validators on the member of a given object and aggregate their results using logical AND
-     * @param obj Object to validate
+     * @param adapter Adapter wraping object to validate
      * @param member Member to process with validators
      * @param ops List of intermediate validators or validation operators
      * @return Logical AND of results of intermediate validators
      */
-    template <typename ObjT, typename MemberT, typename OpsT>
-    bool validate_and(ObjT&& obj, MemberT&& member, OpsT&& ops) const
+    template <typename AdapterT, typename MemberT, typename OpsT>
+    bool validate_and(AdapterT&& adpt, MemberT&& member, OpsT&& ops) const
     {
-        return hana::if_(check_member_path(detail::adapter_helper<ObjT>(obj),member.path),
-            [&obj,&member,&ops](auto&&)
+        if (!check_member_exists(adpt,member))
+        {
+            return _unknown_member_mode==if_member_not_found::ignore;
+        }
+
+        const auto& obj=extract(adpt.object());
+        return hana::if_(check_member_path(obj,member.path),
+            [&adpt,&member,&ops](auto&&)
             {
                 return hana::fold(std::forward<decltype(ops)>(ops),true,
-                            [&member,&obj](bool prevResult, auto&& op)
+                            [&member,&adpt](bool prevResult, auto&& op)
                             {
                                 if (!prevResult)
                                 {
                                     return false;
                                 }
-                                return apply_member(std::forward<ObjT>(obj),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
+                                return apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
                             }
                         );
             },
-            [this](auto&&)
+            [](auto&&)
             {
-                return _unknown_member_mode==if_member_not_found::ignore;
+                return true;
             }
         )(member.path);
     }
@@ -284,7 +385,7 @@ struct adapter
     bool validate_and(MemberT&& member, OpsT&& ops,
                       std::enable_if_t<hana::is_a<member_tag,MemberT>,void*> =nullptr) const
     {
-        return validate_and(_obj,std::forward<MemberT>(member),std::forward<OpsT>(ops));
+        return validate_and(*this,std::forward<MemberT>(member),std::forward<OpsT>(ops));
     }
 
     template <typename ObjT, typename OpsT>
@@ -318,33 +419,39 @@ struct adapter
 
     /**
      * @brief Execute validators on the member of a given object and aggregate their results using logical OR
-     * @param obj Object to validate
+     * @param adapter Adapter wraping object to validate
      * @param member Member to process with validators
      * @param ops List of intermediate validators or validation operators
      * @return Logical OR of results of intermediate validators
      */
-    template <typename ObjT, typename MemberT, typename OpsT>
-    bool validate_or(ObjT&& obj, MemberT&& member, OpsT&& ops) const
+    template <typename AdapterT, typename MemberT, typename OpsT>
+    bool validate_or(AdapterT&& adpt, MemberT&& member, OpsT&& ops) const
     {
-        return hana::if_(check_member_path(detail::adapter_helper<ObjT>(obj),member.path),
-            [&obj,&member,&ops](auto&&)
+        if (!check_member_exists(adpt,member))
+        {
+            return _unknown_member_mode==if_member_not_found::ignore;
+        }
+
+        const auto& obj=extract(adpt.object());
+        return hana::if_(check_member_path(obj,member.path),
+            [&adpt,&member,&ops](auto&&)
             {
                 return hana::value(hana::length(ops))==0
                         ||
                        hana::fold(std::forward<decltype(ops)>(ops),false,
-                            [&obj,&member](bool prevResult, auto&& op)
+                            [&adpt,&member](bool prevResult, auto&& op)
                             {
                                 if (prevResult)
                                 {
                                     return true;
                                 }
-                                return apply_member(std::forward<ObjT>(obj),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
+                                return apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
                             }
                         );
             },
-            [this](auto&&)
+            [](auto&&)
             {
-                return _unknown_member_mode==if_member_not_found::ignore;
+                return true;
             }
         )(member.path);
     }
@@ -359,7 +466,7 @@ struct adapter
     bool validate_or(MemberT&& member, OpsT&& ops,
                      std::enable_if_t<hana::is_a<member_tag,MemberT>,void*> =nullptr) const
     {
-        return validate_or(_obj,std::forward<decltype(member)>(member),std::forward<decltype(ops)>(ops));
+        return validate_or(*this,std::forward<decltype(member)>(member),std::forward<decltype(ops)>(ops));
     }
 
     /**
@@ -387,22 +494,32 @@ struct adapter
 
     /**
      * @brief Execute validator on the member of a given object and negate the result
-     * @param obj Object to validate
+     * @param adapter Adapter wraping object to validate
      * @param member Member to process with validator
      * @param op Intermediate validator or validation operator
      * @return Logical NOT of results of intermediate validator
      */
-    template <typename ObjT, typename MemberT, typename OpT>
-    bool validate_not(ObjT&& obj, MemberT&& member, OpT&& op) const
+    template <typename AdapterT, typename MemberT, typename OpT>
+    bool validate_not(AdapterT&& adpt, MemberT&& member, OpT&& op) const
     {
-        return hana::if_(check_member_path(detail::adapter_helper<ObjT>(obj),member.path),
-            [&obj,&member,&op](auto&&)
+        if (!check_member_exists(adpt,member))
+        {
+            return _unknown_member_mode==if_member_not_found::ignore;
+        }
+
+        const auto& obj=extract(adpt.object());
+        return hana::if_(check_member_path(obj,member.path),
+            [&adpt,&member,&op](auto&&)
             {
-                return !apply_member(std::forward<ObjT>(obj),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
+                return !apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
             },
-            [this](auto&&)
+            [&adpt,&member](auto&&)
             {
-                return _unknown_member_mode==if_member_not_found::ignore;
+                if (adpt.unknown_member_mode()==if_member_not_found::abort)
+                {
+                    return adpt.validate_exists(member,true);
+                }
+                return true;
             }
         )(member.path);
     }
@@ -417,7 +534,7 @@ struct adapter
     bool validate_not(MemberT&& member, OpT&& op,
                       std::enable_if_t<hana::is_a<member_tag,MemberT>,void*> =nullptr) const
     {
-        return validate_not(_obj,std::forward<decltype(member)>(member),std::forward<decltype(op)>(op));
+        return validate_not(*this,std::forward<decltype(member)>(member),std::forward<decltype(op)>(op));
     }
 };
 

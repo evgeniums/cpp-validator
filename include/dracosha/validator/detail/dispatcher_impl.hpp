@@ -209,7 +209,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      *  @param member Member descriptor
      *  @param prop Property to validate
      *  @param op Operator for validation
-     *  @param b Sample object whose member to use as argument passed to validation operator
+     *  @param b Sample object whose member must be used as argument passed to validation operator
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>

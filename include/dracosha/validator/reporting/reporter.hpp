@@ -189,7 +189,7 @@ class reporter
          *  @param member Member descriptor
          *  @param prop Property to validate
          *  @param op Operator for validation
-         *  @param b Sample object whose member to use as argument passed to validation operator
+         *  @param b Sample object whose member must be used as argument passed to validation operator
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate_with_master_sample(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)

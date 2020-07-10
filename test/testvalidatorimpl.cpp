@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE(CheckOtherSelfField)
     BOOST_CHECK(v1.apply(m));
 }
 
-BOOST_AUTO_TEST_CASE(CheckMasterReferenceField)
+BOOST_AUTO_TEST_CASE(CheckMasterSampleField)
 {
     std::map<int,int> m={{1,50},{2,40},{3,30},{4,20},{5,10}};
     const std::map<int,int> ref1={{1,50},{2,40}};
@@ -574,10 +574,15 @@ BOOST_AUTO_TEST_CASE(CheckNot)
 /**
 
 @todo
-    Configurable abort if not found
-    Multiple elements
-    Test processing of not existing members, add runtime check for member existence
-    Validator with shorter member path than map object
+    Validate multiple elements of a container member
+    Localization of conjunctions, plurals and genders
+    Nested members check in one call
+
+    Test:
+        validation of not existing members of all types
+        reporting validation of all types
+        reporting validation of single member of all types
+        validate lazy objects and operands
 */
 
 BOOST_AUTO_TEST_SUITE_END()

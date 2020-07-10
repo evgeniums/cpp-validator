@@ -116,7 +116,7 @@ class reporting_adapter : public chained_adapter<AdapterT>
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         bool validate(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
         {
-            auto ok=this->next_adapter().validate(member,prop,op,b);
+            auto ok=this->next_adapter().validate(*this,member,prop,op,b);
             if (!ok || _reporter.current_not())
             {
                 _reporter.validate(member,prop,op,b);
@@ -135,7 +135,7 @@ class reporting_adapter : public chained_adapter<AdapterT>
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         bool validate_with_other_member(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
         {
-            auto ok=this->next_adapter().validate(member,prop,op,b);
+            auto ok=this->next_adapter().validate_with_other_member(*this,member,prop,op,b);
             if (!ok || _reporter.current_not())
             {
                 _reporter.validate_with_other_member(member,prop,op,b);
@@ -148,13 +148,13 @@ class reporting_adapter : public chained_adapter<AdapterT>
          *  @param member Member descriptor
          *  @param prop Property to validate
          *  @param op Operator for validation
-         *  @param b Sample object whose member to use as argument passed to validation operator
+         *  @param b Sample object whose member must be used as argument passed to validation operator
          *  @return Validation status
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         bool validate_with_master_sample(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
         {
-            auto ok=this->next_adapter().validate(member,prop,op,b);
+            auto ok=this->next_adapter().validate_with_master_sample(*this,member,prop,op,b);
             if (!ok || _reporter.current_not())
             {
                 _reporter.validate_with_master_sample(member,prop,op,b);

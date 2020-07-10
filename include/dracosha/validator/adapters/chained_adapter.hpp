@@ -49,6 +49,28 @@ class chained_adapter
         {}
 
         /**
+         * @brief Enable/disable checking if a member exists before validating the member
+         * @param enabled Flag
+         *
+         * Disabling checking of member existance improves validation performance but can sometimes cause
+         * exceptions or other undefined errors.
+         * Some basic checking if a member can be found for given object type is performed statically at compile time
+         * regardless of this flag.
+         */
+        void set_check_member_exists_before_validation(bool enable) noexcept
+        {
+            _next_adapter.set_check_member_exists_before_validation(enable);
+        }
+        /**
+         * @brief Get flag of checking if member exists befor validation
+         * @return Flag
+         */
+        bool is_check_member_exists_before_validation() const noexcept
+        {
+            return _next_adapter.is_check_member_exists_before_validation();
+        }
+
+        /**
          * @brief Set mode to use if member is not found
          * @param mode Mode
          */
