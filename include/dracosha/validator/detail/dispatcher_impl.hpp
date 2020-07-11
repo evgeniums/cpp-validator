@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <type_traits>
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/status.hpp>
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/extract.hpp>
 #include <dracosha/validator/check_member.hpp>
@@ -58,7 +59,7 @@ struct dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>
      *  @return Validation status
      */
     template <typename ...Args>
-    constexpr bool operator() (T1&& obj, Args&&... args) const;
+    status operator() (T1&& obj, Args&&... args) const;
 
     /**
      *  @brief Perform validation of object's property at one level without member nesting
@@ -68,28 +69,28 @@ struct dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>
      *  @return Validation status
      */
     template <typename ...Args>
-    constexpr static bool invoke(T1&& obj, Args&&... args);
+    static status invoke(T1&& obj, Args&&... args);
 
     /**
      * @brief Execute validators on object and aggregate their results using logical AND
      * @return Logical AND of results of intermediate validators
      */
     template <typename ... Args>
-    constexpr static bool validate_and(T1&& obj, Args&&... args);
+    static status validate_and(T1&& obj, Args&&... args);
 
     /**
      * @brief Execute validators on object and aggregate their results using logical OR
      * @return Logical OR of results of intermediate validators
      */
     template <typename ... Args>
-    constexpr static bool validate_or(T1&& obj, Args&&... args);
+    static status validate_or(T1&& obj, Args&&... args);
 
     /**
      * @brief Execute validator on object and negate its result using logical NOT
      * @return Logical NOT of result of intermediate validators
      */
     template <typename ... Args>
-    constexpr static bool validate_not(T1&& obj, Args&&... args);
+    static status validate_not(T1&& obj, Args&&... args);
 };
 
 /**
@@ -106,7 +107,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      *  @return Validation status
      */
     template <typename T2, typename OpT>
-    constexpr bool operator() (T1&& a, OpT&& op, T2&& b) const
+    status operator() (T1&& a, OpT&& op, T2&& b) const
     {
         return a.validate_operator(std::forward<OpT>(op),std::forward<T2>(b));
     }
@@ -120,7 +121,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT>
-    constexpr bool operator() (PropT&& prop, T1&& a, OpT&& op, T2&& b) const
+    status operator() (PropT&& prop, T1&& a, OpT&& op, T2&& b) const
     {
         return invoke(std::forward<T1>(a),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
     }
@@ -134,7 +135,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT>
-    constexpr static bool invoke(T1&& a, PropT&& prop, OpT&& op, T2&& b,
+    static status invoke(T1&& a, PropT&& prop, OpT&& op, T2&& b,
                                      std::enable_if_t<
                                        !hana::is_a<member_tag,T2>,
                                        void*
@@ -152,7 +153,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
-    constexpr static bool invoke(T1&& a, MemberT&& member, PropT&&, OpT&&, T2&& b,
+    static status invoke(T1&& a, MemberT&& member, PropT&&, OpT&&, T2&& b,
                                  std::enable_if_t<std::is_same<exists_t,std::decay_t<OpT>>::value,
                                    void*
                                  > =nullptr
@@ -171,7 +172,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
-    constexpr static bool invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
+    static status invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
                                  std::enable_if_t<
                                    (!hana::is_a<member_tag,T2> &&
                                     !hana::is_a<master_sample_tag,T2> &&
@@ -193,7 +194,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
-    constexpr static bool invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
+    static status invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
                                  std::enable_if_t<
                                    hana::is_a<member_tag,T2>,
                                    void*
@@ -213,7 +214,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
-    constexpr static bool invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
+    static status invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
                                  std::enable_if_t<
                                    hana::is_a<master_sample_tag,T2>,
                                    void*
@@ -228,7 +229,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      * @return Logical AND of results of intermediate validators
      */
     template <typename ... Args>
-    constexpr static bool validate_and(T1&& a, Args&&... args)
+    static status validate_and(T1&& a, Args&&... args)
     {
         return a.validate_and(std::forward<Args>(args)...);
     }
@@ -238,7 +239,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      * @return Logical OR of results of intermediate validators
      */
     template <typename ... Args>
-    constexpr static bool validate_or(T1&& a, Args&&... args)
+    static status validate_or(T1&& a, Args&&... args)
     {
         return a.validate_or(std::forward<Args>(args)...);
     }
@@ -248,7 +249,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      * @return Logical NOT of result of intermediate validators
      */
     template <typename ... Args>
-    constexpr static bool validate_not(T1&& a, Args&&... args)
+    static status validate_not(T1&& a, Args&&... args)
     {
         return a.validate_not(std::forward<Args>(args)...);
     }
@@ -259,7 +260,7 @@ constexpr dispatcher_impl_t<T1> dispatcher_impl{};
 
 template <typename T1>
 template <typename ...Args>
-constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::operator() (T1&& obj, Args&&... args) const
+status dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::operator() (T1&& obj, Args&&... args) const
 {
     using type=decltype(make_adapter(std::forward<T1>(obj)));
     return dispatcher_impl<type>(make_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
@@ -267,7 +268,7 @@ constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::op
 
 template <typename T1>
 template <typename ...Args>
-constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::invoke(T1&& obj, Args&&... args)
+status dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::invoke(T1&& obj, Args&&... args)
 {
     using type=decltype(make_adapter(std::forward<T1>(obj)));
     return dispatcher_impl<type>.invoke(make_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
@@ -275,7 +276,7 @@ constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::in
 
 template <typename T1>
 template <typename ...Args>
-constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_and(T1&& obj, Args&&... args)
+status dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_and(T1&& obj, Args&&... args)
 {
     using type=decltype(make_adapter(std::forward<T1>(obj)));
     return dispatcher_impl<type>.validate_and(make_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
@@ -283,7 +284,7 @@ constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::va
 
 template <typename T1>
 template <typename ...Args>
-constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_or(T1&& obj, Args&&... args)
+status dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_or(T1&& obj, Args&&... args)
 {
     using type=decltype(make_adapter(std::forward<T1>(obj)));
     return dispatcher_impl<type>.validate_or(make_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
@@ -291,7 +292,7 @@ constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::va
 
 template <typename T1>
 template <typename ...Args>
-constexpr bool dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_not(T1&& obj, Args&&... args)
+status dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_not(T1&& obj, Args&&... args)
 {
     using type=decltype(make_adapter(std::forward<T1>(obj)));
     return dispatcher_impl<type>.validate_not(make_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);

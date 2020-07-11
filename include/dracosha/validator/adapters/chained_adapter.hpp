@@ -76,7 +76,7 @@ class chained_adapter
          */
         void set_unknown_member_mode(if_member_not_found mode) noexcept
         {
-            _next_adapter.set(mode);
+            _next_adapter.set_unknown_member_mode(mode);
         }
 
         /**

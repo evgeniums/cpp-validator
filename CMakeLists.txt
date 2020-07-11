@@ -4,6 +4,8 @@ SET (HEADERS
     include/dracosha/validator/version.hpp
     include/dracosha/validator/config.hpp
 
+    include/dracosha/validator/status.hpp
+
     include/dracosha/validator/utils/hana_to_std_tuple.hpp
     include/dracosha/validator/utils/scalar_compare.hpp
     include/dracosha/validator/utils/adjust_storable_type.hpp

@@ -58,7 +58,7 @@ class single_member_adapter : public chained_adapter<AdapterT>
          *  @return Validation status
          */
         template <typename T2, typename OpT>
-        bool validate_operator(OpT&& op, T2&& b)
+        status validate_operator(OpT&& op, T2&& b)
         {
             return this->next_adapter().validate_operator(op,b);
         }
@@ -71,7 +71,7 @@ class single_member_adapter : public chained_adapter<AdapterT>
          *  @return Validation status
          */
         template <typename T2, typename OpT, typename PropT>
-        bool validate_property(PropT&& prop, OpT&& op, T2&& b)
+        status validate_property(PropT&& prop, OpT&& op, T2&& b)
         {
             return this->next_adapter().validate_property(prop,op,b);
         }
@@ -84,11 +84,11 @@ class single_member_adapter : public chained_adapter<AdapterT>
          *  @return Validation status
          */
         template <typename T2, typename MemberT1>
-        bool validate_exists(MemberT1&& member, T2&& b)
+        status validate_exists(MemberT1&& member, T2&& b)
         {
             if (!_member.isEqual(member))
             {
-                return true;
+                return status::code::ignore;
             }
             return this->next_adapter().validate_exists(member,b);
         }
@@ -102,11 +102,11 @@ class single_member_adapter : public chained_adapter<AdapterT>
          *  @return Validation status
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT1>
-        bool validate(MemberT1&& member, PropT&& prop, OpT&& op, T2&& b)
+        status validate(MemberT1&& member, PropT&& prop, OpT&& op, T2&& b)
         {
             if (!_member.isEqual(member))
             {
-                return true;
+                return status::code::ignore;
             }
             return this->next_adapter().validate(member,prop,op,b);
         }
@@ -120,11 +120,11 @@ class single_member_adapter : public chained_adapter<AdapterT>
          *  @return Validation status
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT1>
-        bool validate_with_other_member(MemberT1&& member, PropT&& prop, OpT&& op, T2&& b)
+        status validate_with_other_member(MemberT1&& member, PropT&& prop, OpT&& op, T2&& b)
         {
             if (!_member.isEqual(member))
             {
-                return true;
+                return status::code::ignore;
             }
             return this->next_adapter().validate(member,prop,op,b);
         }
@@ -138,11 +138,11 @@ class single_member_adapter : public chained_adapter<AdapterT>
          *  @return Validation status
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT1>
-        bool validate_with_master_sample(MemberT1&& member, PropT&& prop, OpT&& op, T2&& b)
+        status validate_with_master_sample(MemberT1&& member, PropT&& prop, OpT&& op, T2&& b)
         {
             if (!_member.isEqual(member))
             {
-                return true;
+                return status::code::ignore;
             }
             return this->next_adapter().validate(member,prop,op,b);
         }
@@ -153,7 +153,7 @@ class single_member_adapter : public chained_adapter<AdapterT>
          * @return Logical AND of results of intermediate validators
          */
         template <typename OpsT>
-        bool validate_and(OpsT&& ops)
+        status validate_and(OpsT&& ops)
         {
             return this->next_adapter().validate_and(*this,std::forward<OpsT>(ops));
         }
@@ -165,11 +165,11 @@ class single_member_adapter : public chained_adapter<AdapterT>
          * @return Logical AND of results of intermediate validators
          */
         template <typename OpsT, typename MemberT1>
-        bool validate_and(MemberT1&& member, OpsT&& ops)
+        status validate_and(MemberT1&& member, OpsT&& ops)
         {
             if (!_member.isEqual(member))
             {
-                return true;
+                return status::code::ignore;
             }
             return this->next_adapter().validate_and(*this,member,std::forward<OpsT>(ops));
         }
@@ -180,7 +180,7 @@ class single_member_adapter : public chained_adapter<AdapterT>
          * @return Logical OR of results of intermediate validators
          */
         template <typename OpsT>
-        bool validate_or(OpsT&& ops)
+        status validate_or(OpsT&& ops)
         {
             return this->next_adapter().validate_or(*this,std::forward<OpsT>(ops));
         }
@@ -192,11 +192,11 @@ class single_member_adapter : public chained_adapter<AdapterT>
          * @return Logical OR of results of intermediate validators
          */
         template <typename OpsT, typename MemberT1>
-        bool validate_or(MemberT1&& member, OpsT&& ops)
+        status validate_or(MemberT1&& member, OpsT&& ops)
         {
             if (!_member.isEqual(member))
             {
-                return true;
+                return status::code::ignore;
             }
             return this->next_adapter().validate_or(*this,member,std::forward<OpsT>(ops));
         }
@@ -207,7 +207,7 @@ class single_member_adapter : public chained_adapter<AdapterT>
          * @return Logical NOT of results of intermediate validator
          */
         template <typename OpT>
-        bool validate_not(OpT&& op)
+        status validate_not(OpT&& op)
         {
             return this->next_adapter().validate_not(*this,std::forward<OpT>(op));
         }
@@ -222,11 +222,11 @@ class single_member_adapter : public chained_adapter<AdapterT>
          *       but only the first matched condition for nested OR operator
          */
         template <typename OpT, typename MemberT1>
-        bool validate_not(MemberT1&& member, OpT&& op)
+        status validate_not(MemberT1&& member, OpT&& op)
         {
             if (!_member.isEqual(member))
             {
-                return true;
+                return status::code::ignore;
             }
             return this->next_adapter().validate_not(*this,member,std::forward<OpT>(op));
         }

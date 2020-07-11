@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <type_traits>
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/status.hpp>
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/extract.hpp>
 #include <dracosha/validator/check_member.hpp>
@@ -46,7 +47,7 @@ struct dispatcher_t
      *  @return Validation status
      */
     template <typename T1, typename ...Args>
-    constexpr bool operator() (T1&& a, Args&&... args) const
+    status operator() (T1&& a, Args&&... args) const
     {
         return detail::dispatcher_impl<T1>(std::forward<T1>(a),std::forward<Args>(args)...);
     }
@@ -60,7 +61,7 @@ struct dispatcher_t
      *  @return Validation status
      */
     template <typename T1, typename T2, typename OpT, typename PropT>
-    constexpr bool operator() (PropT&& prop, T1&& a, OpT&& op, T2&& b) const
+    status operator() (PropT&& prop, T1&& a, OpT&& op, T2&& b) const
     {
         return invoke(std::forward<T1>(a),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
     }
@@ -72,7 +73,7 @@ struct dispatcher_t
      *  @return Validation status
      */
     template <typename T1, typename ...Args>
-    constexpr static bool invoke(T1&& a, Args&&... args)
+    static status invoke(T1&& a, Args&&... args)
     {
         return detail::dispatcher_impl<T1>.invoke(std::forward<T1>(a),std::forward<Args>(args)...);
     }
@@ -84,7 +85,7 @@ struct dispatcher_t
      * @return Logical AND of results of intermediate validators
      */
     template <typename T1, typename ...Args>
-    constexpr static bool validate_and(T1&& a, Args&&... args)
+    static status validate_and(T1&& a, Args&&... args)
     {
         return detail::dispatcher_impl<T1>.validate_and(std::forward<T1>(a),std::forward<Args>(args)...);
     }
@@ -96,7 +97,7 @@ struct dispatcher_t
      * @return Logical OR of results of intermediate validators
      */
     template <typename T1, typename ...Args>
-    constexpr static bool validate_or(T1&& a, Args&&... args)
+    static status validate_or(T1&& a, Args&&... args)
     {
         return detail::dispatcher_impl<T1>.validate_or(std::forward<T1>(a),std::forward<Args>(args)...);
     }
@@ -108,7 +109,7 @@ struct dispatcher_t
      * @return Logical NOT of result of intermediate validator
      */
     template <typename T1, typename ...Args>
-    constexpr static bool validate_not(T1&& a, Args&&... args)
+    static status validate_not(T1&& a, Args&&... args)
     {
         return detail::dispatcher_impl<T1>.validate_not(std::forward<T1>(a),std::forward<Args>(args)...);
     }

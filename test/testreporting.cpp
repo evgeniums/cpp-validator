@@ -256,4 +256,90 @@ BOOST_AUTO_TEST_CASE(CheckNestedValidationReportOp)
     rep1.clear();
 }
 
+BOOST_AUTO_TEST_CASE(CheckOtherFieldReportOp)
+{
+    std::map<std::string,int> m1={
+            {"field1",10},
+            {"field2",5},
+            {"field3",5}
+        };
+    std::string rep1;
+    auto ra1=make_reporting_adapter(rep1,m1);
+
+    auto v1=validator(
+                _["field1"](gt,_["field2"]),
+                _["field2"](eq,_["field3"])
+            );
+    BOOST_CHECK(v1.apply(ra1));
+    rep1.clear();
+
+    auto v2=validator(
+                _["field2"](gt,_["field3"]) ^OR^ _["field3"](eq,_["field1"])
+            );
+    BOOST_CHECK(!v2.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"field2 is greater than field3 OR field3 is equal to field1");
+    rep1.clear();
+}
+
+BOOST_AUTO_TEST_CASE(CheckSampleObjectReportOp)
+{
+    std::map<std::string,int> m1={
+            {"field1",10},
+            {"field2",5},
+            {"field3",5}
+        };
+    std::map<std::string,int> m2={
+            {"field1",10},
+            {"field2",5},
+            {"field3",5}
+        };
+    std::string rep1;
+    auto ra1=make_reporting_adapter(rep1,m1);
+
+    auto v1=validator(
+                _["field1"](gte,_(m2)),
+                _["field2"](eq,_(m2))
+            );
+    BOOST_CHECK(v1.apply(ra1));
+    rep1.clear();
+
+    auto v2=validator(
+                _["field2"](gt,_(m2)) ^OR^ _["field3"](lt,_(m2))
+            );
+    BOOST_CHECK(!v2.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"field2 is greater than field2 of sample OR field3 is less than field3 of sample");
+    rep1.clear();
+}
+
+BOOST_AUTO_TEST_CASE(CheckNotExistingMemberIgnoreReportOp)
+{
+    std::map<std::string,int> m1={
+            {"field1",10},
+            {"field3",5}
+        };
+    std::string rep1;
+    auto ra1=make_reporting_adapter(rep1,m1);
+    ra1.set_check_member_exists_before_validation(true);
+
+    auto v1=validator(
+                _["field1"](gte,9),
+                _["field2"](eq,100)
+            );
+    BOOST_CHECK(v1.apply(ra1));
+    rep1.clear();
+
+    auto v2=validator(
+                _["field2"](gt,100)
+            );
+    BOOST_CHECK(v2.apply(ra1));
+    rep1.clear();
+
+    auto v3=validator(
+                _["field2"](gt,100) ^OR^ _["field1"](eq,20)
+            );
+    BOOST_CHECK(!v3.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"field1 is equal to 20");
+    rep1.clear();
+}
+
 BOOST_AUTO_TEST_SUITE_END()

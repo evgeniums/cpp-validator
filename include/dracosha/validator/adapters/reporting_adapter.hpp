@@ -59,7 +59,7 @@ class reporting_adapter : public chained_adapter<AdapterT>
          *  @return Validation status
          */
         template <typename T2, typename OpT>
-        bool validate_operator(OpT&& op, T2&& b)
+        status validate_operator(OpT&& op, T2&& b)
         {
             auto ok=this->next_adapter().validate_operator(op,b);
             if (!ok || _reporter.current_not())
@@ -77,7 +77,7 @@ class reporting_adapter : public chained_adapter<AdapterT>
          *  @return Validation status
          */
         template <typename T2, typename OpT, typename PropT>
-        bool validate_property(PropT&& prop, OpT&& op, T2&& b)
+        status validate_property(PropT&& prop, OpT&& op, T2&& b)
         {
             auto ok=this->next_adapter().validate_property(prop,op,b);
             if (!ok || _reporter.current_not())
@@ -95,7 +95,7 @@ class reporting_adapter : public chained_adapter<AdapterT>
          *  @return Validation status
          */
         template <typename T2, typename MemberT>
-        bool validate_exists(MemberT&& member, T2&& b)
+        status validate_exists(MemberT&& member, T2&& b)
         {
             auto ok=this->next_adapter().validate_exists(member,b);
             if (!ok || _reporter.current_not())
@@ -114,7 +114,7 @@ class reporting_adapter : public chained_adapter<AdapterT>
          *  @return Validation status
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT>
-        bool validate(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
+        status validate(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
         {
             auto ok=this->next_adapter().validate(*this,member,prop,op,b);
             if (!ok || _reporter.current_not())
@@ -133,7 +133,7 @@ class reporting_adapter : public chained_adapter<AdapterT>
          *  @return Validation status
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT>
-        bool validate_with_other_member(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
+        status validate_with_other_member(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
         {
             auto ok=this->next_adapter().validate_with_other_member(*this,member,prop,op,b);
             if (!ok || _reporter.current_not())
@@ -152,7 +152,7 @@ class reporting_adapter : public chained_adapter<AdapterT>
          *  @return Validation status
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT>
-        bool validate_with_master_sample(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
+        status validate_with_master_sample(MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
         {
             auto ok=this->next_adapter().validate_with_master_sample(*this,member,prop,op,b);
             if (!ok || _reporter.current_not())
@@ -163,7 +163,7 @@ class reporting_adapter : public chained_adapter<AdapterT>
         }
 
         template <typename ObjT, typename OpsT>
-        bool validate_and(ObjT&& obj, OpsT&& ops,
+        status validate_and(ObjT&& obj, OpsT&& ops,
                                  std::enable_if_t<!hana::is_a<member_tag,ObjT>,void*> =nullptr)
         {
             return aggregate(
@@ -178,13 +178,13 @@ class reporting_adapter : public chained_adapter<AdapterT>
          * @return Logical AND of results of intermediate validators
          */
         template <typename OpsT>
-        bool validate_and(OpsT&& ops)
+        status validate_and(OpsT&& ops)
         {
             return validate_and(*this,std::forward<OpsT>(ops));
         }
 
         template <typename ObjT, typename MemberT, typename OpsT>
-        bool validate_and(ObjT&& obj, MemberT&& member, OpsT&& ops)
+        status validate_and(ObjT&& obj, MemberT&& member, OpsT&& ops)
         {
             return aggregate(
                             string_and,
@@ -200,14 +200,14 @@ class reporting_adapter : public chained_adapter<AdapterT>
          * @return Logical AND of results of intermediate validators
          */
         template <typename MemberT, typename OpsT>
-        bool validate_and(MemberT&& member,OpsT&& ops,
+        status validate_and(MemberT&& member,OpsT&& ops,
                           std::enable_if_t<hana::is_a<member_tag,MemberT>,void*> =nullptr)
         {
             return validate_and(*this,std::forward<MemberT>(member),std::forward<OpsT>(ops));
         }
 
         template <typename ObjT, typename OpsT>
-        bool validate_or(ObjT&& obj, OpsT&& ops,
+        status validate_or(ObjT&& obj, OpsT&& ops,
                                  std::enable_if_t<!hana::is_a<member_tag,ObjT>,void*> =nullptr)
         {
             return aggregate(
@@ -222,13 +222,13 @@ class reporting_adapter : public chained_adapter<AdapterT>
          * @return Logical OR of results of intermediate validators
          */
         template <typename OpsT>
-        bool validate_or(OpsT&& ops)
+        status validate_or(OpsT&& ops)
         {
             return validate_or(*this,std::forward<OpsT>(ops));
         }
 
         template <typename ObjT,typename MemberT, typename OpsT>
-        bool validate_or(ObjT&& obj, MemberT&& member, OpsT&& ops)
+        status validate_or(ObjT&& obj, MemberT&& member, OpsT&& ops)
         {
             return aggregate(
                             string_or,
@@ -244,14 +244,14 @@ class reporting_adapter : public chained_adapter<AdapterT>
          * @return Logical OR of results of intermediate validators
          */
         template <typename MemberT, typename OpsT>
-        bool validate_or(MemberT&& member, OpsT&& ops,
+        status validate_or(MemberT&& member, OpsT&& ops,
                          std::enable_if_t<hana::is_a<member_tag,MemberT>,void*> =nullptr)
         {
             return validate_or(*this,std::forward<MemberT>(member),std::forward<OpsT>(ops));
         }
 
         template <typename ObjT, typename OpT>
-        bool validate_not(ObjT&& obj, OpT&& op,
+        status validate_not(ObjT&& obj, OpT&& op,
                                  std::enable_if_t<!hana::is_a<member_tag,ObjT>,void*> =nullptr)
         {
             return aggregate(
@@ -266,13 +266,13 @@ class reporting_adapter : public chained_adapter<AdapterT>
          * @return Logical NOT of results of intermediate validator
          */
         template <typename OpT>
-        bool validate_not(OpT&& op)
+        status validate_not(OpT&& op)
         {
             return validate_not(*this,std::forward<OpT>(op));
         }
 
         template <typename ObjT, typename MemberT, typename OpT>
-        bool validate_not(ObjT&& obj, MemberT&& member, OpT&& op)
+        status validate_not(ObjT&& obj, MemberT&& member, OpT&& op)
         {
             return aggregate(
                             string_not,
@@ -291,7 +291,7 @@ class reporting_adapter : public chained_adapter<AdapterT>
          *       but only the first matched condition for nested OR operator
          */
         template <typename MemberT, typename OpT>
-        bool validate_not(MemberT&& member, OpT&& op,
+        status validate_not(MemberT&& member, OpT&& op,
                           std::enable_if_t<hana::is_a<member_tag,MemberT>,void*> =nullptr)
         {
             return validate_not(*this,std::forward<MemberT>(member),std::forward<OpT>(op));
@@ -300,12 +300,12 @@ class reporting_adapter : public chained_adapter<AdapterT>
     private:
 
         template <typename AgrregationT,typename HandlerT, typename ...Args>
-        bool aggregate(AgrregationT&& aggregation,HandlerT&& handler,Args&&... args)
+        status aggregate(AgrregationT&& aggregation,HandlerT&& handler,Args&&... args)
         {
             _reporter.aggregate_open(std::forward<AgrregationT>(aggregation),std::forward<Args>(args)...);
-            auto ok=handler();
-            _reporter.aggregate_close(ok);
-            return ok;
+            auto st=handler();
+            _reporter.aggregate_close(st);
+            return st;
         }
 
         ReporterT _reporter;
