@@ -179,7 +179,25 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportAggregation)
                 _["field1"](size(gte,100) ^OR^ value(gte,"zzzzzzzzzzzz"))
             );
     BOOST_CHECK(!v3.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to xxxxxx OR (size of field1 is greater than or equal to 100 OR field1 is greater than or equal to zzzzzzzzzzzz)"));
+    BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to xxxxxx OR size of field1 is greater than or equal to 100 OR field1 is greater than or equal to zzzzzzzzzzzz"));
+    rep1.clear();
+
+    auto v4=validator(
+                _["field1"](gte,"xxxxxx")
+                 ^OR^
+                _["field1"](size(gte,100) ^AND^ value(gte,"zzzzzzzzzzzz"))
+            );
+    BOOST_CHECK(!v4.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to xxxxxx OR size of field1 is greater than or equal to 100"));
+    rep1.clear();
+
+    auto v5=validator(
+                _["field1"](gte,"xxxxxx")
+                 ^OR^
+                _["field1"](size(gte,1) ^AND^ value(gte,"zzzzzzzzzzzz"))
+            );
+    BOOST_CHECK(!v5.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to xxxxxx OR field1 is greater than or equal to zzzzzzzzzzzz"));
     rep1.clear();
 }
 
@@ -340,6 +358,263 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberIgnoreReportOp)
     BOOST_CHECK(!v3.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"field1 is equal to 20");
     rep1.clear();
+
+    auto v4=validator(
+                _["field2"](value(gt,100) ^OR^ value(eq,20))
+            );
+    BOOST_CHECK(v4.apply(ra1));
+    rep1.clear();
+
+    auto v5=validator(
+                _["field2"](value(gt,100) ^OR^ value(eq,20)),
+                _["field1"](gte,9)
+            );
+    BOOST_CHECK(v5.apply(ra1));
+    rep1.clear();
+
+    auto v6=validator(
+                _["field2"](value(gt,100) ^OR^ value(eq,20)),
+                _["field1"](gte,100)
+            );
+    BOOST_CHECK(!v6.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"field1 is greater than or equal to 100");
+    rep1.clear();
 }
+
+BOOST_AUTO_TEST_CASE(CheckNotExistingMemberAbortReportOp)
+{
+    std::map<std::string,int> m1={
+            {"field1",10},
+            {"field3",5}
+        };
+    std::string rep1;
+    auto ra1=make_reporting_adapter(rep1,m1);
+    ra1.set_check_member_exists_before_validation(true);
+    ra1.set_unknown_member_mode(if_member_not_found::abort);
+
+    auto v1=validator(
+                _["field1"](gte,9),
+                _["field2"](eq,100)
+            );
+    BOOST_CHECK(!v1.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"field2 is equal to 100");
+    rep1.clear();
+
+    auto v2=validator(
+                _["field2"](gt,100)
+            );
+    BOOST_CHECK(!v2.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"field2 is greater than 100");
+    rep1.clear();
+
+    auto v3=validator(
+                _["field2"](gt,100) ^OR^ _["field1"](eq,20)
+            );
+    BOOST_CHECK(!v3.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"field2 is greater than 100 OR field1 is equal to 20");
+    rep1.clear();
+
+    auto v4=validator(
+                _["field2"](value(gt,100) ^OR^ value(eq,20))
+            );
+    BOOST_CHECK(!v4.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"field2 is greater than 100 OR field2 is equal to 20");
+    rep1.clear();
+
+    auto v5=validator(
+                _["field2"](value(gt,100) ^OR^ value(eq,20)),
+                _["field1"](gte,9)
+            );
+    BOOST_CHECK(!v5.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"field2 is greater than 100 OR field2 is equal to 20");
+    rep1.clear();
+
+    auto v6=validator(
+                _["field2"](value(gt,100) ^OR^ value(eq,20)),
+                _["field1"](gte,100)
+            );
+    BOOST_CHECK(!v6.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"field2 is greater than 100 OR field2 is equal to 20");
+    rep1.clear();
+}
+
+//BOOST_AUTO_TEST_CASE(CheckNotExistingOtherMemberIgnoreReportOp)
+//{
+//    std::map<std::string,int> m1={
+//            {"field1",10},
+//            {"field3",5}
+//        };
+//    std::string rep1;
+//    auto ra1=make_reporting_adapter(rep1,m1);
+//    ra1.set_check_member_exists_before_validation(true);
+//    ra1.set_unknown_member_mode(if_member_not_found::abort);
+
+//    auto v1=validator(
+//                _["field1"](gte,9),
+//                _["field2"](eq,_["field1"])
+//            );
+//    BOOST_CHECK(!v1.apply(ra1));
+//    BOOST_CHECK_EQUAL(rep1,"field2 is equal to field1");
+//    rep1.clear();
+//    auto v1_1=validator(
+//                _["field1"](gte,9),
+//                _["field3"](eq,_["field4"])
+//            );
+//    BOOST_CHECK(!v1_1.apply(ra1));
+//    BOOST_CHECK_EQUAL(rep1,"field3 is equal to field4");
+//    rep1.clear();
+
+//    auto v2=validator(
+//                _["field2"](gt,_["field1"])
+//            );
+//    BOOST_CHECK(!v2.apply(ra1));
+//    BOOST_CHECK_EQUAL(rep1,"field2 is equal to field1");
+//    rep1.clear();
+//    auto v2_1=validator(
+//                _["field3"](gt,_["field4"])
+//            );
+//    BOOST_CHECK(!v2_1.apply(ra1));
+//    BOOST_CHECK_EQUAL(rep1,"field3 is equal to field4");
+//    rep1.clear();
+
+//    auto v3=validator(
+//                _["field2"](gt,_["field3"]) ^OR^ _["field1"](eq,20)
+//            );
+//    BOOST_CHECK(!v3.apply(ra1));
+//    BOOST_CHECK_EQUAL(rep1,"field1 is equal to 20");
+//    rep1.clear();
+//    auto v3_1=validator(
+//                _["field1"](gt,_["field4"]) ^OR^ _["field1"](eq,20)
+//            );
+//    BOOST_CHECK(!v3_1.apply(ra1));
+//    BOOST_CHECK_EQUAL(rep1,"field1 is equal to 20");
+//    rep1.clear();
+
+//    auto v4=validator(
+//                _["field2"](value(gt,_["field1"]) ^OR^ value(eq,_["field1"]))
+//            );
+//    BOOST_CHECK(v4.apply(ra1));
+//    rep1.clear();
+//    auto v4_1=validator(
+//                _["field1"](value(gt,_["field4"]) ^OR^ value(eq,_["field4"]))
+//            );
+//    BOOST_CHECK(v4_1.apply(ra1));
+//    rep1.clear();
+
+//    auto v5=validator(
+//                _["field2"](value(gt,_["field1"]) ^OR^ value(eq,_["field1"])),
+//                _["field1"](gte,9)
+//            );
+//    BOOST_CHECK(v5.apply(ra1));
+//    rep1.clear();
+//    auto v5_1=validator(
+//                _["field3"](value(gt,_["field4"]) ^OR^ value(eq,_["field4"])),
+//                _["field1"](gte,9)
+//            );
+//    BOOST_CHECK(v5_1.apply(ra1));
+//    rep1.clear();
+
+//    auto v6=validator(
+//                _["field2"](value(gt,_["field1"]) ^OR^ value(eq,_["field1"])),
+//                _["field1"](gte,100)
+//            );
+//    BOOST_CHECK(!v6.apply(ra1));
+//    BOOST_CHECK_EQUAL(rep1,"field1 is greater than or equal to 100");
+//    rep1.clear();
+//    auto v6_1=validator(
+//                _["field3"](value(gt,_["field4"]) ^OR^ value(eq,_["field4"])),
+//                _["field1"](gte,100)
+//            );
+//    BOOST_CHECK(!v6_1.apply(ra1));
+//    BOOST_CHECK_EQUAL(rep1,"field1 is greater than or equal to 100");
+//    rep1.clear();
+//}
+
+//BOOST_AUTO_TEST_CASE(CheckNotExistingOtherMemberAbortReportOp)
+//{
+//    std::map<std::string,int> m1={
+//            {"field1",10},
+//            {"field3",5}
+//        };
+//    std::string rep1;
+//    auto ra1=make_reporting_adapter(rep1,m1);
+//    ra1.set_check_member_exists_before_validation(true);
+
+//    auto v1=validator(
+//                _["field1"](gte,9),
+//                _["field2"](eq,_["field1"])
+//            );
+//    BOOST_CHECK(v1.apply(ra1));
+//    rep1.clear();
+//    auto v1_1=validator(
+//                _["field1"](gte,9),
+//                _["field3"](eq,_["field4"])
+//            );
+//    BOOST_CHECK(v1_1.apply(ra1));
+//    rep1.clear();
+
+//    auto v2=validator(
+//                _["field2"](gt,100)
+//            );
+//    BOOST_CHECK(v2.apply(ra1));
+//    rep1.clear();
+//    auto v2_1=validator(
+//                _["field1"](gt,_["field4"])
+//            );
+//    BOOST_CHECK(v2_1.apply(ra1));
+//    rep1.clear();
+
+//    auto v3=validator(
+//                _["field2"](gt,_["field3"]) ^OR^ _["field1"](eq,20)
+//            );
+//    BOOST_CHECK(!v3.apply(ra1));
+//    BOOST_CHECK_EQUAL(rep1,"field1 is equal to 20");
+//    rep1.clear();
+//    auto v3_1=validator(
+//                _["field1"](gt,_["field4"]) ^OR^ _["field1"](eq,20)
+//            );
+//    BOOST_CHECK(!v3_1.apply(ra1));
+//    BOOST_CHECK_EQUAL(rep1,"field1 is equal to 20");
+//    rep1.clear();
+
+//    auto v4=validator(
+//                _["field2"](value(gt,_["field1"]) ^OR^ value(eq,_["field1"]))
+//            );
+//    BOOST_CHECK(v4.apply(ra1));
+//    rep1.clear();
+//    auto v4_1=validator(
+//                _["field1"](value(gt,_["field4"]) ^OR^ value(eq,_["field4"]))
+//            );
+//    BOOST_CHECK(v4_1.apply(ra1));
+//    rep1.clear();
+
+//    auto v5=validator(
+//                _["field2"](value(gt,_["field1"]) ^OR^ value(eq,_["field1"])),
+//                _["field1"](gte,9)
+//            );
+//    BOOST_CHECK(v5.apply(ra1));
+//    rep1.clear();
+//    auto v5_1=validator(
+//                _["field3"](value(gt,_["field4"]) ^OR^ value(eq,_["field4"])),
+//                _["field1"](gte,9)
+//            );
+//    BOOST_CHECK(v5_1.apply(ra1));
+//    rep1.clear();
+
+//    auto v6=validator(
+//                _["field2"](value(gt,_["field1"]) ^OR^ value(eq,_["field1"])),
+//                _["field1"](gte,100)
+//            );
+//    BOOST_CHECK(!v6.apply(ra1));
+//    BOOST_CHECK_EQUAL(rep1,"field1 is greater than or equal to 100");
+//    rep1.clear();
+//    auto v6_1=validator(
+//                _["field3"](value(gt,_["field4"]) ^OR^ value(eq,_["field4"])),
+//                _["field1"](gte,100)
+//            );
+//    BOOST_CHECK(!v6_1.apply(ra1));
+//    BOOST_CHECK_EQUAL(rep1,"field1 is greater than or equal to 100");
+//    rep1.clear();
+//}
 
 BOOST_AUTO_TEST_SUITE_END()

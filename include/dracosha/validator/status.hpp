@@ -25,6 +25,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Status to be used as result of validation operation
+ */
 class status
 {
     public:
@@ -36,7 +39,7 @@ class status
             ignore
         };
 
-        status() : _code(code::ok)
+        status() noexcept : _code(code::ok)
         {}
         ~status()=default;
         status(const status&)=default;
@@ -44,17 +47,32 @@ class status
         status& operator= (const status&)=default;
         status& operator= (status&&)=default;
 
+        /**
+         * @brief Constructor from code
+         * @param c Status code
+         */
         status(code c) noexcept : _code(c)
         {}
 
+        /**
+         * @brief Constructor from boolean
+         * @param ok Boolean status
+         */
         status(bool ok) noexcept : _code(ok?code::ok:code::fail)
         {}
 
+        /**
+         * @brief Convert to boolean
+         */
         operator bool () const noexcept
         {
             return _code!=code::fail;
         }
 
+        /**
+         * @brief Get value
+         * @return Status code
+         */
         code value() const noexcept
         {
             return _code;

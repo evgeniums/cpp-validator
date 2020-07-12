@@ -72,10 +72,6 @@ class reporter
                 ++_not_count;
             }
             _stack.emplace_back(std::forward<AggregationT>(aggregation));
-            if (_stack.size()>1)
-            {
-                _stack.back().single=false;
-            }
         }
 
         /**
@@ -92,10 +88,6 @@ class reporter
             }
             _stack.emplace_back(std::forward<AggregationT>(aggregation),
                                 _formatter.member_to_string(std::forward<MemberT>(member)));
-            if (_stack.size()>1)
-            {
-                _stack.back().single=false;
-            }
         }
 
         /**
@@ -108,6 +100,7 @@ class reporter
             {
                 if (!ok || current_not())
                 {
+                    updateBrackets();
                     auto wrapper=wrap_backend_formatter(report_dst(),_dst);
                     _formatter.aggregate(wrapper,_stack.back());
                 }
@@ -237,6 +230,24 @@ class reporter
                 return _stack.at(_stack.size()-2).parts.back();
             }
             return _dst;
+        }
+
+        void updateBrackets()
+        {
+            if (_stack.size()>1
+                    &&
+                (
+                    (_stack.at(_stack.size()-2).parts.size()>1
+                     ||
+                     _stack.at(_stack.size()-2).aggregation.id==aggregation_id::NOT
+                     )
+                        &&
+                    _stack.back().parts.size()>1
+                )
+            )
+            {
+                _stack.back().single=false;
+            }
         }
 
         DstT _dst;

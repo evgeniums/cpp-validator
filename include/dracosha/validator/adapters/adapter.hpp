@@ -118,7 +118,7 @@ struct adapter
     }
 
     template <typename AdapterT, typename MemberT>
-    status check_member_exists(AdapterT&& adpt, MemberT&& member) const
+    bool check_member_exists(AdapterT&& adpt, MemberT&& member) const
     {
         if (!check_member_path(extract(adpt.object()),member.path))
         {
@@ -126,11 +126,7 @@ struct adapter
         }
         if (adpt.is_check_member_exists_before_validation())
         {
-            if (adpt.unknown_member_mode()==if_member_not_found::ignore)
-            {
-                return validate_exists(member,true);
-            }
-            return adpt.validate_exists(member,true);
+            return validate_exists(member,true);
         }
         return true;
     }
@@ -431,11 +427,6 @@ struct adapter
     template <typename AdapterT, typename MemberT, typename OpsT>
     status validate_or(AdapterT&& adpt, MemberT&& member, OpsT&& ops) const
     {
-        if (!check_member_exists(adpt,member))
-        {
-            return (_unknown_member_mode==if_member_not_found::ignore)?status::code::ignore:status::code::fail;
-        }
-
         const auto& obj=extract(adpt.object());
         return hana::if_(check_member_path(obj,member.path),
             [&adpt,&member,&ops](auto&&)
