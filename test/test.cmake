@@ -1,6 +1,7 @@
 SET(SOURCES
     ${SOURCES}
     ${VALIDATOR_TEST_SRC}/testvalidatorimpl.cpp
+    ${VALIDATOR_TEST_SRC}/testvalidator.cpp
     ${VALIDATOR_TEST_SRC}/testreporting.cpp
     ${VALIDATOR_TEST_SRC}/testtranslator.cpp
     ${VALIDATOR_TEST_SRC}/testfmtformatter.cpp

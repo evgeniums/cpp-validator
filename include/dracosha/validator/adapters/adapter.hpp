@@ -334,7 +334,7 @@ struct adapter
     template <typename OpsT>
     status validate_and(OpsT&& ops) const
     {
-        return validate_and(_obj,std::forward<OpsT>(ops));
+        return validate_and(*this,std::forward<OpsT>(ops));
     }
 
     /**

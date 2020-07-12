@@ -8,7 +8,7 @@
 
 using namespace dracosha::validator;
 
-BOOST_AUTO_TEST_SUITE(TestOperators)
+BOOST_AUTO_TEST_SUITE(TestValidatorImpl)
 
 struct TestRefStruct
 {
@@ -580,7 +580,6 @@ BOOST_AUTO_TEST_CASE(CheckNot)
 
     Test:
         validation of not existing members of all types
-        reporting validation of all types
         reporting validation of single member of all types
         validate lazy objects and operands
 */
