@@ -32,6 +32,8 @@ SET (HEADERS
     include/dracosha/validator/make_validator.hpp
     include/dracosha/validator/dispatcher.hpp
     include/dracosha/validator/check_member_path.hpp
+    include/dracosha/validator/with_check_member_exists.hpp
+    include/dracosha/validator/check_member_exists_traits_proxy.hpp
 
     include/dracosha/validator/operators/operator.hpp
     include/dracosha/validator/operators/exists.hpp
@@ -50,7 +52,7 @@ SET (HEADERS
     include/dracosha/validator/properties.hpp
 
     include/dracosha/validator/adapters/adapter.hpp
-    include/dracosha/validator/adapters/chained_adapter.hpp
+    include/dracosha/validator/adapters/default_adapter.hpp
     include/dracosha/validator/adapters/reporting_adapter.hpp
     include/dracosha/validator/adapters/single_member_adapter.hpp
 
@@ -91,7 +93,8 @@ SET (HEADERS
     include/dracosha/validator/detail/if_bool.hpp
     include/dracosha/validator/detail/formatter_std.hpp
     include/dracosha/validator/detail/backend_formatter_helper.hpp
-    include/dracosha/validator/detail/adapter_helper.hpp
+    include/dracosha/validator/detail/default_adapter_impl.hpp
+    include/dracosha/validator/detail/reporting_adapter_impl.hpp
 )
 
 SET (SOURCES

@@ -38,6 +38,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/get_member.hpp>
 #include <dracosha/validator/dispatcher.hpp>
 #include <dracosha/validator/adapters/adapter.hpp>
+#include <dracosha/validator/adapters/default_adapter.hpp>
 #include <dracosha/validator/prepare_dispatcher.hpp>
 #include <dracosha/validator/apply.hpp>
 #include <dracosha/validator/detail/validator_impl.hpp>

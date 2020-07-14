@@ -8,44 +8,42 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/adapters/chained_adapter.hpp
+/** \file validator/check_member_exists_traits_proxy.hpp
 *
-*  Defines base class for chained adapters.
+*  Defines proxy class for adapters using traits that inherits with_check_member_exists.
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_CHAINED_ADAPTER_HPP
-#define DRACOSHA_VALIDATOR_CHAINED_ADAPTER_HPP
+#ifndef DRACOSHA_VALIDATOR_CHECK_MEMBER_EXISTS_PROXY_HPP
+#define DRACOSHA_VALIDATOR_CHECK_MEMBER_EXISTS_PROXY_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/adapters/adapter.hpp>
+#include <dracosha/validator/status.hpp>
+#include <dracosha/validator/with_check_member_exists.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
 /**
- *  @brief Base class for chained adapters
- *
+ * @brief Proxy class for adapters using traits that inherits with_check_member_exists
  */
 template <typename AdapterT>
-class chained_adapter
+class check_member_exists_traits_proxy
 {
     public:
 
-        using hana_tag=adapter_tag;
-
-        using next_adapter_type=AdapterT;
+        using adapter_type=AdapterT;
 
         /**
          * @brief Constructor
-         * @param next_adapter Next adapter in chain
+         * @param adapter Adapter object
          */
-        chained_adapter(
-            AdapterT&& next_adapter
-        ) : _next_adapter(std::forward<AdapterT>(next_adapter))
+        check_member_exists_traits_proxy(
+            AdapterT& adapter
+        ) : _adapter(adapter)
         {}
 
         /**
@@ -59,7 +57,7 @@ class chained_adapter
          */
         void set_check_member_exists_before_validation(bool enable) noexcept
         {
-            _next_adapter.set_check_member_exists_before_validation(enable);
+            _adapter.traits().set_check_member_exists_before_validation(enable);
         }
         /**
          * @brief Get flag of checking if member exists befor validation
@@ -67,7 +65,7 @@ class chained_adapter
          */
         bool is_check_member_exists_before_validation() const noexcept
         {
-            return _next_adapter.is_check_member_exists_before_validation();
+            return _adapter.traits().is_check_member_exists_before_validation();
         }
 
         /**
@@ -76,7 +74,7 @@ class chained_adapter
          */
         void set_unknown_member_mode(if_member_not_found mode) noexcept
         {
-            _next_adapter.set_unknown_member_mode(mode);
+            _adapter.traits().set_unknown_member_mode(mode);
         }
 
         /**
@@ -85,37 +83,36 @@ class chained_adapter
          */
         if_member_not_found unknown_member_mode() const noexcept
         {
-            return _next_adapter.unknown_member_mode();
+            return _adapter.traits().unknown_member_mode();
         }
 
         /**
-         * @brief Get reference to wrapped object
-         * @return Wrapped object under validation
+         * @brief Check if member exists
+         * @param member Member to check
+         * @return Status of checking
          */
-        auto object() const noexcept -> decltype(auto)
+        template <typename MemberT>
+        bool check_member_exists(MemberT&& member) const
         {
-            return _next_adapter.object();
+            return _adapter.traits().check_member_exists(std::forward<MemberT>(member));
         }
 
-    protected:
-
-        AdapterT& next_adapter() noexcept
+        /**
+         * @brief Get status to return if member is not found
+         * @return Resulting status
+         */
+        status not_found_status() const
         {
-            return _next_adapter;
-        }
-
-        const AdapterT& next_adapter() const noexcept
-        {
-            return _next_adapter;
+            return _adapter.traits().not_found_status();
         }
 
     private:
 
-        AdapterT _next_adapter;
+        AdapterT& _adapter;
 };
 
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_CHAINED_ADAPTER_HPP
+#endif // DRACOSHA_VALIDATOR_CHECK_MEMBER_EXISTS_PROXY_HPP

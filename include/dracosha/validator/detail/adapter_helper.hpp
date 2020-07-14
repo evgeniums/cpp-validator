@@ -51,7 +51,7 @@ struct adapter_helper_t<T,hana::when<hana::is_a<adapter_tag,T>>>
     template <typename T1>
     auto operator() (T1&& val) const -> decltype(auto)
     {
-        return val.object();
+        return val.get();
     }
 };
 /**

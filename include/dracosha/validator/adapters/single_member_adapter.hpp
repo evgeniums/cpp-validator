@@ -21,7 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/adapters/adapter.hpp>
-#include <dracosha/validator/adapters/chained_adapter.hpp>
+#include <dracosha/validator/check_member_exists_traits_proxy.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -272,7 +272,7 @@ auto make_single_member_adapter(MemberT&& member, ObjT&& obj,
 {
     return make_single_member_adapter(
                 std::forward<MemberT>(member),
-                make_adapter(std::forward<ObjT>(obj))
+                make_default_adapter(std::forward<ObjT>(obj))
         );
 }
 

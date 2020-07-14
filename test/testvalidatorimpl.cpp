@@ -579,9 +579,7 @@ BOOST_AUTO_TEST_CASE(CheckNot)
     Nested members check in one call
 
     Test:
-        validation of not existing members of all types
         reporting validation of single member of all types
-        validate lazy objects and operands
 */
 
 BOOST_AUTO_TEST_SUITE_END()

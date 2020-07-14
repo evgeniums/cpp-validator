@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_SUITE(TestValidator)
 BOOST_AUTO_TEST_CASE(CheckValidation)
 {
     std::map<std::string,size_t> m1={{"field1",1}};
-    auto a1=make_adapter(m1);
+    auto a1=make_default_adapter(m1);
 
     auto v0=validator(
                 _["field1"](eq,1)
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(CheckValidation)
     {
         return hana::id(m1);
     };
-    auto a2=make_adapter(lazy(get_obj));
+    auto a2=make_default_adapter(lazy(get_obj));
     m1["field1"]=10;
     BOOST_CHECK(!v0.apply(a2));
     BOOST_CHECK(v1.apply(a2));
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(CheckLazyValidation)
     {
         return hana::id(m1);
     };
-    auto a2=make_adapter(lazy(get_obj));
+    auto a2=make_default_adapter(lazy(get_obj));
     BOOST_CHECK(v0.apply(a2));
     BOOST_CHECK(!v1.apply(a2));
     BOOST_CHECK(!v2.apply(a2));
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(CheckLazyValidation)
 BOOST_AUTO_TEST_CASE(CheckValidationAggregation)
 {
     std::map<std::string,std::string> m1={{"field1","value1"}};
-    auto a1=make_adapter(m1);
+    auto a1=make_default_adapter(m1);
 
     auto v1=validator(
                 _["field1"](value(gte,"z1000") ^OR^ length(lt,3))
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE(CheckLazyValidationAggregation)
     {
         return hana::id(m1);
     };
-    auto a1=make_adapter(lazy(get_obj));
+    auto a1=make_default_adapter(lazy(get_obj));
     std::string str1="zzzzzzzzzzzz";
     auto get_val=[&str1]() -> decltype(auto)
     {
@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_CASE(CheckLazyValidationAggregation)
 BOOST_AUTO_TEST_CASE(CheckValidationNot)
 {
     std::map<std::string,size_t> m1={{"field1",10}};
-    auto a1=make_adapter(m1);
+    auto a1=make_default_adapter(m1);
 
     auto v1=validator(
                 NOT(_["field1"](eq,10))
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE(CheckNestedValidation)
     std::map<std::string,std::map<size_t,size_t>> m1={
             {"field1",{{1,10}}}
         };
-    auto a1=make_adapter(m1);
+    auto a1=make_default_adapter(m1);
 
     auto v1=validator(
                 _[size](gte,0),
@@ -255,7 +255,7 @@ BOOST_AUTO_TEST_CASE(CheckOtherField)
             {"field2",5},
             {"field3",5}
         };
-    auto a1=make_adapter(m1);
+    auto a1=make_default_adapter(m1);
 
     auto v1=validator(
                 _["field1"](gt,_["field2"]),
@@ -280,7 +280,7 @@ BOOST_AUTO_TEST_CASE(CheckLazyOtherField)
     {
         return hana::id(m1);
     };
-    auto a1=make_adapter(lazy(get_obj));
+    auto a1=make_default_adapter(lazy(get_obj));
 
     auto v1=validator(
                 _["field1"](gt,_["field2"]),
@@ -306,7 +306,7 @@ BOOST_AUTO_TEST_CASE(CheckSampleObject)
             {"field2",5},
             {"field3",5}
         };
-    auto a1=make_adapter(m1);
+    auto a1=make_default_adapter(m1);
 
     auto v1=validator(
                 _["field1"](gte,_(m2)),
@@ -336,7 +336,7 @@ BOOST_AUTO_TEST_CASE(CheckLazySampleObject)
     {
         return hana::id(m1);
     };
-    auto a1=make_adapter(lazy(get_obj));
+    auto a1=make_default_adapter(lazy(get_obj));
 
     auto v1=validator(
                 _["field1"](gte,_(m2)),
@@ -356,7 +356,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberIgnore)
             {"field1",10},
             {"field3",5}
         };
-    auto a1=make_adapter(m1);
+    auto a1=make_default_adapter(m1);
     a1.set_check_member_exists_before_validation(true);
     BOOST_REQUIRE(a1.is_check_member_exists_before_validation());
 
@@ -400,7 +400,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberAbort)
             {"field1",10},
             {"field3",5}
         };
-    auto a1=make_adapter(m1);
+    auto a1=make_default_adapter(m1);
     a1.set_check_member_exists_before_validation(true);
     a1.set_unknown_member_mode(if_member_not_found::abort);
 
@@ -444,7 +444,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingOtherMemberIgnore)
             {"field1",10},
             {"field3",5}
         };
-    auto a1=make_adapter(m1);
+    auto a1=make_default_adapter(m1);
     a1.set_check_member_exists_before_validation(true);
 
     auto v1=validator(
@@ -514,7 +514,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingOtherMemberAbort)
             {"field1",10},
             {"field3",5}
         };
-    auto a1=make_adapter(m1);
+    auto a1=make_default_adapter(m1);
     a1.set_check_member_exists_before_validation(true);
     a1.set_unknown_member_mode(if_member_not_found::abort);
 
@@ -590,7 +590,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberSampleIgnore)
             {"field2",5},
             {"field3",5}
         };
-    auto a1=make_adapter(m1);
+    auto a1=make_default_adapter(m1);
     a1.set_check_member_exists_before_validation(true);
 
     auto v1=validator(
@@ -616,7 +616,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberSampleAbort)
             {"field2",5},
             {"field3",5}
         };
-    auto a1=make_adapter(m1);
+    auto a1=make_default_adapter(m1);
     a1.set_check_member_exists_before_validation(true);
     a1.set_unknown_member_mode(if_member_not_found::abort);
 
