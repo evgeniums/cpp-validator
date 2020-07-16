@@ -21,6 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/string_view.hpp>
+#include <dracosha/validator/utils/object_wrapper.hpp>
 #include <dracosha/validator/adapters/adapter.hpp>
 #include <dracosha/validator/reporting/reporter.hpp>
 #include <dracosha/validator/detail/reporting_adapter_impl.hpp>
@@ -34,7 +35,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  * @brief Traits of reporting adapter that validates only single member
  */
 template <typename MemberT, typename T, typename ReporterT>
-struct single_member_adapter_traits : public detail::reporting_adapter_impl<ReporterT,detail::single_member_adapter_impl<MemberT>>
+class single_member_adapter_traits : public object_wrapper<T>,
+                                     public detail::reporting_adapter_impl<ReporterT,detail::single_member_adapter_impl<MemberT>>
 {
     public:
 
@@ -49,22 +51,12 @@ struct single_member_adapter_traits : public detail::reporting_adapter_impl<Repo
                     MemberT&& member,
                     T&& val,
                     ReporterT&& reporter
-                )
-            : detail::reporting_adapter_impl<ReporterT,detail::single_member_adapter_impl<MemberT>>(
-                  std::forward<ReporterT>(reporter),
-                  std::forward<MemberT>(member)
-                ),
-              _val(std::forward<T>(val))
+                ) : object_wrapper<T>(std::forward<T>(val)),
+                    detail::reporting_adapter_impl<ReporterT,detail::single_member_adapter_impl<MemberT>>(
+                        std::forward<ReporterT>(reporter),
+                        std::forward<MemberT>(member)
+                    )
         {}
-
-        const std::decay_t<T>& get() const
-        {
-            return _val;
-        }
-
-    private:
-
-        T _val;
 };
 
 /**

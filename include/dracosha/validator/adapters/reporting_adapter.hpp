@@ -20,6 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_REPORTING_ADAPTER_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/utils/object_wrapper.hpp>
 #include <dracosha/validator/adapters/adapter.hpp>
 #include <dracosha/validator/reporting/reporter.hpp>
 #include <dracosha/validator/detail/reporting_adapter_impl.hpp>
@@ -32,8 +33,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  * @brief Traits of reporting adapter
  */
 template <typename T, typename ReporterT>
-struct reporting_adapter_traits : public with_check_member_exists<adapter<reporting_adapter_traits<T,ReporterT>>>,
-                                  public reference_wrapper_t<const T>,
+struct reporting_adapter_traits : public object_wrapper<T>,
+                                  public with_check_member_exists<adapter<reporting_adapter_traits<T,ReporterT>>>,
                                   public detail::reporting_adapter_impl<ReporterT,detail::default_adapter_impl>
 {
     public:
@@ -46,11 +47,11 @@ struct reporting_adapter_traits : public with_check_member_exists<adapter<report
          */
         reporting_adapter_traits(
                     adapter<reporting_adapter_traits<T,ReporterT>>& adpt,
-                    const T& obj,
+                    T&& obj,
                     ReporterT&& reporter
                 )
-            : with_check_member_exists<adapter<reporting_adapter_traits<T,ReporterT>>>(adpt),
-              reference_wrapper_t<const T>(obj),
+            : object_wrapper<T>(std::forward<T>(obj)),
+              with_check_member_exists<adapter<reporting_adapter_traits<T,ReporterT>>>(adpt),
               detail::reporting_adapter_impl<ReporterT,detail::default_adapter_impl>(std::forward<ReporterT>(reporter))
         {}
 };
@@ -72,10 +73,10 @@ class reporting_adapter : public adapter<reporting_adapter_traits<T,ReporterT>>,
          * @param reporter_args Parameters to forward to reporter's constructor
          */
         reporting_adapter(
-                const T& obj,
+                T&& obj,
                 ReporterT&& reporter
             )
-            : adapter<reporting_adapter_traits<T,ReporterT>>(obj,std::forward<ReporterT>(reporter)),
+            : adapter<reporting_adapter_traits<T,ReporterT>>(std::forward<T>(obj),std::forward<ReporterT>(reporter)),
               check_member_exists_traits_proxy<reporting_adapter<T,ReporterT>>(*this)
         {}
 };
@@ -87,14 +88,14 @@ class reporting_adapter : public adapter<reporting_adapter_traits<T,ReporterT>>,
  * @return Reporting adapter
  */
 template <typename ObjT, typename ReporterT>
-auto make_reporting_adapter(const ObjT& obj,
+auto make_reporting_adapter(ObjT&& obj,
                             ReporterT&& reporter,
                             std::enable_if_t<
                                     hana::is_a<reporter_tag,ReporterT>,
                                     void*>
                             =nullptr)
 {
-    return reporting_adapter<ObjT,ReporterT>(obj,std::forward<ReporterT>(reporter));
+    return reporting_adapter<ObjT,ReporterT>(std::forward<ObjT>(obj),std::forward<ReporterT>(reporter));
 }
 
 /**
@@ -104,14 +105,14 @@ auto make_reporting_adapter(const ObjT& obj,
  * @return Reporting adapter
  */
 template <typename ObjT, typename DstT>
-auto make_reporting_adapter(const ObjT& obj,
+auto make_reporting_adapter(ObjT&& obj,
                             DstT& dst,
                             std::enable_if_t<
                                     (!hana::is_a<reporter_tag,DstT> && !hana::is_a<adapter_tag,ObjT>),
                                     void*>
                             =nullptr)
 {
-    return make_reporting_adapter(obj,make_reporter(dst));
+    return make_reporting_adapter(std::forward<ObjT>(obj),make_reporter(dst));
 }
 
 //-------------------------------------------------------------

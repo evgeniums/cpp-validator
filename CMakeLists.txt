@@ -13,6 +13,7 @@ SET (HEADERS
     include/dracosha/validator/utils/make_types_tuple.hpp
     include/dracosha/validator/utils/reference_wrapper.hpp
     include/dracosha/validator/utils/string_view.hpp
+    include/dracosha/validator/utils/object_wrapper.hpp
 
     include/dracosha/validator/property.hpp
     include/dracosha/validator/can_get.hpp
