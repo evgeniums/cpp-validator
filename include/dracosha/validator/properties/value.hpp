@@ -37,7 +37,7 @@ struct type_p_value
         return hana::id(std::forward<T>(v));
     }
     template <typename T>
-    constexpr static T has()
+    constexpr static bool has()
     {
         return true;
     }

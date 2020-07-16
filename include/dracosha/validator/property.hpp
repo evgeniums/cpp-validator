@@ -40,7 +40,7 @@ constexpr detail::has_property_t<T,PropT> has_property{};
   @param b Property which must be pre-declared with DRACOSHA_VALIDATOR_PROPERTY()
   @return Validation status
 */
-BOOST_HANA_CONSTEXPR_LAMBDA auto has_property_fn=[](auto a, auto b)
+BOOST_HANA_CONSTEXPR_LAMBDA auto has_property_fn=[](auto&& a, auto&& b)
 {
     return has_property<decltype(a),decltype(b)>();
 };

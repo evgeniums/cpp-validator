@@ -8,16 +8,16 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/scalar_compare.hpp
+/** \file validator/utils/safe_compare.hpp
 *
-*  Defines compiler friendly operators to compare scalar values
+*  Defines type safe operators to compare values
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_COMPARE_HPP
-#define DRACOSHA_VALIDATOR_COMPARE_HPP
+#ifndef DRACOSHA_VALIDATOR_SAFE_COMPARE_HPP
+#define DRACOSHA_VALIDATOR_SAFE_COMPARE_HPP
 
 #include <type_traits>
 
@@ -28,24 +28,125 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- *  @brief Compare two values of matching types
- *
- * "Matching types" means that compiler does not emit warnings when values of these types are compared.
+ * @brief Safe less than or equal to if operation is not possible
  */
 template <typename LeftT, typename RightT, typename=void>
-struct scalar_compare
+struct safe_lte
 {
-    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
+    constexpr static bool f(const LeftT&, const RightT&) noexcept
+    {
+        return false;
+    }
+};
+/**
+ * @brief Safe less or equal to if operation is possible
+ */
+template <typename LeftT, typename RightT>
+struct safe_lte<LeftT,RightT,
+            std::enable_if_t
+            <
+                std::is_same<
+                       bool,
+                       decltype(
+                           std::declval<LeftT>()<=std::declval<RightT>()
+                        )
+                   >::value
+            >
+        >
+{
+    constexpr static bool f(const LeftT& left, const RightT& right) noexcept
+    {
+        return left <= right;
+    }
+};
+
+/**
+ * @brief Safe less than if operation is not possible
+ */
+template <typename LeftT, typename RightT, typename=void>
+struct safe_lt
+{
+    constexpr static bool f(const LeftT&, const RightT&) noexcept
+    {
+        return false;
+    }
+};
+
+/**
+ * @brief Safe less than if operation is possible
+ */
+template <typename LeftT, typename RightT>
+struct safe_lt<LeftT,RightT,
+            std::enable_if_t
+            <
+                std::is_same<
+                       bool,
+                       decltype(
+                           std::declval<LeftT>()<std::declval<RightT>()
+                        )
+                   >::value
+            >
+        >
+{
+    constexpr static bool f(const LeftT& left, const RightT& right) noexcept
     {
         return left < right;
     }
-    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
+};
+
+/**
+ * @brief Safe equal to if operation is not possible
+ */
+template <typename LeftT, typename RightT, typename=void>
+struct safe_eq
+{
+    constexpr static bool f(const LeftT&, const RightT&) noexcept
+    {
+        return false;
+    }
+};
+
+/**
+ * @brief Safe equal to if operation is possible
+ */
+template <typename LeftT, typename RightT>
+struct safe_eq<LeftT,RightT,
+            std::enable_if_t
+            <
+                std::is_same<
+                       bool,
+                       decltype(
+                           std::declval<LeftT>()==std::declval<RightT>()
+                        )
+                   >::value
+            >
+        >
+{
+    constexpr static bool f(const LeftT& left, const RightT& right) noexcept
     {
         return left == right;
     }
+};
+
+/**
+ *  @brief Compare two values of comparable or not comparable types  types
+ *
+ * If types are not comparable then comparation result is always false.
+ */
+template <typename LeftT, typename RightT, typename=void>
+struct safe_compare
+{
+    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
+    {
+        return safe_lt<LeftT,RightT>::f(left,right);
+    }
+    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
+    {
+        return safe_eq<LeftT,RightT>::f(left,right);
+    }
     constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
     {
-        return left <= right;
+        return safe_lte<LeftT,RightT>::f(left,right);
     }
 };
 
@@ -54,7 +155,7 @@ struct scalar_compare
  *
  */
 template <typename LeftT, typename RightT>
-struct scalar_compare<LeftT,RightT,
+struct safe_compare<LeftT,RightT,
                         std::enable_if_t<
                             std::is_signed<LeftT>::value &&
                             !std::is_floating_point<LeftT>::value &&
@@ -90,7 +191,7 @@ struct scalar_compare<LeftT,RightT,
  *
  */
 template <typename LeftT, typename RightT>
-struct scalar_compare<LeftT, RightT,
+struct safe_compare<LeftT, RightT,
         std::enable_if_t<
             std::is_unsigned<LeftT>::value &&
             std::is_signed<RightT>::value &&
@@ -125,7 +226,7 @@ struct scalar_compare<LeftT, RightT,
  *
  */
 template <typename LeftT,typename RightT>
-struct scalar_compare<LeftT,RightT,
+struct safe_compare<LeftT,RightT,
                     std::enable_if_t<!std::is_same<LeftT, bool>::value && std::is_same<RightT, bool>::value>
                 >
 {
@@ -148,7 +249,7 @@ struct scalar_compare<LeftT,RightT,
  *
  */
 template <typename LeftT, typename RightT>
-struct scalar_compare<LeftT, RightT,
+struct safe_compare<LeftT, RightT,
         std::enable_if_t<std::is_same<LeftT, bool>::value && !std::is_same<RightT, bool>::value>
     >
 {
@@ -168,50 +269,17 @@ struct scalar_compare<LeftT, RightT,
 
 //-------------------------------------------------------------
 
-template <typename LeftT, typename RightT, typename=void>
-struct compare
-{
-};
-
 /**
- * @brief Compare non scalar values
+ * @brief Compare if left value is less than right value
  */
 template <typename LeftT, typename RightT>
-struct compare<LeftT, RightT,
-        std::enable_if_t<!std::is_scalar<LeftT>::value && !std::is_scalar<RightT>::value>>
+constexpr bool safe_compare_less(const LeftT& a, const RightT& b)
 {
-    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
-    {
-        return left < right;
-    }
-    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
-    {
-        return left==right;
-    }
-    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
-    {
-        return left <= right;
-    }
-};
-
-/**
- * @brief Compare two values when at least one of them is of scalar type
- */
-template <typename LeftT, typename RightT>
-struct compare<LeftT, RightT,
-        std::enable_if_t<std::is_scalar<LeftT>::value || std::is_scalar<RightT>::value>
-    > : public scalar_compare<LeftT,RightT>
-{
-};
-
-template <typename LeftT, typename RightT>
-constexpr bool compare_less(const LeftT& a, const RightT& b)
-{
-    return compare<LeftT,RightT>::less(a,b);
+    return safe_compare<LeftT,RightT>::less(a,b);
 }
 
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_COMPARE_HPP
+#endif // DRACOSHA_VALIDATOR_SAFE_COMPARE_HPP

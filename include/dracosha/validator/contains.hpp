@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/can_check_contains.hpp>
-#include <dracosha/validator/utils/scalar_compare.hpp>
+#include <dracosha/validator/utils/safe_compare.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -74,7 +74,7 @@ struct contains_t
                         hana::if_(detail::has_isSet(a,b),
                             [](auto&& a1, auto&& b1) { return a1.isSet(b1); },
                             hana::if_((detail::has_size(a) && (detail::has_at(a,b)||detail::has_brackets(a,b))),
-                                [](auto&& a1, auto&& b1) { return compare_less(b1,a1.size()) && compare_less(0,b1); },
+                                [](auto&& a1, auto&& b1) { return safe_compare_less(b1,a1.size()) && safe_compare_less(0,b1); },
                                 [](auto&&, auto&&) { return false; }
                             )
                         )

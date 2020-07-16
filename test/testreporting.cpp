@@ -27,35 +27,22 @@ BOOST_AUTO_TEST_CASE(CheckReportingAdapter)
 {
     std::string report;
     NonCopyable nc;
-    auto ra1=make_reporting_adapter(report,nc);
+    auto ra1=make_reporting_adapter(nc,report);
     using adapter_type1=decltype(ra1);
     static_assert(std::is_same<typename adapter_type1::reporter_type,decltype(make_reporter(report))>::value,"");
     static_assert(!std::is_lvalue_reference<typename adapter_type1::reporter_type>::value,"");
     static_assert(!std::is_rvalue_reference<typename adapter_type1::reporter_type>::value,"");
-//    static_assert(!std::is_lvalue_reference<typename adapter_type1::next_adapter_type>::value,"");
-//    static_assert(!std::is_rvalue_reference<typename adapter_type1::next_adapter_type>::value,"");
 
     auto rp2=make_reporter(report);
     auto& rp_ref2=rp2;
-    auto ra2=make_reporting_adapter(rp_ref2,nc);
+    auto ra2=make_reporting_adapter(nc,rp_ref2);
     using adapter_type2=decltype(ra2);
     static_assert(std::is_same<typename adapter_type2::reporter_type,decltype(rp_ref2)>::value,"");
     static_assert(std::is_lvalue_reference<typename adapter_type2::reporter_type>::value,"");
 
-    auto ra3=make_reporting_adapter(rp2,nc);
+    auto ra3=make_reporting_adapter(nc,rp2);
     using adapter_type3=decltype(ra3);
     static_assert(std::is_lvalue_reference<typename adapter_type3::reporter_type>::value,"");
-
-//    auto a4=make_default_adapter(nc);
-//    auto ra4=make_reporting_adapter(report,a4);
-//    using adapter_type4=decltype(ra4);
-//    static_assert(!std::is_lvalue_reference<typename adapter_type4::reporter_type>::value,"");
-//    static_assert(std::is_lvalue_reference<typename adapter_type4::next_adapter_type>::value,"");
-
-//    auto ra5=make_reporting_adapter(rp2,a4);
-//    using adapter_type5=decltype(ra5);
-//    static_assert(std::is_lvalue_reference<typename adapter_type5::reporter_type>::value,"");
-//    static_assert(std::is_lvalue_reference<typename adapter_type5::next_adapter_type>::value,"");
 
     BOOST_CHECK(true);
 }
@@ -141,7 +128,7 @@ BOOST_AUTO_TEST_CASE(CheckValidationReport)
             );
 
     std::string rep1;
-    auto ra1=make_reporting_adapter(rep1,m1);
+    auto ra1=make_reporting_adapter(m1,rep1);
     BOOST_CHECK(!v1.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to 10"));
 
@@ -157,7 +144,7 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportAggregation)
 {
     std::map<std::string,std::string> m1={{"field1","value1"}};
     std::string rep1;
-    auto ra1=make_reporting_adapter(rep1,m1);
+    auto ra1=make_reporting_adapter(m1,rep1);
 
     auto v1=validator(
                 _["field1"](value(gte,"z1000") ^OR^ length(lt,3))
@@ -206,7 +193,7 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportNot)
 {
     std::map<std::string,size_t> m1={{"field1",10}};
     std::string rep1;
-    auto ra1=make_reporting_adapter(rep1,m1);
+    auto ra1=make_reporting_adapter(m1,rep1);
 
     auto v1=validator(
                 NOT(_["field1"](eq,10))
@@ -251,7 +238,7 @@ BOOST_AUTO_TEST_CASE(CheckNestedValidationReport)
             {"field1",{{1,10}}}
         };
     std::string rep1;
-    auto ra1=make_reporting_adapter(rep1,m1);
+    auto ra1=make_reporting_adapter(m1,rep1);
 
     auto v1=validator(
                 _[size](gte,0),
@@ -283,7 +270,7 @@ BOOST_AUTO_TEST_CASE(CheckOtherFieldReport)
             {"field3",5}
         };
     std::string rep1;
-    auto ra1=make_reporting_adapter(rep1,m1);
+    auto ra1=make_reporting_adapter(m1,rep1);
 
     auto v1=validator(
                 _["field1"](gt,_["field2"]),
@@ -313,7 +300,7 @@ BOOST_AUTO_TEST_CASE(CheckSampleObjectReport)
             {"field3",5}
         };
     std::string rep1;
-    auto ra1=make_reporting_adapter(rep1,m1);
+    auto ra1=make_reporting_adapter(m1,rep1);
 
     auto v1=validator(
                 _["field1"](gte,_(m2)),
@@ -337,7 +324,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberIgnoreReport)
             {"field3",5}
         };
     std::string rep1;
-    auto ra1=make_reporting_adapter(rep1,m1);
+    auto ra1=make_reporting_adapter(m1,rep1);
     ra1.set_check_member_exists_before_validation(true);
 
     auto v1=validator(
@@ -389,7 +376,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberAbortReport)
             {"field3",5}
         };
     std::string rep1;
-    auto ra1=make_reporting_adapter(rep1,m1);
+    auto ra1=make_reporting_adapter(m1,rep1);
     ra1.set_check_member_exists_before_validation(true);
     ra1.set_unknown_member_mode(if_member_not_found::abort);
 
@@ -446,7 +433,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingOtherMemberIgnoreReport)
             {"field3",5}
         };
     std::string rep1;
-    auto ra1=make_reporting_adapter(rep1,m1);
+    auto ra1=make_reporting_adapter(m1,rep1);
     ra1.set_check_member_exists_before_validation(true);
 
     auto v1=validator(
@@ -533,7 +520,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingOtherMemberAbortReport)
             {"field3",5}
         };
     std::string rep1;
-    auto ra1=make_reporting_adapter(rep1,m1);
+    auto ra1=make_reporting_adapter(m1,rep1);
     ra1.set_check_member_exists_before_validation(true);
     ra1.set_unknown_member_mode(if_member_not_found::abort);
 
@@ -634,7 +621,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberSampleIgnoreReport)
             {"field3",5}
         };
     std::string rep1;
-    auto ra1=make_reporting_adapter(rep1,m1);
+    auto ra1=make_reporting_adapter(m1,rep1);
     ra1.set_check_member_exists_before_validation(true);
 
     auto v1=validator(
@@ -664,7 +651,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberSampleAbortReport)
             {"field3",5}
         };
     std::string rep1;
-    auto ra1=make_reporting_adapter(rep1,m1);
+    auto ra1=make_reporting_adapter(m1,rep1);
     ra1.set_check_member_exists_before_validation(true);
     ra1.set_unknown_member_mode(if_member_not_found::abort);
 

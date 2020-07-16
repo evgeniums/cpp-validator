@@ -31,7 +31,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 /**
  * @brief Traits of reporting adapter
  */
-template <typename T,typename ReporterT>
+template <typename T, typename ReporterT>
 struct reporting_adapter_traits : public with_check_member_exists<adapter<reporting_adapter_traits<T,ReporterT>>>,
                                   public reference_wrapper_t<const T>,
                                   public detail::reporting_adapter_impl<ReporterT,detail::default_adapter_impl>
@@ -44,15 +44,14 @@ struct reporting_adapter_traits : public with_check_member_exists<adapter<report
          * @param obj Constant reference to object under validation
          * @param reporter_args Parameters to forward to reporter's constructor
          */
-        template <typename ... ReporterArgs>
         reporting_adapter_traits(
                     adapter<reporting_adapter_traits<T,ReporterT>>& adpt,
                     const T& obj,
-                    ReporterArgs&&... reporter_args
+                    ReporterT&& reporter
                 )
             : with_check_member_exists<adapter<reporting_adapter_traits<T,ReporterT>>>(adpt),
               reference_wrapper_t<const T>(obj),
-              detail::reporting_adapter_impl<ReporterT,detail::default_adapter_impl>(std::forward<ReporterArgs>(reporter_args)...)
+              detail::reporting_adapter_impl<ReporterT,detail::default_adapter_impl>(std::forward<ReporterT>(reporter))
         {}
 };
 
@@ -72,12 +71,11 @@ class reporting_adapter : public adapter<reporting_adapter_traits<T,ReporterT>>,
          * @param obj Constant reference to object under validation
          * @param reporter_args Parameters to forward to reporter's constructor
          */
-        template <typename ... ReporterArgs>
         reporting_adapter(
                 const T& obj,
-                ReporterArgs&&... reporter_args
+                ReporterT&& reporter
             )
-            : adapter<reporting_adapter_traits<T,ReporterT>>(obj,std::forward<ReporterArgs>(reporter_args)...),
+            : adapter<reporting_adapter_traits<T,ReporterT>>(obj,std::forward<ReporterT>(reporter)),
               check_member_exists_traits_proxy<reporting_adapter<T,ReporterT>>(*this)
         {}
 };
@@ -88,9 +86,9 @@ class reporting_adapter : public adapter<reporting_adapter_traits<T,ReporterT>>,
  * @param obj Object to validate
  * @return Reporting adapter
  */
-template <typename ReporterT, typename ObjT>
-auto make_reporting_adapter(ReporterT&& reporter,
-                            const ObjT& obj,
+template <typename ObjT, typename ReporterT>
+auto make_reporting_adapter(const ObjT& obj,
+                            ReporterT&& reporter,
                             std::enable_if_t<
                                     hana::is_a<reporter_tag,ReporterT>,
                                     void*>
@@ -105,15 +103,15 @@ auto make_reporting_adapter(ReporterT&& reporter,
  * @param obj Object to validate
  * @return Reporting adapter
  */
-template <typename DstT, typename ObjT>
-auto make_reporting_adapter(DstT& dst,
-                            const ObjT& obj,
+template <typename ObjT, typename DstT>
+auto make_reporting_adapter(const ObjT& obj,
+                            DstT& dst,
                             std::enable_if_t<
                                     (!hana::is_a<reporter_tag,DstT> && !hana::is_a<adapter_tag,ObjT>),
                                     void*>
                             =nullptr)
 {
-    return make_reporting_adapter(make_reporter(dst),obj);
+    return make_reporting_adapter(obj,make_reporter(dst));
 }
 
 //-------------------------------------------------------------

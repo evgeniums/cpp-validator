@@ -20,7 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_COMPARISON_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/utils/scalar_compare.hpp>
+#include <dracosha/validator/utils/safe_compare.hpp>
 #include <dracosha/validator/operators/operator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -35,7 +35,7 @@ struct eq_t : public op<eq_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return compare<T1,T2>::equal(a,b);
+        return safe_compare<T1,T2>::equal(a,b);
     }
 
     constexpr static const char* description="is equal to";
@@ -50,7 +50,7 @@ struct ne_t : public op<ne_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return !compare<T1,T2>::equal(a,b);
+        return !safe_compare<T1,T2>::equal(a,b);
     }
 
     constexpr static const char* description="is not equal to";
@@ -65,7 +65,7 @@ struct lt_t : public op<lt_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return compare<T1,T2>::less(a,b);
+        return safe_compare<T1,T2>::less(a,b);
     }
 
     constexpr static const char* description="is less than";
@@ -80,7 +80,7 @@ struct lte_t : public op<lte_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return compare<T1,T2>::less_equal(a,b);
+        return safe_compare<T1,T2>::less_equal(a,b);
     }
 
     constexpr static const char* description="is less than or equal to";
@@ -95,7 +95,7 @@ struct gt_t : public op<gt_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return compare<T2,T1>::less(b,a);
+        return safe_compare<T2,T1>::less(b,a);
     }
 
     constexpr static const char* description="is greater than";
@@ -110,7 +110,7 @@ struct gte_t : public op<gte_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return compare<T2,T1>::less_equal(b,a);
+        return safe_compare<T2,T1>::less_equal(b,a);
     }
 
     constexpr static const char* description="is greater than or equal to";

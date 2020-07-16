@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <type_traits>
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/utils/scalar_compare.hpp>
+#include <dracosha/validator/utils/safe_compare.hpp>
 #include <dracosha/validator/utils/adjust_storable_type.hpp>
 #include <dracosha/validator/detail/has_method.hpp>
 #include <dracosha/validator/property.hpp>

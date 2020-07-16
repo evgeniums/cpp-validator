@@ -38,16 +38,15 @@ class reporting_adapter_impl
 
         template <typename ...Args>
         reporting_adapter_impl(
-            NextAdapterImplT&& next_adapter_impl,
+            ReporterT&& reporter,
             Args&&... args
-        ) : _next_adapter_impl(std::forward<NextAdapterImplT>(next_adapter_impl)),
-            _reporter(std::forward<Args>(args)...)
+        ) : _reporter(std::forward<ReporterT>(reporter)),
+            _next_adapter_impl(std::forward<Args>(args)...)
         {}
 
-        template <typename ...Args>
         reporting_adapter_impl(
-            Args&&... args
-        ) : _reporter(std::forward<Args>(args)...)
+            ReporterT&& reporter
+        ) : _reporter(std::forward<ReporterT>(reporter))
         {}
 
         template <typename AdapterT, typename T2, typename OpT>
@@ -184,8 +183,8 @@ class reporting_adapter_impl
             return st;
         }
 
-        NextAdapterImplT _next_adapter_impl;
         ReporterT _reporter;
+        NextAdapterImplT _next_adapter_impl;
 };
 
 }

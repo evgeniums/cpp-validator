@@ -16,8 +16,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_ADAPTER_IMPL_HPP
-#define DRACOSHA_VALIDATOR_ADAPTER_IMPL_HPP
+#ifndef DRACOSHA_VALIDATOR_DEFAULT_ADAPTER_IMPL_HPP
+#define DRACOSHA_VALIDATOR_DEFAULT_ADAPTER_IMPL_HPP
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/status.hpp>
@@ -272,4 +272,4 @@ struct default_adapter_impl
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_ADAPTER_IMPL_HPP
+#endif // DRACOSHA_VALIDATOR_DEFAULT_ADAPTER_IMPL_HPP
