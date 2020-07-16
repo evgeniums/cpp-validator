@@ -116,10 +116,11 @@ struct single_member_adapter_impl
         {
             return status::code::ignore;
         }
-        return default_adapter_impl::validate_with_master_sample(std::forward<AdapterT>(adpt),std::forward<MemberT>(member),
-                                                         std::forward<PropT>(prop),
-                                                         std::forward<OpT>(op),
-                                                         std::forward<T2>(b));
+        const auto& obj=extract(adpt.traits().get());
+        return status(op(
+                    property(obj,std::forward<PropT>(prop)),
+                    property(get_member(b(),member.path),prop)
+                ));
     }
 
     template <typename AdapterT, typename OpsT>

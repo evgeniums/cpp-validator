@@ -229,4 +229,34 @@ BOOST_AUTO_TEST_CASE(CheckNestedSingleMemberReport)
     rep1.clear();
 }
 
+BOOST_AUTO_TEST_CASE(CheckSingleMemberSampleObjectReport)
+{
+    std::map<size_t,size_t> sample={
+        {1,10},
+        {2,20},
+        {3,30}
+    };
+
+    std::vector<float> vec1;
+    auto v1=validator(
+                _[size](eq,1),
+                _[1](gte,_(sample)),
+                _[10](eq,_(sample))
+            );
+    std::string rep1;
+
+    auto sa1=make_single_member_adapter(_[1],100,rep1);
+    BOOST_CHECK(v1.apply(sa1));
+    rep1.clear();
+
+    auto sa2=make_single_member_adapter(_[20],1000,rep1);
+    BOOST_CHECK(v1.apply(sa1));
+    rep1.clear();
+
+    auto sa3=make_single_member_adapter(_[1],5,rep1);
+    BOOST_CHECK(!v1.apply(sa3));
+    BOOST_CHECK_EQUAL(rep1,"1 is greater than or equal to 1 of sample");
+    rep1.clear();
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -576,10 +576,7 @@ BOOST_AUTO_TEST_CASE(CheckNot)
 @todo
     Validate multiple elements of a container member
     Localization of conjunctions, plurals and genders
-    Nested members check in one call
-
-    Test:
-        reporting validation of single member of all types
+    Use special formatting for number-indexed fields
 */
 
 BOOST_AUTO_TEST_SUITE_END()
