@@ -54,7 +54,7 @@ struct member_name
         return _v.get();
     }
 
-    reference_wrapper_t<T> _v;
+    reference_wrapper<T> _v;
 };
 
 /**

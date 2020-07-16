@@ -71,7 +71,7 @@ constexpr extract_ref_t<T> extract_ref_impl{};
  * @brief Copyable wrapper of references
  */
 template <typename T>
-struct reference_wrapper_t
+struct reference_wrapper
 {
     using hana_tag=ref_tag;
     using type=T;
@@ -80,7 +80,7 @@ struct reference_wrapper_t
      * @brief Ctor
      * @param v Const reference to kepp
      */
-    reference_wrapper_t(T& v)
+    reference_wrapper(T& v)
         : _v(v)
     {}
 
@@ -123,7 +123,7 @@ struct reference_wrapper_t
 */
 BOOST_HANA_CONSTEXPR_LAMBDA auto cref =[](const auto& v)
 {
-    return reference_wrapper_t<std::remove_reference_t<decltype(v)>>{v};
+    return reference_wrapper<std::remove_reference_t<decltype(v)>>{v};
 };
 
 /**
@@ -133,7 +133,7 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto cref =[](const auto& v)
 */
 BOOST_HANA_CONSTEXPR_LAMBDA auto ref =[](auto& v)
 {
-    return reference_wrapper_t<std::remove_reference_t<decltype(v)>>{v};
+    return reference_wrapper<std::remove_reference_t<decltype(v)>>{v};
 };
 
 /**

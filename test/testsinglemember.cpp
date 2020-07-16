@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(CheckStringView)
     auto v_ptr=&v3;
     BOOST_CHECK(a_ptr==v_ptr);
 
-    auto ref3=reference_wrapper_t<const std::decay_t<decltype(v3)>>(v3);
+    auto ref3=reference_wrapper<const std::decay_t<decltype(v3)>>(v3);
     BOOST_CHECK_EQUAL(ref3.get(),a);
 }
 
