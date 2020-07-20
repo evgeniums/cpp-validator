@@ -105,8 +105,7 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberReport)
 
     auto sa9=make_single_member_adapter(_[10],100,rep1);
     BOOST_CHECK(!v1.apply(sa9));
-    //! @todo Use other formatting for indexed members
-    BOOST_CHECK_EQUAL(rep1,"10 is greater than or equal to 1000");
+    BOOST_CHECK_EQUAL(rep1,"element #10 is greater than or equal to 1000");
     rep1.clear();
 }
 
@@ -255,7 +254,7 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberSampleObjectReport)
 
     auto sa3=make_single_member_adapter(_[1],5,rep1);
     BOOST_CHECK(!v1.apply(sa3));
-    BOOST_CHECK_EQUAL(rep1,"1 is greater than or equal to 1 of sample");
+    BOOST_CHECK_EQUAL(rep1,"element #1 is greater than or equal to element #1 of sample");
     rep1.clear();
 }
 

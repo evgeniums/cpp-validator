@@ -28,7 +28,18 @@ void check_bypass(const T& proc)
     BOOST_CHECK_EQUAL(proc(size),size.name());
     BOOST_CHECK_EQUAL(proc(gte),std::string(gte));
     BOOST_CHECK_EQUAL(proc("field1"),std::string("field1"));
-    BOOST_CHECK_EQUAL(proc(10),std::string("10"));
+    BOOST_CHECK_EQUAL(proc(10),"element #10");
+    BOOST_CHECK_EQUAL(proc(Dummy{}),std::string("<\?\?\?\?\?>"));
+}
+
+template <typename T>
+void check_strings_bypass(const T& proc)
+{
+    BOOST_CHECK_EQUAL(proc(value),value.name());
+    BOOST_CHECK_EQUAL(proc(size),size.name());
+    BOOST_CHECK_EQUAL(proc(gte),std::string(gte));
+    BOOST_CHECK_EQUAL(proc("field1"),std::string("field1"));
+    BOOST_CHECK_EQUAL(proc(10),"10");
     BOOST_CHECK_EQUAL(proc(Dummy{}),std::string("<\?\?\?\?\?>"));
 }
 
@@ -55,12 +66,19 @@ struct translator_env
     }
 
     template <typename T>
-    void check(const T& strings)
+    void check(const T& strings, bool no_el=false)
     {
         BOOST_CHECK_EQUAL(strings(value),_m[value.name()]);
         BOOST_CHECK_EQUAL(strings(gte),_m[std::string(gte)]);
         BOOST_CHECK_EQUAL(strings("field1"),_m[std::string("field1")]);
-        BOOST_CHECK_EQUAL(strings(10),std::string("10"));
+        if (no_el)
+        {
+            BOOST_CHECK_EQUAL(strings(10),std::string("10"));
+        }
+        else
+        {
+            BOOST_CHECK_EQUAL(strings(10),std::string("element #10"));
+        }
         BOOST_CHECK_EQUAL(strings(Dummy{}),std::string("<\?\?\?\?\?>"));
     }
 
@@ -86,14 +104,14 @@ BOOST_AUTO_TEST_SUITE(TestStrings)
 
 BOOST_AUTO_TEST_CASE(CheckDefaultStrings)
 {
-    check_bypass(default_strings);
+    check_strings_bypass(default_strings);
 }
 
 BOOST_AUTO_TEST_CASE(CheckTranslatedStrings)
 {
     translator_env env;
     auto strings=env.strings();
-    env.check(strings);
+    env.check(strings,true);
 }
 
 BOOST_AUTO_TEST_CASE(CheckMemberNames)
@@ -168,7 +186,7 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
         BOOST_CHECK_EQUAL(mn(gte),env._m[std::string(gte)]);
         BOOST_CHECK_EQUAL(mn("field1"),std::string("other translation of field1"));
         BOOST_CHECK_EQUAL(mn("field2"),std::string("filed2_translated"));
-        BOOST_CHECK_EQUAL(mn(10),std::string("10"));
+        BOOST_CHECK_EQUAL(mn(10),std::string("element #10"));
         BOOST_CHECK_EQUAL(mn(Dummy{}),std::string("<\?\?\?\?\?>"));
     }
 
@@ -184,9 +202,18 @@ BOOST_AUTO_TEST_CASE(CheckMemberNames)
         BOOST_CHECK_EQUAL(mn(gte),"\"gte_translated\"");
         BOOST_CHECK_EQUAL(mn("field1"),std::string("\"other translation of field1\""));
         BOOST_CHECK_EQUAL(mn("field2"),std::string("\"filed2_translated\""));
-        BOOST_CHECK_EQUAL(mn(10),std::string("\"10\""));
+        BOOST_CHECK_EQUAL(mn(10),std::string("\"element #10\""));
         BOOST_CHECK_EQUAL(mn(Dummy{}),std::string("\"<\?\?\?\?\?>\""));
     }
+}
+
+BOOST_AUTO_TEST_CASE(CheckIntegralMemberName)
+{
+    auto mn=get_default_member_names();
+    static_assert(std::is_integral<decltype(10)>::value,"");
+    static_assert(!can_single_member_name<decltype(10),decltype(bypass_member_names)>::value,"");
+    auto str=mn(10);
+    BOOST_CHECK_EQUAL(str,"element #10");
 }
 
 BOOST_AUTO_TEST_CASE(CheckValues)

@@ -28,6 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/operators.hpp>
 #include <dracosha/validator/reporting/member_name.hpp>
 #include <dracosha/validator/reporting/values.hpp>
+#include <dracosha/validator/reporting/aggregation_strings.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -54,8 +55,8 @@ inline std::map<std::string,std::string> strings_sample_locale()
     m[string_must_not_be]="must not be";
     m[string_conjunction_of]="of";
     m[string_conjunction_aggregate]=": ";
-    m[string_conjunction_for]="for";
     m[string_member_name_conjunction]=" of ";
+    m[string_element]="element #";
 
     // properties
     m[value.name()]="value";

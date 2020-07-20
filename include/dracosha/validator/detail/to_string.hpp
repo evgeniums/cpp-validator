@@ -86,7 +86,7 @@ struct can_to_string<T,
 };
 
 /**
- *  @brief Convert to string string can be constructible using sdt::to_string()
+ *  @brief Convert to string if string can be constructible using sdt::to_string()
  */
 template <typename T>
 struct to_string_t<T,hana::when<can_to_string<T>::value>>

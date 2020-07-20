@@ -34,11 +34,16 @@ struct member_names_tag;
 
 /**
  * @brief Traits for member names formatter that do not perform any formatting and just bypass names "as is".
+ *
+ * The only exception is inegral member name which is not bypassed but must be processed explicitly by
+ * single_member_name helper.
  */
 struct bypass_member_names_t
 {
     template <typename T>
-    std::string operator() (const T&) const
+    std::string operator() (const T&,
+                            std::enable_if_t<!std::is_integral<std::decay_t<T>>::value,void*> =nullptr
+                            ) const
     {
         return std::string();
     }

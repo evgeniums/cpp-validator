@@ -147,37 +147,6 @@ struct apply_reorder_present_2args_t
     }
 };
 
-/**
- * @brief Adjust presentation and order of validation report for 2 arguments with logical operator and a member
- */
-template <typename MemberT,typename OpT>
-struct apply_reorder_present_2args_t<MemberT,OpT,
-                        hana::when<hana::is_a<aggregation_op_tag,OpT>>
-                    >
-{
-    template <typename DstT, typename FormatterTs>
-    constexpr auto operator () (
-                                    DstT& dst,
-                                    FormatterTs&& formatters,
-                                    const MemberT& member,
-                                    const OpT& op
-                                ) const -> decltype(auto)
-    {
-        // for member op:
-        backend_formatter.append_join_args(
-            dst,
-            " ",
-            apply_ref(hana::at(formatters,hana::size_c<1>),string_conjunction_for),
-            apply_ref(hana::at(formatters,hana::size_c<0>),member),
-            apply_ref(hana::at(formatters,hana::size_c<1>),op)
-        );
-        return backend_formatter.append(
-            dst,
-            apply_ref(hana::at(formatters,hana::size_c<1>),string_conjunction_aggregate)
-        );
-    }
-};
-
 template <typename OpT, typename T2>
 constexpr apply_reorder_present_2args_t<OpT,T2> apply_reorder_present_2args{};
 

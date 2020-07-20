@@ -78,6 +78,16 @@ struct string_member_name_conjunction_t : public enable_to_string<string_member_
 constexpr string_member_name_conjunction_t string_member_name_conjunction{};
 
 //-------------------------------------------------------------
+/**
+ * @brief String to use for indexed elements
+ */
+struct string_element_t : public enable_to_string<string_element_t>
+{
+    constexpr static const char* description="element #";
+};
+constexpr string_element_t string_element{};
+
+//-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 

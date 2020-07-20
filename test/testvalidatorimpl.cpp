@@ -576,7 +576,6 @@ BOOST_AUTO_TEST_CASE(CheckNot)
 @todo
     Validate multiple elements of a container member
     Localization of conjunctions, plurals and genders
-    Use special formatting for number-indexed fields
 */
 
 BOOST_AUTO_TEST_SUITE_END()

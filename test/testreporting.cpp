@@ -131,13 +131,23 @@ BOOST_AUTO_TEST_CASE(CheckValidationReport)
     auto ra1=make_reporting_adapter(m1,rep1);
     BOOST_CHECK(!v1.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to 10"));
+    rep1.clear();
 
     auto v2=validator(
                 _["field1"](length(gte,10))
             );
-    rep1.clear();
     BOOST_CHECK(!v2.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("length of field1 is greater than or equal to 10"));
+    rep1.clear();
+
+    std::vector<size_t> vec1={10,20,30,40,50};
+    auto ra2=make_reporting_adapter(vec1,rep1);
+    auto v3=validator(
+                _[1](gte,100)
+            );
+    BOOST_CHECK(!v3.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,std::string("element #1 is greater than or equal to 100"));
+    rep1.clear();
 }
 
 BOOST_AUTO_TEST_CASE(CheckValidationReportAggregation)
@@ -251,7 +261,7 @@ BOOST_AUTO_TEST_CASE(CheckNestedValidationReport)
                 _["field1"][1](lt,5)
             );
     BOOST_CHECK(!v2.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"1 of field1 is less than 5");
+    BOOST_CHECK_EQUAL(rep1,"element #1 of field1 is less than 5");
     rep1.clear();
 
     auto v3=validator(

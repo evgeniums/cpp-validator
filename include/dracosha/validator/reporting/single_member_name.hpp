@@ -23,6 +23,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/reporting/decorator.hpp>
+#include <dracosha/validator/reporting/member_name.hpp>
+#include <dracosha/validator/reporting/backend_formatter.hpp>
+#include <dracosha/validator/detail/to_string.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -31,6 +34,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename T, typename TraitsT, typename=void>
 struct can_single_member_name
 {
+    constexpr static const bool value=false;
 };
 /**
  * @brief Check if traits have suitable operator ()(const T&) for name transforming
@@ -57,7 +61,28 @@ struct single_member_name_t
 };
 
 /**
- * @brief Helper when operator can be used and id can be converted to string.
+ * @brief Helper when traits can not be used and id is of inegral type.
+ *
+ * Integral ID is interpreted as index and formatted like "element #id".
+ */
+template <typename T, typename TraitsT>
+struct single_member_name_t<T,TraitsT,
+                                hana::when<!can_single_member_name<T,TraitsT>::value
+                                            && std::is_integral<std::decay_t<T>>::value
+                                           >
+                            >
+{
+    template <typename StringsT>
+    std::string operator() (const T& id, const TraitsT& traits, const StringsT& strings) const
+    {
+        std::string dst;
+        backend_formatter.append(dst,strings(string_element),id);
+        return decorate<TraitsT,decltype(dst)>(traits,dst);
+    }
+};
+
+/**
+ * @brief Helper when traits can be used and id can be converted to string.
  *
  * If the result of traits is either empty or the same as id then the id is forwarded to strings.
  */
@@ -78,7 +103,7 @@ struct single_member_name_t<T,TraitsT,hana::when<can_single_member_name<T,Traits
 };
 
 /**
- * @brief Helper when operator can be used but the id can not be converted to string.
+ * @brief Helper when traits can be used but the id can not be converted to string.
  *
  * If the result of traits is empty then the id is forwarded to strings.
  */
