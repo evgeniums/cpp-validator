@@ -48,6 +48,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/operators.hpp>
 #include <dracosha/validator/validate.hpp>
+#include <dracosha/validator/detail/default_adapter_impl.ipp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

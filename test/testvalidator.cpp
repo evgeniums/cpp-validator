@@ -703,6 +703,23 @@ BOOST_AUTO_TEST_CASE(CheckValidateMemberAny)
                 _["field1"](ANY(value(gte,"zzzz") ^OR^ size(gte,50)))
             );
     BOOST_CHECK(!v7.apply(a4));
+
+    std::map<size_t,std::string> m5={
+        {1,"value10"},{2,"value100"},{3,""},{4,"hello"}
+    };
+    auto a5=make_default_adapter(m5);
+    auto v8=validator(
+                ANY(value(gte,"val") ^AND^ size(gte,5))
+            );
+    BOOST_CHECK(v8.apply(a5));
+    auto v9=validator(
+                ANY(value(gte,"zzzzzz") ^OR^ size(gte,5))
+            );
+    BOOST_CHECK(v9.apply(a5));
+    auto v10=validator(
+                ANY(value(gte,"zzzzzz") ^OR^ size(gte,50))
+            );
+    BOOST_CHECK(!v10.apply(a5));
 }
 
 BOOST_AUTO_TEST_CASE(CheckValidateMmemberAll)
@@ -770,6 +787,23 @@ BOOST_AUTO_TEST_CASE(CheckValidateMmemberAll)
                 _["field1"](ALL(value(gte,"zzzz") ^OR^ size(gte,50)))
             );
     BOOST_CHECK(!v7.apply(a4));
+
+    std::map<size_t,std::string> m5={
+        {1,"value10"},{2,"value100"},{3,"hi"},{4,"hello"}
+    };
+    auto a5=make_default_adapter(m5);
+    auto v8=validator(
+                ALL(value(gte,"h") ^AND^ size(gte,2))
+            );
+    BOOST_CHECK(v8.apply(a5));
+    auto v9=validator(
+                ALL(value(gte,"zzzzzz") ^OR^ size(gte,2))
+            );
+    BOOST_CHECK(v9.apply(a5));
+    auto v10=validator(
+                ALL(value(gte,"val") ^OR^ size(gte,5))
+            );
+    BOOST_CHECK(!v10.apply(a5));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

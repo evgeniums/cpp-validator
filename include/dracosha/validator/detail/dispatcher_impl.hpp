@@ -27,6 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/extract.hpp>
 #include <dracosha/validator/check_member.hpp>
 #include <dracosha/validator/get_member.hpp>
+#include <dracosha/validator/adapters/default_adapter.hpp>
 #include <dracosha/validator/operators/exists.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN

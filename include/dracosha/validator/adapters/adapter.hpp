@@ -222,10 +222,22 @@ class adapter
             return _traits.validate_not(*this,std::forward<decltype(member)>(member),std::forward<decltype(op)>(op));
         }
 
+        template <typename OpT>
+        status validate_any(OpT&& op) const
+        {
+            return _traits.validate_any(*this,std::forward<decltype(op)>(op));
+        }
+
         template <typename MemberT, typename OpT>
         status validate_any(MemberT&& member, OpT&& op) const
         {
             return _traits.validate_any(*this,std::forward<decltype(member)>(member),std::forward<decltype(op)>(op));
+        }
+
+        template <typename OpT>
+        status validate_all(OpT&& op) const
+        {
+            return _traits.validate_all(*this,std::forward<decltype(op)>(op));
         }
 
         template <typename MemberT, typename OpT>

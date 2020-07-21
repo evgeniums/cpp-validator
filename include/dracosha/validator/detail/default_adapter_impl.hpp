@@ -42,13 +42,25 @@ struct aggregate_impl
     template <typename ContainerT, typename AdapterT, typename MemberT, typename OpT>
     static status all(ContainerT&&, AdapterT&& adpt, MemberT&& member, OpT&& op)
     {
-        return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+        return apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
     }
 
     template <typename ContainerT, typename AdapterT, typename MemberT, typename OpT>
     static status any(ContainerT&&, AdapterT&& adpt, MemberT&& member, OpT&& op)
     {
-        return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+        return apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member));
+    }
+
+    template <typename ContainerT, typename AdapterT, typename OpT>
+    static status all(ContainerT&&, AdapterT&& adpt, OpT&& op)
+    {
+        return apply(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op));
+    }
+
+    template <typename ContainerT, typename AdapterT, typename OpT>
+    static status any(ContainerT&&, AdapterT&& adpt, OpT&& op)
+    {
+        return apply(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op));
     }
 };
 
@@ -71,6 +83,9 @@ struct aggregate_impl<T,
         return status::code::ok;
     }
 
+    template <typename ContainerT, typename AdapterT, typename OpT>
+    static status all(ContainerT&& container, AdapterT&& adpt, OpT&& op);
+
     template <typename ContainerT, typename AdapterT, typename MemberT, typename OpT>
     static status any(ContainerT&& container, AdapterT&& adpt, MemberT&& member, OpT&& op)
     {
@@ -91,6 +106,9 @@ struct aggregate_impl<T,
         }
         return status::code::fail;
     }
+
+    template <typename ContainerT, typename AdapterT, typename OpT>
+    static status any(ContainerT&& container, AdapterT&& adpt, OpT&& op);
 };
 
 //-------------------------------------------------------------
@@ -296,6 +314,13 @@ struct default_adapter_impl
         )(member.path);
     }
 
+    template <typename AdapterT, typename OpT>
+    static status validate_any(AdapterT&& adpt, OpT&& op)
+    {
+        const auto& obj=extract(adpt.traits().get());
+        return aggregate_impl<decltype(obj)>::any(obj,std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op));
+    }
+
     template <typename AdapterT, typename MemberT, typename OpT>
     static status validate_any(AdapterT&& adpt, MemberT&& member, OpT&& op)
     {
@@ -303,7 +328,7 @@ struct default_adapter_impl
         return hana::if_(check_member_path(obj,member.path),
             [&obj,&adpt,&member,&op](auto&&)
             {
-                auto&& container=get_member(obj,member.path);
+                const auto& container=get_member(obj,member.path);
                 return aggregate_impl<decltype(container)>::any(container,std::forward<decltype(adpt)>(adpt),member,std::forward<decltype(op)>(op));
             },
             [](auto&&)
@@ -313,6 +338,13 @@ struct default_adapter_impl
         )(member.path);
     }
 
+    template <typename AdapterT, typename OpT>
+    static status validate_all(AdapterT&& adpt, OpT&& op)
+    {
+        const auto& obj=extract(adpt.traits().get());
+        return aggregate_impl<decltype(obj)>::all(obj,std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op));
+    }
+
     template <typename AdapterT, typename MemberT, typename OpT>
     static status validate_all(AdapterT&& adpt, MemberT&& member, OpT&& op)
     {
@@ -320,7 +352,7 @@ struct default_adapter_impl
         return hana::if_(check_member_path(obj,member.path),
             [&obj,&adpt,&member,&op](auto&&)
             {
-                auto&& container=get_member(obj,member.path);
+                const auto& container=get_member(obj,member.path);
                 return aggregate_impl<decltype(container)>::all(container,std::forward<decltype(adpt)>(adpt),member,std::forward<decltype(op)>(op));
             },
             [](auto&&)
