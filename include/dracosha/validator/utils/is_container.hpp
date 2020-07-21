@@ -57,7 +57,10 @@ struct is_container_t
 };
 template <typename T>
 struct is_container_t<T,
-            hana::when<has_begin<T>::value && has_end<T>::value>
+            hana::when<
+                has_begin<T>::value && has_end<T>::value
+                && !std::is_same<std::decay_t<T>,std::string>::value
+            >
         >
 {
     constexpr static const bool value=true;

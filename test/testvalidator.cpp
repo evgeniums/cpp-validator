@@ -691,6 +691,18 @@ BOOST_AUTO_TEST_CASE(CheckValidateMemberAny)
     BOOST_CHECK(v4.apply(a3));
     BOOST_CHECK(v5.apply(a3));
     BOOST_CHECK(!v6.apply(a3));
+
+    std::map<std::string,std::string> m4={
+            {"field1","value10"}
+        };
+    auto a4=make_default_adapter(m4);
+    BOOST_CHECK(v4.apply(a4));
+    BOOST_CHECK(v5.apply(a4));
+    BOOST_CHECK(!v6.apply(a4));
+    auto v7=validator(
+                _["field1"](ANY(value(gte,"zzzz") ^OR^ size(gte,50)))
+            );
+    BOOST_CHECK(!v7.apply(a4));
 }
 
 BOOST_AUTO_TEST_CASE(CheckValidateMmemberAll)
@@ -746,6 +758,18 @@ BOOST_AUTO_TEST_CASE(CheckValidateMmemberAll)
     BOOST_CHECK(v4.apply(a3));
     BOOST_CHECK(v5.apply(a3));
     BOOST_CHECK(!v6.apply(a3));
+
+    std::map<std::string,std::string> m4={
+            {"field1","value10"}
+        };
+    auto a4=make_default_adapter(m4);
+    BOOST_CHECK(v4.apply(a4));
+    BOOST_CHECK(v5.apply(a4));
+    BOOST_CHECK(v6.apply(a4));
+    auto v7=validator(
+                _["field1"](ALL(value(gte,"zzzz") ^OR^ size(gte,50)))
+            );
+    BOOST_CHECK(!v7.apply(a4));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

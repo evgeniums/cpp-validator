@@ -36,6 +36,65 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 namespace detail
 {
 
+template <typename T, typename=hana::when<true>>
+struct aggregate_impl
+{
+    template <typename ContainerT, typename AdapterT, typename MemberT, typename OpT>
+    static status all(ContainerT&&, AdapterT&& adpt, MemberT&& member, OpT&& op)
+    {
+        return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+    }
+
+    template <typename ContainerT, typename AdapterT, typename MemberT, typename OpT>
+    static status any(ContainerT&&, AdapterT&& adpt, MemberT&& member, OpT&& op)
+    {
+        return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+    }
+};
+
+template <typename T>
+struct aggregate_impl<T,
+        hana::when<is_container_t<T>::value>>
+{
+    template <typename ContainerT, typename AdapterT, typename MemberT, typename OpT>
+    static status all(ContainerT&& container, AdapterT&& adpt, MemberT&& member, OpT&& op)
+    {
+        for (auto it=container.begin();it!=container.end();++it)
+        {
+            auto el_member=member[wrap_it(it)];
+            auto ret=apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),el_member);
+            if (!ret)
+            {
+                return ret;
+            }
+        }
+        return status::code::ok;
+    }
+
+    template <typename ContainerT, typename AdapterT, typename MemberT, typename OpT>
+    static status any(ContainerT&& container, AdapterT&& adpt, MemberT&& member, OpT&& op)
+    {
+        bool empty=true;
+        for (auto it=container.begin();it!=container.end();++it)
+        {
+            auto el_member=member[wrap_it(it)];
+            auto ret=apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),el_member);
+            if (ret)
+            {
+                return ret;
+            }
+            empty=false;
+        }
+        if (empty)
+        {
+            return status::code::ok;
+        }
+        return status::code::fail;
+    }
+};
+
+//-------------------------------------------------------------
+
 struct default_adapter_impl
 {
     template <typename AdapterT, typename T2, typename OpT>
@@ -245,31 +304,7 @@ struct default_adapter_impl
             [&obj,&adpt,&member,&op](auto&&)
             {
                 auto&& container=get_member(obj,member.path);
-                return hana::eval_if(is_container(container),
-                    [&container,&adpt,&member,&op](auto&&)
-                    {
-                        bool empty=true;
-                        for (auto it=container.begin();it!=container.end();++it)
-                        {
-                            auto el_member=member[wrap_it(it)];
-                            auto ret=apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),el_member);
-                            if (ret)
-                            {
-                                return status(ret);
-                            }
-                            empty=false;
-                        }
-                        if (empty)
-                        {
-                            return status(status::code::ok);
-                        }
-                        return status(status::code::fail);
-                    },
-                    [&adpt,&member,&op](auto&&)
-                    {
-                        return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
-                    }
-                );
+                return aggregate_impl<decltype(container)>::any(container,std::forward<decltype(adpt)>(adpt),member,std::forward<decltype(op)>(op));
             },
             [](auto&&)
             {
@@ -286,25 +321,7 @@ struct default_adapter_impl
             [&obj,&adpt,&member,&op](auto&&)
             {
                 auto&& container=get_member(obj,member.path);
-                return hana::eval_if(is_container(container),
-                    [&container,&adpt,&member,&op](auto&&)
-                    {
-                        for (auto it=container.begin();it!=container.end();++it)
-                        {
-                            auto el_member=member[wrap_it(it)];
-                            auto ret=apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),el_member);
-                            if (!ret)
-                            {
-                                return status(ret);
-                            }
-                        }
-                        return status(status::code::ok);
-                    },
-                    [&adpt,&member,&op](auto&&)
-                    {
-                        return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
-                    }
-                );
+                return aggregate_impl<decltype(container)>::all(container,std::forward<decltype(adpt)>(adpt),member,std::forward<decltype(op)>(op));
             },
             [](auto&&)
             {
