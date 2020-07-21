@@ -30,7 +30,9 @@ enum class aggregation_id : int
 {
     AND,
     OR,
-    NOT
+    NOT,
+    ANY,
+    ALL
 };
 
 struct aggregation_op_tag;
@@ -67,6 +69,15 @@ struct aggregation_op
  */
 template <typename DerivedT>
 struct logical_op
+{
+    using hana_tag=aggregation_op_tag;
+};
+
+/**
+ * @brief Pseudo aggregation operator
+ */
+template <typename DerivedT>
+struct aggregate_op
 {
     using hana_tag=aggregation_op_tag;
 };

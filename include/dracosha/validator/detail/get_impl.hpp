@@ -35,6 +35,7 @@ namespace get_helpers
         property = 1,
         at = 2,
         brackets = 3,
+        iterator = 4,
 
         none = -1
     };
@@ -51,7 +52,11 @@ namespace get_helpers
                 hana::if_(
                     can_get<T1, T2>.brackets(),
                     getter::brackets,
-                    getter::none
+                    hana::if_(
+                        can_get<T1, T2>.iterator(),
+                        getter::iterator,
+                        getter::none
+                    )
                 )
             )
         );
@@ -63,8 +68,22 @@ template <typename T1, typename T2, typename=hana::when<true>>
 struct get_t
 {
 };
+
 /**
- * Get as property
+ * @brief Get with iterator
+ */
+template <typename T1, typename T2>
+struct get_t<T1,T2,
+            hana::when<get_helpers::selector<T1,T2>::value == get_helpers::getter::iterator>>
+{
+    auto operator () (T1&&, T2&& k) const -> decltype(auto)
+    {
+        return k.get();
+    }
+};
+
+/**
+ * @brief Get as property
  */
 template <typename T1, typename T2>
 struct get_t<T1,T2,
@@ -77,7 +96,7 @@ struct get_t<T1,T2,
 };
 
 /**
- * Get using at(key) method
+ * @brief Get using at(key) method
  */
 template <typename T1, typename T2>
 struct get_t<T1,T2,
@@ -90,7 +109,7 @@ struct get_t<T1,T2,
 };
 
 /**
- * Get using [key] operator
+ * @brief Get using [key] operator
  */
 template <typename T1, typename T2>
 struct get_t<T1,T2,
@@ -103,7 +122,7 @@ struct get_t<T1,T2,
 };
 
 /**
- * Traits for getting member from object of type T1 using key of type T2
+ * @brief Traits for getting member from object of type T1 using key of type T2
  */
 template <typename T1, typename T2>
 constexpr get_t<T1,T2> get_impl{};

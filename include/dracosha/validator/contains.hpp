@@ -25,6 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/can_check_contains.hpp>
 #include <dracosha/validator/utils/safe_compare.hpp>
+#include <dracosha/validator/utils/wrap_it.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -35,6 +36,22 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  */
 struct contains_t
 {
+    /**
+     * @brief Check if T2 is iterator
+     *
+     * Check is performed at compile time.
+     */
+    template <typename T1, typename T2>
+    constexpr bool operator () (
+                                const T1&,
+                                const T2&,
+                                std::enable_if_t<hana::is_a<wrap_iterator_tag,T2>,
+                                                                    void*> =nullptr
+                             ) const
+    {
+        return true;
+    }
+
     /**
      * @brief Check if object contains property
      *
@@ -61,7 +78,8 @@ struct contains_t
     constexpr bool operator () (
                                 const T1& a,
                                 const T2& b,
-                                std::enable_if_t<!has_property<T1,T2>() && can_check_contains<T1,T2>(),
+                                std::enable_if_t<
+                                    (!hana::is_a<wrap_iterator_tag,T2> && !has_property<T1,T2>() && can_check_contains<T1,T2>()),
                                                                     void*> =nullptr
                              ) const
     {

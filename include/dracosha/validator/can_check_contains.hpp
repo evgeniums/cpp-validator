@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/detail/has_method.hpp>
 #include <dracosha/validator/property.hpp>
+#include <dracosha/validator/utils/wrap_it.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -33,7 +34,10 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename T1, typename T2>
 struct can_check_contains_t
 {
-    constexpr static const bool value = detail::has_find_c(hana::type_c<T1>, hana::type_c<T2>)
+    constexpr static const bool value =
+        hana::is_a<wrap_iterator_tag,T2>
+        ||
+        detail::has_find_c(hana::type_c<T1>, hana::type_c<T2>)
         ||
         detail::has_has_c(hana::type_c<T1>, hana::type_c<T2>)
         ||

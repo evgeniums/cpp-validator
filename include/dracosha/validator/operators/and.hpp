@@ -33,7 +33,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  * @param xs Intermediate validators whose result must be forwarded to logical AND
  * @return Logical "and" of intermediate validator results
  *
- * Can be used both in functioin call notation AND(...) and in infix notation (... ^AND^ ...)
+ * Can be used both as function call notation AND(...) and as infix notation (... ^AND^ ...)
  */
 BOOST_HANA_CONSTEXPR_LAMBDA auto AND=hana::infix([](auto&& ...xs) -> decltype(auto)
 {

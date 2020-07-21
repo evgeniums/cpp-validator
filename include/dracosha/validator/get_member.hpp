@@ -20,6 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_GET_MEMBER_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/get.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

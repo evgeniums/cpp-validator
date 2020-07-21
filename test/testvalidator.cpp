@@ -632,4 +632,120 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberSampleAbort)
     BOOST_CHECK(!v2.apply(a1));
 }
 
+BOOST_AUTO_TEST_CASE(CheckValidateMemberAny)
+{
+    std::map<std::string,std::vector<size_t>> m1={
+            {"field1",
+             {10,20,30,40,50}
+            }
+        };
+    auto a1=make_default_adapter(m1);
+
+    auto v1=validator(
+                _["field1"](ANY(value(gte,10)))
+            );
+    BOOST_CHECK(v1.apply(a1));
+
+    auto v2=validator(
+                _["field1"](ANY(value(gte,50)))
+            );
+    BOOST_CHECK(v2.apply(a1));
+
+    auto v3=validator(
+                _["field1"](ANY(value(gte,100)))
+            );
+    BOOST_CHECK(!v3.apply(a1));
+
+
+    std::map<std::string,std::vector<std::string>> m2={
+            {"field1",
+             {"value10","value100","","hello"}
+            }
+        };
+    auto a2=make_default_adapter(m2);
+
+    auto v4=validator(
+                _["field1"](ANY(value(gte,"val") ^AND^ size(gte,5)))
+            );
+    BOOST_CHECK(v4.apply(a2));
+
+    auto v5=validator(
+                _["field1"](ANY(value(gte,"zzzzzz") ^OR^ size(gte,5)))
+            );
+    BOOST_CHECK(v5.apply(a2));
+
+    auto v6=validator(
+                _["field1"](ANY(value(gte,"zzzzzz") ^OR^ size(gte,50)))
+            );
+    BOOST_CHECK(!v6.apply(a2));
+
+    std::map<std::string,std::map<size_t,std::string>> m3={
+            {"field1",
+             {
+                 {1,"value10"},{2,"value100"},{3,""},{4,"hello"}
+             }
+            }
+        };
+    auto a3=make_default_adapter(m3);
+
+    BOOST_CHECK(v4.apply(a3));
+    BOOST_CHECK(v5.apply(a3));
+    BOOST_CHECK(!v6.apply(a3));
+}
+
+BOOST_AUTO_TEST_CASE(CheckValidateMmemberAll)
+{
+    std::map<std::string,std::vector<size_t>> m1={
+            {"field1",
+             {10,20,30,40,50}
+            }
+        };
+    auto a1=make_default_adapter(m1);
+
+    auto v1=validator(
+                _["field1"](ALL(value(gte,10)))
+            );
+    BOOST_CHECK(v1.apply(a1));
+
+    auto v2=validator(
+                _["field1"](ALL(value(gte,20)))
+            );
+    BOOST_CHECK(!v2.apply(a1));
+
+    std::map<std::string,std::vector<std::string>> m2={
+            {"field1",
+             {"value10","value100","hi","hello"}
+            }
+        };
+    auto a2=make_default_adapter(m2);
+
+    auto v4=validator(
+                _["field1"](ALL(value(gte,"h") ^AND^ size(gte,2)))
+            );
+    BOOST_CHECK(v4.apply(a2));
+
+    auto v5=validator(
+                _["field1"](ALL(value(gte,"zzzzzz") ^OR^ size(gte,2)))
+            );
+    BOOST_CHECK(v5.apply(a2));
+
+    auto v6=validator(
+                _["field1"](ALL(value(gte,"val") ^OR^ size(gte,5)))
+            );
+    BOOST_CHECK(!v6.apply(a2));
+
+    std::map<std::string,std::map<size_t,std::string>> m3={
+            {"field1",
+             {
+                 {1,"value10"},{2,"value100"},{3,"hi"},{4,"hello"}
+             }
+            }
+        };
+    auto a3=make_default_adapter(m3);
+
+    BOOST_CHECK(v4.apply(a3));
+    BOOST_CHECK(v5.apply(a3));
+    BOOST_CHECK(!v6.apply(a3));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

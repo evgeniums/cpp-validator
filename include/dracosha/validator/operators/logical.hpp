@@ -22,8 +22,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/operators/and.hpp>
 #include <dracosha/validator/operators/or.hpp>
 #include <dracosha/validator/operators/not.hpp>
-#include <dracosha/validator/operators/comparison.hpp>
-#include <dracosha/validator/operators/exists.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

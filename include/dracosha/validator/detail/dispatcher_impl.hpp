@@ -91,6 +91,20 @@ struct dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>
      */
     template <typename ... Args>
     static status validate_not(T1&& obj, Args&&... args);
+
+    /**
+     * @brief Execute validator to check if any element of a container satisfies the condition
+     * @return Success if any element of a container satisfies the condition
+     */
+    template <typename ...Args>
+    static status validate_any(T1&& obj, Args&&... args);
+
+    /**
+     * @brief Execute validator to check if all elements of a container satisfy the condition
+     * @return Success if all elements of a container satisfy the condition
+     */
+    template <typename ...Args>
+    static status validate_all(T1&& obj, Args&&... args);
 };
 
 /**
@@ -253,6 +267,26 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     {
         return a.validate_not(std::forward<Args>(args)...);
     }
+
+    /**
+     * @brief Execute validator to check if any element of a container satisfies the condition
+     * @return Success if any element of a container satisfies the condition
+     */
+    template <typename ...Args>
+    static status validate_any(T1&& a, Args&&... args)
+    {
+        return a.validate_any(std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Execute validator to check if all elements of a container satisfy the condition
+     * @return Success if all elements of a container satisfy the condition
+     */
+    template <typename ...Args>
+    static status validate_all(T1&& a, Args&&... args)
+    {
+        return a.validate_all(std::forward<Args>(args)...);
+    }
 };
 
 template <typename T1>
@@ -296,6 +330,22 @@ status dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_n
 {
     using type=decltype(make_default_adapter(std::forward<T1>(obj)));
     return dispatcher_impl<type>.validate_not(make_default_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
+}
+
+template <typename T1>
+template <typename ...Args>
+status dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_any(T1&& obj, Args&&... args)
+{
+    using type=decltype(make_default_adapter(std::forward<T1>(obj)));
+    return dispatcher_impl<type>.validate_any(make_default_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
+}
+
+template <typename T1>
+template <typename ...Args>
+status dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_all(T1&& obj, Args&&... args)
+{
+    using type=decltype(make_default_adapter(std::forward<T1>(obj)));
+    return dispatcher_impl<type>.validate_all(make_default_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
 }
 
 }

@@ -25,6 +25,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/extract.hpp>
 #include <dracosha/validator/get_member.hpp>
 #include <dracosha/validator/apply.hpp>
+#include <dracosha/validator/utils/is_container.hpp>
+#include <dracosha/validator/utils/wrap_it.hpp>
 #include <dracosha/validator/operators/exists.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -227,6 +229,82 @@ struct default_adapter_impl
                                 return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
                             }
                         );
+            },
+            [](auto&&)
+            {
+                return status();
+            }
+        )(member.path);
+    }
+
+    template <typename AdapterT, typename MemberT, typename OpT>
+    static status validate_any(AdapterT&& adpt, MemberT&& member, OpT&& op)
+    {
+        const auto& obj=extract(adpt.traits().get());
+        return hana::if_(check_member_path(obj,member.path),
+            [&obj,&adpt,&member,&op](auto&&)
+            {
+                auto&& container=get_member(obj,member.path);
+                return hana::eval_if(is_container(container),
+                    [&container,&adpt,&member,&op](auto&&)
+                    {
+                        bool empty=true;
+                        for (auto it=container.begin();it!=container.end();++it)
+                        {
+                            auto el_member=member[wrap_it(it)];
+                            auto ret=apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),el_member);
+                            if (ret)
+                            {
+                                return status(ret);
+                            }
+                            empty=false;
+                        }
+                        if (empty)
+                        {
+                            return status(status::code::ok);
+                        }
+                        return status(status::code::fail);
+                    },
+                    [&adpt,&member,&op](auto&&)
+                    {
+                        return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+                    }
+                );
+            },
+            [](auto&&)
+            {
+                return status();
+            }
+        )(member.path);
+    }
+
+    template <typename AdapterT, typename MemberT, typename OpT>
+    static status validate_all(AdapterT&& adpt, MemberT&& member, OpT&& op)
+    {
+        const auto& obj=extract(adpt.traits().get());
+        return hana::if_(check_member_path(obj,member.path),
+            [&obj,&adpt,&member,&op](auto&&)
+            {
+                auto&& container=get_member(obj,member.path);
+                return hana::eval_if(is_container(container),
+                    [&container,&adpt,&member,&op](auto&&)
+                    {
+                        for (auto it=container.begin();it!=container.end();++it)
+                        {
+                            auto el_member=member[wrap_it(it)];
+                            auto ret=apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),el_member);
+                            if (!ret)
+                            {
+                                return status(ret);
+                            }
+                        }
+                        return status(status::code::ok);
+                    },
+                    [&adpt,&member,&op](auto&&)
+                    {
+                        return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+                    }
+                );
             },
             [](auto&&)
             {

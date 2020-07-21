@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/detail/has_method.hpp>
 #include <dracosha/validator/property.hpp>
+#include <dracosha/validator/utils/wrap_it.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -32,18 +33,56 @@ struct can_get_t
 {
 };
 
+template <typename T1, typename T2>
+struct can_get_t<T1,T2,hana::when<hana::is_a<wrap_iterator_tag,T2>>>
+{
+    constexpr bool operator () () const
+    {
+        return true;
+    }
+
+    constexpr static bool iterator()
+    {
+        return true;
+    }
+
+    constexpr static bool property()
+    {
+        return false;
+    }
+
+    constexpr static bool brackets()
+    {
+        return false;
+    }
+
+    constexpr static bool at()
+    {
+        return false;
+    }
+};
+
 /**
  *  Member is assumed to be gettable if object has either at(key) method or brackets [key] operator
  *  and type of the key satisfies signature of the corresponding method/operator.
  */
 template <typename T1, typename T2>
-struct can_get_t<T1,T2,hana::when<!hana::is_a<property_tag,T2>>>
+struct can_get_t<T1,T2,hana::when<
+        (!hana::is_a<property_tag,T2>
+        &&
+        !hana::is_a<wrap_iterator_tag,T2>)
+        >>
 {
     constexpr bool operator () () const
     {
         return detail::has_at_c(hana::type_c<T1>,hana::type_c<T2>)
                ||
                detail::has_brackets_c(hana::type_c<T1>,hana::type_c<T2>);
+    }
+
+    constexpr static bool iterator()
+    {
+        return false;
     }
 
     constexpr static bool property()
@@ -71,6 +110,11 @@ struct can_get_t<T1,T2,hana::when<hana::is_a<property_tag,T2>>>
     constexpr bool operator () () const
     {
         return has_property<T1,T2>();
+    }
+
+    constexpr static bool iterator()
+    {
+        return false;
     }
 
     constexpr static bool property()

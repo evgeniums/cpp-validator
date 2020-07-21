@@ -571,6 +571,18 @@ BOOST_AUTO_TEST_CASE(CheckNot)
     BOOST_CHECK(v6.apply(m));
 }
 
+BOOST_AUTO_TEST_CASE(CheckIsPair)
+{
+    std::map<size_t,std::string> m1={
+        {1,"hi"},
+        {2,"hello"}
+    };
+
+    auto it=m1.begin();
+    static_assert(is_pair_t<decltype(*it)>::value,"");
+    BOOST_CHECK(true);
+}
+
 /**
 
 @todo

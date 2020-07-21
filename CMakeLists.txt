@@ -14,6 +14,10 @@ SET (HEADERS
     include/dracosha/validator/utils/reference_wrapper.hpp
     include/dracosha/validator/utils/string_view.hpp
     include/dracosha/validator/utils/object_wrapper.hpp
+    include/dracosha/validator/utils/is_container.hpp
+    include/dracosha/validator/utils/is_pair.hpp
+    include/dracosha/validator/utils/get_it.hpp
+    include/dracosha/validator/utils/wrap_it.hpp
 
     include/dracosha/validator/property.hpp
     include/dracosha/validator/can_get.hpp
@@ -43,6 +47,8 @@ SET (HEADERS
     include/dracosha/validator/operators/and.hpp
     include/dracosha/validator/operators/or.hpp
     include/dracosha/validator/operators/not.hpp
+    include/dracosha/validator/operators/any.hpp
+    include/dracosha/validator/operators/all.hpp
     include/dracosha/validator/operators/aggregation.hpp
     include/dracosha/validator/operators/logical.hpp
     include/dracosha/validator/operators.hpp
@@ -85,9 +91,11 @@ SET (HEADERS
     include/dracosha/validator/detail/validator_impl.hpp
     include/dracosha/validator/detail/aggregate_and.hpp
     include/dracosha/validator/detail/aggregate_or.hpp
+    include/dracosha/validator/detail/aggregate_any.hpp
+    include/dracosha/validator/detail/aggregate_all.hpp
+    include/dracosha/validator/detail/logical_not.hpp
     include/dracosha/validator/detail/dispatcher_impl.hpp
     include/dracosha/validator/detail/take_address_of.hpp
-    include/dracosha/validator/detail/logical_not.hpp
     include/dracosha/validator/detail/to_string.hpp
     include/dracosha/validator/detail/format_value.hpp
     include/dracosha/validator/detail/formatter_fmt.hpp
