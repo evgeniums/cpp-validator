@@ -739,6 +739,38 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAnyReport)
     BOOST_CHECK(!v5.apply(ra2));
     BOOST_CHECK_EQUAL(rep1,"at least one element is greater than or equal to zzz OR size of at least one element is equal to 100");
     rep1.clear();
+
+    std::map<size_t,std::vector<size_t>> m3={
+        {1,{1,2,3,4,5}},
+        {10,{10,20,30,40,50}},
+        {100,{100,200,300,400,500}}
+    };
+    auto ra3=make_reporting_adapter(m3,rep1);
+    auto v6=validator(
+                ANY(size(gte,5) ^AND^ ANY(value(gte,1)))
+            );
+    BOOST_CHECK(v6.apply(ra3));
+    rep1.clear();
+
+    auto v7=validator(
+                ANY(size(gte,5) ^AND^ ANY(value(gte,1000)))
+            );
+    BOOST_CHECK(!v7.apply(ra3));
+    BOOST_CHECK_EQUAL(rep1,"at least one element of at least one element is greater than or equal to 1000");
+    rep1.clear();
+
+    std::map<size_t,std::map<size_t,std::vector<size_t>>> m4={
+        {5,
+         {{10,{10,20,30,40,50}}}
+        }
+    };
+    auto ra4=make_reporting_adapter(m4,rep1);
+    auto v8=validator(
+                _[5](ANY(size(gte,1) ^AND^ ANY(value(gte,1000))))
+            );
+    BOOST_CHECK(!v8.apply(ra4));
+    BOOST_CHECK_EQUAL(rep1,"at least one element of at least one element of element #5 is greater than or equal to 1000");
+    rep1.clear();
 }
 
 BOOST_AUTO_TEST_CASE(CheckAggregationAllReport)
@@ -798,6 +830,38 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAllReport)
             );
     BOOST_CHECK(!v5.apply(ra2));
     BOOST_CHECK_EQUAL(rep1,"each element is greater than or equal to value5 OR size of each element is less than or equal to 7");
+    rep1.clear();
+
+    std::map<size_t,std::vector<size_t>> m3={
+        {1,{1,2,3,4,5}},
+        {10,{10,20,30,40,50}},
+        {100,{100,200,300,400,500}}
+    };
+    auto ra3=make_reporting_adapter(m3,rep1);
+    auto v6=validator(
+                ALL(size(gte,5) ^AND^ ALL(value(gte,1)))
+            );
+    BOOST_CHECK(v6.apply(ra3));
+    rep1.clear();
+
+    auto v7=validator(
+                ALL(size(gte,5) ^AND^ ALL(value(lt,300)))
+            );
+    BOOST_CHECK(!v7.apply(ra3));
+    BOOST_CHECK_EQUAL(rep1,"each element of each element is less than 300");
+    rep1.clear();
+
+    std::map<size_t,std::map<size_t,std::vector<size_t>>> m4={
+        {5,
+         {{10,{10,20,30,40,50}}}
+        }
+    };
+    auto ra4=make_reporting_adapter(m4,rep1);
+    auto v8=validator(
+                _[5](ALL(size(gte,1) ^AND^ ALL(value(lt,50))))
+            );
+    BOOST_CHECK(!v8.apply(ra4));
+    BOOST_CHECK_EQUAL(rep1,"each element of each element of element #5 is less than 50");
     rep1.clear();
 }
 

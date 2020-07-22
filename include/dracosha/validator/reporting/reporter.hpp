@@ -68,18 +68,7 @@ class reporter
         template <typename AggregationT>
         void aggregate_open(AggregationT&& aggregation)
         {
-            auto skip=skip_part();
-            if (
-                aggregation.id==aggregation_id::ANY
-                    ||
-                aggregation.id==aggregation_id::ALL
-                    ||
-                 skip
-               )
-            {
-                ++_any_all_count;
-            }
-            if (skip)
+            if (skip_aggregate_open())
             {
                 return;
             }
@@ -98,18 +87,7 @@ class reporter
         template <typename AggregationT, typename MemberT>
         void aggregate_open(AggregationT&& aggregation, MemberT&& member)
         {
-            auto skip=skip_part();
-            if (
-                aggregation.id==aggregation_id::ANY
-                    ||
-                aggregation.id==aggregation_id::ALL
-                    ||
-                 skip
-               )
-            {
-                ++_any_all_count;
-            }
-            if (skip)
+            if (skip_aggregate_open())
             {
                 return;
             }
@@ -127,24 +105,25 @@ class reporter
          */
         void aggregate_close(bool ok)
         {
-            if (skip_part())
-            {
-                --_any_all_count;
-                if (_any_all_count!=0)
-                {
-                    return;
-                }
-            }
-
             if (!_stack.empty())
             {
+                auto& back=_stack.back();
+                if (skip_part())
+                {
+                    --back.any_all_count;
+                    if (back.any_all_count!=0)
+                    {
+                        return;
+                    }
+                }
+
                 if (!ok || current_not())
                 {
                     updateBrackets();
                     auto wrapper=wrap_backend_formatter(report_dst(),_dst);
-                    _formatter.aggregate(wrapper,_stack.back());
+                    _formatter.aggregate(wrapper,back);
                 }
-                if (_stack.back().aggregation.id==aggregation_id::NOT)
+                if (back.aggregation.id==aggregation_id::NOT)
                 {
                     --_not_count;
                 }
@@ -288,6 +267,16 @@ class reporter
                 {
                     return !back.parts.empty();
                 }
+            }
+            return false;
+        }
+
+        bool skip_aggregate_open()
+        {
+            if (skip_part())
+            {
+                ++_stack.back().any_all_count;
+                return true;
             }
             return false;
         }

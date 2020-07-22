@@ -44,7 +44,10 @@ struct report_aggregation
             std::string member=std::string()
         ) : aggregation(std::move(aggregation)),
             member(std::move(member)),
-            single(true)
+            single(true),
+            any_all_count(
+                    static_cast<size_t>(aggregation.id==aggregation_id::ANY || aggregation.id==aggregation_id::ALL)
+                )
     {}
 
     aggregation_op aggregation;
@@ -53,6 +56,7 @@ struct report_aggregation
     std::vector<DstT> parts;
 
     bool single;
+    size_t any_all_count;
 };
 
 //-------------------------------------------------------------
