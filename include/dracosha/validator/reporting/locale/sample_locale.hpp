@@ -57,6 +57,8 @@ inline std::map<std::string,std::string> strings_sample_locale()
     m[string_conjunction_aggregate]=": ";
     m[string_member_name_conjunction]=" of ";
     m[string_element]="element #";
+    m[string_any]="at least one element";
+    m[string_all]="each element";
 
     // properties
     m[value.name()]="value";

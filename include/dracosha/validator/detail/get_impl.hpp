@@ -63,7 +63,6 @@ namespace get_helpers
     };
 }
 
-
 template <typename T1, typename T2, typename=hana::when<true>>
 struct get_t
 {

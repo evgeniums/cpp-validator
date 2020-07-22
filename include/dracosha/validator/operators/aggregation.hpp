@@ -26,6 +26,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Codes of aggregation operators
+ */
 enum class aggregation_id : int
 {
     AND,
@@ -37,6 +40,9 @@ enum class aggregation_id : int
 
 struct aggregation_op_tag;
 
+/**
+ * @brief Aggregation operator descriptor
+ */
 struct aggregation_op
 {
     using hana_tag=aggregation_op_tag;
@@ -53,6 +59,10 @@ struct aggregation_op
     aggregation_op& operator= (const aggregation_op& other)=default;
     aggregation_op& operator= (aggregation_op&& other)=default;
 
+    /**
+     * @brief Constructor
+     * @param other Source descriptor
+     */
     template <typename T>
     aggregation_op(const T& other)
         : id(other.id),

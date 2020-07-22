@@ -30,7 +30,7 @@ namespace detail
 {
 
 /**
- * @brief Aggregation operator to check if any element of a container satisfies the condition.
+ * @brief Aggregation operator to check if at least one element of a container satisfies the condition.
  */
 struct aggregate_any_t
 {
@@ -38,7 +38,7 @@ struct aggregate_any_t
      * @brief Execute validator on container
      * @param a Container to validate
      * @param op Validator to apply to container's elements
-     * @return True if any element of the container passed the validator
+     * @return True if at least one element of the container passed the validator
      */
     template <typename T, typename OpT>
     constexpr bool operator ()(T&& a,OpT&& op) const
@@ -51,7 +51,7 @@ struct aggregate_any_t
      * @param a Object to validate
      * @param member Member to process with validator, assumed to be a container
      * @param op Validator to apply to container's elements
-     * @return True if any element of the container passed the validator
+     * @return True if at least one element of the container passed the validator
      */
     template <typename T, typename OpT, typename MemberT>
     constexpr bool operator () (T&& a,MemberT&& member,OpT&& op) const

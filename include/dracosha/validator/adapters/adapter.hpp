@@ -222,24 +222,46 @@ class adapter
             return _traits.validate_not(*this,std::forward<decltype(member)>(member),std::forward<decltype(op)>(op));
         }
 
+        /**
+         * @brief Check if at least one element satisfies validation condition
+         * @param op Validation operator
+         * @return Validation status
+         */
         template <typename OpT>
         status validate_any(OpT&& op) const
         {
             return _traits.validate_any(*this,std::forward<decltype(op)>(op));
         }
 
+        /**
+         * @brief Check if at least one element of the member satisfies validation condition
+         * @param member Member to validate
+         * @param op Validation operator
+         * @return Validation status
+         */
         template <typename MemberT, typename OpT>
         status validate_any(MemberT&& member, OpT&& op) const
         {
             return _traits.validate_any(*this,std::forward<decltype(member)>(member),std::forward<decltype(op)>(op));
         }
 
+        /**
+         * @brief Check if all elements satisfy validation condition
+         * @param op Validation operator
+         * @return Validation status
+         */
         template <typename OpT>
         status validate_all(OpT&& op) const
         {
             return _traits.validate_all(*this,std::forward<decltype(op)>(op));
         }
 
+        /**
+         * @brief Check if all elements of the member satisfy validation condition
+         * @param member Member to validate
+         * @param op Validation operator
+         * @return Validation status
+         */
         template <typename MemberT, typename OpT>
         status validate_all(MemberT&& member, OpT&& op) const
         {

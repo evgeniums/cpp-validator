@@ -54,7 +54,7 @@ struct wrap_it_t
 
 BOOST_HANA_CONSTEXPR_LAMBDA auto wrap_it=[](auto&& it, auto&& aggregation)
 {
-    return wrap_it_t<decltype(it)>{std::forward<decltype(it)>(it),aggregation.description};
+    return wrap_it_t<decltype(it)>{std::forward<decltype(it)>(it),aggregation};
 };
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
