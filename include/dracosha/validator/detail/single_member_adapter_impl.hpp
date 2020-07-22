@@ -187,7 +187,7 @@ class single_member_adapter_impl
                    hana::fold(std::forward<decltype(ops)>(ops),false,
                         [&adpt,&member](status prevResult, auto&& op)
                         {
-                            if (prevResult.value()==status::code::ok)
+                            if (prevResult.value()==status::code::success)
                             {
                                 return prevResult;
                             }

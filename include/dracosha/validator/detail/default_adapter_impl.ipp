@@ -47,7 +47,7 @@ status aggregate_impl<T,
             return ret;
         }
     }
-    return status::code::ok;
+    return status::code::success;
 }
 
 template <typename T>
@@ -65,7 +65,7 @@ status aggregate_impl<T,
             return ret;
         }
     }
-    return status::code::ok;
+    return status::code::success;
 }
 
 template <typename T>
@@ -87,7 +87,7 @@ status aggregate_impl<T,
     }
     if (empty)
     {
-        return status::code::ok;
+        return status::code::success;
     }
     return status::code::fail;
 }
@@ -111,7 +111,7 @@ status aggregate_impl<T,
     }
     if (empty)
     {
-        return status::code::ok;
+        return status::code::success;
     }
     return status::code::fail;
 }

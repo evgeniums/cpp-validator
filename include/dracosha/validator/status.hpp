@@ -34,12 +34,12 @@ class status
 
         enum class code : int
         {
-            ok,
+            success,
             fail,
             ignore
         };
 
-        status() noexcept : _code(code::ok)
+        status() noexcept : _code(code::success)
         {}
         ~status()=default;
         status(const status&)=default;
@@ -58,7 +58,7 @@ class status
          * @brief Constructor from boolean
          * @param ok Boolean status
          */
-        status(bool ok) noexcept : _code(ok?code::ok:code::fail)
+        status(bool ok) noexcept : _code(ok?code::success:code::fail)
         {}
 
         /**

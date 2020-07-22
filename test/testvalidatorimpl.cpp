@@ -586,7 +586,6 @@ BOOST_AUTO_TEST_CASE(CheckIsPair)
 /**
 
 @todo
-    Validate multiple elements of a container member
     Localization of conjunctions, plurals and genders
 */
 
