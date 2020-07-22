@@ -49,7 +49,7 @@ auto default_backend_formatter(DstT& dst)
  * @param dst Destination object
  * @return std::stringstream backend formatter
  */
-auto default_backend_formatter(std::string& dst)
+inline auto default_backend_formatter(std::string& dst)
 {
     return detail::std_backend_formatter{dst};
 }
