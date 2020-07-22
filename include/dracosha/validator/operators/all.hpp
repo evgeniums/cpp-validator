@@ -58,9 +58,11 @@ constexpr all_t ALL{};
 struct string_all_t : public aggregate_op<string_all_t>
 {
     constexpr static const aggregation_id id=aggregation_id::ALL;
-    constexpr static const char* open_token="all elements ";
+    constexpr static const char* open_token="";
     constexpr static const char* close_token="";
     constexpr static const char* conjunction_token="";
+
+    constexpr static const char* description="each element";
 };
 constexpr string_all_t string_all{};
 

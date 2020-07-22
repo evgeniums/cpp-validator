@@ -681,5 +681,125 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberSampleAbortReport)
     rep1.clear();
 }
 
+BOOST_AUTO_TEST_CASE(CheckAggregationAnyReport)
+{
+    std::map<std::string,std::map<size_t,std::string>> m1={
+            {"field1",
+             {
+                 {1,"value1"},
+                 {2,"value2"},
+                 {3,"value3"},
+                 {4,"value4"}
+             }
+            }
+        };
+
+    std::string rep1;
+    auto ra1=make_reporting_adapter(m1,rep1);
+
+    auto v1=validator(
+                _["field1"](ANY(value(gte,"zzz")))
+            );
+    BOOST_CHECK(!v1.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"at least one element of field1 is greater than or equal to zzz");
+    rep1.clear();
+
+    auto v2=validator(
+                _["field1"](ANY(value(gte,"zzz") ^AND^ size(eq,100)))
+            );
+    BOOST_CHECK(!v2.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"at least one element of field1 is greater than or equal to zzz");
+    rep1.clear();
+
+    auto v3=validator(
+                _["field1"](ANY(value(gte,"zzz") ^OR^ size(eq,100)))
+            );
+    BOOST_CHECK(!v3.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"at least one element of field1 is greater than or equal to zzz OR size of at least one element of field1 is equal to 100");
+    rep1.clear();
+
+    std::map<size_t,std::string> m2={
+        {1,"value1"},
+        {2,"value2"},
+        {3,"value3"},
+        {4,"value4"}
+    };
+    auto ra2=make_reporting_adapter(m2,rep1);
+
+    auto v4=validator(
+                ANY(value(gte,"zzz") ^AND^ size(eq,100))
+            );
+    BOOST_CHECK(!v4.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,"at least one element is greater than or equal to zzz");
+    rep1.clear();
+
+    auto v5=validator(
+                ANY(value(gte,"zzz") ^OR^ size(eq,100))
+            );
+    BOOST_CHECK(!v5.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,"at least one element is greater than or equal to zzz OR size of at least one element is equal to 100");
+    rep1.clear();
+}
+
+BOOST_AUTO_TEST_CASE(CheckAggregationAllReport)
+{
+    std::map<std::string,std::map<size_t,std::string>> m1={
+            {"field1",
+             {
+                 {1,"value1"},
+                 {2,"value2"},
+                 {3,"value3"},
+                 {4,"value4"}
+             }
+            }
+        };
+
+    std::string rep1;
+    auto ra1=make_reporting_adapter(m1,rep1);
+
+    auto v1=validator(
+                _["field1"](ALL(value(gte,"value3")))
+            );
+    BOOST_CHECK(!v1.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"each element of field1 is greater than or equal to value3");
+    rep1.clear();
+
+    auto v2=validator(
+                _["field1"](ALL(value(gte,"val") ^AND^ size(gte,100)))
+            );
+    BOOST_CHECK(!v2.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"size of each element of field1 is greater than or equal to 100");
+    rep1.clear();
+
+    auto v3=validator(
+                _["field1"](ALL(value(gte,"zzz") ^OR^ size(eq,100)))
+            );
+    BOOST_CHECK(!v3.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"each element of field1 is greater than or equal to zzz OR size of each element of field1 is equal to 100");
+    rep1.clear();
+
+    std::map<size_t,std::string> m2={
+        {1,"value1"},
+        {2,"value2"},
+        {3,"value3"},
+        {4,"value444"}
+    };
+    auto ra2=make_reporting_adapter(m2,rep1);
+
+    auto v4=validator(
+                ALL(size(gte,1) ^AND^ value(lte,"value3"))
+            );
+    BOOST_CHECK(!v4.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,"each element is less than or equal to value3");
+    rep1.clear();
+
+    auto v5=validator(
+                ALL(value(gte,"value5") ^OR^ size(lte,7))
+            );
+    BOOST_CHECK(!v5.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,"each element is greater than or equal to value5 OR size of each element is less than or equal to 7");
+    rep1.clear();
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 #endif

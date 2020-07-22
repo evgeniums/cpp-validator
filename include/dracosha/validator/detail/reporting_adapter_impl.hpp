@@ -21,6 +21,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/detail/default_adapter_impl.hpp>
+#include <dracosha/validator/operators/any.hpp>
+#include <dracosha/validator/operators/all.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -168,6 +170,44 @@ class reporting_adapter_impl
             return aggregate(
                             string_not,
                             [this,&adpt,&member,&op](){return _next_adapter_impl.validate_not(std::forward<AdapterT>(adpt),member,std::forward<OpT>(op));},
+                            member
+                        );
+        }
+
+        template <typename AdapterT, typename OpT>
+        status validate_any(AdapterT&& adpt, OpT&& op)
+        {
+            return aggregate(
+                            string_any,
+                            [this,&adpt,&op](){return _next_adapter_impl.validate_any(std::forward<AdapterT>(adpt),std::forward<OpT>(op));}
+                        );
+        }
+
+        template <typename AdapterT, typename MemberT, typename OpT>
+        status validate_any(AdapterT&& adpt, MemberT&& member, OpT&& op)
+        {
+            return aggregate(
+                            string_any,
+                            [this,&adpt,&member,&op](){return _next_adapter_impl.validate_any(std::forward<AdapterT>(adpt),member,std::forward<OpT>(op));},
+                            member
+                        );
+        }
+
+        template <typename AdapterT, typename OpT>
+        status validate_all(AdapterT&& adpt, OpT&& op)
+        {
+            return aggregate(
+                            string_all,
+                            [this,&adpt,&op](){return _next_adapter_impl.validate_all(std::forward<AdapterT>(adpt),std::forward<OpT>(op));}
+                        );
+        }
+
+        template <typename AdapterT, typename MemberT, typename OpT>
+        status validate_all(AdapterT&& adpt, MemberT&& member, OpT&& op)
+        {
+            return aggregate(
+                            string_all,
+                            [this,&adpt,&member,&op](){return _next_adapter_impl.validate_all(std::forward<AdapterT>(adpt),member,std::forward<OpT>(op));},
                             member
                         );
         }

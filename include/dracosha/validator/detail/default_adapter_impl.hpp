@@ -69,43 +69,13 @@ struct aggregate_impl<T,
         hana::when<is_container_t<T>::value>>
 {
     template <typename ContainerT, typename AdapterT, typename MemberT, typename OpT>
-    static status all(ContainerT&& container, AdapterT&& adpt, MemberT&& member, OpT&& op)
-    {
-        for (auto it=container.begin();it!=container.end();++it)
-        {
-            auto el_member=member[wrap_it(it)];
-            auto ret=apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),el_member);
-            if (!ret)
-            {
-                return ret;
-            }
-        }
-        return status::code::ok;
-    }
+    static status all(ContainerT&& container, AdapterT&& adpt, MemberT&& member, OpT&& op);
 
     template <typename ContainerT, typename AdapterT, typename OpT>
     static status all(ContainerT&& container, AdapterT&& adpt, OpT&& op);
 
     template <typename ContainerT, typename AdapterT, typename MemberT, typename OpT>
-    static status any(ContainerT&& container, AdapterT&& adpt, MemberT&& member, OpT&& op)
-    {
-        bool empty=true;
-        for (auto it=container.begin();it!=container.end();++it)
-        {
-            auto el_member=member[wrap_it(it)];
-            auto ret=apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),el_member);
-            if (ret)
-            {
-                return ret;
-            }
-            empty=false;
-        }
-        if (empty)
-        {
-            return status::code::ok;
-        }
-        return status::code::fail;
-    }
+    static status any(ContainerT&& container, AdapterT&& adpt, MemberT&& member, OpT&& op);
 
     template <typename ContainerT, typename AdapterT, typename OpT>
     static status any(ContainerT&& container, AdapterT&& adpt, OpT&& op);

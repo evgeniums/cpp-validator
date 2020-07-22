@@ -57,7 +57,8 @@ class reporter
                     FormatterT&& formatter
                 ) : _dst(std::move(dst)),
                     _formatter(std::forward<FormatterT>(formatter)),
-                    _not_count(0)
+                    _not_count(0),
+                    _any_all_count(0)
         {}
 
         /**
@@ -67,6 +68,21 @@ class reporter
         template <typename AggregationT>
         void aggregate_open(AggregationT&& aggregation)
         {
+            auto skip=skip_part();
+            if (
+                aggregation.id==aggregation_id::ANY
+                    ||
+                aggregation.id==aggregation_id::ALL
+                    ||
+                 skip
+               )
+            {
+                ++_any_all_count;
+            }
+            if (skip)
+            {
+                return;
+            }
             if (aggregation.id==aggregation_id::NOT)
             {
                 ++_not_count;
@@ -82,6 +98,21 @@ class reporter
         template <typename AggregationT, typename MemberT>
         void aggregate_open(AggregationT&& aggregation, MemberT&& member)
         {
+            auto skip=skip_part();
+            if (
+                aggregation.id==aggregation_id::ANY
+                    ||
+                aggregation.id==aggregation_id::ALL
+                    ||
+                 skip
+               )
+            {
+                ++_any_all_count;
+            }
+            if (skip)
+            {
+                return;
+            }
             if (aggregation.id==aggregation_id::NOT)
             {
                 ++_not_count;
@@ -96,6 +127,15 @@ class reporter
          */
         void aggregate_close(bool ok)
         {
+            if (skip_part())
+            {
+                --_any_all_count;
+                if (_any_all_count!=0)
+                {
+                    return;
+                }
+            }
+
             if (!_stack.empty())
             {
                 if (!ok || current_not())
@@ -120,7 +160,11 @@ class reporter
         template <typename T2, typename OpT>
         void validate_operator(const OpT& op, const T2& b)
         {
-             auto wrapper=wrap_backend_formatter(current(),_dst);
+            if (skip_part())
+            {
+                return;
+            }
+            auto wrapper=wrap_backend_formatter(current(),_dst);
             _formatter.validate_operator(wrapper,op,b);
         }
 
@@ -133,6 +177,10 @@ class reporter
         template <typename T2, typename OpT, typename PropT>
         void validate_property(const PropT& prop, const OpT& op, const T2& b)
         {
+            if (skip_part())
+            {
+                return;
+            }
             auto wrapper=wrap_backend_formatter(current(),_dst);
             _formatter.validate_property(wrapper,prop,op,b);
         }
@@ -145,6 +193,10 @@ class reporter
         template <typename T2, typename MemberT>
         void validate_exists(const MemberT& member, const T2& b)
         {
+            if (skip_part())
+            {
+                return;
+            }
             auto wrapper=wrap_backend_formatter(current(),_dst);
             _formatter.validate_exists(wrapper,member,b);
         }
@@ -159,6 +211,10 @@ class reporter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
         {
+            if (skip_part())
+            {
+                return;
+            }
             auto wrapper=wrap_backend_formatter(current(),_dst);
             _formatter.validate(wrapper,member,prop,op,b);
         }
@@ -173,6 +229,10 @@ class reporter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate_with_other_member(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
         {
+            if (skip_part())
+            {
+                return;
+            }
             auto wrapper=wrap_backend_formatter(current(),_dst);
             _formatter.validate_with_other_member(wrapper,member,prop,op,b);
         }
@@ -187,6 +247,10 @@ class reporter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate_with_master_sample(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
         {
+            if (skip_part())
+            {
+                return;
+            }
             auto wrapper=wrap_backend_formatter(current(),_dst);
             _formatter.validate_with_master_sample(wrapper,member,prop,op,b);
         }
@@ -211,6 +275,22 @@ class reporter
         }
 
     private:
+
+        bool skip_part() const noexcept
+        {
+            if (!_stack.empty())
+            {
+                const auto& back=_stack.back();
+                if (back.aggregation.id==aggregation_id::ANY
+                        ||
+                    back.aggregation.id==aggregation_id::ALL
+                    )
+                {
+                    return !back.parts.empty();
+                }
+            }
+            return false;
+        }
 
         typename DstT::type& current()
         {
@@ -254,6 +334,7 @@ class reporter
         FormatterT _formatter;
         std::vector<report_aggregation<typename DstT::type>> _stack;
         size_t _not_count;
+        size_t _any_all_count;
 };
 
 /**

@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/property.hpp>
+#include <dracosha/validator/utils/wrap_it.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -37,7 +38,8 @@ namespace detail
 template <typename T, typename =hana::when<true>>
 struct to_string_t
 {
-    std::string operator () (const T&) const
+    template <typename T1>
+    std::string operator () (T1&&) const
     {
         return std::string("<\?\?\?\?\?>");
     }
@@ -49,9 +51,10 @@ struct to_string_t
 template <typename T>
 struct to_string_t<T,hana::when<std::is_constructible<std::string,T>::value>>
 {
-    std::string operator () (const T& id) const
+    template <typename T1>
+    std::string operator () (T1&& id) const
     {
-        return id;
+        return std::string(std::forward<T1>(id));
     }
 };
 
@@ -64,6 +67,18 @@ struct to_string_t<T,hana::when<hana::is_a<property_tag,T>>>
     std::string operator () (const T&) const
     {
         return std::string(T::name());
+    }
+};
+
+/**
+ *  @brief Convert to string if argument is a iterator
+ */
+template <typename T>
+struct to_string_t<T,hana::when<hana::is_a<wrap_iterator_tag,T>>>
+{
+    std::string operator () (const T& id) const
+    {
+        return std::string(id.name());
     }
 };
 

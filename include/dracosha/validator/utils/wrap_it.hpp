@@ -19,6 +19,8 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_WRAP_IT_HPP
 #define DRACOSHA_VALIDATOR_WRAP_IT_HPP
 
+#include <string>
+
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/get_it.hpp>
 
@@ -41,12 +43,18 @@ struct wrap_it_t
         return get_it(_it);
     }
 
+    std::string name() const
+    {
+        return _name;
+    }
+
     T _it;
+    std::string _name;
 };
 
-BOOST_HANA_CONSTEXPR_LAMBDA auto wrap_it=[](auto&& it)
+BOOST_HANA_CONSTEXPR_LAMBDA auto wrap_it=[](auto&& it, auto&& aggregation)
 {
-    return wrap_it_t<decltype(it)>{std::forward<decltype(it)>(it)};
+    return wrap_it_t<decltype(it)>{std::forward<decltype(it)>(it),aggregation.description};
 };
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

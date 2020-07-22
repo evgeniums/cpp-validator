@@ -22,6 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/member.hpp>
 #include <dracosha/validator/detail/default_adapter_impl.hpp>
+#include <dracosha/validator/operators/all.hpp>
+#include <dracosha/validator/operators/any.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -38,7 +40,25 @@ status aggregate_impl<T,
 {
     for (auto it=container.begin();it!=container.end();++it)
     {
-        auto el_member=member<decltype(wrap_it(it))>(wrap_it(it));
+        auto el_member=member<decltype(wrap_it(it,string_all))>(wrap_it(it,string_all));
+        auto ret=apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),el_member);
+        if (!ret)
+        {
+            return ret;
+        }
+    }
+    return status::code::ok;
+}
+
+template <typename T>
+template <typename ContainerT, typename AdapterT, typename MemberT, typename OpT>
+status aggregate_impl<T,
+        hana::when<is_container_t<T>::value>>
+        ::all(ContainerT&& container, AdapterT&& adpt, MemberT&& member, OpT&& op)
+{
+    for (auto it=container.begin();it!=container.end();++it)
+    {
+        auto el_member=member[wrap_it(it,string_all)];
         auto ret=apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),el_member);
         if (!ret)
         {
@@ -57,7 +77,31 @@ status aggregate_impl<T,
     bool empty=true;
     for (auto it=container.begin();it!=container.end();++it)
     {
-        auto el_member=member<decltype(wrap_it(it))>(wrap_it(it));
+        auto el_member=member<decltype(wrap_it(it,string_any))>(wrap_it(it,string_any));
+        auto ret=apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),el_member);
+        if (ret)
+        {
+            return ret;
+        }
+        empty=false;
+    }
+    if (empty)
+    {
+        return status::code::ok;
+    }
+    return status::code::fail;
+}
+
+template <typename T>
+template <typename ContainerT, typename AdapterT, typename MemberT, typename OpT>
+status aggregate_impl<T,
+        hana::when<is_container_t<T>::value>>
+        ::any(ContainerT&& container, AdapterT&& adpt, MemberT&& member, OpT&& op)
+{
+    bool empty=true;
+    for (auto it=container.begin();it!=container.end();++it)
+    {
+        auto el_member=member[wrap_it(it,string_any)];
         auto ret=apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),el_member);
         if (ret)
         {

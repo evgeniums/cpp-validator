@@ -58,9 +58,11 @@ constexpr any_t ANY{};
 struct string_any_t : public aggregate_op<string_any_t>
 {
     constexpr static const aggregation_id id=aggregation_id::ANY;
-    constexpr static const char* open_token="any element ";
+    constexpr static const char* open_token="";
     constexpr static const char* close_token="";
     constexpr static const char* conjunction_token="";
+
+    constexpr static const char* description="at least one element";
 };
 constexpr string_any_t string_any{};
 
