@@ -586,7 +586,9 @@ BOOST_AUTO_TEST_CASE(CheckIsPair)
 /**
 
 @todo
-    Localization of conjunctions, plurals and genders
+    Localization of conjunctions, plurals and genders.
+    String operators.
+    Regular expressions operators.
 */
 
 BOOST_AUTO_TEST_SUITE_END()

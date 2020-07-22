@@ -31,6 +31,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 namespace detail
 {
 
+/**
+ * @brief Implementation of reporting adapter
+ */
 template <typename ReporterT, typename NextAdapterImplT>
 class reporting_adapter_impl
 {

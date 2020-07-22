@@ -36,6 +36,14 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 namespace detail
 {
 
+/**
+ * @brief Implementation of single member reporting adapter.
+ *
+ * Adapter first checks path of the member to validate and performs validation only
+ * if the path matches the path of filtering member.
+ *
+ * @note Currently nested ALL/ANY aggregation operators are not supported.
+ */
 template <typename CheckMemberT>
 class single_member_adapter_impl
 {

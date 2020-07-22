@@ -36,6 +36,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 namespace detail
 {
 
+/**
+ * @brief Helper for ANY/ALL aggregation of non-container types
+ */
 template <typename T, typename=hana::when<true>>
 struct aggregate_impl
 {
@@ -64,6 +67,9 @@ struct aggregate_impl
     }
 };
 
+/**
+ * @brief Helper for ANY/ALL aggregation of container types
+ */
 template <typename T>
 struct aggregate_impl<T,
         hana::when<is_container_t<T>::value>>
@@ -82,9 +88,14 @@ struct aggregate_impl<T,
 };
 
 //-------------------------------------------------------------
-
+/**
+ * @brief Implementation of default adapter
+ */
 struct default_adapter_impl
 {
+    /**
+     *  Call validation operator on object extracted from adapter
+     */
     template <typename AdapterT, typename T2, typename OpT>
     static status validate_operator(AdapterT&& adpt, OpT&& op, T2&& b)
     {
@@ -95,6 +106,9 @@ struct default_adapter_impl
                 );
     }
 
+    /**
+     *  Call validation operator on property of the object extracted from adapter
+     */
     template <typename AdapterT, typename T2, typename OpT, typename PropT>
     static status validate_property(AdapterT&& adpt, PropT&& prop, OpT&& op, T2&& b)
     {
@@ -105,6 +119,9 @@ struct default_adapter_impl
                 );
     }
 
+    /**
+     * Check if member exists.
+     */
     template <typename AdapterT, typename T2, typename MemberT>
     static status validate_exists(AdapterT&& adpt, MemberT&& member, T2&& b, bool from_check_member)
     {
@@ -122,6 +139,10 @@ struct default_adapter_impl
         )(member.path);
     }
 
+    /**
+     * Validate a member.
+     * If configured, the existance of the member can be checked before validation.
+     */
     template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
     static status validate(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
     {
@@ -146,6 +167,10 @@ struct default_adapter_impl
         )(member.path);
     }
 
+    /**
+     * Validate a member using other member as sample.
+     * If configured, the existance of the member can be checked before validation.
+     */
     template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
     static status validate_with_other_member(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
     {
@@ -170,6 +195,10 @@ struct default_adapter_impl
         )(member.path,b.path);
     }
 
+    /**
+     * Validate a member using member with the same path of sample object.
+     * If configured, the existance of the member can be checked before validation.
+     */
     template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
     static status validate_with_master_sample(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
     {
@@ -194,6 +223,9 @@ struct default_adapter_impl
         )(member.path);
     }
 
+    /**
+     * Validate AND aggregation.
+     */
     template <typename AdapterT, typename OpsT>
     static status validate_and(AdapterT&& adpt, OpsT&& ops)
     {
@@ -209,6 +241,9 @@ struct default_adapter_impl
                 );
     }
 
+    /**
+     * Validate a member using AND aggregation.
+     */
     template <typename AdapterT, typename MemberT, typename OpsT>
     static status validate_and(AdapterT&& adpt, MemberT&& member, OpsT&& ops)
     {
@@ -239,6 +274,9 @@ struct default_adapter_impl
         )(member.path);
     }
 
+    /**
+     * Validate OR aggregation.
+     */
     template <typename AdapterT, typename OpsT>
     static status validate_or(AdapterT&& adpt, OpsT&& ops)
     {
@@ -257,6 +295,9 @@ struct default_adapter_impl
         return ok;
     }
 
+    /**
+     * Validate a member using OR aggregation.
+     */
     template <typename AdapterT, typename MemberT, typename OpsT>
     static status validate_or(AdapterT&& adpt, MemberT&& member, OpsT&& ops)
     {
@@ -284,6 +325,9 @@ struct default_adapter_impl
         )(member.path);
     }
 
+    /**
+     * Validate ANY aggregation.
+     */
     template <typename AdapterT, typename OpT>
     static status validate_any(AdapterT&& adpt, OpT&& op)
     {
@@ -291,6 +335,9 @@ struct default_adapter_impl
         return aggregate_impl<decltype(obj)>::any(obj,std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op));
     }
 
+    /**
+     * Validate a member using ANY aggregation.
+     */
     template <typename AdapterT, typename MemberT, typename OpT>
     static status validate_any(AdapterT&& adpt, MemberT&& member, OpT&& op)
     {
@@ -308,6 +355,9 @@ struct default_adapter_impl
         )(member.path);
     }
 
+    /**
+     * Validate a member ALL aggregation.
+     */
     template <typename AdapterT, typename OpT>
     static status validate_all(AdapterT&& adpt, OpT&& op)
     {
@@ -315,6 +365,9 @@ struct default_adapter_impl
         return aggregate_impl<decltype(obj)>::all(obj,std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op));
     }
 
+    /**
+     * Validate a member using ALL aggregation.
+     */
     template <typename AdapterT, typename MemberT, typename OpT>
     static status validate_all(AdapterT&& adpt, MemberT&& member, OpT&& op)
     {
@@ -332,12 +385,18 @@ struct default_adapter_impl
         )(member.path);
     }
 
+    /**
+     * Validate NOT aggregation.
+     */
     template <typename AdapterT, typename OpT>
     static status validate_not(AdapterT&& adpt, OpT&& op)
     {
         return status(!apply(std::forward<AdapterT>(adpt),std::forward<decltype(op)>(op)));
     }
 
+    /**
+     * Validate a member NOT aggregation.
+     */
     template <typename AdapterT, typename MemberT, typename OpT>
     static status validate_not(AdapterT&& adpt, MemberT&& member, OpT&& op)
     {
