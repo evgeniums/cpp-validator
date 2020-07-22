@@ -30,7 +30,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Mode of processing of not found members
+ * @brief Modes of processing of not found members
  */
 enum class if_member_not_found : int
 {
@@ -38,6 +38,9 @@ enum class if_member_not_found : int
     abort //!< Abort validating with false report if member is not found
 };
 
+/**
+ * @brief Base template for classes that can be queried if a member exists.
+ */
 template <typename AdapterT>
 struct with_check_member_exists
 {

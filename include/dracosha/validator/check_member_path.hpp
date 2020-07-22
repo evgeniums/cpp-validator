@@ -42,6 +42,12 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto check_member_path =[](auto&& obj,auto&& path)
     return !hana::is_nothing(hana::monadic_fold_left<hana::optional_tag>(path_c,obj_c,hana::sfinae(check_member)));
 };
 
+/**
+  * @brief Check if members have paths of the same types.
+  * @param member1 First member
+  * @param Second member
+  * @return Result of check operation
+  */
 BOOST_HANA_CONSTEXPR_LAMBDA auto check_member_path_types =[](const auto& member1,const auto& member2)
 {
     auto path1_c=hana::transform(member1.path,hana::make_type);

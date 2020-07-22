@@ -24,6 +24,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
+/**
+ * @brief Helper for getting value from container's iterator
+ */
 template <typename T, typename=hana::when<true>>
 struct get_it_t
 {
@@ -33,6 +36,12 @@ struct get_it_t
         return *it;
     }
 };
+
+/**
+ * @brief Helper for getting value from container's iterator when iterator can be converted to std::pair
+ *
+ * Used for std::map, etc.
+ */
 template <typename T>
 struct get_it_t<T,
             hana::when<is_pair_t<decltype(*std::declval<T>())>::value>
@@ -47,10 +56,15 @@ struct get_it_t<T,
 template <typename T>
 constexpr get_it_t<T> get_it_impl{};
 
+/**
+ * @brief Get value from iterator.
+ * @param it Iterator to get value from
+ * @return Reference to iterator's value
+ */
 template <typename T>
-constexpr auto get_it(T&& v) -> decltype(auto)
+constexpr auto get_it(T&& it) -> decltype(auto)
 {
-    return get_it_impl<T>(std::forward<T>(v));
+    return get_it_impl<T>(std::forward<T>(it));
 }
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

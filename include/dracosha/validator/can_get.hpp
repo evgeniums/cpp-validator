@@ -28,11 +28,21 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ *  @brief Helper to check if member can be got from object by key.
+ *
+ *  Member is assumed to be gettable if key is wrapped iterator.
+ */
 template <typename T1, typename T2, typename =hana::when<true>>
 struct can_get_t
 {
 };
 
+/**
+ *  @brief Helper to check if member can be got from object by key.
+ *
+ *  Member is assumed to be gettable if key is wrapped iterator.
+ */
 template <typename T1, typename T2>
 struct can_get_t<T1,T2,hana::when<hana::is_a<wrap_iterator_tag,T2>>>
 {
@@ -63,6 +73,8 @@ struct can_get_t<T1,T2,hana::when<hana::is_a<wrap_iterator_tag,T2>>>
 };
 
 /**
+ *  @brief Helper to check if member can be got from object by key.
+ *
  *  Member is assumed to be gettable if object has either at(key) method or brackets [key] operator
  *  and type of the key satisfies signature of the corresponding method/operator.
  */
@@ -102,6 +114,8 @@ struct can_get_t<T1,T2,hana::when<
 };
 
 /**
+ *  @brief Helper to check if member can be got from object by key.
+ *
  *  Member is assumed to be gettable if object has the property.
  */
 template <typename T1, typename T2>
@@ -133,8 +147,8 @@ struct can_get_t<T1,T2,hana::when<hana::is_a<property_tag,T2>>>
     }
 };
 
-/**
- * Helper to check if member can be got from object of type T1 using key of type T2.
+/**  
+ * @brief Helper to check if member can be got from object of type T1 using key of type T2.
  */
 template <typename T1, typename T2>
 constexpr can_get_t<T1,T2> can_get{};

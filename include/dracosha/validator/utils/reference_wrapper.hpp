@@ -31,6 +31,10 @@ struct ref_tag;
 
 namespace detail
 {
+
+/**
+ * @brief Helper to extract value from object or reference.
+ */
 template <typename T, typename =hana::when<true>>
 struct extract_ref_t
 {

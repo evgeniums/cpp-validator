@@ -25,6 +25,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Helper to check if object has property "first"
+ */
 template <typename T, typename=void>
 struct has_first
 {
@@ -38,6 +41,9 @@ struct has_first<T,
     constexpr static const bool value=true;
 };
 
+/**
+ * @brief Helper to check if object has property "second"
+ */
 template <typename T, typename=void>
 struct has_second
 {
@@ -50,6 +56,9 @@ struct has_second<T,
     constexpr static const bool value=true;
 };
 
+/**
+ * @brief Helper to check if object is of std::pair type. i.e has "first" and "second" properties.
+ */
 template <typename T, typename =hana::when<true>>
 struct is_pair_t
 {
@@ -63,6 +72,9 @@ struct is_pair_t<T,
     constexpr static const bool value=true;
 };
 
+/**
+ * @brief Check if object is of std::pair type.
+ */
 template <typename T>
 constexpr auto is_pair(T&&)
 {

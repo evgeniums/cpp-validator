@@ -28,21 +28,34 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct wrap_iterator_tag;
 
+/**
+ * @brief Wrapper of container's iterator
+ */
 template <typename T>
 struct wrap_it_t
 {
     using hana_tag=wrap_iterator_tag;
 
+    /**
+      @brief Get value from wrapped iterator
+      */
     auto get() -> decltype(auto)
     {
         return get_it(_it);
     }
 
+    /**
+      @brief Get value from wrapped iterator
+      */
     auto get() const -> decltype(auto)
     {
         return get_it(_it);
     }
 
+    /**
+     * @brief Get iterator name
+     * @return Iterator name to use in report
+     */
     std::string name() const
     {
         return _name;
@@ -52,6 +65,12 @@ struct wrap_it_t
     std::string _name;
 };
 
+/**
+  @brief Wrap iterator
+  @param it Iterator
+  @param aggregation Aggregation descriptor to take iterator name from
+  @return Wrapped iterator
+  */
 BOOST_HANA_CONSTEXPR_LAMBDA auto wrap_it=[](auto&& it, auto&& aggregation)
 {
     return wrap_it_t<decltype(it)>{std::forward<decltype(it)>(it),aggregation};
