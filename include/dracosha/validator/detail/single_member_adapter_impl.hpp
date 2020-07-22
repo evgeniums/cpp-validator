@@ -37,161 +37,233 @@ namespace detail
 {
 
 template <typename CheckMemberT>
-struct single_member_adapter_impl
+class single_member_adapter_impl
 {
-    CheckMemberT _member;
+    public:
 
-    single_member_adapter_impl(CheckMemberT&& member):_member(std::forward<CheckMemberT>(member))
-    {}
+        single_member_adapter_impl(CheckMemberT&& member)
+            :_member(std::forward<CheckMemberT>(member)),
+             _skip_member_filter(false)
+        {}
 
-    template <typename AdapterT, typename T2, typename OpT>
-    status validate_operator(AdapterT&& adpt, OpT&& op, T2&& b) const
-    {
-        return default_adapter_impl::validate_operator(std::forward<AdapterT>(adpt),
-                                                         std::forward<OpT>(op),
-                                                         std::forward<T2>(b));
-    }
-
-    template <typename AdapterT, typename T2, typename OpT, typename PropT>
-    status validate_property(AdapterT&& adpt, PropT&& prop, OpT&& op, T2&& b) const
-    {
-        return default_adapter_impl::validate_property(std::forward<AdapterT>(adpt),
-                                                         std::forward<PropT>(prop),
-                                                         std::forward<OpT>(op),
-                                                         std::forward<T2>(b));
-    }
-
-    template <typename AdapterT, typename T2, typename MemberT>
-    status validate_exists(AdapterT&& adpt, MemberT&& member, T2&& b, bool from_check_member) const
-    {
-        std::ignore=adpt;
-        std::ignore=from_check_member;
-        if (!_member.isEqual(member))
+        template <typename AdapterT, typename T2, typename OpT>
+        status validate_operator(AdapterT&& adpt, OpT&& op, T2&& b) const
         {
-            return status::code::ignore;
+            return default_adapter_impl::validate_operator(std::forward<AdapterT>(adpt),
+                                                             std::forward<OpT>(op),
+                                                             std::forward<T2>(b));
         }
-        return b;
-    }
 
-    template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
-    status validate(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
-    {
-        const auto& obj=extract(adpt.traits().get());
-        return hana::eval_if(
-                    (
-                        check_member_path_types(_member,member)
-                        &&
-                        has_property_fn(obj,prop)
-                     ),
-            [this,&member,&adpt,&prop,&op,&b](auto&&)
-            {
-                if (!_member.isEqual(member))
-                {
-                    return status(status::code::ignore);
-                }
-                return validate_property(std::forward<AdapterT>(adpt),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
-            },
-            [](auto&&)
+        template <typename AdapterT, typename T2, typename OpT, typename PropT>
+        status validate_property(AdapterT&& adpt, PropT&& prop, OpT&& op, T2&& b) const
+        {
+            return default_adapter_impl::validate_property(std::forward<AdapterT>(adpt),
+                                                             std::forward<PropT>(prop),
+                                                             std::forward<OpT>(op),
+                                                             std::forward<T2>(b));
+        }
+
+        template <typename AdapterT, typename T2, typename MemberT>
+        status validate_exists(AdapterT&& adpt, MemberT&& member, T2&& b, bool from_check_member) const
+        {
+            std::ignore=adpt;
+            std::ignore=from_check_member;
+            if (filter_member(member))
             {
                 return status(status::code::ignore);
             }
-        );
-    }
-
-    template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
-    status validate_with_other_member(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
-    {
-        std::ignore=adpt;
-        std::ignore=member;
-        std::ignore=prop;
-        std::ignore=op;
-        std::ignore=b;
-        return status::code::ignore;
-    }
-
-    template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
-    status validate_with_master_sample(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
-    {
-        if (!_member.isEqual(member))
-        {
-            return status::code::ignore;
+            return b;
         }
-        const auto& obj=extract(adpt.traits().get());
-        return status(op(
-                    property(obj,std::forward<PropT>(prop)),
-                    property(get_member(b(),member.path),prop)
-                ));
-    }
 
-    template <typename AdapterT, typename OpsT>
-    status validate_and(AdapterT&& adpt, OpsT&& ops) const
-    {
-        return default_adapter_impl::validate_and(std::forward<AdapterT>(adpt),std::forward<OpsT>(ops));
-    }
-
-    template <typename AdapterT, typename MemberT, typename OpsT>
-    status validate_and(AdapterT&& adpt, MemberT&& member, OpsT&& ops) const
-    {
-        if (!_member.isEqual(member))
+        template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
+        status validate(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
         {
-            return status::code::ignore;
-        }
-        return hana::fold(std::forward<decltype(ops)>(ops),true,
-                    [&member,&adpt](status prevResult, auto&& op)
+            const auto& obj=extract(adpt.traits().get());
+            if (_skip_member_filter)
+            {
+                return hana::if_(check_member_path(obj,member.path),
+                    [&obj,&prop,&op,&b](auto&& path)
                     {
-                        if (!prevResult)
-                        {
-                            return prevResult;
-                        }
-                        return status(
-                            apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member))
-                        );
-                    }
-                );
-    }
-
-    template <typename AdapterT, typename OpsT>
-    status validate_or(AdapterT&& adpt, OpsT&& ops) const
-    {
-        return default_adapter_impl::validate_or(std::forward<AdapterT>(adpt),std::forward<OpsT>(ops));
-    }
-
-    template <typename AdapterT, typename MemberT, typename OpsT>
-    status validate_or(AdapterT&& adpt, MemberT&& member, OpsT&& ops) const
-    {
-        if (!_member.isEqual(member))
-        {
-            return status::code::ignore;
-        }
-        return hana::value(hana::length(ops))==0
-                ||
-               hana::fold(std::forward<decltype(ops)>(ops),false,
-                    [&adpt,&member](status prevResult, auto&& op)
+                        return op(
+                                    property(get_member(obj,std::forward<decltype(path)>(path)),std::forward<PropT>(prop)),
+                                    extract(std::forward<T2>(b))
+                                );
+                    },
+                    [](auto&&)
                     {
-                        if (prevResult.value()==status::code::ok)
-                        {
-                            return prevResult;
-                        }
-                        return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+                        return status();
                     }
-                );
-    }
+                )(member.path);
+            }
 
-    template <typename AdapterT, typename OpT>
-    status validate_not(AdapterT&& adpt, OpT&& op) const
-    {
-        return default_adapter_impl::validate_not(std::forward<AdapterT>(adpt),std::forward<OpT>(op));
-    }
+            return hana::eval_if(
+                        (
+                            (check_member_path_types(_member,member))
+                            &&
+                            has_property_fn(obj,prop)
+                         ),
+                [this,&member,&adpt,&prop,&op,&b](auto&&)
+                {
+                    if (filter_member(member))
+                    {
+                        return status(status::code::ignore);
+                    }
+                    return validate_property(std::forward<AdapterT>(adpt),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
+                },
+                [](auto&&)
+                {
+                    return status(status::code::ignore);
+                }
+            );
+        }
 
-    template <typename AdapterT, typename MemberT, typename OpT>
-    status validate_not(AdapterT&& adpt, MemberT&& member, OpT&& op) const
-    {
-        if (!_member.isEqual(member))
+        template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
+        status validate_with_other_member(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
         {
+            std::ignore=adpt;
+            std::ignore=member;
+            std::ignore=prop;
+            std::ignore=op;
+            std::ignore=b;
             return status::code::ignore;
         }
-        return status(!apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
-    }
+
+        template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
+        status validate_with_master_sample(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
+        {
+            if (filter_member(member))
+            {
+                return status(status::code::ignore);
+            }
+            const auto& obj=extract(adpt.traits().get());
+            return status(op(
+                        property(obj,std::forward<PropT>(prop)),
+                        property(get_member(b(),member.path),prop)
+                    ));
+        }
+
+        template <typename AdapterT, typename OpsT>
+        status validate_and(AdapterT&& adpt, OpsT&& ops) const
+        {
+            return default_adapter_impl::validate_and(std::forward<AdapterT>(adpt),std::forward<OpsT>(ops));
+        }
+
+        template <typename AdapterT, typename MemberT, typename OpsT>
+        status validate_and(AdapterT&& adpt, MemberT&& member, OpsT&& ops) const
+        {
+            if (filter_member(member))
+            {
+                return status(status::code::ignore);
+            }
+            return hana::fold(std::forward<decltype(ops)>(ops),true,
+                        [&member,&adpt](status prevResult, auto&& op)
+                        {
+                            if (!prevResult)
+                            {
+                                return prevResult;
+                            }
+                            return status(
+                                apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member))
+                            );
+                        }
+                    );
+        }
+
+        template <typename AdapterT, typename OpsT>
+        status validate_or(AdapterT&& adpt, OpsT&& ops) const
+        {
+            return default_adapter_impl::validate_or(std::forward<AdapterT>(adpt),std::forward<OpsT>(ops));
+        }
+
+        template <typename AdapterT, typename MemberT, typename OpsT>
+        status validate_or(AdapterT&& adpt, MemberT&& member, OpsT&& ops) const
+        {
+            if (filter_member(member))
+            {
+                return status(status::code::ignore);
+            }
+            return hana::value(hana::length(ops))==0
+                    ||
+                   hana::fold(std::forward<decltype(ops)>(ops),false,
+                        [&adpt,&member](status prevResult, auto&& op)
+                        {
+                            if (prevResult.value()==status::code::ok)
+                            {
+                                return prevResult;
+                            }
+                            return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+                        }
+                    );
+        }
+
+        template <typename AdapterT, typename OpT>
+        status validate_not(AdapterT&& adpt, OpT&& op) const
+        {
+            return default_adapter_impl::validate_not(std::forward<AdapterT>(adpt),std::forward<OpT>(op));
+        }
+
+        template <typename AdapterT, typename MemberT, typename OpT>
+        status validate_not(AdapterT&& adpt, MemberT&& member, OpT&& op) const
+        {
+            if (filter_member(member))
+            {
+                return status(status::code::ignore);
+            }
+            return status(!apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+        }
+
+        template <typename AdapterT, typename OpT>
+        status validate_any(AdapterT&& adpt, OpT&& op) const
+        {
+            return default_adapter_impl::validate_any(std::forward<AdapterT>(adpt),std::forward<OpT>(op));
+        }
+
+        template <typename AdapterT, typename MemberT, typename OpT>
+        status validate_any(AdapterT&& adpt, MemberT&& member, OpT&& op) const
+        {
+            if (filter_member(member))
+            {
+                return status(status::code::ignore);
+            }
+            _skip_member_filter=true;
+            auto ret=default_adapter_impl::validate_any(std::forward<AdapterT>(adpt),std::forward<decltype(member)>(member),std::forward<OpT>(op));
+            _skip_member_filter=false;
+            return ret;
+        }
+
+        template <typename AdapterT, typename OpT>
+        status validate_all(AdapterT&& adpt, OpT&& op) const
+        {
+            return default_adapter_impl::validate_all(std::forward<AdapterT>(adpt),std::forward<OpT>(op));
+        }
+
+        template <typename AdapterT, typename MemberT, typename OpT>
+        status validate_all(AdapterT&& adpt, MemberT&& member, OpT&& op) const
+        {
+            if (filter_member(member))
+            {
+                return status(status::code::ignore);
+            }
+            _skip_member_filter=true;
+            auto ret=default_adapter_impl::validate_all(std::forward<AdapterT>(adpt),std::forward<decltype(member)>(member),std::forward<OpT>(op));
+            _skip_member_filter=false;
+            return ret;
+        }
+
+    private:
+
+        template <typename MemberT>
+        bool filter_member(const MemberT& member) const noexcept
+        {
+            if (!_skip_member_filter && !_member.isEqual(member))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        CheckMemberT _member;
+        mutable bool _skip_member_filter;
 };
 }
 

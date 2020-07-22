@@ -258,4 +258,58 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberSampleObjectReport)
     rep1.clear();
 }
 
+BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
+{
+    std::map<std::string,std::map<size_t,std::string>> m1={
+            {"field1",
+             {
+                 {1,"value1"},
+                 {2,"value2"},
+                 {3,"value3"},
+                 {4,"value4000"}
+             }
+            },
+            {"field2",
+             {
+                 {10,"value10"},
+                 {20,"value20"},
+                 {30,"value30"},
+                 {40,"value400"}
+             }
+            }
+        };
+    std::string rep1;
+    auto sa1=make_single_member_adapter(_["field2"],m1,rep1);
+
+    auto v1=validator(
+                _["field1"](ANY(size(gte,9))),
+                _["field2"](ANY(size(gte,8)))
+            );
+    BOOST_CHECK(v1.apply(sa1));
+    rep1.clear();
+
+    auto v2=validator(
+                _["field1"](ALL(size(gte,9))),
+                _["field2"](ALL(size(gte,8)))
+            );
+    BOOST_CHECK(!v2.apply(sa1));
+    BOOST_CHECK_EQUAL(rep1,"size of each element of field2 is greater than or equal to 8");
+    rep1.clear();
+
+    auto v3=validator(
+                _["field1"](ALL(size(gte,9))),
+                _["field2"](ANY(size(gte,8)))
+            );
+    BOOST_CHECK(v3.apply(sa1));
+    rep1.clear();
+
+    auto v4=validator(
+                _["field1"](ANY(size(gte,1000))),
+                _["field2"](ANY(value(gte,"zzz")))
+            );
+    BOOST_CHECK(!v4.apply(sa1));
+    BOOST_CHECK_EQUAL(rep1,"at least one element of field2 is greater than or equal to zzz");
+    rep1.clear();
+}
+
 BOOST_AUTO_TEST_SUITE_END()

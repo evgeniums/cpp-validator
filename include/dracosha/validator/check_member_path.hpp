@@ -34,7 +34,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
   This operation is expected to be static and must be performed at compile time.
 */
-BOOST_HANA_CONSTEXPR_LAMBDA auto check_member_path =[](auto obj,auto path)
+BOOST_HANA_CONSTEXPR_LAMBDA auto check_member_path =[](auto&& obj,auto&& path)
 {
     auto path_c=hana::transform(path,hana::make_type);
     auto obj_c=hana::type_c<decltype(obj)>;
