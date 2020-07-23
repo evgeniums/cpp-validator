@@ -52,6 +52,7 @@ SET (HEADERS
     include/dracosha/validator/operators/all.hpp
     include/dracosha/validator/operators/aggregation.hpp
     include/dracosha/validator/operators/logical.hpp
+    include/dracosha/validator/operators/invert_op.hpp
     include/dracosha/validator/operators.hpp
 
     include/dracosha/validator/properties/value.hpp

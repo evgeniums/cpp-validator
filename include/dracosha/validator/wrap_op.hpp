@@ -8,43 +8,26 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operators/operator.hpp
+/** \file validator/operators/wrap_op.hpp
 *
-*  Defines base operator
+*  Defines operator wrapper
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_OPERATOR_HPP
-#define DRACOSHA_VALIDATOR_OPERATOR_HPP
+#ifndef DRACOSHA_VALIDATOR_WRAP_OP_HPP
+#define DRACOSHA_VALIDATOR_WRAP_OP_HPP
 
 #include <string>
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
-#include <dracosha/validator/utils/enable_to_string.hpp>
+#include <dracosha/validator/operators/operator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-/**
- * @brief Tag for all operator clases
- */
-struct operator_tag;
-
-/**
- * @brief Base operator class
- */
-template <typename DerivedT>
-struct op : public enable_to_string<DerivedT>
-{
-    using hana_tag=operator_tag;
-};
-
-/**
- * @brief Wrap operator
- */
 template <typename T>
 class wrap_op : public object_wrapper<T>
 {
@@ -69,19 +52,13 @@ class wrap_op : public object_wrapper<T>
          */
         operator std::string() const
         {
-            return _description.empty()?std::string(this->get()):_description;
+            return _description;
         }
 
-        /**
-         * @brief Apply operator
-         * @param Value to validate
-         * @param Sample vaue
-         * @return Validation status
-         */
         template <typename T1, typename T2>
-        bool operator() (const T1& a, const T2& b) const
+        constexpr bool operator() (const T1& a, const T2& b) const
         {
-            return this->get()(a,b);
+            return get()(b,a);
         }
 
     private:
@@ -93,4 +70,4 @@ class wrap_op : public object_wrapper<T>
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_OPERATOR_HPP
+#endif // DRACOSHA_VALIDATOR_WRAP_OP_HPP

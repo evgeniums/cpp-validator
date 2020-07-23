@@ -26,6 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/master_sample.hpp>
 #include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/operators.hpp>
+#include <dracosha/validator/operators/invert_op.hpp>
 #include <dracosha/validator/reporting/member_name.hpp>
 #include <dracosha/validator/reporting/values.hpp>
 #include <dracosha/validator/reporting/aggregation_strings.hpp>
@@ -74,6 +75,7 @@ inline std::map<std::string,std::string> strings_sample_locale()
     m[string_and_t::conjunction_token]=" AND ";
     m[string_or_t::conjunction_token]=" OR ";
     m[string_not_t::open_token]="NOT ";
+    m[string_invert_op]="NOT";
 
     // comparison
     m[eq]="must be equal to";

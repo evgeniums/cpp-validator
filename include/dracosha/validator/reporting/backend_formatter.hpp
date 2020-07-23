@@ -20,6 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_BACKEND_FORMATTER_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/utils/reference_wrapper.hpp>
 #include <dracosha/validator/detail/backend_formatter_helper.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN

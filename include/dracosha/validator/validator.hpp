@@ -19,8 +19,6 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_HPP
 #define DRACOSHA_VALIDATOR_HPP
 
-#include <type_traits>
-
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/safe_compare.hpp>
 #include <dracosha/validator/utils/adjust_storable_type.hpp>
@@ -50,6 +48,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/validate.hpp>
 #include <dracosha/validator/detail/default_adapter_impl.ipp>
 #include <dracosha/validator/operand.hpp>
+#include <dracosha/validator/operators/invert_op.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -83,9 +82,23 @@ struct _t
     }
 
     template <typename T1, typename T2>
-    constexpr auto operator () (T1&& val, T2&& description) const
+    constexpr auto operator () (
+            T1&& val,
+            T2&& description,
+            std::enable_if_t<!hana::is_a<operator_tag,T1>,void*> =nullptr
+        ) const
     {
         return operand<T1>(std::forward<T1>(val),std::forward<T2>(description));
+    }
+
+    template <typename T1, typename T2>
+    constexpr auto operator () (
+            T1&& val,
+            T2&& description,
+            std::enable_if_t<hana::is_a<operator_tag,T1>,void*> =nullptr
+        ) const
+    {
+        return wrap_op<T1>(std::forward<T1>(val),std::forward<T2>(description));
     }
 };
 constexpr _t _{};

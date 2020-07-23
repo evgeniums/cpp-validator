@@ -8,45 +8,39 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operators/operator.hpp
+/** \file validator/operators/invert_op.hpp
 *
-*  Defines base operator
+*  Defines invertion operator
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_OPERATOR_HPP
-#define DRACOSHA_VALIDATOR_OPERATOR_HPP
+#ifndef DRACOSHA_VALIDATOR_INVERT_OP_HPP
+#define DRACOSHA_VALIDATOR_INVERT_OP_HPP
 
 #include <string>
+
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/utils/object_wrapper.hpp>
 #include <dracosha/validator/utils/enable_to_string.hpp>
+#include <dracosha/validator/operators/operator.hpp>
+#include <dracosha/validator/reporting/backend_formatter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-/**
- * @brief Tag for all operator clases
- */
-struct operator_tag;
-
-/**
- * @brief Base operator class
- */
-template <typename DerivedT>
-struct op : public enable_to_string<DerivedT>
+struct string_invert_op_t : public enable_to_string<string_invert_op_t>
 {
-    using hana_tag=operator_tag;
+    constexpr static const char* description="NOT";
 };
+constexpr string_invert_op_t string_invert_op{};
 
 /**
- * @brief Wrap operator
+ * @brief Invert operator
  */
 template <typename T>
-class wrap_op : public object_wrapper<T>
+class invert_op : public object_wrapper<T>
 {
     public:
 
@@ -57,7 +51,7 @@ class wrap_op : public object_wrapper<T>
          * @param val Operator
          * @param description String to use in report formatting to represent the operator
          */
-        wrap_op(
+        invert_op(
                 T&& val,
                 std::string description=std::string()
             ) : object_wrapper<T>(std::forward<T>(val)),
@@ -69,11 +63,17 @@ class wrap_op : public object_wrapper<T>
          */
         operator std::string() const
         {
-            return _description.empty()?std::string(this->get()):_description;
+            if (_description.empty())
+            {
+                std::string str;
+                backend_formatter.append(str,std::string(string_invert_op)," ",std::string(this->get()));
+                return str;
+            }
+            return _description;
         }
 
         /**
-         * @brief Apply operator
+         * @brief Apply and invert operator
          * @param Value to validate
          * @param Sample vaue
          * @return Validation status
@@ -81,7 +81,7 @@ class wrap_op : public object_wrapper<T>
         template <typename T1, typename T2>
         bool operator() (const T1& a, const T2& b) const
         {
-            return this->get()(a,b);
+            return !this->get()(a,b);
         }
 
     private:
@@ -89,8 +89,31 @@ class wrap_op : public object_wrapper<T>
         std::string _description;
 };
 
+/**
+ * @brief Create inverted operator
+ * @param v Operator
+ * @return Inverted perator
+ */
+template <typename T>
+auto _n(T&& v)
+{
+    return invert_op<T>(std::forward<T>(v));
+}
+
+/**
+ * @brief Create inverted operator with custom description
+ * @param v Operator
+ * @param description Custom description
+ * @return Inverted perator
+ */
+template <typename T>
+auto _n(T&& v, std::string description)
+{
+    return invert_op<T>(std::forward<T>(v),std::move(description));
+}
+
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_OPERATOR_HPP
+#endif // DRACOSHA_VALIDATOR_INVERT_OP_HPP
