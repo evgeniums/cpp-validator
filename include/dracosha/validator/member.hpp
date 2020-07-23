@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/adjust_storable_type.hpp>
 #include <dracosha/validator/utils/make_types_tuple.hpp>
+#include <dracosha/validator/utils/optional.hpp>
 #include <dracosha/validator/apply.hpp>
 #include <dracosha/validator/dispatcher.hpp>
 #include <dracosha/validator/properties.hpp>
@@ -55,8 +56,7 @@ struct member
     template <typename T1, typename ParentPathTs>
     member(T1&& key, ParentPathTs&& parent_path,
            std::enable_if_t<!std::is_constructible<std::string,ParentPathTs>::value,void*> =nullptr)
-         : path(hana::append(std::forward<ParentPathTs>(parent_path),std::forward<T1>(key))),
-           _has_name(false)
+         : path(hana::append(std::forward<ParentPathTs>(parent_path),std::forward<T1>(key)))
     {}
 
     /**
@@ -67,8 +67,7 @@ struct member
     template <typename ParentPathTs>
     member(type key, ParentPathTs&& parent_path,
            std::enable_if_t<!std::is_constructible<std::string,ParentPathTs>::value,void*> =nullptr)
-         : path(hana::append(std::forward<ParentPathTs>(parent_path),std::move(key))),
-           _has_name(false)
+         : path(hana::append(std::forward<ParentPathTs>(parent_path),std::move(key)))
     {}
 
     /**
@@ -77,8 +76,7 @@ struct member
      */
     template <typename T1>
     member(T1&& key)
-         : path(hana::make_tuple(std::forward<T1>(key))),
-           _has_name(false)
+         : path(hana::make_tuple(std::forward<T1>(key)))
     {}
 
     /**
@@ -91,8 +89,7 @@ struct member
            T1&& name,
            std::enable_if_t<std::is_constructible<std::string,T1>::value,void*> =nullptr)
          : path(std::move(path)),
-           _name(std::forward<T1>(name)),
-           _has_name(!_name.empty())
+           _name(std::forward<T1>(name))
     {}
 
     /**
@@ -100,8 +97,7 @@ struct member
      * @param str Key of current member
      */
     member(std::string str)
-         : path(hana::make_tuple(std::move(str))),
-           _has_name(false)
+         : path(hana::make_tuple(std::move(str)))
     {}
 
     /**
@@ -170,26 +166,29 @@ struct member
         return member(path,std::forward<T1>(v));
     }
 
-    std::string name() const noexcept
+    const std::string& name() const
     {
-        return _name;
+        return _name.value();
     }
 
     bool has_name() const noexcept
     {
-        return _has_name;
+        return _name.has_value();
     }
 
     void set_name(std::string name)
     {
         _name=std::move(name);
-        _has_name=!name.empty();
+    }
+
+    void unset_name()
+    {
+        _name.reset();
     }
 
     private:
 
-        std::string _name;
-        bool _has_name;
+        optional<std::string> _name;
 };
 
 //-------------------------------------------------------------

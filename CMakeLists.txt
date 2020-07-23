@@ -18,6 +18,7 @@ SET (HEADERS
     include/dracosha/validator/utils/is_pair.hpp
     include/dracosha/validator/utils/get_it.hpp
     include/dracosha/validator/utils/wrap_it.hpp
+    include/dracosha/validator/utils/optional.hpp
 
     include/dracosha/validator/property.hpp
     include/dracosha/validator/can_get.hpp

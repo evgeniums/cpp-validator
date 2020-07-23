@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
 #include <dracosha/validator/utils/enable_to_string.hpp>
+#include <dracosha/validator/utils/optional.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -59,9 +60,18 @@ class wrap_op : public object_wrapper<T>
          */
         wrap_op(
                 T&& val,
-                std::string description=std::string()
+                std::string description
             ) : object_wrapper<T>(std::forward<T>(val)),
                 _description(std::move(description))
+        {}
+
+        /**
+         * @brief Constructor
+         * @param val Operator
+         */
+        wrap_op(
+                T&& val
+            ) : object_wrapper<T>(std::forward<T>(val))
         {}
 
         /**
@@ -69,7 +79,7 @@ class wrap_op : public object_wrapper<T>
          */
         operator std::string() const
         {
-            return _description.empty()?std::string(this->get()):_description;
+            return !_description?std::string(this->get()):_description.value();
         }
 
         /**
@@ -86,7 +96,7 @@ class wrap_op : public object_wrapper<T>
 
     private:
 
-        std::string _description;
+        optional<std::string> _description;
 };
 
 //-------------------------------------------------------------

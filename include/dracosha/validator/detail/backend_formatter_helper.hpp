@@ -125,6 +125,19 @@ struct backend_formatter_helper<DstT,
     }
 };
 
+template <typename T>
+auto to_dst(T&& v,
+            std::enable_if_t<hana::is_a<backend_formatter_tag,T>,void*> =nullptr) -> decltype(auto)
+{
+    return v.get();
+}
+template <typename T>
+auto to_dst(T&& v,
+            std::enable_if_t<!hana::is_a<backend_formatter_tag,T>,void*> =nullptr) -> decltype(auto)
+{
+    return hana::id(std::forward<T>(v));
+}
+
 }
 
 //-------------------------------------------------------------

@@ -147,48 +147,73 @@ BOOST_AUTO_TEST_CASE(CheckValidationReport)
     BOOST_CHECK(!v3.apply(ra2));
     BOOST_CHECK_EQUAL(rep1,std::string("element #1 must be greater than or equal to 100"));
     rep1.clear();
+}
 
-    auto v4=validator(
+BOOST_AUTO_TEST_CASE(CheckCustomDescriptions)
+{
+    std::string rep1;
+    std::vector<size_t> vec1={10,20,30,40,50};
+    auto ra1=make_reporting_adapter(vec1,rep1);
+
+    auto v1=validator(
                 _[1](gte,_(100,"one hundred"))
             );
-    BOOST_CHECK(!v4.apply(ra2));
+    BOOST_CHECK(!v1.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("element #1 must be greater than or equal to one hundred"));
     rep1.clear();
 
-    auto v5=validator(
+    auto v2=validator(
                 _[1]("first element")(gte,_(100,"one hundred"))
             );
-    BOOST_CHECK(!v5.apply(ra2));
+    BOOST_CHECK(!v2.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("first element must be greater than or equal to one hundred"));
     rep1.clear();
 
-    auto v6=validator(
+    auto v3=validator(
                 _[1]("first element")(_(gte,"must be not less than"),_(100,"one hundred"))
             );
-    BOOST_CHECK(!v6.apply(ra2));
+    BOOST_CHECK(!v3.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("first element must be not less than one hundred"));
     rep1.clear();
 
-    auto v7=validator(
+    auto v4=validator(
                 _[1]("first element")(
                     value(_(gte,"must be not less than"),_(100,"one hundred"))
                     ^OR^
                     value(_(eq,"must be the same as"),_(1,"one"))
                 )
             );
-    BOOST_CHECK(!v7.apply(ra2));
+    BOOST_CHECK(!v4.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("first element must be not less than one hundred OR first element must be the same as one"));
     rep1.clear();
 
-    auto v8=validator(
+    auto v5=validator(
                 _[1]("first element")(
                     value(_n(gte,"must be less than"),_(5,"five"))
                     ^OR^
                     value(_n(eq,"must not be the same as"),_(20,"twenty"))
                 )
             );
-    BOOST_CHECK(!v8.apply(ra2));
+    BOOST_CHECK(!v5.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("first element must be less than five OR first element must not be the same as twenty"));
+    rep1.clear();
+
+    auto v6=validator(
+                _[1]("")(
+                    value(_(gte,""),_(500,""))
+                )
+            );
+    BOOST_CHECK(!v6.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string(""));
+    rep1.clear();
+
+    auto v7=validator(
+                _[1]("")(
+                    value(_n(eq,""),_(20,""))
+                )
+            );
+    BOOST_CHECK(!v7.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string(""));
     rep1.clear();
 }
 

@@ -25,6 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/enable_to_string.hpp>
 #include <dracosha/validator/operators/operator.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
+#include <dracosha/validator/utils/optional.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -53,9 +54,18 @@ class invert_op : public object_wrapper<T>
          */
         invert_op(
                 T&& val,
-                std::string description=std::string()
+                std::string description
             ) : object_wrapper<T>(std::forward<T>(val)),
                 _description(std::move(description))
+        {}
+
+        /**
+         * @brief Constructor
+         * @param val Operator
+         */
+        invert_op(
+                T&& val
+            ) : object_wrapper<T>(std::forward<T>(val))
         {}
 
         /**
@@ -63,13 +73,13 @@ class invert_op : public object_wrapper<T>
          */
         operator std::string() const
         {
-            if (_description.empty())
+            if (!_description)
             {
                 std::string str;
                 backend_formatter.append(str,std::string(string_invert_op)," ",std::string(this->get()));
                 return str;
             }
-            return _description;
+            return _description.value();
         }
 
         /**
@@ -86,7 +96,7 @@ class invert_op : public object_wrapper<T>
 
     private:
 
-        std::string _description;
+        optional<std::string> _description;
 };
 
 /**

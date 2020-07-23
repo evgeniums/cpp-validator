@@ -606,9 +606,13 @@ BOOST_AUTO_TEST_CASE(CheckIsMasterSample)
 /**
 
 @todo
+    Override validator report.
     Localization of conjunctions, plurals and genders.
     String operators.
     Regular expressions operators.
+    IOS_SDK_VERSION_X10 in cmake.
+    Generate config file.
+    Remove legacy files.
 */
 
 BOOST_AUTO_TEST_SUITE_END()
