@@ -468,7 +468,7 @@ BOOST_AUTO_TEST_CASE(CheckCanGetAtCompileTime)
     BOOST_CHECK(true);
 }
 
-BOOST_AUTO_TEST_CASE(CheckExistsWithCompileTime)
+BOOST_AUTO_TEST_CASE(CheckExistsValidator)
 {
     std::map<std::string,std::string> m1;
     m1["one"]="one_value";
