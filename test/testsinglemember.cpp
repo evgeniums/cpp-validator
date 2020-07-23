@@ -73,12 +73,12 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberReport)
 
     auto sa2=make_single_member_adapter(_["field10"],std::string("value10"),rep1);
     BOOST_CHECK(!v1.apply(sa2));
-    BOOST_CHECK_EQUAL(rep1,"size of field10 is less than 3");
+    BOOST_CHECK_EQUAL(rep1,"size of field10 must be less than 3");
     rep1.clear();
 
     auto sa3=make_single_member_adapter(_["field1"],"0",rep1);
     BOOST_CHECK(!v1.apply(sa3));
-    BOOST_CHECK_EQUAL(rep1,"field1 is greater than or equal to 1");
+    BOOST_CHECK_EQUAL(rep1,"field1 must be greater than or equal to 1");
     rep1.clear();
 
     std::string str4="0";
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberReport)
 
     auto sa9=make_single_member_adapter(_[10],100,rep1);
     BOOST_CHECK(!v1.apply(sa9));
-    BOOST_CHECK_EQUAL(rep1,"element #10 is greater than or equal to 1000");
+    BOOST_CHECK_EQUAL(rep1,"element #10 must be greater than or equal to 1000");
     rep1.clear();
 }
 
@@ -125,12 +125,12 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAggregationReport)
 
     auto sa2=make_single_member_adapter(_["field10"],"01",rep1);
     BOOST_CHECK(!v1.apply(sa2));
-    BOOST_CHECK_EQUAL(rep1,"field10 is greater than or equal to 10");
+    BOOST_CHECK_EQUAL(rep1,"field10 must be greater than or equal to 10");
     rep1.clear();
 
     auto sa3=make_single_member_adapter(_["field10"],"1000",rep1);
     BOOST_CHECK(!v1.apply(sa3));
-    BOOST_CHECK_EQUAL(rep1,"size of field10 is less than 3");
+    BOOST_CHECK_EQUAL(rep1,"size of field10 must be less than 3");
     rep1.clear();
 
     auto sa4=make_single_member_adapter(_[10],5000,rep1);
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAggregationReport)
 
     auto sa7=make_single_member_adapter(_["field100"],"01234567890",rep1);
     BOOST_CHECK(!v1.apply(sa7));
-    BOOST_CHECK_EQUAL(rep1,"field100 is greater than how are you OR size of field100 is less than or equal to 5");
+    BOOST_CHECK_EQUAL(rep1,"field100 must be greater than how are you OR size of field100 must be less than or equal to 5");
     rep1.clear();
 
     auto v2=validator(
@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAggregationReport)
 
     auto sa10=make_single_member_adapter(_["field10"],"100",rep1);
     BOOST_CHECK(!v2.apply(sa10));
-    BOOST_CHECK_EQUAL(rep1,"field10 is greater than or equal to value1 OR field10 is equal to 10");
+    BOOST_CHECK_EQUAL(rep1,"field10 must be greater than or equal to value1 OR field10 must be equal to 10");
     rep1.clear();
 
     auto v3=validator(
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAggregationReport)
     rep1.clear();
     auto sa12=make_single_member_adapter(_["field10"],"value100",rep1);
     BOOST_CHECK(!v3.apply(sa12));
-    BOOST_CHECK_EQUAL(rep1,"NOT field10 is greater than or equal to value1");
+    BOOST_CHECK_EQUAL(rep1,"NOT field10 must be greater than or equal to value1");
     rep1.clear();
 
     auto v4=validator(
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAggregationReport)
     BOOST_CHECK(v4.apply(sa11));
     rep1.clear();
     BOOST_CHECK(!v4.apply(sa12));
-    BOOST_CHECK_EQUAL(rep1,"NOT field10 is greater than or equal to value1");
+    BOOST_CHECK_EQUAL(rep1,"NOT field10 must be greater than or equal to value1");
     rep1.clear();
 }
 
@@ -219,12 +219,12 @@ BOOST_AUTO_TEST_CASE(CheckNestedSingleMemberReport)
 
     auto sa5=make_single_member_adapter(_["field10"]["field20"],"0",rep1);
     BOOST_CHECK(!v1.apply(sa5));
-    BOOST_CHECK_EQUAL(rep1,"field20 of field10 is greater than or equal to 10");
+    BOOST_CHECK_EQUAL(rep1,"field20 of field10 must be greater than or equal to 10");
     rep1.clear();
 
     auto sa6=make_single_member_adapter(_["field10"]["field20"],"999",rep1);
     BOOST_CHECK(!v1.apply(sa6));
-    BOOST_CHECK_EQUAL(rep1,"size of field20 of field10 is less than 3");
+    BOOST_CHECK_EQUAL(rep1,"size of field20 of field10 must be less than 3");
     rep1.clear();
 }
 
@@ -254,7 +254,7 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberSampleObjectReport)
 
     auto sa3=make_single_member_adapter(_[1],5,rep1);
     BOOST_CHECK(!v1.apply(sa3));
-    BOOST_CHECK_EQUAL(rep1,"element #1 is greater than or equal to element #1 of sample");
+    BOOST_CHECK_EQUAL(rep1,"element #1 must be greater than or equal to element #1 of sample");
     rep1.clear();
 }
 
@@ -293,7 +293,7 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
                 _["field2"](ALL(size(gte,8)))
             );
     BOOST_CHECK(!v2.apply(sa1));
-    BOOST_CHECK_EQUAL(rep1,"size of each element of field2 is greater than or equal to 8");
+    BOOST_CHECK_EQUAL(rep1,"size of each element of field2 must be greater than or equal to 8");
     rep1.clear();
 
     auto v3=validator(
@@ -308,7 +308,7 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
                 _["field2"](ANY(value(gte,"zzz")))
             );
     BOOST_CHECK(!v4.apply(sa1));
-    BOOST_CHECK_EQUAL(rep1,"at least one element of field2 is greater than or equal to zzz");
+    BOOST_CHECK_EQUAL(rep1,"at least one element of field2 must be greater than or equal to zzz");
     rep1.clear();
 }
 

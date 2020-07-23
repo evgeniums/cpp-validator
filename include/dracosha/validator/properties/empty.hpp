@@ -33,14 +33,14 @@ DRACOSHA_VALIDATOR_PROPERTY(empty)
 //-------------------------------------------------------------
 struct string_empty_t : public enable_to_string<string_empty_t>
 {
-    constexpr static const char* description="is empty";
+    constexpr static const char* description="must be empty";
 };
 constexpr string_empty_t string_empty{};
 
 //-------------------------------------------------------------
 struct string_not_empty_t : public enable_to_string<string_not_empty_t>
 {
-    constexpr static const char* description="is not empty";
+    constexpr static const char* description="must be not empty";
 };
 constexpr string_not_empty_t string_not_empty{};
 

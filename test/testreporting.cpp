@@ -52,13 +52,13 @@ BOOST_AUTO_TEST_CASE(CheckReporter)
     std::string rep1;
     auto r1=make_reporter(rep1);
     r1.validate("field1",value,gte,10);
-    BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to 10"));
+    BOOST_CHECK_EQUAL(rep1,std::string("field1 must be greater than or equal to 10"));
 
     std::string rep2;
     auto w2=wrap_backend_formatter(rep2);
     auto r2=make_reporter(w2);
     r2.validate("field1",value,gte,10);
-    BOOST_CHECK_EQUAL(rep2,std::string("field1 is greater than or equal to 10"));
+    BOOST_CHECK_EQUAL(rep2,std::string("field1 must be greater than or equal to 10"));
 
     auto& dst2_f=r2.destination<decltype(w2)>();
     std::string& s2_1=dst2_f;
@@ -78,20 +78,20 @@ BOOST_AUTO_TEST_CASE(CheckReporterAggregate)
     r1.aggregate_open(string_and);
     r1.validate("field1",value,gte,10);
     r1.aggregate_close(false);
-    BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to 10"));
+    BOOST_CHECK_EQUAL(rep1,std::string("field1 must be greater than or equal to 10"));
     rep1.clear();
 
     r1.aggregate_open(string_or);
     r1.validate("field1",value,gte,10);
     r1.validate("field1",size,lt,100);
     r1.aggregate_close(false);
-    BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to 10 OR size of field1 is less than 100"));
+    BOOST_CHECK_EQUAL(rep1,std::string("field1 must be greater than or equal to 10 OR size of field1 must be less than 100"));
     rep1.clear();
 
     r1.aggregate_open(string_not);
     r1.validate("field1",value,gte,10);
     r1.aggregate_close(false);
-    BOOST_CHECK_EQUAL(rep1,std::string("NOT field1 is greater than or equal to 10"));
+    BOOST_CHECK_EQUAL(rep1,std::string("NOT field1 must be greater than or equal to 10"));
     rep1.clear();
 
     r1.aggregate_open(string_or);
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(CheckReporterAggregate)
         r1.validate("field10",size,lt,50);
     r1.aggregate_close(false);
     r1.aggregate_close(false);
-    BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to 10 OR size of field1 is less than 100 OR (field10 is greater than or equal to 5 AND size of field10 is less than 50)"));
+    BOOST_CHECK_EQUAL(rep1,std::string("field1 must be greater than or equal to 10 OR size of field1 must be less than 100 OR (field10 must be greater than or equal to 5 AND size of field10 must be less than 50)"));
     rep1.clear();
 
     r1.aggregate_open(string_not);
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(CheckReporterAggregate)
     r1.aggregate_close(false);
     r1.aggregate_close(false);
     r1.aggregate_close(false);
-    BOOST_CHECK_EQUAL(rep1,std::string("NOT (field1 is greater than or equal to 10 OR size of field1 is less than 100 OR (field10 is greater than or equal to 5 AND size of field10 is less than 50))"));
+    BOOST_CHECK_EQUAL(rep1,std::string("NOT (field1 must be greater than or equal to 10 OR size of field1 must be less than 100 OR (field10 must be greater than or equal to 5 AND size of field10 must be less than 50))"));
     rep1.clear();
 }
 
@@ -130,14 +130,14 @@ BOOST_AUTO_TEST_CASE(CheckValidationReport)
     std::string rep1;
     auto ra1=make_reporting_adapter(m1,rep1);
     BOOST_CHECK(!v1.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to 10"));
+    BOOST_CHECK_EQUAL(rep1,std::string("field1 must be greater than or equal to 10"));
     rep1.clear();
 
     auto v2=validator(
                 _["field1"](length(gte,10))
             );
     BOOST_CHECK(!v2.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,std::string("length of field1 is greater than or equal to 10"));
+    BOOST_CHECK_EQUAL(rep1,std::string("length of field1 must be greater than or equal to 10"));
     rep1.clear();
 
     std::vector<size_t> vec1={10,20,30,40,50};
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(CheckValidationReport)
                 _[1](gte,100)
             );
     BOOST_CHECK(!v3.apply(ra2));
-    BOOST_CHECK_EQUAL(rep1,std::string("element #1 is greater than or equal to 100"));
+    BOOST_CHECK_EQUAL(rep1,std::string("element #1 must be greater than or equal to 100"));
     rep1.clear();
 }
 
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportAggregation)
                 _["field1"](value(gte,"z1000") ^OR^ length(lt,3))
             );
     BOOST_CHECK(!v1.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to z1000 OR length of field1 is less than 3"));
+    BOOST_CHECK_EQUAL(rep1,std::string("field1 must be greater than or equal to z1000 OR length of field1 must be less than 3"));
     rep1.clear();
 
     auto v2=validator(
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportAggregation)
                 _["field1"](size(gte,100))
             );
     BOOST_CHECK(!v2.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,std::string("size of field1 is greater than or equal to 100"));
+    BOOST_CHECK_EQUAL(rep1,std::string("size of field1 must be greater than or equal to 100"));
     rep1.clear();
 
     auto v3=validator(
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportAggregation)
                 _["field1"](size(gte,100) ^OR^ value(gte,"zzzzzzzzzzzz"))
             );
     BOOST_CHECK(!v3.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to xxxxxx OR size of field1 is greater than or equal to 100 OR field1 is greater than or equal to zzzzzzzzzzzz"));
+    BOOST_CHECK_EQUAL(rep1,std::string("field1 must be greater than or equal to xxxxxx OR size of field1 must be greater than or equal to 100 OR field1 must be greater than or equal to zzzzzzzzzzzz"));
     rep1.clear();
 
     auto v4=validator(
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportAggregation)
                 _["field1"](size(gte,100) ^AND^ value(gte,"zzzzzzzzzzzz"))
             );
     BOOST_CHECK(!v4.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to xxxxxx OR size of field1 is greater than or equal to 100"));
+    BOOST_CHECK_EQUAL(rep1,std::string("field1 must be greater than or equal to xxxxxx OR size of field1 must be greater than or equal to 100"));
     rep1.clear();
 
     auto v5=validator(
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportAggregation)
                 _["field1"](size(gte,1) ^AND^ value(gte,"zzzzzzzzzzzz"))
             );
     BOOST_CHECK(!v5.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,std::string("field1 is greater than or equal to xxxxxx OR field1 is greater than or equal to zzzzzzzzzzzz"));
+    BOOST_CHECK_EQUAL(rep1,std::string("field1 must be greater than or equal to xxxxxx OR field1 must be greater than or equal to zzzzzzzzzzzz"));
     rep1.clear();
 }
 
@@ -209,14 +209,14 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportNot)
                 NOT(_["field1"](eq,10))
             );
     BOOST_CHECK(!v1.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,std::string("NOT field1 is equal to 10"));
+    BOOST_CHECK_EQUAL(rep1,std::string("NOT field1 must be equal to 10"));
     rep1.clear();
 
     auto v2=validator(
                 _["field1"](NOT(value(gte,1)))
             );
     BOOST_CHECK(!v2.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,std::string("NOT field1 is greater than or equal to 1"));
+    BOOST_CHECK_EQUAL(rep1,std::string("NOT field1 must be greater than or equal to 1"));
     rep1.clear();
 
     auto v3=validator(
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportNot)
                 )
             );
     BOOST_CHECK(!v3.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,std::string("NOT (field1 is equal to 10 AND field1 is greater than or equal to 8)"));
+    BOOST_CHECK_EQUAL(rep1,std::string("NOT (field1 must be equal to 10 AND field1 must be greater than or equal to 8)"));
     rep1.clear();
 
     // validator reports only the first matched condition for nested OR operator
@@ -238,7 +238,7 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportNot)
                 )
             );
     BOOST_CHECK(!v4.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,std::string("NOT field1 is equal to 10"));
+    BOOST_CHECK_EQUAL(rep1,std::string("NOT field1 must be equal to 10"));
     rep1.clear();
 }
 
@@ -261,7 +261,7 @@ BOOST_AUTO_TEST_CASE(CheckNestedValidationReport)
                 _["field1"][1](lt,5)
             );
     BOOST_CHECK(!v2.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"element #1 of field1 is less than 5");
+    BOOST_CHECK_EQUAL(rep1,"element #1 of field1 must be less than 5");
     rep1.clear();
 
     auto v3=validator(
@@ -293,7 +293,7 @@ BOOST_AUTO_TEST_CASE(CheckOtherFieldReport)
                 _["field2"](gt,_["field3"]) ^OR^ _["field3"](eq,_["field1"])
             );
     BOOST_CHECK(!v2.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field2 is greater than field3 OR field3 is equal to field1");
+    BOOST_CHECK_EQUAL(rep1,"field2 must be greater than field3 OR field3 must be equal to field1");
     rep1.clear();
 }
 
@@ -323,7 +323,7 @@ BOOST_AUTO_TEST_CASE(CheckSampleObjectReport)
                 _["field2"](gt,_(m2)) ^OR^ _["field3"](lt,_(m2))
             );
     BOOST_CHECK(!v2.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field2 is greater than field2 of sample OR field3 is less than field3 of sample");
+    BOOST_CHECK_EQUAL(rep1,"field2 must be greater than field2 of sample OR field3 must be less than field3 of sample");
     rep1.clear();
 }
 
@@ -354,7 +354,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberIgnoreReport)
                 _["field2"](gt,100) ^OR^ _["field1"](eq,20)
             );
     BOOST_CHECK(!v3.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field1 is equal to 20");
+    BOOST_CHECK_EQUAL(rep1,"field1 must be equal to 20");
     rep1.clear();
 
     auto v4=validator(
@@ -375,7 +375,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberIgnoreReport)
                 _["field1"](gte,100)
             );
     BOOST_CHECK(!v6.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field1 is greater than or equal to 100");
+    BOOST_CHECK_EQUAL(rep1,"field1 must be greater than or equal to 100");
     rep1.clear();
 }
 
@@ -395,28 +395,28 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberAbortReport)
                 _["field2"](eq,100)
             );
     BOOST_CHECK(!v1.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field2 is equal to 100");
+    BOOST_CHECK_EQUAL(rep1,"field2 must be equal to 100");
     rep1.clear();
 
     auto v2=validator(
                 _["field2"](gt,100)
             );
     BOOST_CHECK(!v2.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field2 is greater than 100");
+    BOOST_CHECK_EQUAL(rep1,"field2 must be greater than 100");
     rep1.clear();
 
     auto v3=validator(
                 _["field2"](gt,100) ^OR^ _["field1"](eq,20)
             );
     BOOST_CHECK(!v3.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field2 is greater than 100 OR field1 is equal to 20");
+    BOOST_CHECK_EQUAL(rep1,"field2 must be greater than 100 OR field1 must be equal to 20");
     rep1.clear();
 
     auto v4=validator(
                 _["field2"](value(gt,100) ^OR^ value(eq,20))
             );
     BOOST_CHECK(!v4.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field2 is greater than 100 OR field2 is equal to 20");
+    BOOST_CHECK_EQUAL(rep1,"field2 must be greater than 100 OR field2 must be equal to 20");
     rep1.clear();
 
     auto v5=validator(
@@ -424,7 +424,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberAbortReport)
                 _["field1"](gte,9)
             );
     BOOST_CHECK(!v5.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field2 is greater than 100 OR field2 is equal to 20");
+    BOOST_CHECK_EQUAL(rep1,"field2 must be greater than 100 OR field2 must be equal to 20");
     rep1.clear();
 
     auto v6=validator(
@@ -432,7 +432,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberAbortReport)
                 _["field1"](gte,100)
             );
     BOOST_CHECK(!v6.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field2 is greater than 100 OR field2 is equal to 20");
+    BOOST_CHECK_EQUAL(rep1,"field2 must be greater than 100 OR field2 must be equal to 20");
     rep1.clear();
 }
 
@@ -474,13 +474,13 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingOtherMemberIgnoreReport)
                 _["field2"](gt,_["field3"]) ^OR^ _["field1"](eq,20)
             );
     BOOST_CHECK(!v3.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field1 is equal to 20");
+    BOOST_CHECK_EQUAL(rep1,"field1 must be equal to 20");
     rep1.clear();
     auto v3_1=validator(
                 _["field1"](gt,_["field4"]) ^OR^ _["field1"](eq,20)
             );
     BOOST_CHECK(!v3_1.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field1 is equal to 20");
+    BOOST_CHECK_EQUAL(rep1,"field1 must be equal to 20");
     rep1.clear();
 
     auto v4=validator(
@@ -512,14 +512,14 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingOtherMemberIgnoreReport)
                 _["field1"](gte,100)
             );
     BOOST_CHECK(!v6.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field1 is greater than or equal to 100");
+    BOOST_CHECK_EQUAL(rep1,"field1 must be greater than or equal to 100");
     rep1.clear();
     auto v6_1=validator(
                 _["field3"](value(gt,_["field4"]) ^OR^ value(eq,_["field4"])),
                 _["field1"](gte,100)
             );
     BOOST_CHECK(!v6_1.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field1 is greater than or equal to 100");
+    BOOST_CHECK_EQUAL(rep1,"field1 must be greater than or equal to 100");
     rep1.clear();
 }
 
@@ -539,53 +539,53 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingOtherMemberAbortReport)
                 _["field2"](eq,_["field1"])
             );
     BOOST_CHECK(!v1.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field2 is equal to field1");
+    BOOST_CHECK_EQUAL(rep1,"field2 must be equal to field1");
     rep1.clear();
     auto v1_1=validator(
                 _["field1"](gte,9),
                 _["field3"](eq,_["field4"])
             );
     BOOST_CHECK(!v1_1.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field3 is equal to field4");
+    BOOST_CHECK_EQUAL(rep1,"field3 must be equal to field4");
     rep1.clear();
 
     auto v2=validator(
                 _["field2"](eq,_["field1"])
             );
     BOOST_CHECK(!v2.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field2 is equal to field1");
+    BOOST_CHECK_EQUAL(rep1,"field2 must be equal to field1");
     rep1.clear();
     auto v2_1=validator(
                 _["field3"](eq,_["field4"])
             );
     BOOST_CHECK(!v2_1.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field3 is equal to field4");
+    BOOST_CHECK_EQUAL(rep1,"field3 must be equal to field4");
     rep1.clear();
 
     auto v3=validator(
                 _["field2"](gt,_["field3"]) ^OR^ _["field1"](eq,20)
             );
     BOOST_CHECK(!v3.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field2 is greater than field3 OR field1 is equal to 20");
+    BOOST_CHECK_EQUAL(rep1,"field2 must be greater than field3 OR field1 must be equal to 20");
     rep1.clear();
     auto v3_1=validator(
                 _["field1"](gt,_["field4"]) ^OR^ _["field1"](eq,20)
             );
     BOOST_CHECK(!v3_1.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field1 is greater than field4 OR field1 is equal to 20");
+    BOOST_CHECK_EQUAL(rep1,"field1 must be greater than field4 OR field1 must be equal to 20");
     rep1.clear();
 
     auto v4=validator(
                 _["field2"](value(gt,_["field1"]) ^OR^ value(eq,_["field1"]))
             );
     BOOST_CHECK(!v4.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field2 is greater than field1 OR field2 is equal to field1");
+    BOOST_CHECK_EQUAL(rep1,"field2 must be greater than field1 OR field2 must be equal to field1");
     rep1.clear();
     auto v4_1=validator(
                 _["field1"](value(gt,_["field4"]) ^OR^ value(eq,_["field4"]))
             );
     BOOST_CHECK(!v4_1.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field1 is greater than field4 OR field1 is equal to field4");
+    BOOST_CHECK_EQUAL(rep1,"field1 must be greater than field4 OR field1 must be equal to field4");
     rep1.clear();
 
     auto v5=validator(
@@ -593,14 +593,14 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingOtherMemberAbortReport)
                 _["field1"](gte,9)
             );
     BOOST_CHECK(!v5.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field2 is greater than field1 OR field2 is equal to field1");
+    BOOST_CHECK_EQUAL(rep1,"field2 must be greater than field1 OR field2 must be equal to field1");
     rep1.clear();
     auto v5_1=validator(
                 _["field3"](value(gt,_["field4"]) ^OR^ value(eq,_["field4"])),
                 _["field1"](gte,9)
             );
     BOOST_CHECK(!v5_1.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field3 is greater than field4 OR field3 is equal to field4");
+    BOOST_CHECK_EQUAL(rep1,"field3 must be greater than field4 OR field3 must be equal to field4");
     rep1.clear();
 
     auto v6=validator(
@@ -608,14 +608,14 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingOtherMemberAbortReport)
                 _["field1"](gte,100)
             );
     BOOST_CHECK(!v6.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field2 is greater than field1 OR field2 is equal to field1");
+    BOOST_CHECK_EQUAL(rep1,"field2 must be greater than field1 OR field2 must be equal to field1");
     rep1.clear();
     auto v6_1=validator(
                 _["field3"](value(gt,_["field4"]) ^OR^ value(eq,_["field4"])),
                 _["field1"](gte,100)
             );
     BOOST_CHECK(!v6_1.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field3 is greater than field4 OR field3 is equal to field4");
+    BOOST_CHECK_EQUAL(rep1,"field3 must be greater than field4 OR field3 must be equal to field4");
     rep1.clear();
 }
 
@@ -645,7 +645,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberSampleIgnoreReport)
                 _["field2"](gt,_(m2)) ^OR^ _["field3"](lt,_(m2))
             );
     BOOST_CHECK(!v2.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field3 is less than field3 of sample");
+    BOOST_CHECK_EQUAL(rep1,"field3 must be less than field3 of sample");
     rep1.clear();
 }
 
@@ -670,14 +670,14 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberSampleAbortReport)
                 _["field2"](eq,_(m2))
             );
     BOOST_CHECK(!v1.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field2 is equal to field2 of sample");
+    BOOST_CHECK_EQUAL(rep1,"field2 must be equal to field2 of sample");
     rep1.clear();
 
     auto v2=validator(
                 _["field2"](gt,_(m2)) ^OR^ _["field3"](lt,_(m2))
             );
     BOOST_CHECK(!v2.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"field2 is greater than field2 of sample OR field3 is less than field3 of sample");
+    BOOST_CHECK_EQUAL(rep1,"field2 must be greater than field2 of sample OR field3 must be less than field3 of sample");
     rep1.clear();
 }
 
@@ -701,21 +701,21 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAnyReport)
                 _["field1"](ANY(value(gte,"zzz")))
             );
     BOOST_CHECK(!v1.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"at least one element of field1 is greater than or equal to zzz");
+    BOOST_CHECK_EQUAL(rep1,"at least one element of field1 must be greater than or equal to zzz");
     rep1.clear();
 
     auto v2=validator(
                 _["field1"](ANY(value(gte,"zzz") ^AND^ size(eq,100)))
             );
     BOOST_CHECK(!v2.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"at least one element of field1 is greater than or equal to zzz");
+    BOOST_CHECK_EQUAL(rep1,"at least one element of field1 must be greater than or equal to zzz");
     rep1.clear();
 
     auto v3=validator(
                 _["field1"](ANY(value(gte,"zzz") ^OR^ size(eq,100)))
             );
     BOOST_CHECK(!v3.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"at least one element of field1 is greater than or equal to zzz OR size of at least one element of field1 is equal to 100");
+    BOOST_CHECK_EQUAL(rep1,"at least one element of field1 must be greater than or equal to zzz OR size of at least one element of field1 must be equal to 100");
     rep1.clear();
 
     std::map<size_t,std::string> m2={
@@ -730,14 +730,14 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAnyReport)
                 ANY(value(gte,"zzz") ^AND^ size(eq,100))
             );
     BOOST_CHECK(!v4.apply(ra2));
-    BOOST_CHECK_EQUAL(rep1,"at least one element is greater than or equal to zzz");
+    BOOST_CHECK_EQUAL(rep1,"at least one element must be greater than or equal to zzz");
     rep1.clear();
 
     auto v5=validator(
                 ANY(value(gte,"zzz") ^OR^ size(eq,100))
             );
     BOOST_CHECK(!v5.apply(ra2));
-    BOOST_CHECK_EQUAL(rep1,"at least one element is greater than or equal to zzz OR size of at least one element is equal to 100");
+    BOOST_CHECK_EQUAL(rep1,"at least one element must be greater than or equal to zzz OR size of at least one element must be equal to 100");
     rep1.clear();
 
     std::map<size_t,std::vector<size_t>> m3={
@@ -756,7 +756,7 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAnyReport)
                 ANY(size(gte,5) ^AND^ ANY(value(gte,1000)))
             );
     BOOST_CHECK(!v7.apply(ra3));
-    BOOST_CHECK_EQUAL(rep1,"at least one element of at least one element is greater than or equal to 1000");
+    BOOST_CHECK_EQUAL(rep1,"at least one element of at least one element must be greater than or equal to 1000");
     rep1.clear();
 
     std::map<size_t,std::map<size_t,std::vector<size_t>>> m4={
@@ -769,7 +769,7 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAnyReport)
                 _[5](ANY(size(gte,1) ^AND^ ANY(value(gte,1000))))
             );
     BOOST_CHECK(!v8.apply(ra4));
-    BOOST_CHECK_EQUAL(rep1,"at least one element of at least one element of element #5 is greater than or equal to 1000");
+    BOOST_CHECK_EQUAL(rep1,"at least one element of at least one element of element #5 must be greater than or equal to 1000");
     rep1.clear();
 }
 
@@ -793,21 +793,21 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAllReport)
                 _["field1"](ALL(value(gte,"value3")))
             );
     BOOST_CHECK(!v1.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"each element of field1 is greater than or equal to value3");
+    BOOST_CHECK_EQUAL(rep1,"each element of field1 must be greater than or equal to value3");
     rep1.clear();
 
     auto v2=validator(
                 _["field1"](ALL(value(gte,"val") ^AND^ size(gte,100)))
             );
     BOOST_CHECK(!v2.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"size of each element of field1 is greater than or equal to 100");
+    BOOST_CHECK_EQUAL(rep1,"size of each element of field1 must be greater than or equal to 100");
     rep1.clear();
 
     auto v3=validator(
                 _["field1"](ALL(value(gte,"zzz") ^OR^ size(eq,100)))
             );
     BOOST_CHECK(!v3.apply(ra1));
-    BOOST_CHECK_EQUAL(rep1,"each element of field1 is greater than or equal to zzz OR size of each element of field1 is equal to 100");
+    BOOST_CHECK_EQUAL(rep1,"each element of field1 must be greater than or equal to zzz OR size of each element of field1 must be equal to 100");
     rep1.clear();
 
     std::map<size_t,std::string> m2={
@@ -822,14 +822,14 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAllReport)
                 ALL(size(gte,1) ^AND^ value(lte,"value3"))
             );
     BOOST_CHECK(!v4.apply(ra2));
-    BOOST_CHECK_EQUAL(rep1,"each element is less than or equal to value3");
+    BOOST_CHECK_EQUAL(rep1,"each element must be less than or equal to value3");
     rep1.clear();
 
     auto v5=validator(
                 ALL(value(gte,"value5") ^OR^ size(lte,7))
             );
     BOOST_CHECK(!v5.apply(ra2));
-    BOOST_CHECK_EQUAL(rep1,"each element is greater than or equal to value5 OR size of each element is less than or equal to 7");
+    BOOST_CHECK_EQUAL(rep1,"each element must be greater than or equal to value5 OR size of each element must be less than or equal to 7");
     rep1.clear();
 
     std::map<size_t,std::vector<size_t>> m3={
@@ -848,7 +848,7 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAllReport)
                 ALL(size(gte,5) ^AND^ ALL(value(lt,300)))
             );
     BOOST_CHECK(!v7.apply(ra3));
-    BOOST_CHECK_EQUAL(rep1,"each element of each element is less than 300");
+    BOOST_CHECK_EQUAL(rep1,"each element of each element must be less than 300");
     rep1.clear();
 
     std::map<size_t,std::map<size_t,std::vector<size_t>>> m4={
@@ -861,7 +861,7 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAllReport)
                 _[5](ALL(size(gte,1) ^AND^ ALL(value(lt,50))))
             );
     BOOST_CHECK(!v8.apply(ra4));
-    BOOST_CHECK_EQUAL(rep1,"each element of each element of element #5 is less than 50");
+    BOOST_CHECK_EQUAL(rep1,"each element of each element of element #5 must be less than 50");
     rep1.clear();
 }
 

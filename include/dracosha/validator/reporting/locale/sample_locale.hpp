@@ -49,8 +49,8 @@ inline std::map<std::string,std::string> strings_sample_locale()
     m[string_true]="true";
     m[string_false]="false";
     m[string_master_sample]="sample";
-    m[string_empty]="is empty";
-    m[string_not_empty]="is not empty";
+    m[string_empty]="must be empty";
+    m[string_not_empty]="must be not empty";
     m[string_must_be]="must be";
     m[string_must_not_be]="must not be";
     m[string_conjunction_of]="of";
@@ -67,8 +67,8 @@ inline std::map<std::string,std::string> strings_sample_locale()
     m[length.name()]="length";
 
     // existance
-    m[string_exists]="exists";
-    m[string_not_exists]="does not exist";
+    m[string_exists]="must exist";
+    m[string_not_exists]="must not exist";
 
     // logical
     m[string_and_t::conjunction_token]=" AND ";
@@ -76,12 +76,12 @@ inline std::map<std::string,std::string> strings_sample_locale()
     m[string_not_t::open_token]="NOT ";
 
     // comparison
-    m[eq]="is equal to";
-    m[ne]="is not equal to";
-    m[lt]="is less than";
-    m[lte]="is less than or equal to";
-    m[gt]="is greater than";
-    m[gte]="is greater than or equal to";
+    m[eq]="must be equal to";
+    m[ne]="must be not equal to";
+    m[lt]="must be less than";
+    m[lte]="must be less than or equal to";
+    m[gt]="must be greater than";
+    m[gte]="must be greater than or equal to";
 
     return m;
 }

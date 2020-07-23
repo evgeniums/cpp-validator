@@ -38,7 +38,7 @@ struct eq_t : public op<eq_t>
         return safe_compare<T1,T2>::equal(a,b);
     }
 
-    constexpr static const char* description="is equal to";
+    constexpr static const char* description="must be equal to";
 };
 constexpr eq_t eq{};
 
@@ -53,7 +53,7 @@ struct ne_t : public op<ne_t>
         return !safe_compare<T1,T2>::equal(a,b);
     }
 
-    constexpr static const char* description="is not equal to";
+    constexpr static const char* description="must be not equal to";
 };
 constexpr ne_t ne{};
 
@@ -68,7 +68,7 @@ struct lt_t : public op<lt_t>
         return safe_compare<T1,T2>::less(a,b);
     }
 
-    constexpr static const char* description="is less than";
+    constexpr static const char* description="must be less than";
 };
 constexpr lt_t lt{};
 
@@ -83,7 +83,7 @@ struct lte_t : public op<lte_t>
         return safe_compare<T1,T2>::less_equal(a,b);
     }
 
-    constexpr static const char* description="is less than or equal to";
+    constexpr static const char* description="must be less than or equal to";
 };
 constexpr lte_t lte{};
 
@@ -98,7 +98,7 @@ struct gt_t : public op<gt_t>
         return safe_compare<T2,T1>::less(b,a);
     }
 
-    constexpr static const char* description="is greater than";
+    constexpr static const char* description="must be greater than";
 };
 constexpr gt_t gt{};
 
@@ -113,7 +113,7 @@ struct gte_t : public op<gte_t>
         return safe_compare<T2,T1>::less_equal(b,a);
     }
 
-    constexpr static const char* description="is greater than or equal to";
+    constexpr static const char* description="must be greater than or equal to";
 };
 constexpr gte_t gte{};
 

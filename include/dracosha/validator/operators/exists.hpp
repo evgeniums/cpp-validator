@@ -46,14 +46,14 @@ constexpr exists_t exists{};
 //-------------------------------------------------------------
 struct string_exists_t : public enable_to_string<string_exists_t>
 {
-    constexpr static const char* description="exists";
+    constexpr static const char* description="must exist";
 };
 constexpr string_exists_t string_exists{};
 
 //-------------------------------------------------------------
 struct string_not_exists_t : public enable_to_string<string_not_exists_t>
 {
-    constexpr static const char* description="does not exist";
+    constexpr static const char* description="must not exist";
 };
 constexpr string_not_exists_t string_not_exists{};
 
