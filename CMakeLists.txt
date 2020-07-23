@@ -33,6 +33,7 @@ SET (HEADERS
     include/dracosha/validator/prepare_dispatcher.hpp
     include/dracosha/validator/apply.hpp
     include/dracosha/validator/member.hpp
+    include/dracosha/validator/operand.hpp
     include/dracosha/validator/master_sample.hpp
     include/dracosha/validator/validator.hpp
     include/dracosha/validator/make_validator.hpp

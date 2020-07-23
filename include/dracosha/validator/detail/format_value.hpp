@@ -32,18 +32,25 @@ namespace detail
 template <typename T, typename =hana::when<true>>
 struct format_value_t
 {
-};
-
-/**
- * @brief  Formatter of non-boolean values
- */
-template <typename T>
-struct format_value_t<T,hana::when<!std::is_same<bool,std::decay_t<T>>::value>>
-{
     template <typename T1, typename TranslatorT, typename DecoratorT>
     auto operator () (T1&& val, const TranslatorT&, const DecoratorT& decorator) const -> decltype(auto)
     {
         return decorator(std::forward<T1>(val));
+    }
+};
+
+/**
+ * @brief  Formatter of values the std::string can be constructed from
+ */
+template <typename T>
+struct format_value_t<T,hana::when<
+            std::is_constructible<std::string,T>::value>
+        >
+{
+    template <typename T1, typename TranslatorT, typename DecoratorT>
+    auto operator () (T1&& val, const TranslatorT&, const DecoratorT& decorator) const -> decltype(auto)
+    {
+        return decorator(std::string(std::forward<T1>(val)));
     }
 };
 

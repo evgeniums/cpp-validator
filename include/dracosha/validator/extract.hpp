@@ -21,6 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/lazy.hpp>
+#include <dracosha/validator/operand.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -34,8 +35,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 BOOST_HANA_CONSTEXPR_LAMBDA auto extract = [](auto&& v) ->decltype(auto)
 {
   return hana::if_(hana::is_a<lazy_tag,decltype(v)>,
-    [](auto&& x) -> decltype(auto) { return x(); },
-    [](auto&& x) -> decltype(auto) { return hana::id(std::forward<decltype(x)>(x)); }
+    [](auto&& x) -> decltype(auto) { return extract_operand(x()); },
+    [](auto&& x) -> decltype(auto) { return extract_operand(std::forward<decltype(x)>(x)); }
   )(std::forward<decltype(v)>(v));
 };
 

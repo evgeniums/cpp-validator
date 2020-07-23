@@ -20,12 +20,6 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_OBJECT_WRAPPER_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/status.hpp>
-#include <dracosha/validator/utils/reference_wrapper.hpp>
-#include <dracosha/validator/with_check_member_exists.hpp>
-#include <dracosha/validator/check_member_exists_traits_proxy.hpp>
-#include <dracosha/validator/adapters/adapter.hpp>
-#include <dracosha/validator/detail/default_adapter_impl.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

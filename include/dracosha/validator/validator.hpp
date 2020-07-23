@@ -49,6 +49,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/operators.hpp>
 #include <dracosha/validator/validate.hpp>
 #include <dracosha/validator/detail/default_adapter_impl.ipp>
+#include <dracosha/validator/operand.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -79,6 +80,12 @@ struct _t
     constexpr auto operator () (const T& masterRefObj) const -> decltype(auto)
     {
         return master_sample<T>(masterRefObj);
+    }
+
+    template <typename T1, typename T2>
+    constexpr auto operator () (T1&& val, T2&& description) const
+    {
+        return operand<T1>(std::forward<T1>(val),std::forward<T2>(description));
     }
 };
 constexpr _t _{};
