@@ -27,6 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/extract.hpp>
 #include <dracosha/validator/check_member.hpp>
 #include <dracosha/validator/get_member.hpp>
+#include <dracosha/validator/master_sample.hpp>
 #include <dracosha/validator/adapters/default_adapter.hpp>
 #include <dracosha/validator/operators/exists.hpp>
 
@@ -36,7 +37,6 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct adapter_tag;
 struct member_tag;
-struct master_sample_tag;
 
 //-------------------------------------------------------------
 namespace detail
@@ -190,7 +190,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     static status invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
                                  std::enable_if_t<
                                    (!hana::is_a<member_tag,T2> &&
-                                    !hana::is_a<master_sample_tag,T2> &&
+                                    !is_master_sample<T2>::value &&
                                     !std::is_same<exists_t,std::decay_t<OpT>>::value),
                                    void*
                                  > =nullptr
@@ -231,7 +231,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     template <typename T2, typename OpT, typename PropT, typename MemberT>
     static status invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
                                  std::enable_if_t<
-                                   hana::is_a<master_sample_tag,T2>,
+                                   is_master_sample<T2>::value,
                                    void*
                                  > =nullptr
                                 )

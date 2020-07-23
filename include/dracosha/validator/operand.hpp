@@ -28,6 +28,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+struct master_sample_tag;
 struct operand_tag;
 
 /**
@@ -41,6 +42,7 @@ class operand : public object_wrapper<T>
     public:
 
         using hana_tag=operand_tag;
+        constexpr static const bool is_master_sample=hana::is_a<master_sample_tag,T>;
 
         /**
          * @brief Constructor

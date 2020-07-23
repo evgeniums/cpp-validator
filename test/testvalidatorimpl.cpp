@@ -583,6 +583,26 @@ BOOST_AUTO_TEST_CASE(CheckIsPair)
     BOOST_CHECK(true);
 }
 
+BOOST_AUTO_TEST_CASE(CheckIsMasterSample)
+{
+    int a1=0;
+    static_assert(!is_master_sample<decltype(a1)>::value,"");
+
+    auto a2=_(a1,"description");
+    static_assert(!is_master_sample<decltype(a2)>::value,"");
+
+    auto s1=_(a1);
+    static_assert(is_master_sample<decltype(s1)>::value,"");
+
+    auto s2=_(s1,"description");
+    static_assert(is_master_sample<decltype(s2)>::value,"");
+
+    std::map<int,int> m={{1,5},{2,40},{3,30},{4,20},{5,10}};
+    const std::map<int,int> ref1={{1,50},{2,40}};
+    auto v01=_[1](gte,_(_(ref1),"sample1"));
+    BOOST_CHECK(!v01.apply(m));
+}
+
 /**
 
 @todo

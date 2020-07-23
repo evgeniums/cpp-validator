@@ -2,6 +2,7 @@
 
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/single_member_adapter.hpp>
+#include <dracosha/validator/adapters/reporting_adapter.hpp>
 
 using namespace dracosha::validator;
 
@@ -236,7 +237,6 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberSampleObjectReport)
         {3,30}
     };
 
-    std::vector<float> vec1;
     auto v1=validator(
                 _[size](eq,1),
                 _[1](gte,_(sample)),
@@ -255,6 +255,15 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberSampleObjectReport)
     auto sa3=make_single_member_adapter(_[1],5,rep1);
     BOOST_CHECK(!v1.apply(sa3));
     BOOST_CHECK_EQUAL(rep1,"element #1 must be greater than or equal to element #1 of sample");
+    rep1.clear();
+
+    auto v2=validator(
+                _[size](eq,1),
+                _[1](gte,_(_(sample),"sample object")),
+                _[10](eq,_(_(sample),"sample object"))
+            );
+    BOOST_CHECK(!v2.apply(sa3));
+    BOOST_CHECK_EQUAL(rep1,"element #1 must be greater than or equal to element #1 of sample object");
     rep1.clear();
 }
 

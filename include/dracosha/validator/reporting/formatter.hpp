@@ -122,11 +122,22 @@ struct formatter
     }
 
     template <typename DstT, typename T2, typename OpT, typename PropT, typename MemberT>
-    void validate_with_master_sample(DstT& dst, const MemberT& member, const PropT& prop, const OpT& op, const T2&) const
+    void validate_with_master_sample(DstT& dst, const MemberT& member, const PropT& prop, const OpT& op, const T2&,
+                                     std::enable_if_t<!hana::is_a<operand_tag,T2>,void*> =nullptr) const
     {
         format(dst,
                make_cref_tuple(_member_names,_member_names,_strings,_strings),
                member,prop,op,string_master_sample
+               );
+    }
+
+    template <typename DstT, typename T2, typename OpT, typename PropT, typename MemberT>
+    void validate_with_master_sample(DstT& dst, const MemberT& member, const PropT& prop, const OpT& op, const T2& b,
+                                     std::enable_if_t<hana::is_a<operand_tag,T2>,void*> =nullptr) const
+    {
+        format(dst,
+               make_cref_tuple(_member_names,_member_names,_strings,_values),
+               member,prop,op,b
                );
     }
 

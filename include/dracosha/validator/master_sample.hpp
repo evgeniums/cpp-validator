@@ -22,7 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_MASTER_SAMPLE_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/dispatcher.hpp>
+#include <dracosha/validator/operand.hpp>
+#include <dracosha/validator/utils/enable_to_string.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -57,9 +58,52 @@ struct master_sample
     const T& ref;
 };
 
+/**
+ * @brief Check if type is a master sample.
+ */
+template <typename T, typename =hana::when<true>>
+struct is_master_sample
+{
+    constexpr static const bool value=false;
+};
+
+/**
+ * @brief Check if type is a master sample.
+ *
+ * Direct master sample object.
+ */
+template <typename T>
+struct is_master_sample<
+            T,
+            hana::when<hana::is_a<master_sample_tag,T>>
+        >
+{
+    constexpr static const bool value=true;
+};
+
+/**
+ * @brief Check if type is a master sample.
+ *
+ * Master sample object embedded to operand.
+ */
+template <typename T>
+struct is_master_sample<
+            T,
+            hana::when<
+                (
+                    hana::is_a<operand_tag,T>
+                    &&
+                    std::decay_t<T>::is_master_sample
+                )
+            >
+        >
+{
+    constexpr static const bool value=true;
+};
+
 //-------------------------------------------------------------
 
-struct string_master_sample_t : public op<string_master_sample_t>
+struct string_master_sample_t : public enable_to_string<string_master_sample_t>
 {
     constexpr static const char* description="sample";
 };

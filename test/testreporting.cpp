@@ -1,4 +1,3 @@
-#if 1
 #include <boost/test/unit_test.hpp>
 
 #include <dracosha/validator/validator.hpp>
@@ -331,6 +330,30 @@ BOOST_AUTO_TEST_CASE(CheckSampleObjectReport)
             );
     BOOST_CHECK(!v2.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"field2 must be greater than field2 of sample OR field3 must be less than field3 of sample");
+    rep1.clear();
+
+    auto v3=validator(
+                _["field2"](gt,_(_(m2),"m2")) ^OR^ _["field3"](lt,_(_(m2),"m2"))
+            );
+    BOOST_CHECK(!v3.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"field2 must be greater than field2 of m2 OR field3 must be less than field3 of m2");
+    rep1.clear();
+
+    std::map<size_t,size_t> m3={
+        {1,10},
+        {2,20},
+        {3,30}
+    };
+    std::map<size_t,size_t> m4={
+        {1,5},
+        {2,20}
+    };
+    auto ra2=make_reporting_adapter(m4,rep1);
+    auto v4=validator(
+                _[1](gt,_(_(m3),"m3"))
+            );
+    BOOST_CHECK(!v4.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,"element #1 must be greater than element #1 of m3");
     rep1.clear();
 }
 
@@ -873,4 +896,3 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAllReport)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-#endif

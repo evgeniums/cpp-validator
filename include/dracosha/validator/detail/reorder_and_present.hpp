@@ -326,7 +326,12 @@ struct apply_reorder_present_4args_t<
  */
 template <typename MemberT, typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_4args_t<
-                MemberT,PropT,OpT,T2,hana::when<std::is_same<std::decay_t<T2>,string_master_sample_t>::value>
+                MemberT,PropT,OpT,T2,hana::when<
+                    (std::is_same<std::decay_t<T2>,string_master_sample_t>::value
+                     ||
+                     is_master_sample<T2>::value
+                     )
+                >
             >
 {
     template <typename DstT, typename FormatterTs>

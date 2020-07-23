@@ -33,6 +33,8 @@ class object_wrapper
 {
     public:
 
+        using type=T;
+
         /**
          * @brief Constructor
          * @param obj Object to wrap

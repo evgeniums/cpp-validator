@@ -146,7 +146,7 @@ class single_member_adapter_impl
             const auto& obj=extract(adpt.traits().get());
             return status(op(
                         property(obj,std::forward<PropT>(prop)),
-                        property(get_member(b(),member.path),prop)
+                        property(get_member(extract(b)(),member.path),prop)
                     ));
         }
 

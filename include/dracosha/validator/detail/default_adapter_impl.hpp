@@ -213,7 +213,7 @@ struct default_adapter_impl
             {
                 return status(op(
                             property(get_member(obj,path),prop),
-                            property(get_member(b(),path),prop)
+                            property(get_member(extract(b)(),path),prop)
                         ));
             },
             [](auto&&)
