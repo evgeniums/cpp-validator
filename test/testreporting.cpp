@@ -154,6 +154,13 @@ BOOST_AUTO_TEST_CASE(CheckValidationReport)
     BOOST_CHECK(!v4.apply(ra2));
     BOOST_CHECK_EQUAL(rep1,std::string("element #1 must be greater than or equal to one hundred"));
     rep1.clear();
+
+    auto v5=validator(
+                _[1]("first element")(gte,_(100,"one hundred"))
+            );
+    BOOST_CHECK(!v5.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,std::string("first element must be greater than or equal to one hundred"));
+    rep1.clear();
 }
 
 BOOST_AUTO_TEST_CASE(CheckValidationReportAggregation)

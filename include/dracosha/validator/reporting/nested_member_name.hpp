@@ -68,6 +68,10 @@ struct nested_member_name_t
 {
     std::string operator() (const T& id, const TraitsT& traits, const StringsT& strings) const
     {
+        if (id.has_name())
+        {
+            return decorate<TraitsT,decltype(id.name())>(traits,id.name());
+        }
         std::string dst;
         backend_formatter.append_join(
             dst,

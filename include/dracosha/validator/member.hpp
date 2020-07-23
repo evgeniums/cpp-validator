@@ -43,8 +43,9 @@ struct member
 {
     using hana_tag=member_tag;
     using type=typename adjust_storable_type<T>::type;
+    using path_type=hana::tuple<ParentPathT...,type>;
 
-    hana::tuple<ParentPathT...,type> path;
+    path_type path;
 
     /**
      * @brief Ctor of nested member
@@ -52,8 +53,10 @@ struct member
      * @param parent_path Path to parent member which is of previous (upper) level
      */
     template <typename T1, typename ParentPathTs>
-    member(T1&& key, ParentPathTs&& parent_path)
-         : path(hana::append(std::forward<ParentPathTs>(parent_path),std::forward<T1>(key)))
+    member(T1&& key, ParentPathTs&& parent_path,
+           std::enable_if_t<!std::is_constructible<std::string,ParentPathTs>::value,void*> =nullptr)
+         : path(hana::append(std::forward<ParentPathTs>(parent_path),std::forward<T1>(key))),
+           _has_name(false)
     {}
 
     /**
@@ -62,8 +65,10 @@ struct member
      * @param parent_path Path to parent member which is of previous (upper) level
      */
     template <typename ParentPathTs>
-    member(type key, ParentPathTs&& parent_path)
-         : path(hana::append(std::forward<ParentPathTs>(parent_path),std::move(key)))
+    member(type key, ParentPathTs&& parent_path,
+           std::enable_if_t<!std::is_constructible<std::string,ParentPathTs>::value,void*> =nullptr)
+         : path(hana::append(std::forward<ParentPathTs>(parent_path),std::move(key))),
+           _has_name(false)
     {}
 
     /**
@@ -72,7 +77,22 @@ struct member
      */
     template <typename T1>
     member(T1&& key)
-         : path(hana::make_tuple(std::forward<T1>(key)))
+         : path(hana::make_tuple(std::forward<T1>(key))),
+           _has_name(false)
+    {}
+
+    /**
+     * @brief Constructor with name
+     * @param path Member's path
+     * @name name member's name
+     */
+    template <typename T1>
+    member(path_type path,
+           T1&& name,
+           std::enable_if_t<std::is_constructible<std::string,T1>::value,void*> =nullptr)
+         : path(std::move(path)),
+           _name(std::forward<T1>(name)),
+           _has_name(!_name.empty())
     {}
 
     /**
@@ -80,7 +100,8 @@ struct member
      * @param str Key of current member
      */
     member(std::string str)
-         : path(hana::make_tuple(std::move(str)))
+         : path(hana::make_tuple(std::move(str))),
+           _has_name(false)
     {}
 
     /**
@@ -137,6 +158,38 @@ struct member
         auto next_member_tmpl=hana::unpack(key_and_path_types,hana::template_<member>);
         return typename decltype(next_member_tmpl)::type(std::forward<T1>(key),path);
     }
+
+    template <typename T1>
+    member operator () (T1&& v,
+                      std::enable_if_t<
+                            std::is_constructible<std::string,T1>::value
+                            &&
+                            !hana::is_a<operator_tag,T1>
+                         ,void*> =nullptr)
+    {
+        return member(path,std::forward<T1>(v));
+    }
+
+    std::string name() const noexcept
+    {
+        return _name;
+    }
+
+    bool has_name() const noexcept
+    {
+        return _has_name;
+    }
+
+    void set_name(std::string name)
+    {
+        _name=std::move(name);
+        _has_name=!name.empty();
+    }
+
+    private:
+
+        std::string _name;
+        bool _has_name;
 };
 
 //-------------------------------------------------------------

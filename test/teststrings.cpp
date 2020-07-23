@@ -334,4 +334,21 @@ BOOST_AUTO_TEST_CASE(CheckNestedMember)
     BOOST_CHECK_EQUAL(str3,std::string("size of field2 of field1"));
 }
 
+BOOST_AUTO_TEST_CASE(CheckMemberName)
+{
+    auto mn=get_default_member_names();
+
+    auto member1=_["field1"]("member1 name");
+    auto str1=mn(member1);
+    BOOST_CHECK_EQUAL(str1,"member1 name");
+
+    auto member2=_["field1"]["field2"]("member2 name");
+    auto str2=mn(member2);
+    BOOST_CHECK_EQUAL(str2,"member2 name");
+
+    auto member3=_["field1"]["field2"][size]("size of nested field");
+    auto str3=mn(member3);
+    BOOST_CHECK_EQUAL(str3,"size of nested field");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
