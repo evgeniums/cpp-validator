@@ -607,6 +607,8 @@ BOOST_AUTO_TEST_CASE(CheckIsMasterSample)
 
 @todo
     Override validator report.
+    Special formatting of properties (e.g. empty, boolean).
+    Refactor exists.
     Localization of conjunctions, plurals and genders.
     String operators.
     Regular expressions operators.
