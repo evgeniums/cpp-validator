@@ -956,4 +956,56 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAllReport)
     rep1.clear();
 }
 
+BOOST_AUTO_TEST_CASE(CheckFlagValidationReport)
+{
+    std::string rep1;
+
+    std::map<std::string,size_t> m1={{"field1",1}};
+    auto ra1=make_reporting_adapter(m1,rep1);
+
+    auto v1=make_validator(
+                empty(flag,true)
+            );
+    BOOST_CHECK(!v1.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"must be empty");
+    rep1.clear();
+
+    auto v2=make_validator(
+                empty(flag,false)
+            );
+    BOOST_CHECK(v2.apply(ra1));
+    rep1.clear();
+
+    auto v3=make_validator(
+                empty(flag(flag_on_off),true)
+            );
+    BOOST_CHECK(!v3.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"empty must be on");
+    rep1.clear();
+
+    std::map<std::string,std::map<size_t,size_t>> m2={{"field1",{{1,10}}}};
+    auto ra2=make_reporting_adapter(m2,rep1);
+
+    auto v4=validator(
+                _["field1"](empty(flag,true))
+            );
+    BOOST_CHECK(!v4.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,"field1 must be empty");
+    rep1.clear();
+
+    auto v5=validator(
+                _["field1"](empty(flag(flag_checked_unchecked),true))
+            );
+    BOOST_CHECK(!v5.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,"empty of field1 must be checked");
+    rep1.clear();
+
+    auto v6=validator(
+                _["field1"](empty(flag("expected to be true"),true))
+            );
+    BOOST_CHECK(!v6.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,"empty of field1 expected to be true");
+    rep1.clear();
+}
+
 BOOST_AUTO_TEST_SUITE_END()

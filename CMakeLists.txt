@@ -42,6 +42,7 @@ SET (HEADERS
     include/dracosha/validator/check_member_path.hpp
     include/dracosha/validator/with_check_member_exists.hpp
     include/dracosha/validator/check_member_exists_traits_proxy.hpp
+    include/dracosha/validator/flag_presets.hpp
 
     include/dracosha/validator/operators/operator.hpp
     include/dracosha/validator/operators/exists.hpp
@@ -54,6 +55,7 @@ SET (HEADERS
     include/dracosha/validator/operators/aggregation.hpp
     include/dracosha/validator/operators/logical.hpp
     include/dracosha/validator/operators/invert_op.hpp
+    include/dracosha/validator/operators/flag.hpp
     include/dracosha/validator/operators.hpp
 
     include/dracosha/validator/properties/value.hpp
@@ -103,7 +105,6 @@ SET (HEADERS
     include/dracosha/validator/detail/format_value.hpp
     include/dracosha/validator/detail/formatter_fmt.hpp
     include/dracosha/validator/detail/reorder_and_present.hpp
-    include/dracosha/validator/detail/if_bool.hpp
     include/dracosha/validator/detail/formatter_std.hpp
     include/dracosha/validator/detail/backend_formatter_helper.hpp
     include/dracosha/validator/detail/default_adapter_impl.hpp

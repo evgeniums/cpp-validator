@@ -21,7 +21,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     detail::reorder_and_present(
                 w2,
                 make_cref_tuple(default_strings,default_values),
-                eq,bool(true)
+                flag,true
             );
     BOOST_CHECK_EQUAL(str2,std::string("must be true"));
 
@@ -30,9 +30,9 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     detail::reorder_and_present(
                 w3,
                 make_cref_tuple(default_strings,default_values),
-                ne,true
+                flag,false
             );
-    BOOST_CHECK_EQUAL(str3,std::string("must not be true"));
+    BOOST_CHECK_EQUAL(str3,std::string("must be false"));
 
     auto mn=get_default_member_names();
     std::string str4;
@@ -49,7 +49,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     detail::reorder_and_present(
                 w5,
                 make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_values),
-                "field2",value,eq,true
+                "field2",value,flag,true
             );
     BOOST_CHECK_EQUAL(str5,std::string("field2 must be true"));
 
@@ -58,7 +58,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     detail::reorder_and_present(
                 w6,
                 make_cref_tuple(get_default_member_names(),default_strings,default_values),
-                empty,eq,false
+                empty,flag,false
             );
     BOOST_CHECK_EQUAL(str6,std::string("must be not empty"));
 
@@ -67,7 +67,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     detail::reorder_and_present(
                 w7,
                 make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_values),
-                "field1",empty,ne,true
+                "field1",empty,flag,false
             );
     BOOST_CHECK_EQUAL(str7,std::string("field1 must be not empty"));
 
@@ -76,7 +76,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     detail::reorder_and_present(
                 w8,
                 make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_values),
-                "field2",empty,eq,true
+                "field2",empty,flag,true
             );
     BOOST_CHECK_EQUAL(str8,std::string("field2 must be empty"));
 
@@ -117,6 +117,75 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     BOOST_CHECK_EQUAL(str12,std::string("size of field2 must be less than or equal to size of field1"));
 }
 
+template <typename WrapStringFn>
+void checkPropertyFlag(const WrapStringFn& wrapper)
+{
+    std::string str1;
+    auto w1=wrapper(str1);
+    auto mn=get_default_member_names();
+
+    detail::reorder_and_present(
+                w1,
+                make_cref_tuple(mn,default_strings,default_values),
+                empty,flag,true
+            );
+    BOOST_CHECK_EQUAL(str1,std::string("must be empty"));
+    str1.clear();
+
+    detail::reorder_and_present(
+                w1,
+                make_cref_tuple(mn,default_strings,default_values),
+                empty,flag,false
+            );
+    BOOST_CHECK_EQUAL(str1,std::string("must be not empty"));
+    str1.clear();
+
+    detail::reorder_and_present(
+                w1,
+                make_cref_tuple(mn,default_strings,default_values),
+                empty,flag(flag_true_false),true
+            );
+    BOOST_CHECK_EQUAL(str1,std::string("empty must be true"));
+    str1.clear();
+    detail::reorder_and_present(
+                w1,
+                make_cref_tuple(mn,default_strings,default_values),
+                empty,flag(flag_true_false),false
+            );
+    BOOST_CHECK_EQUAL(str1,std::string("empty must be false"));
+    str1.clear();
+
+    detail::reorder_and_present(
+                w1,
+                make_cref_tuple(mn,default_strings,default_values),
+                empty,flag(flag_on_off),true
+            );
+    BOOST_CHECK_EQUAL(str1,std::string("empty must be on"));
+    str1.clear();
+    detail::reorder_and_present(
+                w1,
+                make_cref_tuple(mn,default_strings,default_values),
+                empty,flag(flag_on_off),false
+            );
+    BOOST_CHECK_EQUAL(str1,std::string("empty must be off"));
+    str1.clear();
+
+    detail::reorder_and_present(
+                w1,
+                make_cref_tuple(mn,default_strings,default_values),
+                empty,flag("expected"),true
+            );
+    BOOST_CHECK_EQUAL(str1,std::string("empty expected"));
+    str1.clear();
+    detail::reorder_and_present(
+                w1,
+                make_cref_tuple(mn,default_strings,default_values),
+                empty,flag("not expected"),false
+            );
+    BOOST_CHECK_EQUAL(str1,std::string("empty not expected"));
+    str1.clear();
+}
+
 template <typename FormatterT, typename WrapStringFn>
 void testFormatter(const FormatterT& formatter1, const WrapStringFn& wrapper)
 {
@@ -127,20 +196,13 @@ void testFormatter(const FormatterT& formatter1, const WrapStringFn& wrapper)
 
     std::string str2;
     auto w2=wrapper(str2);
-    formatter1.validate_property(w2,empty,eq,false);
+    formatter1.validate_property(w2,empty,flag,false);
     BOOST_CHECK_EQUAL(str2,std::string("must be not empty"));
     std::string str3;
     auto w3=wrapper(str3);
-    formatter1.validate_property(w3,empty,eq,true);
+    formatter1.validate_property(w3,empty,flag,true);
     BOOST_CHECK_EQUAL(str3,std::string("must be empty"));
     std::string str2_1;
-    auto w2_1=wrapper(str2_1);
-    formatter1.validate_property(w2_1,empty,ne,false);
-    BOOST_CHECK_EQUAL(str2_1,std::string("must be empty"));
-    std::string str3_1;
-    auto w3_1=wrapper(str3_1);
-    formatter1.validate_property(w3_1,empty,ne,true);
-    BOOST_CHECK_EQUAL(str3_1,std::string("must be not empty"));
 
     std::string str4;
     auto w4=wrapper(str4);
@@ -148,16 +210,16 @@ void testFormatter(const FormatterT& formatter1, const WrapStringFn& wrapper)
     BOOST_CHECK_EQUAL(str4,std::string("size must be less than or equal to 100"));
     std::string str5;
     auto w5=wrapper(str5);
-    formatter1.validate_property(w5,value,eq,true);
-    BOOST_CHECK_EQUAL(str5,std::string("value must be true"));
+    formatter1.validate_property(w5,value,flag,true);
+    BOOST_CHECK_EQUAL(str5,std::string("must be true"));
 
     std::string str11;
     auto w11=wrapper(str11);
-    formatter1.validate(w11,"field1",value,eq,true);
+    formatter1.validate(w11,"field1",value,flag,true);
     BOOST_CHECK_EQUAL(str11,std::string("field1 must be true"));
     std::string str6;
     auto w6=wrapper(str6);
-    formatter1.validate(w6,"field1",value,eq,false);
+    formatter1.validate(w6,"field1",value,flag,false);
     BOOST_CHECK_EQUAL(str6,std::string("field1 must be false"));
     std::string str7;
     auto w7=wrapper(str7);
@@ -169,11 +231,11 @@ void testFormatter(const FormatterT& formatter1, const WrapStringFn& wrapper)
     BOOST_CHECK_EQUAL(str8,std::string("size of field1 must be less than 100"));
     std::string str9;
     auto w9=wrapper(str9);
-    formatter1.validate(w9,"field1",empty,eq,true);
+    formatter1.validate(w9,"field1",empty,flag,true);
     BOOST_CHECK_EQUAL(str9,std::string("field1 must be empty"));
     std::string str10;
     auto w10=wrapper(str10);
-    formatter1.validate(w10,"field1",empty,ne,true);
+    formatter1.validate(w10,"field1",empty,flag,false);
     BOOST_CHECK_EQUAL(str10,std::string("field1 must be not empty"));
 
     std::string str12;

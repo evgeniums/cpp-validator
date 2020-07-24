@@ -92,6 +92,11 @@ auto make_backend_formatter(std::string& dst)
 }
 }
 
+BOOST_AUTO_TEST_CASE(CheckFmtPropertyFlag)
+{
+    checkPropertyFlag(make_backend_formatter);
+}
+
 BOOST_AUTO_TEST_CASE(CheckFmtOrderAndPresentation)
 {
     checkOrderAndPresentation(make_backend_formatter);

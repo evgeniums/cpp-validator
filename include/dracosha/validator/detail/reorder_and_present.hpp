@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/reporting/report_aggregation.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
-#include <dracosha/validator/detail/if_bool.hpp>
+#include <dracosha/validator/operators/flag.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -149,8 +149,30 @@ struct apply_reorder_present_2args_t
         return apply_reorder_present_fn(
                                 dst,
                                 std::forward<FormatterTs>(formatters),
-                                if_bool<T2,OpT>(std::forward<OpT>(op)),b
+                                std::forward<OpT>(op),b
                                 );
+    }
+};
+
+template <typename OpT, typename T2>
+struct apply_reorder_present_2args_t<
+                        OpT,T2,
+                        hana::when<
+                            std::is_base_of<flag_t,std::decay_t<OpT>>::value
+                        >
+                    >
+{
+    template <typename DstT, typename FormatterTs>
+    constexpr auto operator () (
+                                DstT& dst, FormatterTs&& formatters,
+                                const OpT& op, const T2& b
+                                ) const -> decltype(auto)
+    {
+        backend_formatter.append_join_args(
+                dst,
+                " ",
+                apply_ref(hana::at(formatters,hana::size_c<0>),op.str(value,b))
+            );
     }
 };
 
@@ -173,61 +195,48 @@ struct apply_reorder_present_3args_t
     {
         return apply_reorder_present_fn(dst,
                                 std::forward<FormatterTs>(formatters),
-                                prop,if_bool<T2,OpT>(std::forward<OpT>(op)),b
+                                prop,std::forward<OpT>(op),b
                                 );
     }
 };
 
-/**
- * @brief Adjust presentation and order of validation report for property "empty"
- */
 template <typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_3args_t<
                         PropT,OpT,T2,
                         hana::when<
-                            std::is_same<std::decay_t<PropT>,type_p_empty>::value
-                            &&
-                            std::is_same<std::decay_t<T2>,bool>::value
-                            &&
-                            (std::is_same<std::decay_t<OpT>,eq_t>::value || std::is_same<std::decay_t<OpT>,ne_t>::value)
+                            std::is_base_of<flag_t,std::decay_t<OpT>>::value
                         >
                     >
 {
     template <typename DstT, typename FormatterTs>
     constexpr auto operator () (
                                 DstT& dst, FormatterTs&& formatters,
-                                const PropT&, const OpT&, const T2& b
+                                const PropT& prop, const OpT& op, const T2& b
                                 ) const -> decltype(auto)
     {
-        auto format_empty=[&](bool eq)
-        {
-            if (eq==b)
+        return hana::eval_if(
+            std::decay_t<OpT>::prepend_property(prop),
+            [&dst,&formatters,&op,&prop,&b](auto&&)
             {
-                // is empty
                 backend_formatter.append_join_args(
-                    dst,
-                    " ",
-                    apply_ref(hana::at(formatters,hana::size_c<1>),string_empty)
-                );
-            }
-            else
+                            dst,
+                            " ",
+                            apply_ref(hana::at(formatters,hana::size_c<0>),prop),
+                            apply_ref(hana::at(formatters,hana::size_c<0>),op.str(prop,b))
+                        );
+            },
+            [&dst,&formatters,&op,&prop,&b](auto&&)
             {
-                // is not empty
                 backend_formatter.append_join_args(
-                    dst,
-                    " ",
-                    apply_ref(hana::at(formatters,hana::size_c<1>),string_not_empty)
-                );
+                        dst,
+                        " ",
+                        apply_ref(hana::at(formatters,hana::size_c<0>),op.str(prop,b))
+                    );
             }
-        };
-
-        hana::eval_if(
-            std::is_same<std::decay_t<OpT>,eq_t>::value,
-            [&](auto){format_empty(true);},
-            [&](auto){format_empty(false);}
         );
     }
 };
+
 template <typename PropT, typename OpT, typename T2>
 constexpr apply_reorder_present_3args_t<PropT,OpT,T2> apply_reorder_present_3args{};
 
@@ -254,7 +263,7 @@ struct apply_reorder_present_4args_t
                     dst,
                     " ",
                     apply_ref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),std::forward<OpT>(op)),
                     apply_ref(hana::at(formatters,hana::size_c<3>),b)
                 );
             },
@@ -267,7 +276,7 @@ struct apply_reorder_present_4args_t
                     apply_ref(hana::at(formatters,hana::size_c<1>),prop),
                     apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
                     apply_ref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),std::forward<OpT>(op)),
                     apply_ref(hana::at(formatters,hana::size_c<3>),b)
                 );
             }
@@ -298,7 +307,7 @@ struct apply_reorder_present_4args_t<
                     dst,
                     " ",
                     apply_ref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),std::forward<OpT>(op)),
                     apply_ref(hana::at(formatters,hana::size_c<3>),b.get())
                 );
             },
@@ -311,7 +320,7 @@ struct apply_reorder_present_4args_t<
                     apply_ref(hana::at(formatters,hana::size_c<1>),prop),
                     apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
                     apply_ref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),std::forward<OpT>(op)),
                     apply_ref(hana::at(formatters,hana::size_c<1>),prop),
                     apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
                     apply_ref(hana::at(formatters,hana::size_c<3>),b.get())
@@ -349,7 +358,7 @@ struct apply_reorder_present_4args_t<
                     dst,
                     " ",
                     apply_ref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),std::forward<OpT>(op)),
                     apply_ref(hana::at(formatters,hana::size_c<0>),member),
                     apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
                     apply_ref(hana::at(formatters,hana::size_c<3>),b)
@@ -364,7 +373,7 @@ struct apply_reorder_present_4args_t<
                     apply_ref(hana::at(formatters,hana::size_c<1>),prop),
                     apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
                     apply_ref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),if_bool<T2,OpT>(std::forward<OpT>(op))),
+                    apply_ref(hana::at(formatters,hana::size_c<2>),std::forward<OpT>(op)),
                     apply_ref(hana::at(formatters,hana::size_c<1>),prop),
                     apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
                     apply_ref(hana::at(formatters,hana::size_c<0>),member),
@@ -383,48 +392,38 @@ template <typename MemberT, typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_4args_t<
                         MemberT,PropT,OpT,T2,
                         hana::when<
-                            std::is_same<std::decay_t<PropT>,type_p_empty>::value
-                            &&
-                            std::is_same<std::decay_t<T2>,bool>::value
-                            &&
-                            (std::is_same<std::decay_t<OpT>,eq_t>::value || std::is_same<std::decay_t<OpT>,ne_t>::value)
+                            std::is_base_of<flag_t,std::decay_t<OpT>>::value
                         >
                     >
 {
     template <typename DstT, typename FormatterTs>
     constexpr auto operator () (
                                 DstT& dst, FormatterTs&& formatters,
-                                const MemberT& member, const PropT&, const OpT&, const T2& b
+                                const MemberT& member, const PropT& prop, const OpT& op, const T2& b
                                 ) const -> decltype(auto)
     {
-        auto format_empty=[&](bool eq)
-        {
-            if (eq==b)
+        return hana::eval_if(
+            std::decay_t<OpT>::prepend_property(prop),
+            [&dst,&member,&formatters,&op,&prop,&b](auto&&)
             {
-                // member is empty
                 backend_formatter.append_join_args(
-                    dst,
-                    " ",
-                    apply_ref(hana::at(formatters,hana::size_c<1>),member),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),string_empty)
-                );
-            }
-            else
+                            dst,
+                            " ",
+                            apply_ref(hana::at(formatters,hana::size_c<1>),prop),
+                            apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
+                            apply_ref(hana::at(formatters,hana::size_c<0>),member),
+                            apply_ref(hana::at(formatters,hana::size_c<1>),op.str(prop,b))
+                        );
+            },
+            [&dst,&member,&formatters,&op,&prop,&b](auto&&)
             {
-                // member is not empty
                 backend_formatter.append_join_args(
-                    dst,
-                    " ",
-                    apply_ref(hana::at(formatters,hana::size_c<1>),member),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),string_not_empty)
-                );
+                        dst,
+                        " ",
+                        apply_ref(hana::at(formatters,hana::size_c<0>),member),
+                        apply_ref(hana::at(formatters,hana::size_c<1>),op.str(prop,b))
+                    );
             }
-        };
-
-        hana::eval_if(
-            std::is_same<std::decay_t<OpT>,eq_t>::value,
-            [&](auto){format_empty(true);},
-            [&](auto){format_empty(false);}
         );
     }
 };

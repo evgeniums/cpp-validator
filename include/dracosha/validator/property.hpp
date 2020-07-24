@@ -62,9 +62,12 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> declt
 #define DRACOSHA_VALIDATOR_HAS_PROPERTY(val,prop) hana::is_valid([](auto&& v) -> decltype((void)v.prop){})(val)
 
 /**
-  Define property that can be used with validator
+  @brief Define property that can be used with validator
+  @param prop Property name
+  @param flag_dscr Description of positive flag
+  @param flag_dscr Description of negative flag
  */
-#define DRACOSHA_VALIDATOR_PROPERTY(prop) \
+#define DRACOSHA_VALIDATOR_PROPERTY_FLAG(prop,flag_dscr,n_flag_dscr) \
     auto try_get_##prop =[](auto&& v) -> decltype(auto) \
     { \
       return hana::if_(DRACOSHA_VALIDATOR_HAS_PROPERTY_FN(v,prop), \
@@ -111,6 +114,18 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> declt
         {\
             return #prop; \
         }\
+        constexpr static const char* flag_str(bool b) \
+        {\
+            if (b) \
+            { \
+                return flag_dscr; \
+            } \
+            return n_flag_dscr; \
+        }\
+        constexpr static bool has_flag_str() \
+        { \
+            return flag_dscr!=nullptr && n_flag_dscr!=nullptr; \
+        } \
     }; \
     constexpr type_p_##prop prop{}; \
     template <typename ...Args> \
@@ -118,6 +133,8 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> declt
     { \
         return prepare_dispatcher(prop,std::forward<Args>(args)...); \
     }
+
+#define DRACOSHA_VALIDATOR_PROPERTY(prop) DRACOSHA_VALIDATOR_PROPERTY_FLAG(prop,nullptr,nullptr)
 
 //-------------------------------------------------------------
 

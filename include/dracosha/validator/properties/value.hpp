@@ -21,6 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/property.hpp>
+#include <dracosha/validator/flag_presets.hpp>
 #include <dracosha/validator/prepare_dispatcher.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -47,6 +48,16 @@ struct type_p_value
     constexpr static const char* name()
     {
         return "value";
+    }
+
+    constexpr static const char* flag_str(bool)
+    {
+        return nullptr;
+    }
+
+    constexpr static bool has_flag_str()
+    {
+        return false;
     }
 };
 constexpr type_p_value value{};

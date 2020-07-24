@@ -20,11 +20,21 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_FORMAT_VALUE_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/detail/if_bool.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
+
+struct string_true_t : public enable_to_string<string_true_t>
+{
+    constexpr static const char* description="true";
+};
+constexpr string_true_t string_true{};
+struct string_false_t : public enable_to_string<string_false_t>
+{
+    constexpr static const char* description="false";
+};
+constexpr string_false_t string_false{};
 
 namespace detail
 {

@@ -24,6 +24,11 @@ auto make_backend_formatter(std::string& dst)
 }
 }
 
+BOOST_AUTO_TEST_CASE(CheckStdPropertyFlag)
+{
+    checkPropertyFlag(make_backend_formatter);
+}
+
 BOOST_AUTO_TEST_CASE(CheckStdOrderAndPresentation)
 {
     checkOrderAndPresentation(make_backend_formatter);

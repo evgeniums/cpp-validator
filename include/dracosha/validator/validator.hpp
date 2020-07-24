@@ -123,7 +123,20 @@ struct validator_t
      * @brief Just syntax sugar, return input validator or validation operator as is
      */
     template <typename T>
-    constexpr auto operator () (T&& v) const -> decltype(auto)
+    constexpr auto operator () (T&& v,
+                                std::enable_if_t<hana::is_a<property_tag,T>,void*> =nullptr
+            ) const -> decltype(auto)
+    {
+        return make_validator(std::forward<T>(v));
+    }
+
+    /**
+     * @brief Just syntax sugar, return input validator or validation operator as is
+     */
+    template <typename T>
+    constexpr auto operator () (T&& v,
+                                std::enable_if_t<!hana::is_a<property_tag,T>,void*> =nullptr
+            ) const -> decltype(auto)
     {
         return hana::id(std::forward<T>(v));
     }
