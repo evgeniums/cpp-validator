@@ -25,7 +25,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/enable_to_string.hpp>
 #include <dracosha/validator/operators/operator.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
-#include <dracosha/validator/utils/optional.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -50,18 +49,6 @@ class invert_op : public object_wrapper<T>
         /**
          * @brief Constructor
          * @param val Operator
-         * @param description String to use in report formatting to represent the operator
-         */
-        invert_op(
-                T&& val,
-                std::string description
-            ) : object_wrapper<T>(std::forward<T>(val)),
-                _description(std::move(description))
-        {}
-
-        /**
-         * @brief Constructor
-         * @param val Operator
          */
         invert_op(
                 T&& val
@@ -73,13 +60,9 @@ class invert_op : public object_wrapper<T>
          */
         operator std::string() const
         {
-            if (!_description)
-            {
-                std::string str;
-                backend_formatter.append(str,std::string(string_invert_op)," ",std::string(this->get()));
-                return str;
-            }
-            return _description.value();
+            std::string str;
+            backend_formatter.append(str,std::string(string_invert_op)," ",std::string(this->get()));
+            return str;
         }
 
         /**
@@ -93,10 +76,39 @@ class invert_op : public object_wrapper<T>
         {
             return !this->get()(a,b);
         }
+};
+
+/**
+ * @brief Invert operator with explicit description
+ */
+template <typename T>
+class invert_op_with_string : public invert_op<T>
+{
+    public:
+
+        /**
+         * @brief Constructor
+         * @param val Operator
+         * @param description String to use in report formatting to represent the operator
+         */
+        invert_op_with_string(
+                T&& val,
+                std::string description
+            ) : invert_op<T>(std::forward<T>(val)),
+                _description(std::move(description))
+        {}
+
+        /**
+         * @brief Operator of conversion to std::string
+         */
+        operator std::string() const
+        {
+            return _description;
+        }
 
     private:
 
-        optional<std::string> _description;
+        std::string _description;
 };
 
 /**
@@ -105,7 +117,7 @@ class invert_op : public object_wrapper<T>
  * @return Inverted perator
  */
 template <typename T>
-auto _n(T&& v)
+constexpr auto _n(T&& v)
 {
     return invert_op<T>(std::forward<T>(v));
 }
@@ -119,7 +131,7 @@ auto _n(T&& v)
 template <typename T>
 auto _n(T&& v, std::string description)
 {
-    return invert_op<T>(std::forward<T>(v),std::move(description));
+    return invert_op_with_string<T>(std::forward<T>(v),std::move(description));
 }
 
 //-------------------------------------------------------------
