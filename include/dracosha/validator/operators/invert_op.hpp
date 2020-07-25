@@ -24,6 +24,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/enable_to_string.hpp>
 #include <dracosha/validator/operators/operator.hpp>
+#include <dracosha/validator/operators/exists.hpp>
+#include <dracosha/validator/operators/flag.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -45,6 +47,11 @@ class invert_op : public object_wrapper<T>
     public:
 
         using hana_tag=operator_tag;
+
+        static_assert(!std::is_same<exists_t,std::decay_t<T>>::value && !std::is_same<exists_op_with_string_t,std::decay_t<T>>::value,
+                      "Invertion _n() can not be applied to operator exists");
+        static_assert(!std::is_base_of<flag_t,std::decay_t<T>>::value,
+                      "Invertion _n() can not be applied to operator flag");
 
         /**
          * @brief Constructor
