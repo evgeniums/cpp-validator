@@ -111,6 +111,8 @@ struct _t
                 (hana::is_a<operator_tag,T1>
                  &&
                  !std::is_same<exists_t,std::decay_t<T1>>::value
+                 &&
+                 !std::is_base_of<flag_t,std::decay_t<T1>>::value
                  )
                 ,void*> =nullptr
         ) const
@@ -118,6 +120,30 @@ struct _t
         return wrap_op_with_string<T1>(std::forward<T1>(op),std::forward<T2>(description));
     }
 
+    /**
+     * @brief Wrap flag operator appending explicit description
+     * @param op Flag operator
+     * @param description Explicit description to be used in reporting
+     * @return Flag operator with description
+     */
+    template <typename T1, typename T2>
+    constexpr auto operator () (
+            T1&& op,
+            T2&& description,
+            std::enable_if_t<
+                 std::is_same<flag_op,std::decay_t<T1>>::value
+                ,void*> =nullptr
+        ) const
+    {
+        return op(std::forward<T2>(description));
+    }
+
+    /**
+     * @brief Wrap exists operator appending explicit description
+     * @param op Exists operator
+     * @param description Explicit description to be used in reporting
+     * @return Exists operator with description
+     */
     template <typename T1, typename T2>
     constexpr auto operator () (
             T1&&,

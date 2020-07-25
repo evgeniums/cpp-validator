@@ -1041,10 +1041,24 @@ BOOST_AUTO_TEST_CASE(CheckFlagValidationReport)
     BOOST_CHECK_EQUAL(rep1,"empty of field1 must be checked");
     rep1.clear();
 
+    auto v5_1=validator(
+                _["field1"](empty(_(flag,flag_checked_unchecked),true))
+            );
+    BOOST_CHECK(!v5_1.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,"empty of field1 must be checked");
+    rep1.clear();
+
     auto v6=validator(
                 _["field1"](empty(flag("expected to be true"),true))
             );
     BOOST_CHECK(!v6.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,"empty of field1 expected to be true");
+    rep1.clear();
+
+    auto v6_1=validator(
+                _["field1"](empty(_(flag,"expected to be true"),true))
+            );
+    BOOST_CHECK(!v6_1.apply(ra2));
     BOOST_CHECK_EQUAL(rep1,"empty of field1 expected to be true");
     rep1.clear();
 
@@ -1069,10 +1083,24 @@ BOOST_AUTO_TEST_CASE(CheckFlagValidationReport)
     BOOST_CHECK_EQUAL(rep1,"empty of field1 must be set");
     rep1.clear();
 
+    auto v9_1=validator(
+                _["field1"][empty](_(flag,flag_set_unset),true)
+            );
+    BOOST_CHECK(!v9_1.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,"empty of field1 must be set");
+    rep1.clear();
+
     auto v10=validator(
                 _["field1"][empty](flag("expected to be true"),true)
             );
     BOOST_CHECK(!v10.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,"empty of field1 expected to be true");
+    rep1.clear();
+
+    auto v11=validator(
+                _["field1"][empty](_(flag,"expected to be true"),true)
+            );
+    BOOST_CHECK(!v11.apply(ra2));
     BOOST_CHECK_EQUAL(rep1,"empty of field1 expected to be true");
     rep1.clear();
 }
