@@ -98,14 +98,15 @@ class adapter
          *  @brief Validate existance of a member
          *  @param a Object to validate
          *  @param member Member descriptor
+         *  @param op Operator for validation
          *  @param b Boolean flag, when true check if member exists, when false check if member does not exist
          *  @param from_check_member Boolean flag, when true then the method is called before other validation to check ig method exists
          *  @return Validation status
          */
-        template <typename T2, typename MemberT>
-        status validate_exists(MemberT&& member, T2&& b, bool from_check_member=false) const
+        template <typename T2, typename OpT, typename MemberT>
+        status validate_exists(MemberT&& member, OpT&& op, T2&& b, bool from_check_member=false) const
         {
-            return _traits.validate_exists(*this,std::forward<MemberT>(member),std::forward<T2>(b),from_check_member);
+            return _traits.validate_exists(*this,std::forward<MemberT>(member),std::forward<OpT>(op),std::forward<T2>(b),from_check_member);
         }
 
         /**

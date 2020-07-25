@@ -164,17 +164,22 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
      *  @brief Validate existance of a member
      *  @param a Adapter with object to validate
      *  @param member Member descriptor
+     *  @param op Operator for validation
      *  @param b Boolean flag, when true check if member exists, when false check if member does not exist
      *  @return Validation status
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
-    static status invoke(T1&& a, MemberT&& member, PropT&&, OpT&&, T2&& b,
-                                 std::enable_if_t<std::is_same<exists_t,std::decay_t<OpT>>::value,
+    static status invoke(T1&& a, MemberT&& member, PropT&&, OpT&& op, T2&& b,
+                                 std::enable_if_t<
+                                    (std::is_same<exists_t,std::decay_t<OpT>>::value
+                                    ||
+                                    std::is_same<exists_op_with_string_t,std::decay_t<OpT>>::value
+                                    ),
                                    void*
                                  > =nullptr
                                 )
     {
-        return a.validate_exists(std::forward<MemberT>(member),std::forward<T2>(b));
+        return a.validate_exists(std::forward<MemberT>(member),std::forward<OpT>(op),std::forward<T2>(b));
     }
 
     /**
@@ -191,7 +196,9 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
                                  std::enable_if_t<
                                    (!hana::is_a<member_tag,T2> &&
                                     !is_master_sample<T2>::value &&
-                                    !std::is_same<exists_t,std::decay_t<OpT>>::value),
+                                    !std::is_same<exists_t,std::decay_t<OpT>>::value &&
+                                    !std::is_same<exists_op_with_string_t,std::decay_t<OpT>>::value
+                                    ),
                                    void*
                                  > =nullptr
                                 )

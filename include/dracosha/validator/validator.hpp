@@ -107,10 +107,25 @@ struct _t
     constexpr auto operator () (
             T1&& op,
             T2&& description,
-            std::enable_if_t<hana::is_a<operator_tag,T1>,void*> =nullptr
+            std::enable_if_t<
+                (hana::is_a<operator_tag,T1>
+                 &&
+                 !std::is_same<exists_t,std::decay_t<T1>>::value
+                 )
+                ,void*> =nullptr
         ) const
     {
         return wrap_op_with_string<T1>(std::forward<T1>(op),std::forward<T2>(description));
+    }
+
+    template <typename T1, typename T2>
+    constexpr auto operator () (
+            T1&&,
+            T2&& description,
+            std::enable_if_t<std::is_same<exists_t,std::decay_t<T1>>::value,void*> =nullptr
+        ) const
+    {
+        return exists_op_with_string_t{std::forward<T2>(description)};
     }
 };
 constexpr _t _{};

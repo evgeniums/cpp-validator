@@ -149,8 +149,49 @@ BOOST_AUTO_TEST_CASE(CheckValidationReport)
     rep1.clear();
 }
 
+BOOST_AUTO_TEST_CASE(CheckValidationExistsReport)
+{
+    std::map<std::string,size_t> m1={{"field1",1}};
+    std::string rep1;
+    auto ra1=make_reporting_adapter(m1,rep1);
+
+    auto v1=validator(
+                _["field2"](exists,true)
+            );
+    BOOST_CHECK(!v1.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"field2 must exist");
+    rep1.clear();
+
+    auto v2=validator(
+                _["field1"](exists,false)
+            );
+    BOOST_CHECK(!v2.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"field1 must not exist");
+    rep1.clear();
+
+    auto v3=validator(
+                _["field2"](exists,false)
+            );
+    BOOST_CHECK(v3.apply(ra1));
+    rep1.clear();
+
+    auto v4=validator(
+                _["field2"](_(exists,"should exist"),true)
+            );
+    BOOST_CHECK(!v4.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"field2 should exist");
+    rep1.clear();
+}
+
 BOOST_AUTO_TEST_CASE(CheckCustomDescriptions)
 {
+    auto m0=_["field1"];
+    static_assert(!decltype(m0)::has_name(),"");
+
+    auto m1=_["field1"]("hello");
+    static_assert(decltype(m1)::has_name(),"");
+    BOOST_CHECK_EQUAL(m1.name(),"hello");
+
     std::string rep1;
     std::vector<size_t> vec1={10,20,30,40,50};
     auto ra1=make_reporting_adapter(vec1,rep1);
@@ -1034,16 +1075,6 @@ BOOST_AUTO_TEST_CASE(CheckFlagValidationReport)
     BOOST_CHECK(!v10.apply(ra2));
     BOOST_CHECK_EQUAL(rep1,"empty of field1 expected to be true");
     rep1.clear();
-}
-
-BOOST_AUTO_TEST_CASE(CheckMemberWithString)
-{
-    auto m0=_["field1"];
-    static_assert(!decltype(m0)::has_name(),"");
-
-    auto m1=_["field1"]("hello");
-    static_assert(decltype(m1)::has_name(),"");
-    BOOST_CHECK_EQUAL(m1.name(),"hello");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

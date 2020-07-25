@@ -35,6 +35,14 @@ struct exists_t
 {
     using hana_tag=operator_tag;
 
+    constexpr static const char* description="must exist";
+    constexpr static const char* n_description="must not exist";
+
+    static const char* str(const bool& b)
+    {
+        return b?description:n_description;
+    }
+
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
@@ -42,6 +50,24 @@ struct exists_t
     }
 };
 constexpr exists_t exists{};
+
+struct exists_op_with_string_t
+{
+    using hana_tag=operator_tag;
+
+    std::string str(const bool&) const
+    {
+        return _description;
+    }
+
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b) const
+    {
+        return exists(a,b);
+    }
+
+    std::string _description;
+};
 
 //-------------------------------------------------------------
 struct string_exists_t : public enable_to_string<string_exists_t>

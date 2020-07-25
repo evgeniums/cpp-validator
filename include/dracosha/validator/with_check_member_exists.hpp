@@ -107,7 +107,7 @@ struct with_check_member_exists
         }
         if (is_check_member_exists_before_validation())
         {
-            return _adapter.validate_exists(member,true,true);
+            return _adapter.validate_exists(member,exists,true,true);
         }
         return true;
     }

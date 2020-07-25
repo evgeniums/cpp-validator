@@ -607,7 +607,6 @@ BOOST_AUTO_TEST_CASE(CheckIsMasterSample)
 
 @todo
     Override validator report.
-    Refactor exists.
     Refactor operator descriptions for use in _n()
     Localization of conjunctions, plurals and genders.
     String operators.

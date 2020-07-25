@@ -93,23 +93,13 @@ struct formatter
                );
     }
 
-    template <typename DstT, typename T2, typename MemberT>
-    void validate_exists(DstT& dst, const MemberT& member, const T2& b) const
+    template <typename DstT, typename T2, typename OpT, typename MemberT>
+    void validate_exists(DstT& dst, const MemberT& member, const OpT& op, const T2& b) const
     {
-        if (b)
-        {
-            format(dst,
-                   make_cref_tuple(_member_names,_strings),
-                   member,string_exists
-                   );
-        }
-        else
-        {
-            format(dst,
-                   make_cref_tuple(_member_names,_strings),
-                   member,string_not_exists
-                   );
-        }
+        format(dst,
+               make_cref_tuple(_member_names,_strings),
+               member,op.str(b)
+               );
     }
 
     template <typename DstT, typename T2, typename OpT, typename PropT, typename MemberT>

@@ -240,11 +240,11 @@ void testFormatter(const FormatterT& formatter1, const WrapStringFn& wrapper)
 
     std::string str12;
     auto w12=wrapper(str12);
-    formatter1.validate_exists(w12,"field1",true);
+    formatter1.validate_exists(w12,"field1",exists,true);
     BOOST_CHECK_EQUAL(str12,std::string("field1 must exist"));
     std::string str13;
     auto w13=wrapper(str13);
-    formatter1.validate_exists(w13,"field1",false);
+    formatter1.validate_exists(w13,"field1",exists,false);
     BOOST_CHECK_EQUAL(str13,std::string("field1 must not exist"));
 
     std::string str14;

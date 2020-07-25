@@ -71,8 +71,8 @@ class single_member_adapter_impl
                                                              std::forward<T2>(b));
         }
 
-        template <typename AdapterT, typename T2, typename MemberT>
-        status validate_exists(AdapterT&& adpt, MemberT&& member, T2&& b, bool from_check_member) const
+        template <typename AdapterT, typename T2, typename OpT, typename MemberT>
+        status validate_exists(AdapterT&& adpt, MemberT&& member, OpT&&, T2&& b, bool from_check_member) const
         {
             std::ignore=adpt;
             std::ignore=from_check_member;

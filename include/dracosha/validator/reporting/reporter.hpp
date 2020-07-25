@@ -169,15 +169,15 @@ class reporter
          *  @param member Member descriptor
          *  @param b Boolean flag, when true check if member exists, when false check if member does not exist
          */
-        template <typename T2, typename MemberT>
-        void validate_exists(const MemberT& member, const T2& b)
+        template <typename T2, typename OpT, typename MemberT>
+        void validate_exists(const MemberT& member, const OpT& op, const T2& b)
         {
             if (skip_part())
             {
                 return;
             }
             auto wrapper=wrap_backend_formatter(current(),_dst);
-            _formatter.validate_exists(wrapper,member,b);
+            _formatter.validate_exists(wrapper,member,op,b);
         }
 
         /**

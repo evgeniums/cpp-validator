@@ -76,13 +76,13 @@ class reporting_adapter_impl
             return ok;
         }
 
-        template <typename AdapterT, typename T2, typename MemberT>
-        status validate_exists(AdapterT&& adpt, MemberT&& member, T2&& b, bool from_check_member)
+        template <typename AdapterT, typename T2, typename OpT, typename MemberT>
+        status validate_exists(AdapterT&& adpt, MemberT&& member, OpT&& op, T2&& b, bool from_check_member)
         {
-            auto ok=_next_adapter_impl.validate_exists(adpt,member,b,from_check_member);
+            auto ok=_next_adapter_impl.validate_exists(adpt,member,op,b,from_check_member);
             if (!from_check_member && (!ok || _reporter.current_not()))
             {
-                _reporter.validate_exists(member,b);
+                _reporter.validate_exists(member,op,b);
             }
             return ok;
         }
