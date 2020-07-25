@@ -26,6 +26,23 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+struct property_validator_tag;
+
+template <typename Handler, typename PropT>
+struct property_validator
+{
+    using hana_tag=property_validator_tag;
+    using property_type=PropT;
+
+    Handler fn;
+
+    template <typename ... Args>
+    auto operator () (Args&&... args) const -> decltype(auto)
+    {
+        return fn(std::forward<Args>(args)...);
+    }
+};
+
 /**
   @brief Dispatch validation.
   */
@@ -39,10 +56,11 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto dispatch = [](auto&&... args) -> decltype(auto)
  */
 struct prepare_dispatcher_t
 {
-    template <typename ... Args>
-    constexpr auto operator() (Args&&... args) const -> decltype(auto)
+    template <typename PropT, typename ... Args>
+    constexpr auto operator() (PropT&& prop, Args&&... args) const -> decltype(auto)
     {
-        return hana::reverse_partial(dispatch,std::forward<Args>(args)...);
+        auto fn=hana::reverse_partial(dispatch,std::forward<PropT>(prop),std::forward<Args>(args)...);
+        return property_validator<decltype(fn),PropT>{std::move(fn)};
     }
 };
 constexpr prepare_dispatcher_t prepare_dispatcher{};

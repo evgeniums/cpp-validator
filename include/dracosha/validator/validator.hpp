@@ -124,7 +124,7 @@ struct validator_t
      */
     template <typename T>
     constexpr auto operator () (T&& v,
-                                std::enable_if_t<hana::is_a<property_tag,T>,void*> =nullptr
+                                std::enable_if_t<hana::is_a<property_validator_tag,T>,void*> =nullptr
             ) const -> decltype(auto)
     {
         return make_validator(std::forward<T>(v));
@@ -135,7 +135,7 @@ struct validator_t
      */
     template <typename T>
     constexpr auto operator () (T&& v,
-                                std::enable_if_t<!hana::is_a<property_tag,T>,void*> =nullptr
+                                std::enable_if_t<!hana::is_a<property_validator_tag,T>,void*> =nullptr
             ) const -> decltype(auto)
     {
         return hana::id(std::forward<T>(v));
