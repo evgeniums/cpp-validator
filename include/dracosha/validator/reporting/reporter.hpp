@@ -57,8 +57,7 @@ class reporter
                     FormatterT&& formatter
                 ) : _dst(std::move(dst)),
                     _formatter(std::forward<FormatterT>(formatter)),
-                    _not_count(0),
-                    _any_all_count(0)
+                    _not_count(0)
         {}
 
         /**
@@ -323,7 +322,6 @@ class reporter
         FormatterT _formatter;
         std::vector<report_aggregation<typename DstT::type>> _stack;
         size_t _not_count;
-        size_t _any_all_count;
 };
 
 /**
