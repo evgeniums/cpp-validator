@@ -28,6 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/apply.hpp>
 #include <dracosha/validator/dispatcher.hpp>
 #include <dracosha/validator/properties.hpp>
+#include <dracosha/validator/operators/flag.hpp>
 #include <dracosha/validator/make_validator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -80,6 +81,14 @@ struct member
     {}
 
     /**
+     * @brief Constructor with path
+     * @param path Member's path
+     */
+    member(path_type path)
+         : path(std::move(path))
+    {}
+
+    /**
      * @brief Constructor with name
      * @param path Member's path
      * @name name member's name
@@ -128,13 +137,63 @@ struct member
      * @return Prepared partial validator of "value" property bound to current member
      */
     template <typename OpT, typename T1>
-    constexpr auto operator () (OpT&& op, T1&& b) const -> decltype(auto)
+    constexpr auto operator () (OpT&& op, T1&& b,
+                                std::enable_if_t<
+                                !(
+                                    hana::is_a<property_tag,type>
+                                    &&
+                                    std::is_base_of<flag_t,std::decay_t<OpT>>::value
+                                 )
+                                ,void*> =nullptr) const -> decltype(auto)
     {
         return (*this)(value(std::forward<OpT>(op),std::forward<T1>(b)));
     }
 
     /**
-     * @brief Get key of the member at current level
+     * @brief Rebind plain operator to the property validator if the last key in the path is a property and operator is a flag
+     * @param op Operator of flag type
+     * @param b Argument to forward to operator
+     * @return Prepared partial validator of the property corresponding to the last property key in the path
+     */
+    template <typename OpT, typename T1>
+    constexpr auto operator () (OpT&& op, T1&& b,
+                                std::enable_if_t<
+                                (
+                                    hana::is_a<property_tag,type>
+                                    &&
+                                    std::is_base_of<flag_t,std::decay_t<OpT>>::value
+                                    &&
+                                    sizeof...(ParentPathT)==0
+                                 )
+                                ,void*> =nullptr) const -> decltype(auto)
+    {
+        return make_validator(key()(std::forward<OpT>(op),std::forward<T1>(b)));
+    }
+
+    /**
+     * @brief Rebind plain operator to the property validator of parent member if the last key in the path is a property and operator is a flag
+     * @param op Operator of flag type
+     * @param b Argument to forward to operator
+     * @return Prepared partial validator of the property of parent member corresponding to the last property key in the path
+     */
+    template <typename OpT, typename T1>
+    constexpr auto operator () (OpT&& op, T1&& b,
+                                std::enable_if_t<
+                                (
+                                    hana::is_a<property_tag,type>
+                                    &&
+                                    std::is_base_of<flag_t,std::decay_t<OpT>>::value
+                                    &&
+                                    sizeof...(ParentPathT)!=0
+                                 )
+                                ,void*> =nullptr) const -> decltype(auto)
+    {
+        return member<ParentPathT...>(hana::drop_back(path,hana::size_c<1>))
+                (key()(std::forward<OpT>(op),std::forward<T1>(b)));
+    }
+
+    /**
+     * @brief Get the last key in the path corresponding to the member at current level
      * @return Key of current member
      */
     constexpr const type& key() const

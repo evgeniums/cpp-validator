@@ -963,20 +963,20 @@ BOOST_AUTO_TEST_CASE(CheckFlagValidationReport)
     std::map<std::string,size_t> m1={{"field1",1}};
     auto ra1=make_reporting_adapter(m1,rep1);
 
-    auto v1=make_validator(
+    auto v1=validator(
                 empty(flag,true)
             );
     BOOST_CHECK(!v1.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"must be empty");
     rep1.clear();
 
-    auto v2=make_validator(
+    auto v2=validator(
                 empty(flag,false)
             );
     BOOST_CHECK(v2.apply(ra1));
     rep1.clear();
 
-    auto v3=make_validator(
+    auto v3=validator(
                 empty(flag(flag_on_off),true)
             );
     BOOST_CHECK(!v3.apply(ra1));
@@ -1004,6 +1004,34 @@ BOOST_AUTO_TEST_CASE(CheckFlagValidationReport)
                 _["field1"](empty(flag("expected to be true"),true))
             );
     BOOST_CHECK(!v6.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,"empty of field1 expected to be true");
+    rep1.clear();
+
+    auto v7=validator(
+                _[empty](flag,true)
+            );
+    BOOST_CHECK(!v7.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"must be empty");
+    rep1.clear();
+
+    auto v8=validator(
+                _["field1"][empty](flag,true)
+            );
+    BOOST_CHECK(!v8.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,"field1 must be empty");
+    rep1.clear();
+
+    auto v9=validator(
+                _["field1"][empty](flag(flag_set_unset),true)
+            );
+    BOOST_CHECK(!v9.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,"empty of field1 must be set");
+    rep1.clear();
+
+    auto v10=validator(
+                _["field1"][empty](flag("expected to be true"),true)
+            );
+    BOOST_CHECK(!v10.apply(ra2));
     BOOST_CHECK_EQUAL(rep1,"empty of field1 expected to be true");
     rep1.clear();
 }
