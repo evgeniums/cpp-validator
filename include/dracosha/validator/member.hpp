@@ -24,7 +24,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/adjust_storable_type.hpp>
 #include <dracosha/validator/utils/make_types_tuple.hpp>
-#include <dracosha/validator/utils/optional.hpp>
 #include <dracosha/validator/apply.hpp>
 #include <dracosha/validator/dispatcher.hpp>
 #include <dracosha/validator/properties.hpp>
@@ -86,19 +85,6 @@ struct member
      */
     member(path_type path)
          : path(std::move(path))
-    {}
-
-    /**
-     * @brief Constructor with name
-     * @param path Member's path
-     * @name name member's name
-     */
-    template <typename T1>
-    member(path_type path,
-           T1&& name,
-           std::enable_if_t<std::is_constructible<std::string,T1>::value,void*> =nullptr)
-         : path(std::move(path)),
-           _name(std::forward<T1>(name))
     {}
 
     /**
@@ -215,40 +201,97 @@ struct member
     }
 
     template <typename T1>
-    member operator () (T1&& v,
+    auto operator () (T1&& v,
                       std::enable_if_t<
                             std::is_constructible<std::string,T1>::value
                             &&
                             !hana::is_a<operator_tag,T1>
-                         ,void*> =nullptr)
+                         ,void*> =nullptr);
+
+    constexpr static const char* name()
     {
-        return member(path,std::forward<T1>(v));
+        return "";
     }
 
+    constexpr static bool has_name()
+    {
+        return false;
+    }
+};
+
+template <typename T, typename ...ParentPathT>
+struct member_with_name : public member<T,ParentPathT...>
+{
+    using base_type=member<T,ParentPathT...>;
+
+    /**
+     * @brief Constructor with name
+     * @param path Member's path
+     * @name name member's name
+     */
+    template <typename T1>
+    member_with_name(typename base_type::path_type path,
+           T1&& name)
+         : base_type(std::move(path)),
+           _name(std::forward<T1>(name))
+    {}
+
+    /**
+     * @brief Get member's name
+     * @return Name
+     */
     const std::string& name() const
     {
-        return _name.value();
+        return _name;
     }
 
-    bool has_name() const noexcept
+    /**
+     * @brief Check if member has a name
+     * @return Always true
+     */
+    constexpr static bool has_name()
     {
-        return _name.has_value();
+        return true;
     }
 
-    void set_name(std::string name)
+    /**
+     * @brief Bind compound validator to current member
+     * @param v Prepared partial validator
+     * @return Prepared partial validator bound to current member
+     */
+    template <typename T1>
+    constexpr auto operator () (T1&& v) const -> decltype(auto)
     {
-        _name=std::move(name);
+        return make_validator(hana::reverse_partial(apply_member,std::forward<T1>(v),*this));
     }
 
-    void unset_name()
+    /**
+     * @brief Bind plain operator to current member
+     * @param op Operator
+     * @param b Argument to forward to operator
+     * @return Prepared partial validator of "value" property bound to current member
+     */
+    template <typename OpT, typename T1>
+    constexpr auto operator () (OpT&& op, T1&& b) const -> decltype(auto)
     {
-        _name.reset();
+        return (*this)(value(std::forward<OpT>(op),std::forward<T1>(b)));
     }
 
-    private:
-
-        optional<std::string> _name;
+    std::string _name;
 };
+
+template <typename T, typename ...ParentPathT>
+template <typename T1>
+auto member<T,ParentPathT...>::operator ()
+        (T1&& v,
+          std::enable_if_t<
+                std::is_constructible<std::string,T1>::value
+                &&
+                !hana::is_a<operator_tag,T1>
+             ,void*>)
+{
+    return member_with_name<T,ParentPathT...>(path,std::forward<T1>(v));
+}
 
 //-------------------------------------------------------------
 

@@ -23,7 +23,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
 #include <dracosha/validator/utils/enable_to_string.hpp>
-#include <dracosha/validator/utils/optional.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -56,18 +55,6 @@ class wrap_op : public object_wrapper<T>
         /**
          * @brief Constructor
          * @param val Operator
-         * @param description String to use in report formatting to represent the operator
-         */
-        wrap_op(
-                T&& val,
-                std::string description
-            ) : object_wrapper<T>(std::forward<T>(val)),
-                _description(std::move(description))
-        {}
-
-        /**
-         * @brief Constructor
-         * @param val Operator
          */
         wrap_op(
                 T&& val
@@ -79,7 +66,7 @@ class wrap_op : public object_wrapper<T>
          */
         operator std::string() const
         {
-            return !_description?std::string(this->get()):_description.value();
+            return std::string(this->get());
         }
 
         /**
@@ -93,10 +80,39 @@ class wrap_op : public object_wrapper<T>
         {
             return this->get()(a,b);
         }
+};
+
+/**
+ * @brief Wrap operator with description
+ */
+template <typename T>
+class wrap_op_with_string : public wrap_op<T>
+{
+    public:
+
+        /**
+         * @brief Constructor
+         * @param val Operator
+         * @param description String to use in report formatting to represent the operator
+         */
+        wrap_op_with_string(
+                T&& val,
+                std::string description
+            ) : wrap_op<T>(std::forward<T>(val)),
+                _description(std::move(description))
+        {}
+
+        /**
+         * @brief Operator of conversion to std::string
+         */
+        operator std::string() const
+        {
+            return _description;
+        }
 
     private:
 
-        optional<std::string> _description;
+        std::string _description;
 };
 
 //-------------------------------------------------------------

@@ -110,7 +110,7 @@ struct _t
             std::enable_if_t<hana::is_a<operator_tag,T1>,void*> =nullptr
         ) const
     {
-        return wrap_op<T1>(std::forward<T1>(op),std::forward<T2>(description));
+        return wrap_op_with_string<T1>(std::forward<T1>(op),std::forward<T2>(description));
     }
 };
 constexpr _t _{};

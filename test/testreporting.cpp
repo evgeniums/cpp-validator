@@ -1036,4 +1036,14 @@ BOOST_AUTO_TEST_CASE(CheckFlagValidationReport)
     rep1.clear();
 }
 
+BOOST_AUTO_TEST_CASE(CheckMemberWithString)
+{
+    auto m0=_["field1"];
+    static_assert(!decltype(m0)::has_name(),"");
+
+    auto m1=_["field1"]("hello");
+    static_assert(decltype(m1)::has_name(),"");
+    BOOST_CHECK_EQUAL(m1.name(),"hello");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
