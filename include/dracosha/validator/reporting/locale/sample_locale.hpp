@@ -30,6 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/member_name.hpp>
 #include <dracosha/validator/reporting/values.hpp>
 #include <dracosha/validator/reporting/aggregation_strings.hpp>
+#include <dracosha/validator/reporting/flag_presets.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -58,6 +59,18 @@ inline std::map<std::string,std::string> strings_sample_locale()
     m[string_element]="element #";
     m[string_any]="at least one element";
     m[string_all]="each element";
+
+    // flag descriptions
+    m[flag_true_false_t::description]="must be true";
+    m[flag_true_false_t::n_description]="must be false";
+    m[flag_on_off_t::description]="must be on";
+    m[flag_on_off_t::n_description]="must be off";
+    m[flag_checked_unchecked_t::description]="must be checked";
+    m[flag_checked_unchecked_t::n_description]="must be unchecked";
+    m[flag_set_unset_t::description]="must be set";
+    m[flag_set_unset_t::n_description]="must be unset";
+    m[flag_enable_disable_t::description]="must be enabled";
+    m[flag_enable_disable_t::n_description]="must be disabled";
 
     // properties
     m[value.name()]="value";

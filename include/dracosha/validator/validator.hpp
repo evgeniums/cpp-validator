@@ -81,6 +81,12 @@ struct _t
         return master_sample<T>(masterRefObj);
     }
 
+    /**
+     * @brief Wrap operand appending explicit description to the operand
+     * @param val Operand
+     * @param description Explicit description to be used in reporting
+     * @return Wrapped operand
+     */
     template <typename T1, typename T2>
     constexpr auto operator () (
             T1&& val,
@@ -91,14 +97,20 @@ struct _t
         return operand<T1>(std::forward<T1>(val),std::forward<T2>(description));
     }
 
+    /**
+     * @brief Wrap operator appending explicit description to the operator
+     * @param op Operator
+     * @param description Explicit description to be used in reporting
+     * @return Wrapped operator
+     */
     template <typename T1, typename T2>
     constexpr auto operator () (
-            T1&& val,
+            T1&& op,
             T2&& description,
             std::enable_if_t<hana::is_a<operator_tag,T1>,void*> =nullptr
         ) const
     {
-        return wrap_op<T1>(std::forward<T1>(val),std::forward<T2>(description));
+        return wrap_op<T1>(std::forward<T1>(op),std::forward<T2>(description));
     }
 };
 constexpr _t _{};
@@ -112,6 +124,8 @@ struct validator_t
 {
     /**
      * @brief Wrap list of validators or validation operators into logical AND
+     * @param args Arguments to forward to AND
+     * @return Validator
      */
     template <typename ... Args>
     constexpr auto operator () (Args&& ...args) const -> decltype(auto)
@@ -120,7 +134,9 @@ struct validator_t
     }
 
     /**
-     * @brief Just syntax sugar, return input validator or validation operator as is
+     * @brief Make validator from a property validator
+     * @param v Property validator
+     * @return Validator
      */
     template <typename T>
     constexpr auto operator () (T&& v,
@@ -131,7 +147,9 @@ struct validator_t
     }
 
     /**
-     * @brief Just syntax sugar, return input validator or validation operator as is
+     * @brief Just syntax sugar, return validator or validation operator as is
+     * @param v Validator or validation operator
+     * @return Input validator as is
      */
     template <typename T>
     constexpr auto operator () (T&& v,

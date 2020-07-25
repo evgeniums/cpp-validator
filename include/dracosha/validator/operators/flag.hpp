@@ -10,7 +10,15 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/flag.hpp
 *
-*  Defines flag pseudo operator for boolean operations
+* Defines flag pseudo operator for boolean validation.
+* Examples of flag operator usage:
+* <pre>
+  empty(flag,true) -> must be empty
+  empty(flag,false) -> must be not empty
+  empty(flag(flag_on_off),true) -> must be on
+  empty(flag(flag_on_off),false) -> must be off
+  empty(flag("custom description"),true) -> custom description
+  </pre>
 *
 */
 
@@ -24,22 +32,40 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/operators/operator.hpp>
 #include <dracosha/validator/property.hpp>
-#include <dracosha/validator/flag_presets.hpp>
+#include <dracosha/validator/reporting/flag_presets.hpp>
 #include <dracosha/validator/properties/value.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Base class for "flag" operator.
+ *
+ * Base flag operator tries to use flag description defined in the property.
+ * If that is not applicable then the default preset flag description is used.
+ */
 struct flag_t
 {
     using hana_tag=operator_tag;
 
+    /**
+     * @brief Comparison operator
+     * @param a Left operand
+     * @param b Right operand
+     * @return Result of "is equal" operator
+     */
     constexpr bool operator() (const bool& a, const bool& b) const
     {
         return a==b;
     }
 
+    /**
+     * @brief Get flag description if flag is used with a property and property is not a value.
+     * @param prop Property
+     * @param Operand
+     * @return Flag description taken from the property if it has flag strings or default preset flag description otherwise.
+     */
     template <typename PropT>
     std::string str(PropT&& prop,
                     const bool& b,
@@ -51,6 +77,11 @@ struct flag_t
         return std::decay_t<PropT>::has_flag_str()?prop.flag_str(b):default_flag_preset(b);
     }
 
+    /**
+     * @brief Get flag description if flag is used with either value property or no property.
+     * @param Operand
+     * @return Flag description
+     */
     template <typename PropT>
     std::string str(PropT&&,
                     const bool& b,
@@ -62,6 +93,11 @@ struct flag_t
         return default_flag_preset(b);
     }
 
+    /**
+     * @brief Check if property name should be prepended to the flag description.
+     *
+     * Property name should be prepended if the property is not of "value" type and it does not have flag strings.
+     */
     template <typename PropT>
     constexpr static bool prepend_property(PropT&&)
     {
@@ -69,21 +105,38 @@ struct flag_t
     }
 };
 
+/**
+ * @brief Flag operator with one of preset descriptions.
+ */
 template <typename T>
 struct flag_op_with_preset : public flag_t
 {
     public:
 
+        /**
+         * @brief Constructor
+         * @param v Preset descriptions helper
+         */
         template <typename T1>
         flag_op_with_preset(T1&& v) : _preset(std::forward<T1>(v))
         {}
 
+        /**
+         * @brief Get flag description
+         * @param b Operand
+         * @return Preset flag description
+         */
         template <typename PropT>
         std::string str(PropT&&,const bool& b) const
         {
             return _preset(b);
         }
 
+        /**
+         * @brief Check if property name should be prepended to the flag description.
+         *
+         * Property name is prepended to all properties except for "value" property.
+         */
         template <typename PropT>
         constexpr static bool prepend_property(PropT&&)
         {
@@ -95,20 +148,36 @@ struct flag_op_with_preset : public flag_t
         T _preset;
 };
 
+/**
+ * @brief Flag operator with explicit string description.
+ */
 struct flag_op_with_string : public flag_t
 {
     public:
 
+        /**
+         * @brief Constructor
+         * @param v Explicit flag description
+         */
         template <typename T1>
         flag_op_with_string(T1&& v) : _string(std::forward<T1>(v))
         {}
 
+        /**
+         * @brief Get flag description
+         * @return Explicit flag description
+         */
         template <typename PropT>
         std::string str(PropT&&,const bool&) const
         {
             return _string;
         }
 
+        /**
+         * @brief Check if property name should be prepended to the flag description.
+         *
+         * Property name should be prepended if the property is not of "value" type and it does not have flag strings.
+         */
         template <typename PropT>
         constexpr static bool prepend_property(PropT&&)
         {
@@ -120,10 +189,18 @@ struct flag_op_with_string : public flag_t
         std::string _string;
 };
 
+/**
+ * @brief Flag operator to be used in validators
+ */
 struct flag_op : public flag_t
 {
     using flag_t::operator ();
 
+    /**
+     * @brief Create flag operator with preset descriptions
+     * @param v Preset descriptions helper
+     * @return flag operator
+     */
     template <typename T>
     auto operator() (T&& v,
                      std::enable_if_t<
@@ -134,6 +211,11 @@ struct flag_op : public flag_t
         return flag_op_with_preset<T>{std::forward<T>(v)};
     }
 
+    /**
+     * @brief Create flag operator with explicit string descriptions
+     * @param v Explicit string description
+     * @return flag operator
+     */
     template <typename T>
     auto operator() (T&& v,
                      std::enable_if_t<
@@ -145,14 +227,6 @@ struct flag_op : public flag_t
     }
 };
 constexpr flag_op flag{};
-
-/*
-  empty(flag,true) -> must be empty
-  empty(flag,false) -> must be not empty
-  empty(flag(flag_on_off),true) -> must be on
-  empty(flag(flag_on_off),false) -> must be off
-  empty(flag("custom description"),true) -> custom description
-*/
 
 //-------------------------------------------------------------
 

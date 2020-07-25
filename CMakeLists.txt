@@ -42,7 +42,7 @@ SET (HEADERS
     include/dracosha/validator/check_member_path.hpp
     include/dracosha/validator/with_check_member_exists.hpp
     include/dracosha/validator/check_member_exists_traits_proxy.hpp
-    include/dracosha/validator/flag_presets.hpp
+    include/dracosha/validator/reporting/flag_presets.hpp
 
     include/dracosha/validator/operators/operator.hpp
     include/dracosha/validator/operators/exists.hpp

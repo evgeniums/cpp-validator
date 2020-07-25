@@ -226,6 +226,18 @@ BOOST_AUTO_TEST_CASE(CheckSampleLocale)
     BOOST_CHECK_EQUAL(m[string_any],std::string(string_any));
     BOOST_CHECK_EQUAL(m[string_all],std::string(string_all));
 
+    // flag descriptions
+    BOOST_CHECK_EQUAL(m[flag_true_false_t::description],std::string(flag_true_false_t::description));
+    BOOST_CHECK_EQUAL(m[flag_true_false_t::n_description],std::string(flag_true_false_t::n_description));
+    BOOST_CHECK_EQUAL(m[flag_on_off_t::description],std::string(flag_on_off_t::description));
+    BOOST_CHECK_EQUAL(m[flag_on_off_t::n_description],std::string(flag_on_off_t::n_description));
+    BOOST_CHECK_EQUAL(m[flag_checked_unchecked_t::description],std::string(flag_checked_unchecked_t::description));
+    BOOST_CHECK_EQUAL(m[flag_checked_unchecked_t::n_description],std::string(flag_checked_unchecked_t::n_description));
+    BOOST_CHECK_EQUAL(m[flag_set_unset_t::description],std::string(flag_set_unset_t::description));
+    BOOST_CHECK_EQUAL(m[flag_set_unset_t::n_description],std::string(flag_set_unset_t::n_description));
+    BOOST_CHECK_EQUAL(m[flag_enable_disable_t::description],std::string(flag_enable_disable_t::description));
+    BOOST_CHECK_EQUAL(m[flag_enable_disable_t::n_description],std::string(flag_enable_disable_t::n_description));
+
     // properties
     BOOST_CHECK_EQUAL(m[value.name()],value.name());
     BOOST_CHECK_EQUAL(m[empty.name()],empty.name());

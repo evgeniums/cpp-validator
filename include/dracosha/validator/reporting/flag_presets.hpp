@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/flag_presets.hpp
+/** \file validator/reporting/flag_presets.hpp
 *
 *  Defines some presets of flag descriptions
 *
@@ -27,6 +27,11 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct flag_preset_tag;
 
+/**
+ * @brief Base template for preset flag descriptions.
+ *
+ * This template is a functor that defines operator for getting description depending on the flag value.
+ */
 template <typename DerivedT>
 struct flag_preset
 {
@@ -41,6 +46,11 @@ struct flag_preset
     }
 };
 
+/**
+ * @brief Preset flag descriptions with true/false words.
+ *
+ * This is a default helper for flag descriptions.
+ */
 struct flag_true_false_t : public flag_preset<flag_true_false_t>
 {
     constexpr static const char* description="must be true";
@@ -49,6 +59,9 @@ struct flag_true_false_t : public flag_preset<flag_true_false_t>
 constexpr flag_true_false_t flag_true_false{};
 constexpr flag_true_false_t default_flag_preset{};
 
+/**
+ * @brief Preset flag descriptions with on/off words.
+ */
 struct flag_on_off_t : public flag_preset<flag_on_off_t>
 {
     constexpr static const char* description="must be on";
@@ -56,6 +69,9 @@ struct flag_on_off_t : public flag_preset<flag_on_off_t>
 };
 constexpr flag_on_off_t flag_on_off{};
 
+/**
+ * @brief Preset flag descriptions with checked/unchecked words.
+ */
 struct flag_checked_unchecked_t : public flag_preset<flag_checked_unchecked_t>
 {
     constexpr static const char* description="must be checked";
@@ -63,6 +79,9 @@ struct flag_checked_unchecked_t : public flag_preset<flag_checked_unchecked_t>
 };
 constexpr flag_checked_unchecked_t flag_checked_unchecked{};
 
+/**
+ * @brief Preset flag descriptions with set/unset words.
+ */
 struct flag_set_unset_t : public flag_preset<flag_set_unset_t>
 {
     constexpr static const char* description="must be set";
@@ -70,6 +89,9 @@ struct flag_set_unset_t : public flag_preset<flag_set_unset_t>
 };
 constexpr flag_set_unset_t flag_set_unset{};
 
+/**
+ * @brief Preset flag descriptions with enabled/disabled words.
+ */
 struct flag_enable_disable_t : public flag_preset<flag_enable_disable_t>
 {
     constexpr static const char* description="must be enabled";
