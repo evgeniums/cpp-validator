@@ -39,6 +39,15 @@ template <typename DerivedT>
 struct op : public enable_to_string<DerivedT>
 {
     using hana_tag=operator_tag;
+
+    constexpr static const char* str()
+    {
+        return DerivedT::description;
+    }
+    constexpr static const char* n_str()
+    {
+        return DerivedT::n_description;
+    }
 };
 
 //-------------------------------------------------------------

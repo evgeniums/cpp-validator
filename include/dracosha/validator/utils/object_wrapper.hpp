@@ -48,7 +48,7 @@ class object_wrapper
          * @brief Get const reference to object
          * @return Constant reference to wrapped object
          */
-        const std::decay_t<T>& get() const
+        constexpr const std::decay_t<T>& get() const
         {
             return _obj;
         }

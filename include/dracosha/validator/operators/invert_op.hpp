@@ -67,9 +67,25 @@ class invert_op : public object_wrapper<T>
          */
         operator std::string() const
         {
-            std::string str;
-            backend_formatter.append(str,std::string(string_invert_op)," ",std::string(this->get()));
-            return str;
+            return str();
+        }
+
+        /**
+         * @brief Get operator description for reporting
+         * @return Negative description of embedded operator
+         */
+        constexpr auto str() const
+        {
+            return this->get().n_str();
+        }
+
+        /**
+         * @brief Get negative operator description for reporting
+         * @return Description of embedded operator
+         */
+        constexpr auto n_str() const
+        {
+            return this->get().str();
         }
 
         /**
@@ -79,7 +95,7 @@ class invert_op : public object_wrapper<T>
          * @return Validation status
          */
         template <typename T1, typename T2>
-        bool operator() (const T1& a, const T2& b) const
+        constexpr bool operator() (const T1& a, const T2& b) const
         {
             return !this->get()(a,b);
         }
@@ -109,6 +125,22 @@ class invert_op_with_string : public invert_op<T>
          * @brief Operator of conversion to std::string
          */
         operator std::string() const
+        {
+            return _description;
+        }
+
+        /**
+         * @brief Get explicit operator description
+         */
+        constexpr auto str() const
+        {
+            return _description;
+        }
+
+        /**
+         * @brief Get explicit operator description
+         */
+        constexpr auto n_str() const
         {
             return _description;
         }

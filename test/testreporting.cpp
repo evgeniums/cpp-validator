@@ -256,6 +256,28 @@ BOOST_AUTO_TEST_CASE(CheckCustomDescriptions)
     BOOST_CHECK(!v7.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string(""));
     rep1.clear();
+
+    auto v8=validator(
+                _[1]("first element")(
+                    value(_n(gte),_(5,"five"))
+                    ^OR^
+                    value(_n(eq),_(20,"twenty"))
+                )
+            );
+    BOOST_CHECK(!v8.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string("first element must be less than five OR first element must be not equal to twenty"));
+    rep1.clear();
+
+    auto v9=validator(
+                _[1]("first element")(
+                    value(_n(_n(gte)),_(5000,"five thousands"))
+                    ^OR^
+                    value(_n(_n(eq)),_(200,"two hundreds"))
+                )
+            );
+    BOOST_CHECK(!v9.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string("first element must be greater than or equal to five thousands OR first element must be equal to two hundreds"));
+    rep1.clear();
 }
 
 BOOST_AUTO_TEST_CASE(CheckValidationReportAggregation)

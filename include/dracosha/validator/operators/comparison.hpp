@@ -39,6 +39,7 @@ struct eq_t : public op<eq_t>
     }
 
     constexpr static const char* description="must be equal to";
+    constexpr static const char* n_description="must be not equal to";
 };
 constexpr eq_t eq{};
 
@@ -54,6 +55,7 @@ struct ne_t : public op<ne_t>
     }
 
     constexpr static const char* description="must be not equal to";
+    constexpr static const char* n_description="must be equal to";
 };
 constexpr ne_t ne{};
 
@@ -69,6 +71,7 @@ struct lt_t : public op<lt_t>
     }
 
     constexpr static const char* description="must be less than";
+    constexpr static const char* n_description="must be greater than or equal to";
 };
 constexpr lt_t lt{};
 
@@ -84,6 +87,7 @@ struct lte_t : public op<lte_t>
     }
 
     constexpr static const char* description="must be less than or equal to";
+    constexpr static const char* n_description="must be greater than";
 };
 constexpr lte_t lte{};
 
@@ -99,6 +103,7 @@ struct gt_t : public op<gt_t>
     }
 
     constexpr static const char* description="must be greater than";
+    constexpr static const char* n_description="must be less than or equal to";
 };
 constexpr gt_t gt{};
 
@@ -114,6 +119,7 @@ struct gte_t : public op<gte_t>
     }
 
     constexpr static const char* description="must be greater than or equal to";
+    constexpr static const char* n_description="must be less than";
 };
 constexpr gte_t gte{};
 

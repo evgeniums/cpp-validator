@@ -361,7 +361,7 @@ BOOST_AUTO_TEST_CASE(CheckOperator)
 BOOST_AUTO_TEST_CASE(CheckInvertOp)
 {
     auto op1=_n(gt);
-    BOOST_CHECK_EQUAL(std::string(op1),"NOT must be greater than");
+    BOOST_CHECK_EQUAL(std::string(op1),"must be less than or equal to");
     BOOST_CHECK(!op1(10,2));
 
     auto op2=_n(gte,"must be less than");
