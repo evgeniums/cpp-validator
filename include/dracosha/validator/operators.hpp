@@ -19,13 +19,16 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_OPERATORS_HPP
 #define DRACOSHA_VALIDATOR_OPERATORS_HPP
 
+#include <dracosha/validator/operators/wrap_op.hpp>
+#include <dracosha/validator/operators/invert_op.hpp>
+#include <dracosha/validator/operators/flag.hpp>
+#include <dracosha/validator/operators/exists.hpp>
 #include <dracosha/validator/operators/and.hpp>
 #include <dracosha/validator/operators/or.hpp>
 #include <dracosha/validator/operators/not.hpp>
 #include <dracosha/validator/operators/any.hpp>
 #include <dracosha/validator/operators/all.hpp>
 #include <dracosha/validator/operators/comparison.hpp>
-#include <dracosha/validator/operators/exists.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
