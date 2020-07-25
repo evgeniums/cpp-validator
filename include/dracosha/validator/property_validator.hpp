@@ -8,16 +8,16 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/prepare_dispatcher.hpp
+/** \file validator/property_validator.hpp
 *
-*  Defines helpers for validation preparing
+*  Defines helpers functor for property validation
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_PREPARE_DISPATCHER_HPP
-#define DRACOSHA_VALIDATOR_PREPARE_DISPATCHER_HPP
+#ifndef DRACOSHA_VALIDATOR_PROPERTY_VALIDATOR_HPP
+#define DRACOSHA_VALIDATOR_PROPERTY_VALIDATOR_HPP
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/dispatcher.hpp>
@@ -28,6 +28,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct property_validator_tag;
 
+/**
+ * @brief Property validator functor
+ */
 template <typename Handler, typename PropT>
 struct property_validator
 {
@@ -44,29 +47,19 @@ struct property_validator
 };
 
 /**
-  @brief Dispatch validation.
-  */
-BOOST_HANA_CONSTEXPR_LAMBDA auto dispatch = [](auto&&... args) -> decltype(auto)
-{
-    return dispatcher.invoke(std::forward<decltype(args)>(args)...);
-};
-
-/**
- * @brief Prepare validation dispatcher.
+ * @brief Make property validator functor
+ * @param prop Property
+ * @param args Arguments to forward to validator
  */
-struct prepare_dispatcher_t
+template <typename PropT, typename ... Args>
+constexpr auto make_property_validator(PropT&& prop, Args&&... args)
 {
-    template <typename PropT, typename ... Args>
-    constexpr auto operator() (PropT&& prop, Args&&... args) const -> decltype(auto)
-    {
-        auto fn=hana::reverse_partial(dispatch,std::forward<PropT>(prop),std::forward<Args>(args)...);
-        return property_validator<decltype(fn),PropT>{std::move(fn)};
-    }
-};
-constexpr prepare_dispatcher_t prepare_dispatcher{};
+    auto fn=hana::reverse_partial(dispatch,std::forward<PropT>(prop),std::forward<Args>(args)...);
+    return property_validator<decltype(fn),PropT>{std::move(fn)};
+}
 
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_PREPARE_DISPATCHER_HPP
+#endif // DRACOSHA_VALIDATOR_PROPERTY_VALIDATOR_HPP

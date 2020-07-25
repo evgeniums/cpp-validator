@@ -139,6 +139,14 @@ struct dispatcher_t
 };
 constexpr dispatcher_t dispatcher{};
 
+/**
+  @brief Dispatch validation.
+  */
+BOOST_HANA_CONSTEXPR_LAMBDA auto dispatch = [](auto&&... args) -> decltype(auto)
+{
+    return dispatcher.invoke(std::forward<decltype(args)>(args)...);
+};
+
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

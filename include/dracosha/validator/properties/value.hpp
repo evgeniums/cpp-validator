@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/flag_presets.hpp>
-#include <dracosha/validator/prepare_dispatcher.hpp>
+#include <dracosha/validator/property_validator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -64,7 +64,7 @@ constexpr type_p_value value{};
 template <typename ... Args>
 constexpr auto type_p_value::operator () (Args&&... args) const
 {
-    return prepare_dispatcher(value,std::forward<Args>(args)...);
+    return make_property_validator(value,std::forward<Args>(args)...);
 }
 
 //-------------------------------------------------------------

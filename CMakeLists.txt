@@ -31,7 +31,7 @@ SET (HEADERS
     include/dracosha/validator/extract.hpp
     include/dracosha/validator/get_member.hpp
     include/dracosha/validator/validate.hpp
-    include/dracosha/validator/prepare_dispatcher.hpp
+    include/dracosha/validator/property_validator.hpp
     include/dracosha/validator/apply.hpp
     include/dracosha/validator/member.hpp
     include/dracosha/validator/operand.hpp

@@ -131,7 +131,7 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> declt
     template <typename ...Args> \
     constexpr auto type_p_##prop::operator () (Args&&... args) const -> decltype(auto)\
     { \
-        return prepare_dispatcher(prop,std::forward<Args>(args)...); \
+        return make_property_validator(prop,std::forward<Args>(args)...); \
     }
 
 #define DRACOSHA_VALIDATOR_PROPERTY(prop) DRACOSHA_VALIDATOR_PROPERTY_FLAG(prop,nullptr,nullptr)

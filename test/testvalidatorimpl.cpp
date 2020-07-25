@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(CheckProperty)
     BOOST_CHECK_EQUAL(property(a,size),10);
     BOOST_CHECK(!validate(size,a,gte,100));
 
-    auto check=prepare_dispatcher(size,gte,9);
+    auto check=make_property_validator(size,gte,9);
     BOOST_CHECK(check(a));
 
     auto sz=size(gte,7);
