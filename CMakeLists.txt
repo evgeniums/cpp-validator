@@ -110,6 +110,7 @@ SET (HEADERS
     include/dracosha/validator/detail/default_adapter_impl.hpp
     include/dracosha/validator/detail/reporting_adapter_impl.hpp
     include/dracosha/validator/detail/single_member_adapter_impl.hpp
+    include/dracosha/validator/detail/hint_helper.hpp
 
     include/dracosha/validator/detail/default_adapter_impl.ipp
 )

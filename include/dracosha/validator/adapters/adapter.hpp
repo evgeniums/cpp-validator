@@ -19,10 +19,9 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_ADAPTER_HPP
 #define DRACOSHA_VALIDATOR_ADAPTER_HPP
 
-#include <type_traits>
-
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/status.hpp>
+#include <dracosha/validator/detail/hint_helper.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -269,14 +268,24 @@ class adapter
             return _traits.validate_all(*this,std::forward<decltype(member)>(member),std::forward<decltype(op)>(op));
         }
 
-        void begin_explicit_report() const
+        /**
+         * @brief Call hint processing before validation
+         * @param hint Hint
+         */
+        template <typename HintT>
+        status hint_before(HintT&& hint) const
         {
-            _traits.reporter().begin_explicit_report();
+            return detail::hint_before<TraitsT,HintT>(_traits,std::forward<HintT>(hint));
         }
 
-        void end_explicit_report(const std::string& description) const
+        /**
+         * @brief Call hint processing after validation
+         * @param hint Hint
+         */
+        template <typename HintT>
+        status hint_after(status validation_status, HintT&& hint) const
         {
-            _traits.reporter().end_explicit_report(description);
+            return detail::hint_after<TraitsT,HintT>(_traits,validation_status,std::forward<HintT>(hint));
         }
 
     private:

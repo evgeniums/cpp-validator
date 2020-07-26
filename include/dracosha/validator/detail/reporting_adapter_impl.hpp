@@ -215,6 +215,18 @@ class reporting_adapter_impl
                         );
         }
 
+        status hint_before(const std::string&)
+        {
+            _reporter.begin_explicit_report();
+            return status();
+        }
+
+        status hint_after(status ret,const std::string& description)
+        {
+            _reporter.end_explicit_report(description);
+            return ret;
+        }
+
         ReporterT& reporter()
         {
             return _reporter;

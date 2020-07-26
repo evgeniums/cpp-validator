@@ -2,6 +2,7 @@
 
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
+#include <dracosha/validator/detail/hint_helper.hpp>
 
 using namespace dracosha::validator;
 
@@ -1140,6 +1141,13 @@ BOOST_AUTO_TEST_CASE(CheckExplicitValidationReport)
     BOOST_CHECK_EQUAL(rep1,std::string("Explicit description"));
     rep1.clear();
 
+    auto v1_1=validator(
+                _["field1"](gte,10)
+            ).hint("Explicit description");
+    BOOST_CHECK(!v1_1.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string("Explicit description"));
+    rep1.clear();
+
     auto v2=validator(
                 _["field1"](gte,10)("Explicit description")
             );
@@ -1173,6 +1181,20 @@ BOOST_AUTO_TEST_CASE(CheckExplicitValidationReport)
     BOOST_CHECK(!v5.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("Explicit description 1 OR Explicit description 2"));
     rep1.clear();
+
+    std::map<std::string,std::vector<size_t>> m2={{"field1",{1,2,3,4,5}}};
+    auto ra2=make_reporting_adapter(m2,rep1);
+    auto v6=validator(
+                _["field1"](ANY(value(gte,10) ^OR^ value(eq,15)))("Explicit description 1")
+                ^OR^
+                _["field1"](eq,100)("Explicit description 2")
+            );
+    BOOST_CHECK(!v6.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,std::string("Explicit description 1 OR Explicit description 2"));
+    rep1.clear();
+
+    auto a3=make_default_adapter(m2);
+    BOOST_CHECK(!v6.apply(a3));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

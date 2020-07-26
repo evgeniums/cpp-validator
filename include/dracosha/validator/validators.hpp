@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <string>
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/utils/adjust_storable_type.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -30,27 +31,30 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct validator_tag;
 
 /**
- * @brief Implementation of validator with explicit string description
+ * @brief Validator with hint
  *
  * Validator holds the validating executer and invokes apply() method to perform validation
- * using embedded executor. Reporting description in reporting adapter will be overriden with explicit string description.
+ * using embedded executor.
+ * Before and after validation validator calls hint_before() and hint_after() methods of adapter respectively.
  */
-template <typename Handler>
-class validator_with_string_t
+template <typename Handler, typename HintT>
+class validator_with_hint_t
 {
     public:
 
         using hana_tag=validator_tag;
+        using hint_type=typename adjust_storable_type<HintT>::type;
 
         /**
          * @brief Ctor
          * @param fn Validation handler that will be called to perform validating
          */
-        validator_with_string_t(
+        template <typename HintT1>
+        validator_with_hint_t(
                 Handler fn,
-                std::string description
+                HintT1&& hint
             ) : _fn(std::move(fn)),
-                _description(std::move(description))
+                _hint(std::forward<HintT1>(hint))
         {
         }
 
@@ -63,20 +67,23 @@ class validator_with_string_t
         template <typename AdapterT, typename ... Args>
         auto apply(AdapterT&& adpt, Args&&... args) const
         {
-            adpt.begin_explicit_report();
-            auto ret=_fn(std::forward<AdapterT>(adpt),std::forward<Args>(args)...);
-            adpt.end_explicit_report(_description);
-            return ret;
+            auto ret=adpt.hint_before(_hint);
+            if (!ret)
+            {
+                return adpt.hint_after(ret,_hint);
+            }
+            ret=_fn(std::forward<AdapterT>(adpt),std::forward<Args>(args)...);
+            return adpt.hint_after(ret,_hint);
         }
 
     private:
 
         Handler _fn;
-        std::string _description;
+        hint_type _hint;
 };
 
 /**
- * @brief Implementation of validator
+ * @brief Validator
  *
  * Validator holds the validating executer and invokes apply() method to perform validation
  * using embedded executor.
@@ -108,14 +115,25 @@ class validator_t
         }
 
         /**
-         * @brief Create validator with explicit description for reporting.
-         * @param str Explicit description
-         * @return Validator with explicit description
+         * @brief Create validator with hint
+         * @param h Hint
+         * @return Validator with hint
          */
         template <typename T>
-        auto operator () (T&& str)
+        auto hint(T&& h)
         {
-            return validator_with_string_t<Handler>(std::move(_fn),std::forward<T>(str));
+            return validator_with_hint_t<Handler,T>(std::move(_fn),std::forward<T>(h));
+        }
+
+        /**
+         * @brief Create validator with hint
+         * @param h Hint
+         * @return Validator with hint
+         */
+        template <typename T>
+        auto operator () (T&& h)
+        {
+            return hint(std::forward<T>(h));
         }
 
     private:
