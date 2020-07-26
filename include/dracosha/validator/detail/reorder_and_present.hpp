@@ -23,7 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/reference_wrapper.hpp>
 #include <dracosha/validator/reporting/strings.hpp>
 #include <dracosha/validator/reporting/member_names.hpp>
-#include <dracosha/validator/reporting/values.hpp>
+#include <dracosha/validator/reporting/operand_formatter.hpp>
 #include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/reporting/report_aggregation.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>

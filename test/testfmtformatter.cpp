@@ -117,9 +117,9 @@ BOOST_AUTO_TEST_CASE(CheckFmtFormatterFromMemberNames)
     checkFormatterFromMemberNames(make_backend_formatter);
 }
 
-BOOST_AUTO_TEST_CASE(CheckFmtFormatterFromMemberNamesAndValues)
+BOOST_AUTO_TEST_CASE(CheckFmtFormatterFromMemberNamesAndOperands)
 {
-    checkFormatterFromMemberNamesAndValues(make_backend_formatter);
+    checkFormatterFromMemberNamesAndOperands(make_backend_formatter);
 }
 
 BOOST_AUTO_TEST_CASE(CheckFmtFormatterWithRefs)

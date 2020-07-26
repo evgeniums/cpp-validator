@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/strings.hpp>
 #include <dracosha/validator/reporting/member_name.hpp>
 #include <dracosha/validator/reporting/member_names.hpp>
-#include <dracosha/validator/reporting/values.hpp>
+#include <dracosha/validator/reporting/operand_formatter.hpp>
 #include <dracosha/validator/reporting/order_and_presentation.hpp>
 #include <dracosha/validator/reporting/report_aggregation.hpp>
 
@@ -40,7 +40,7 @@ struct formatter_tag;
  *
  *  Formatter uses four different traits objects that can be customized:
  *  - formatter of member names (MemberNamesT);
- *  - formatter of values (ValuesT);
+ *  - formatter of operands (OperandsT);
  *  - formatter of miscellaneous strings such as operator descriptions, etc. (StringsT);
  *  - traits that perform final ordering and presentation (OrderAndPresentationT).
  *
@@ -51,18 +51,18 @@ struct formatter_tag;
  * macro defined.
  *
  */
-template <typename MemberNamesT, typename ValuesT, typename StringsT, typename OrderAndPresentationT>
+template <typename MemberNamesT, typename OperandsT, typename StringsT, typename OrderAndPresentationT>
 struct formatter
 {
     using hana_tag=formatter_tag;
 
     using member_names_type=MemberNamesT;
-    using values_type=ValuesT;
+    using operands_type=OperandsT;
     using strings_type=StringsT;
     using order_and_presentation_type=OrderAndPresentationT;
 
     MemberNamesT _member_names;
-    ValuesT _values;
+    OperandsT _operands;
     StringsT _strings;
     OrderAndPresentationT _order_and_presentation;
 
@@ -70,7 +70,7 @@ struct formatter
     void validate_operator(DstT& dst,const OpT& op, const T2& b) const
     {
         format(dst,
-               make_cref_tuple(_strings,_values),
+               make_cref_tuple(_strings,_operands),
                op,b
                );
     }
@@ -79,7 +79,7 @@ struct formatter
     void validate_property(DstT& dst,const PropT& prop, const OpT& op, const T2& b) const
     {
         format(dst,
-               make_cref_tuple(_member_names,_strings,_values),
+               make_cref_tuple(_member_names,_strings,_operands),
                prop,op,b
                );
     }
@@ -88,7 +88,7 @@ struct formatter
     void validate(DstT& dst, const MemberT& member, const PropT& prop, const OpT& op, const T2& b) const
     {
         format(dst,
-               make_cref_tuple(_member_names,_member_names,_strings,_values),
+               make_cref_tuple(_member_names,_member_names,_strings,_operands),
                member,prop,op,b
                );
     }
@@ -126,7 +126,7 @@ struct formatter
                                      std::enable_if_t<hana::is_a<operand_tag,T2>,void*> =nullptr) const
     {
         format(dst,
-               make_cref_tuple(_member_names,_member_names,_strings,_values),
+               make_cref_tuple(_member_names,_member_names,_strings,_operands),
                member,prop,op,b
                );
     }
@@ -158,50 +158,50 @@ struct formatter
 /**
  * @brief Create formatter
  * @param mn Formatter of member names
- * @param vs Formatter of values
+ * @param operands Formatter of operands
  * @param strings Strings traits
  * @param order Reordering and presentation traits
  * @return Formatter
  */
-template <typename MemberNamesT,typename ValuesT,typename StringsT, typename OrderAndPresentationT>
-auto make_formatter(MemberNamesT&& mn, ValuesT&& vs, StringsT&& strings, OrderAndPresentationT&& order)
+template <typename MemberNamesT,typename OperandsT,typename StringsT, typename OrderAndPresentationT>
+auto make_formatter(MemberNamesT&& mn, OperandsT&& operands, StringsT&& strings, OrderAndPresentationT&& order)
 {
     return formatter<
                 MemberNamesT,
-                ValuesT,
+                OperandsT,
                 StringsT,
                 OrderAndPresentationT
             >
-            {std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),std::forward<StringsT>(strings),std::forward<OrderAndPresentationT>(order)};
+            {std::forward<MemberNamesT>(mn),std::forward<OperandsT>(operands),std::forward<StringsT>(strings),std::forward<OrderAndPresentationT>(order)};
 }
 
 /**
  * @brief Create formatter with default order and presentation traits
  * @param mn Formatter of member names
- * @param vs Formatter of values
+ * @param operands Formatter of operands
  * @param strings Strings traits
  * @return Formatter
  */
-template <typename MemberNamesT,typename ValuesT,typename StringsT>
-auto make_formatter(MemberNamesT&& mn, ValuesT&& vs, StringsT&& strings)
+template <typename MemberNamesT,typename OperandsT,typename StringsT>
+auto make_formatter(MemberNamesT&& mn, OperandsT&& operands, StringsT&& strings)
 {
-    return make_formatter(std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),std::forward<StringsT>(strings),default_order_and_presentation);
+    return make_formatter(std::forward<MemberNamesT>(mn),std::forward<OperandsT>(operands),std::forward<StringsT>(strings),default_order_and_presentation);
 }
 
 /**
  * @brief Create formatter with default strings traits and order and presentation traits
  * @param mn Formatter of member names
- * @param vs Formatter of values
+ * @param operands Formatter of operands
  * @return Formatter
  */
-template <typename MemberNamesT,typename ValuesT>
-auto make_formatter(MemberNamesT&& mn, ValuesT&& vs)
+template <typename MemberNamesT,typename OperandsT>
+auto make_formatter(MemberNamesT&& mn, OperandsT&& operands)
 {
-    return make_formatter(std::forward<MemberNamesT>(mn),std::forward<ValuesT>(vs),default_strings);
+    return make_formatter(std::forward<MemberNamesT>(mn),std::forward<OperandsT>(operands),default_strings);
 }
 
 /**
- * @brief Create formatter with default values formatter, strings traits and order and presentation traits
+ * @brief Create formatter with default operands formatter, strings traits and order and presentation traits
  * @param mn Formatter of member names
  * @return Formatter
  */
@@ -209,11 +209,11 @@ template <typename MemberNamesT>
 auto make_formatter(MemberNamesT&& mn,
                std::enable_if_t<hana::is_a<member_names_tag,MemberNamesT>,void*> =nullptr)
 {
-    return make_formatter(std::forward<MemberNamesT>(mn),default_values,default_strings);
+    return make_formatter(std::forward<MemberNamesT>(mn),default_operand_formatter,default_strings);
 }
 
 /**
- * @brief Create formatter with default values formatter, member names formatter and order and presentation traits
+ * @brief Create formatter with default operands formatter, member names formatter and order and presentation traits
  * @param strings Strings traits
  * @return Formatter
  */
@@ -221,7 +221,7 @@ template <typename StringsT>
 auto make_formatter(const StringsT& strings,
                std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr)
 {
-    return make_formatter(make_member_names(strings),default_values,strings);
+    return make_formatter(make_member_names(strings),default_operand_formatter,strings);
 }
 
 /**
@@ -230,10 +230,10 @@ auto make_formatter(const StringsT& strings,
  */
 inline auto get_default_formatter() ->
     std::add_lvalue_reference_t<
-        std::add_const_t<decltype(make_formatter(get_default_member_names(),default_values,default_strings))>
+        std::add_const_t<decltype(make_formatter(get_default_member_names(),default_operand_formatter,default_strings))>
     >
 {
-    static const auto default_formatter=make_formatter(get_default_member_names(),default_values,default_strings);
+    static const auto default_formatter=make_formatter(get_default_member_names(),default_operand_formatter,default_strings);
     return default_formatter;
 }
 

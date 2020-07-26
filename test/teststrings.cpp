@@ -4,7 +4,7 @@
 
 #include <dracosha/validator/reporting/strings.hpp>
 #include <dracosha/validator/reporting/member_names.hpp>
-#include <dracosha/validator/reporting/values.hpp>
+#include <dracosha/validator/reporting/operand_formatter.hpp>
 #include <dracosha/validator/properties/value.hpp>
 #include <dracosha/validator/properties/size.hpp>
 #include <dracosha/validator/reporting/mapped_translator.hpp>
@@ -216,43 +216,43 @@ BOOST_AUTO_TEST_CASE(CheckIntegralMemberName)
     BOOST_CHECK_EQUAL(str,"element #10");
 }
 
-BOOST_AUTO_TEST_CASE(CheckValues)
+BOOST_AUTO_TEST_CASE(CheckOperands)
 {
-    BOOST_CHECK_EQUAL(std::string(default_values("hello")),std::string("hello"));
-    BOOST_CHECK_EQUAL(default_values(5),5);
-    BOOST_CHECK_EQUAL(default_values(true),std::string("true"));
-    BOOST_CHECK_EQUAL(default_values(false),std::string("false"));
+    BOOST_CHECK_EQUAL(std::string(default_operand_formatter("hello")),std::string("hello"));
+    BOOST_CHECK_EQUAL(default_operand_formatter(5),5);
+    BOOST_CHECK_EQUAL(default_operand_formatter(true),std::string("true"));
+    BOOST_CHECK_EQUAL(default_operand_formatter(false),std::string("false"));
     NonCopyable nc;
-    const auto& ncr=default_values(nc);
+    const auto& ncr=default_operand_formatter(nc);
     std::ignore=ncr;
 
     translator_env env;
-    auto translate_values=make_translated_values(env._rep,"en");
-    BOOST_CHECK_EQUAL(std::string(translate_values("hello")),std::string("hello"));
-    BOOST_CHECK_EQUAL(translate_values(5),5);
-    BOOST_CHECK_EQUAL(translate_values(true),std::string("true_translated"));
-    BOOST_CHECK_EQUAL(translate_values(false),std::string("false_translated"));
+    auto translate_operands=make_translated_operand_formatter(env._rep,"en");
+    BOOST_CHECK_EQUAL(std::string(translate_operands("hello")),std::string("hello"));
+    BOOST_CHECK_EQUAL(translate_operands(5),5);
+    BOOST_CHECK_EQUAL(translate_operands(true),std::string("true_translated"));
+    BOOST_CHECK_EQUAL(translate_operands(false),std::string("false_translated"));
 
     auto decorator=[](const std::string& val)
     {
         return std::string("\"")+val+std::string("\"");
     };
-    auto vals2=make_values(decorator);
-    BOOST_CHECK_EQUAL(vals2("hi"),"\"hi\"");
+    auto operands2=make_operand_formatter(decorator);
+    BOOST_CHECK_EQUAL(operands2("hi"),"\"hi\"");
 
     mapped_translator tr3;
-    auto vals3=make_translated_values(tr3,decorator);
-    BOOST_CHECK_EQUAL(vals3("hello"),"\"hello\"");
+    auto operands3=make_translated_operand_formatter(tr3,decorator);
+    BOOST_CHECK_EQUAL(operands3("hello"),"\"hello\"");
 
     mapped_translator tr4;
-    auto vals4=make_translated_values(env._rep,"en",std::move(decorator));
-    BOOST_CHECK_EQUAL(vals4(true),"\"true_translated\"");
+    auto operands4=make_translated_operand_formatter(env._rep,"en",std::move(decorator));
+    BOOST_CHECK_EQUAL(operands4(true),"\"true_translated\"");
 
     mapped_translator tr5;
-    auto vals5=make_translated_values(env._rep,"en",quotes_decorator);
-    BOOST_CHECK_EQUAL(vals5(true),"\"true_translated\"");
-    BOOST_CHECK_EQUAL(vals5(100),100);
-    BOOST_CHECK_EQUAL(vals5("Hello"),"\"Hello\"");
+    auto operands5=make_translated_operand_formatter(env._rep,"en",quotes_decorator);
+    BOOST_CHECK_EQUAL(operands5(true),"\"true_translated\"");
+    BOOST_CHECK_EQUAL(operands5(100),100);
+    BOOST_CHECK_EQUAL(operands5("Hello"),"\"Hello\"");
 }
 
 BOOST_AUTO_TEST_CASE(CheckHanaZipTransform)

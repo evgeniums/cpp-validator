@@ -78,7 +78,7 @@ SET (HEADERS
     include/dracosha/validator/reporting/translator_repository.hpp
     include/dracosha/validator/reporting/no_translator.hpp
     include/dracosha/validator/reporting/mapped_translator.hpp
-    include/dracosha/validator/reporting/values.hpp
+    include/dracosha/validator/reporting/operand_formatter.hpp
     include/dracosha/validator/reporting/order_and_presentation.hpp
     include/dracosha/validator/reporting/report_aggregation.hpp
     include/dracosha/validator/reporting/aggregation_strings.hpp
@@ -102,7 +102,7 @@ SET (HEADERS
     include/dracosha/validator/detail/dispatcher_impl.hpp
     include/dracosha/validator/detail/take_address_of.hpp
     include/dracosha/validator/detail/to_string.hpp
-    include/dracosha/validator/detail/format_value.hpp
+    include/dracosha/validator/detail/format_operand.hpp
     include/dracosha/validator/detail/formatter_fmt.hpp
     include/dracosha/validator/detail/reorder_and_present.hpp
     include/dracosha/validator/detail/formatter_std.hpp

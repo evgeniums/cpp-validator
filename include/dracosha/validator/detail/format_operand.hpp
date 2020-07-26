@@ -8,16 +8,16 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/format_value.hpp
+/** \file validator/detail/format_operand.hpp
 *
-* Defines helper for value formatting.
+* Defines helper for operands formatting.
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_FORMAT_VALUE_HPP
-#define DRACOSHA_VALIDATOR_FORMAT_VALUE_HPP
+#ifndef DRACOSHA_VALIDATOR_FORMAT_OPERAND_HPP
+#define DRACOSHA_VALIDATOR_FORMAT_OPERAND_HPP
 
 #include <dracosha/validator/config.hpp>
 
@@ -39,8 +39,11 @@ constexpr string_false_t string_false{};
 namespace detail
 {
 
+/**
+ * @brief Helper for operands formatting
+ */
 template <typename T, typename =hana::when<true>>
-struct format_value_t
+struct format_operand_t
 {
     template <typename T1, typename TranslatorT, typename DecoratorT>
     auto operator () (T1&& val, const TranslatorT&, const DecoratorT& decorator) const -> decltype(auto)
@@ -50,10 +53,10 @@ struct format_value_t
 };
 
 /**
- * @brief  Formatter of values the std::string can be constructed from
+ * @brief  Formatter of operands from which the std::string can be constructed
  */
 template <typename T>
-struct format_value_t<T,hana::when<
+struct format_operand_t<T,hana::when<
             std::is_constructible<std::string,T>::value>
         >
 {
@@ -68,7 +71,7 @@ struct format_value_t<T,hana::when<
  * @brief  Formatter of boolean values
  */
 template <typename T>
-struct format_value_t<T,hana::when<std::is_same<bool,std::decay_t<T>>::value>>
+struct format_operand_t<T,hana::when<std::is_same<bool,std::decay_t<T>>::value>>
 {
     template <typename T1, typename TranslatorT, typename DecoratorT>
     auto operator () (T1&& val, const TranslatorT& translator, const DecoratorT& decorator) const -> decltype(auto)
@@ -81,7 +84,7 @@ struct format_value_t<T,hana::when<std::is_same<bool,std::decay_t<T>>::value>>
  * @brief Default formatter of values
  */
 template <typename T>
-constexpr format_value_t<T> format_value{};
+constexpr format_operand_t<T> format_operand{};
 
 }
 
@@ -89,4 +92,4 @@ constexpr format_value_t<T> format_value{};
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_FORMAT_VALUE_HPP
+#endif // DRACOSHA_VALIDATOR_FORMAT_OPERAND_HPP

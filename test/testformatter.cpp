@@ -11,7 +11,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     auto w1=wrapper(str1);
     detail::reorder_and_present(
                 w1,
-                make_cref_tuple(default_strings,default_values),
+                make_cref_tuple(default_strings,default_operand_formatter),
                 gte,10
             );
     BOOST_CHECK_EQUAL(str1,std::string("must be greater than or equal to 10"));
@@ -20,7 +20,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     auto w2=wrapper(str2);
     detail::reorder_and_present(
                 w2,
-                make_cref_tuple(default_strings,default_values),
+                make_cref_tuple(default_strings,default_operand_formatter),
                 flag,true
             );
     BOOST_CHECK_EQUAL(str2,std::string("must be true"));
@@ -29,7 +29,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     auto w3=wrapper(str3);
     detail::reorder_and_present(
                 w3,
-                make_cref_tuple(default_strings,default_values),
+                make_cref_tuple(default_strings,default_operand_formatter),
                 flag,false
             );
     BOOST_CHECK_EQUAL(str3,std::string("must be false"));
@@ -39,7 +39,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     auto w4=wrapper(str4);
     detail::reorder_and_present(
                 w4,
-                make_cref_tuple(mn,mn,default_strings,default_values),
+                make_cref_tuple(mn,mn,default_strings,default_operand_formatter),
                 "field1",size,eq,100
             );
     BOOST_CHECK_EQUAL(str4,std::string("size of field1 must be equal to 100"));
@@ -48,7 +48,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     auto w5=wrapper(str5);
     detail::reorder_and_present(
                 w5,
-                make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_values),
+                make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_operand_formatter),
                 "field2",value,flag,true
             );
     BOOST_CHECK_EQUAL(str5,std::string("field2 must be true"));
@@ -57,7 +57,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     auto w6=wrapper(str6);
     detail::reorder_and_present(
                 w6,
-                make_cref_tuple(get_default_member_names(),default_strings,default_values),
+                make_cref_tuple(get_default_member_names(),default_strings,default_operand_formatter),
                 empty,flag,false
             );
     BOOST_CHECK_EQUAL(str6,std::string("must be not empty"));
@@ -66,7 +66,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     auto w7=wrapper(str7);
     detail::reorder_and_present(
                 w7,
-                make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_values),
+                make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_operand_formatter),
                 "field1",empty,flag,false
             );
     BOOST_CHECK_EQUAL(str7,std::string("field1 must be not empty"));
@@ -75,7 +75,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     auto w8=wrapper(str8);
     detail::reorder_and_present(
                 w8,
-                make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_values),
+                make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_operand_formatter),
                 "field2",empty,flag,true
             );
     BOOST_CHECK_EQUAL(str8,std::string("field2 must be empty"));
@@ -84,7 +84,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     auto w9=wrapper(str9);
     detail::reorder_and_present(
                 w9,
-                make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_values),
+                make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_operand_formatter),
                 "field2",value,lte,10
             );
     BOOST_CHECK_EQUAL(str9,std::string("field2 must be less than or equal to 10"));
@@ -126,7 +126,7 @@ void checkPropertyFlag(const WrapStringFn& wrapper)
 
     detail::reorder_and_present(
                 w1,
-                make_cref_tuple(mn,default_strings,default_values),
+                make_cref_tuple(mn,default_strings,default_operand_formatter),
                 empty,flag,true
             );
     BOOST_CHECK_EQUAL(str1,std::string("must be empty"));
@@ -134,7 +134,7 @@ void checkPropertyFlag(const WrapStringFn& wrapper)
 
     detail::reorder_and_present(
                 w1,
-                make_cref_tuple(mn,default_strings,default_values),
+                make_cref_tuple(mn,default_strings,default_operand_formatter),
                 empty,flag,false
             );
     BOOST_CHECK_EQUAL(str1,std::string("must be not empty"));
@@ -142,14 +142,14 @@ void checkPropertyFlag(const WrapStringFn& wrapper)
 
     detail::reorder_and_present(
                 w1,
-                make_cref_tuple(mn,default_strings,default_values),
+                make_cref_tuple(mn,default_strings,default_operand_formatter),
                 empty,flag(flag_true_false),true
             );
     BOOST_CHECK_EQUAL(str1,std::string("empty must be true"));
     str1.clear();
     detail::reorder_and_present(
                 w1,
-                make_cref_tuple(mn,default_strings,default_values),
+                make_cref_tuple(mn,default_strings,default_operand_formatter),
                 empty,flag(flag_true_false),false
             );
     BOOST_CHECK_EQUAL(str1,std::string("empty must be false"));
@@ -157,14 +157,14 @@ void checkPropertyFlag(const WrapStringFn& wrapper)
 
     detail::reorder_and_present(
                 w1,
-                make_cref_tuple(mn,default_strings,default_values),
+                make_cref_tuple(mn,default_strings,default_operand_formatter),
                 empty,flag(flag_on_off),true
             );
     BOOST_CHECK_EQUAL(str1,std::string("empty must be on"));
     str1.clear();
     detail::reorder_and_present(
                 w1,
-                make_cref_tuple(mn,default_strings,default_values),
+                make_cref_tuple(mn,default_strings,default_operand_formatter),
                 empty,flag(flag_on_off),false
             );
     BOOST_CHECK_EQUAL(str1,std::string("empty must be off"));
@@ -172,14 +172,14 @@ void checkPropertyFlag(const WrapStringFn& wrapper)
 
     detail::reorder_and_present(
                 w1,
-                make_cref_tuple(mn,default_strings,default_values),
+                make_cref_tuple(mn,default_strings,default_operand_formatter),
                 empty,flag("expected"),true
             );
     BOOST_CHECK_EQUAL(str1,std::string("empty expected"));
     str1.clear();
     detail::reorder_and_present(
                 w1,
-                make_cref_tuple(mn,default_strings,default_values),
+                make_cref_tuple(mn,default_strings,default_operand_formatter),
                 empty,flag("not expected"),false
             );
     BOOST_CHECK_EQUAL(str1,std::string("empty not expected"));
@@ -320,7 +320,7 @@ void checkDefaultFormatter(const WrapStringFn& wrapper)
 
     using fm_type=decltype(fm);
     static_assert(std::is_lvalue_reference<typename std::decay_t<fm_type>::member_names_type>::value,"");
-    static_assert(std::is_lvalue_reference<typename std::decay_t<fm_type>::values_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename std::decay_t<fm_type>::operands_type>::value,"");
     static_assert(std::is_lvalue_reference<typename std::decay_t<fm_type>::strings_type>::value,"");
     static_assert(std::is_lvalue_reference<typename std::decay_t<fm_type>::order_and_presentation_type>::value,"");
 
@@ -335,7 +335,7 @@ void checkFormatterFromStrings(const WrapStringFn& wrapper)
 
     using fm_type=decltype(fm);
     static_assert(!std::is_lvalue_reference<typename fm_type::member_names_type>::value,"");
-    static_assert(std::is_lvalue_reference<typename fm_type::values_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::operands_type>::value,"");
     static_assert(std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
     static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
 
@@ -350,7 +350,7 @@ void checkFormatterFromMemberNames(const WrapStringFn& wrapper)
 
     using fm_type=decltype(fm);
     static_assert(!std::is_lvalue_reference<typename fm_type::member_names_type>::value,"");
-    static_assert(std::is_lvalue_reference<typename fm_type::values_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::operands_type>::value,"");
     static_assert(std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
     static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
 
@@ -358,15 +358,15 @@ void checkFormatterFromMemberNames(const WrapStringFn& wrapper)
 }
 
 template <typename WrapStringFn>
-void checkFormatterFromMemberNamesAndValues(const WrapStringFn& wrapper)
+void checkFormatterFromMemberNamesAndOperands(const WrapStringFn& wrapper)
 {
     translator_repository rep;
 
-    auto fm=make_formatter(make_member_names(make_test_strings(rep)),make_translated_values(rep,"en"));
+    auto fm=make_formatter(make_member_names(make_test_strings(rep)),make_translated_operand_formatter(rep,"en"));
 
     using fm_type=decltype(fm);
     static_assert(!std::is_lvalue_reference<typename fm_type::member_names_type>::value,"");
-    static_assert(!std::is_lvalue_reference<typename fm_type::values_type>::value,"");
+    static_assert(!std::is_lvalue_reference<typename fm_type::operands_type>::value,"");
     static_assert(std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
     static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
 
@@ -379,7 +379,7 @@ void checkFormatterWithRefs(const WrapStringFn& wrapper)
     translator_repository rep;
     auto st=make_test_strings(rep);
     auto mn=make_member_names(st);
-    auto vs=make_translated_values(rep,"en");
+    auto vs=make_translated_operand_formatter(rep,"en");
     auto fm=make_formatter(
                 mn,
                 vs,
@@ -388,7 +388,7 @@ void checkFormatterWithRefs(const WrapStringFn& wrapper)
 
     using fm_type=decltype(fm);
     static_assert(std::is_lvalue_reference<typename fm_type::member_names_type>::value,"");
-    static_assert(std::is_lvalue_reference<typename fm_type::values_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::operands_type>::value,"");
     static_assert(std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
     static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
 
@@ -401,18 +401,18 @@ void checkFormatterWithRvals(const WrapStringFn& wrapper)
     mapped_translator tr1;
     auto fm=make_formatter(
                 make_member_names(make_translated_strings(tr1)),
-                make_translated_values(tr1),
+                make_translated_operand_formatter(tr1),
                 make_translated_strings(tr1)
                 );
 
     using fm_type=decltype(fm);
     static_assert(!std::is_lvalue_reference<typename fm_type::member_names_type>::value,"");
-    static_assert(!std::is_lvalue_reference<typename fm_type::values_type>::value,"");
+    static_assert(!std::is_lvalue_reference<typename fm_type::operands_type>::value,"");
     static_assert(!std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
     static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
 
     static_assert(!std::is_rvalue_reference<typename fm_type::member_names_type>::value,"");
-    static_assert(!std::is_rvalue_reference<typename fm_type::values_type>::value,"");
+    static_assert(!std::is_rvalue_reference<typename fm_type::operands_type>::value,"");
     static_assert(!std::is_rvalue_reference<typename fm_type::strings_type>::value,"");
 
     testFormatter(fm,wrapper);
