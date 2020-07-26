@@ -20,7 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_MAKE_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/detail/validator_impl.hpp>
+#include <dracosha/validator/validators.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -32,7 +32,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 */
 BOOST_HANA_CONSTEXPR_LAMBDA auto make_validator = [](auto fn)
 {
-    return detail::validator_impl<decltype(fn)>(std::move(fn));
+    return validator_t<decltype(fn)>(std::move(fn));
 };
 
 //-------------------------------------------------------------

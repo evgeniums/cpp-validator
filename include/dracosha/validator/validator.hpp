@@ -39,7 +39,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/adapters/default_adapter.hpp>
 #include <dracosha/validator/property_validator.hpp>
 #include <dracosha/validator/apply.hpp>
-#include <dracosha/validator/detail/validator_impl.hpp>
 #include <dracosha/validator/make_validator.hpp>
 #include <dracosha/validator/member.hpp>
 #include <dracosha/validator/master_sample.hpp>
@@ -161,7 +160,7 @@ constexpr _t _{};
 /**
  * @brief Helper class to wrap validators
  */
-struct validator_t
+struct wrap_validator
 {
     /**
      * @brief Wrap list of validators or validation operators into logical AND
@@ -200,7 +199,7 @@ struct validator_t
         return hana::id(std::forward<T>(v));
     }
 };
-constexpr validator_t validator{};
+constexpr wrap_validator validator{};
 
 //-------------------------------------------------------------
 

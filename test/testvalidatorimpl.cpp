@@ -607,7 +607,6 @@ BOOST_AUTO_TEST_CASE(CheckIsMasterSample)
 
 @todo
     Member getter in adapter traits.
-    Override validator report.
     Localization of conjunctions, plurals and genders.
     String operators.
     Regular expressions operators.

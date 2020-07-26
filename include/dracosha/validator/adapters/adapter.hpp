@@ -269,6 +269,16 @@ class adapter
             return _traits.validate_all(*this,std::forward<decltype(member)>(member),std::forward<decltype(op)>(op));
         }
 
+        void begin_explicit_report() const
+        {
+            _traits.reporter().begin_explicit_report();
+        }
+
+        void end_explicit_report(const std::string& description) const
+        {
+            _traits.reporter().end_explicit_report(description);
+        }
+
     private:
 
         mutable TraitsT _traits;

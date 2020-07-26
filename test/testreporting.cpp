@@ -1127,4 +1127,52 @@ BOOST_AUTO_TEST_CASE(CheckFlagValidationReport)
     rep1.clear();
 }
 
+BOOST_AUTO_TEST_CASE(CheckExplicitValidationReport)
+{
+    std::map<std::string,size_t> m1={{"field1",1}};
+    std::string rep1;
+    auto ra1=make_reporting_adapter(m1,rep1);
+
+    auto v1=validator(
+                _["field1"](gte,10)
+            )("Explicit description");
+    BOOST_CHECK(!v1.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string("Explicit description"));
+    rep1.clear();
+
+    auto v2=validator(
+                _["field1"](gte,10)("Explicit description")
+            );
+    BOOST_CHECK(!v2.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string("Explicit description"));
+    rep1.clear();
+
+    auto v3=validator(
+                _["field1"](gte,10)("Explicit description 1")
+                ^OR^
+                _["field1"](eq,100)("Explicit description 2")
+            );
+    BOOST_CHECK(!v3.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string("Explicit description 1 OR Explicit description 2"));
+    rep1.clear();
+
+    auto v4=validator(
+                _["field1"](gte,10)("Explicit description 1")
+                ^OR^
+                _["field1"](eq,100)("Explicit description 2")
+            )("Explicit description");
+    BOOST_CHECK(!v4.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string("Explicit description"));
+    rep1.clear();
+
+    auto v5=validator(
+                _["field1"](value(gte,10) ^OR^ value(eq,15))("Explicit description 1")
+                ^OR^
+                _["field1"](eq,100)("Explicit description 2")
+            );
+    BOOST_CHECK(!v5.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,std::string("Explicit description 1 OR Explicit description 2"));
+    rep1.clear();
+}
+
 BOOST_AUTO_TEST_SUITE_END()

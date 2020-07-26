@@ -215,6 +215,16 @@ class reporting_adapter_impl
                         );
         }
 
+        ReporterT& reporter()
+        {
+            return _reporter;
+        }
+
+        const ReporterT& reporter() const
+        {
+            return _reporter;
+        }
+
     private:
 
         template <typename AgrregationT,typename HandlerT, typename ...Args>

@@ -57,7 +57,8 @@ class reporter
                     FormatterT&& formatter
                 ) : _dst(std::move(dst)),
                     _formatter(std::forward<FormatterT>(formatter)),
-                    _not_count(0)
+                    _not_count(0),
+                    _explicit_reporting_count(0)
         {}
 
         /**
@@ -67,7 +68,7 @@ class reporter
         template <typename AggregationT>
         void aggregate_open(AggregationT&& aggregation)
         {
-            if (skip_aggregate_open())
+            if (skip_aggregate_open() || skip_explicit_report())
             {
                 return;
             }
@@ -86,7 +87,7 @@ class reporter
         template <typename AggregationT, typename MemberT>
         void aggregate_open(AggregationT&& aggregation, MemberT&& member)
         {
-            if (skip_aggregate_open())
+            if (skip_aggregate_open() || skip_explicit_report())
             {
                 return;
             }
@@ -104,6 +105,11 @@ class reporter
          */
         void aggregate_close(bool ok)
         {
+            if (skip_explicit_report())
+            {
+                return;
+            }
+
             if (!_stack.empty())
             {
                 auto& back=_stack.back();
@@ -138,7 +144,7 @@ class reporter
         template <typename T2, typename OpT>
         void validate_operator(const OpT& op, const T2& b)
         {
-            if (skip_part())
+            if (skip_part() || skip_explicit_report())
             {
                 return;
             }
@@ -155,7 +161,7 @@ class reporter
         template <typename T2, typename OpT, typename PropT>
         void validate_property(const PropT& prop, const OpT& op, const T2& b)
         {
-            if (skip_part())
+            if (skip_part() || skip_explicit_report())
             {
                 return;
             }
@@ -171,7 +177,7 @@ class reporter
         template <typename T2, typename OpT, typename MemberT>
         void validate_exists(const MemberT& member, const OpT& op, const T2& b)
         {
-            if (skip_part())
+            if (skip_part() || skip_explicit_report())
             {
                 return;
             }
@@ -189,7 +195,7 @@ class reporter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
         {
-            if (skip_part())
+            if (skip_part() || skip_explicit_report())
             {
                 return;
             }
@@ -207,7 +213,7 @@ class reporter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate_with_other_member(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
         {
-            if (skip_part())
+            if (skip_part() || skip_explicit_report())
             {
                 return;
             }
@@ -225,7 +231,7 @@ class reporter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate_with_master_sample(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
         {
-            if (skip_part())
+            if (skip_part() || skip_explicit_report())
             {
                 return;
             }
@@ -252,7 +258,31 @@ class reporter
             return _not_count!=0;
         }
 
+        void begin_explicit_report()
+        {
+            ++_explicit_reporting_count;
+        }
+
+        void end_explicit_report(const std::string& description)
+        {
+            --_explicit_reporting_count;
+            if (skip_part())
+            {
+                return;
+            }
+            if (_explicit_reporting_count==0)
+            {
+                auto wrapper=wrap_backend_formatter(current(),_dst);
+                wrapper.append(description);
+            }
+        }
+
     private:
+
+        bool skip_explicit_report() const noexcept
+        {
+            return _explicit_reporting_count!=0;
+        }
 
         bool skip_part() const noexcept
         {
@@ -322,6 +352,7 @@ class reporter
         FormatterT _formatter;
         std::vector<report_aggregation<typename DstT::type>> _stack;
         size_t _not_count;
+        size_t _explicit_reporting_count;
 };
 
 /**
