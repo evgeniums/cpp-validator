@@ -27,6 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/operators/exists.hpp>
 #include <dracosha/validator/operators/flag.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
+#include <dracosha/validator/reporting/concrete_phrase.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -147,7 +148,7 @@ class invert_op_with_string : public invert_op<T>
 
     private:
 
-        std::string _description;
+        concrete_phrase _description;
 };
 
 /**

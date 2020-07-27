@@ -48,6 +48,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/detail/default_adapter_impl.ipp>
 #include <dracosha/validator/operand.hpp>
 #include <dracosha/validator/operators/invert_op.hpp>
+#include <dracosha/validator/operators/wrap_op.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

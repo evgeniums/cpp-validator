@@ -28,9 +28,13 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+struct concrete_phrase_tag;
+
 class concrete_phrase
 {
     public:
+
+        using hana_tag=concrete_phrase_tag;
 
         concrete_phrase(
                 std::string phrase

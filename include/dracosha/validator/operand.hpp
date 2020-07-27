@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
+#include <dracosha/validator/reporting/concrete_phrase.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -66,7 +67,7 @@ class operand : public object_wrapper<T>
 
     private:
 
-        std::string _description;
+        concrete_phrase _description;
 };
 
 /**

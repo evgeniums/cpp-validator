@@ -20,8 +20,9 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_WRAP_OP_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/utils/object_wrapper.hpp>
 #include <dracosha/validator/operators/operator.hpp>
+#include <dracosha/validator/utils/object_wrapper.hpp>
+#include <dracosha/validator/reporting/concrete_phrase.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -131,7 +132,7 @@ class wrap_op_with_string : public wrap_op<T>
 
     private:
 
-        std::string _description;
+        concrete_phrase _description;
 };
 
 //-------------------------------------------------------------
