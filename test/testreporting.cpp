@@ -191,7 +191,20 @@ BOOST_AUTO_TEST_CASE(CheckCustomDescriptions)
 
     auto m1=_["field1"]("hello");
     static_assert(decltype(m1)::has_name(),"");
-    BOOST_CHECK_EQUAL(m1.name(),"hello");
+    BOOST_CHECK_EQUAL(std::string(m1.name()),"hello");
+
+    auto m2=_["field1"]("spaces",word::plural);
+    static_assert(decltype(m2)::has_name(),"");
+    BOOST_CHECK_EQUAL(std::string(m2.name()),"spaces");
+    BOOST_CHECK(word_bitmask.is_set(m2.name().attributes(),word::plural));
+    BOOST_CHECK(!word_bitmask.is_set(m2.name().attributes(),word::neuter));
+
+    auto m3=_["field1"]("cats",word::plural,word::feminine);
+    static_assert(decltype(m3)::has_name(),"");
+    BOOST_CHECK_EQUAL(std::string(m3.name()),"cats");
+    BOOST_CHECK(word_bitmask.is_set(m3.name().attributes(),word::plural));
+    BOOST_CHECK(word_bitmask.is_set(m3.name().attributes(),word::feminine));
+    BOOST_CHECK(!word_bitmask.is_set(m3.name().attributes(),word::neuter));
 
     std::string rep1;
     std::vector<size_t> vec1={10,20,30,40,50};

@@ -18,6 +18,7 @@ SET (HEADERS
     include/dracosha/validator/utils/is_pair.hpp
     include/dracosha/validator/utils/get_it.hpp
     include/dracosha/validator/utils/wrap_it.hpp
+    include/dracosha/validator/utils/feature_bitmask.hpp
 
     include/dracosha/validator/property.hpp
     include/dracosha/validator/can_get.hpp
@@ -88,6 +89,8 @@ SET (HEADERS
     include/dracosha/validator/reporting/decorator.hpp
     include/dracosha/validator/reporting/quotes_decorator.hpp
     include/dracosha/validator/reporting/flag_presets.hpp
+    include/dracosha/validator/reporting/word_attributes.hpp
+    include/dracosha/validator/reporting/concrete_phrase.hpp
 
     include/dracosha/validator/reporting/locale/sample_locale.hpp
 

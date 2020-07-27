@@ -29,6 +29,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/operators/flag.hpp>
 #include <dracosha/validator/make_validator.hpp>
+#include <dracosha/validator/reporting/word_attributtes.hpp>
+#include <dracosha/validator/reporting/concrete_phrase.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -125,6 +127,8 @@ struct member
     template <typename OpT, typename T1>
     constexpr auto operator () (OpT&& op, T1&& b,
                                 std::enable_if_t<
+                                hana::is_a<operator_tag,OpT>
+                                &&
                                 !(
                                     hana::is_a<property_tag,type>
                                     &&
@@ -203,10 +207,15 @@ struct member
     template <typename T1>
     auto operator () (T1&& v,
                       std::enable_if_t<
-                            std::is_constructible<std::string,T1>::value
+                            std::is_constructible<concrete_phrase,T1>::value
                             &&
                             !hana::is_a<operator_tag,T1>
                          ,void*> =nullptr);
+
+    template <typename T1, typename ... Attributes>
+    auto operator () (T1&& v,
+                      word word_attr,
+                      Attributes&&... word_attributes);
 
     constexpr static const char* name()
     {
@@ -240,7 +249,7 @@ struct member_with_name : public member<T,ParentPathT...>
      * @brief Get member's name
      * @return Name
      */
-    const std::string& name() const
+    const concrete_phrase& name() const
     {
         return _name;
     }
@@ -277,7 +286,7 @@ struct member_with_name : public member<T,ParentPathT...>
         return (*this)(value(std::forward<OpT>(op),std::forward<T1>(b)));
     }
 
-    std::string _name;
+    concrete_phrase _name;
 };
 
 template <typename T, typename ...ParentPathT>
@@ -285,12 +294,23 @@ template <typename T1>
 auto member<T,ParentPathT...>::operator ()
         (T1&& v,
           std::enable_if_t<
-                std::is_constructible<std::string,T1>::value
+                std::is_constructible<concrete_phrase,T1>::value
                 &&
                 !hana::is_a<operator_tag,T1>
              ,void*>)
 {
     return member_with_name<T,ParentPathT...>(path,std::forward<T1>(v));
+}
+
+template <typename T, typename ...ParentPathT>
+template <typename T1, typename ... Attributes>
+auto member<T,ParentPathT...>::operator ()
+        (T1&& v,
+         word word_attr,
+         Attributes&&... word_attributes
+         )
+{
+    return member_with_name<T,ParentPathT...>(path,concrete_phrase(std::forward<T1>(v),word_attr,std::forward<Attributes>(word_attributes)...));
 }
 
 //-------------------------------------------------------------
