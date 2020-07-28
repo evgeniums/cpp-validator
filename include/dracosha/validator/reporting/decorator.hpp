@@ -46,6 +46,9 @@ struct no_decorator_t
 };
 constexpr no_decorator_t no_decorator{};
 
+/**
+ * @brief Decorator that adds brackets around initial string
+ */
 struct brackets_decorator_t
 {
     using hana_tag=decorator_tag;
@@ -98,6 +101,12 @@ struct decorate_t<T,Arg,
 template <typename T, typename Arg>
 constexpr decorate_t<T,Arg> decorate_inst{};
 
+/**
+ * @brief Decorate argument
+ * @param obj Object that can have or not have a decorator
+ * @param arg Argument to decorate if applicable
+ * @return If object has decorator then decorated argument or argument "as is" otherwise
+ */
 template <typename T, typename Arg>
 constexpr auto decorate(T&& obj, Arg&& arg) -> decltype(auto)
 {

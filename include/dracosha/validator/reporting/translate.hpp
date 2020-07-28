@@ -64,10 +64,16 @@ struct translate_t<T,Arg,
 template <typename T, typename Arg>
 constexpr translate_t<T,Arg> translate_inst{};
 
-template <typename T, typename Arg>
-constexpr auto translate(T&& obj, Arg&& arg) -> decltype(auto)
+/**
+ * @brief Translate a phrase
+ * @param obj Object that can have or not have a translator
+ * @param phrase Phrase to translate if applicable
+ * @return If object has translator then translated phrase or phrase "as is" otherwise
+ */
+template <typename T, typename PhraseT>
+constexpr auto translate(T&& obj, PhraseT&& phrase) -> decltype(auto)
 {
-    return translate_inst<T,Arg>(std::forward<T>(obj),std::forward<Arg>(arg));
+    return translate_inst<T,PhraseT>(std::forward<T>(obj),std::forward<PhraseT>(phrase));
 }
 
 //-------------------------------------------------------------

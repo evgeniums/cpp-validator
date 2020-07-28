@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/word_attributes.hpp
 *
-* Defines word attributes.
+* Defines lexical attributes of words and phrases
 *
 */
 
@@ -28,7 +28,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Word attributes
+ * @brief Lexical attributes of a word or phrase
  */
 enum class word : uint8_t
 {

@@ -174,6 +174,12 @@ struct nested_member_name_t<T,TraitsT,
 template <typename T, typename TraitsT>
 constexpr nested_member_name_t<T,TraitsT> nested_member_name_inst{};
 
+/**
+ * @brief Process nested member name
+ * @param id Member
+ * @param traits Traits of member names formatter
+ * @return Processed member name
+ */
 template <typename T, typename TraitsT>
 constexpr auto nested_member_name(const T& id, const TraitsT& traits) -> decltype(auto)
 {

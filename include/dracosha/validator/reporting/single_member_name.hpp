@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/single_member_name.hpp
 *
-* Defines helper to format single member names.
+* Defines helper to format single member name.
 *
 */
 
@@ -48,6 +48,7 @@ struct can_single_member_name
 {
     constexpr static const bool value=false;
 };
+
 /**
  * @brief Check if traits have suitable operator ()(const T&) for name transforming
  */
@@ -111,6 +112,12 @@ struct single_member_name_t<T,TraitsT,
 template <typename T, typename TraitsT>
 constexpr single_member_name_t<T,TraitsT> single_member_name_inst{};
 
+/**
+ * @brief Process key of a member at one level
+ * @param id Member key
+ * @param traits Traits of member names formatter
+ * @return Processed member name
+ */
 template <typename T, typename TraitsT>
 constexpr auto single_member_name(const T& id, const TraitsT& traits) -> decltype(auto)
 {

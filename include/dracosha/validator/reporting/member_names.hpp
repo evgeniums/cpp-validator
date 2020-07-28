@@ -138,7 +138,7 @@ struct translate_member_names_traits_t : public TraitsT
 };
 
 /**
- * @brief Make translated member names from other member names using translator
+ * @brief Create translated member names from other member names using translator
  * @param original_mn Original member names formatter
  * @param translator Translator
  * @return Member names formatter that first uses original formatter and then translate member names
@@ -154,17 +154,35 @@ auto make_translated_member_names(OriginalMemberNamesT&& original_mn, translator
             );
 }
 
+/**
+ * @brief Create translated member names from other member names using translator from translator repository
+ * @param original_mn Original member names formatter
+ * @param rep Translator repository
+ * @param loc Locale
+ * @return Member names formatter that first uses original formatter and then translate member names
+ */
 template <typename OriginalMemberNamesT>
 auto make_translated_member_names(OriginalMemberNamesT&& original_mn, const translator_repository& rep, const std::string& loc=std::locale().name())
 {
     return make_translated_member_names(std::move(original_mn),*rep.find_translator(loc));
 }
 
+/**
+ * @brief Create member names with default traits using translator
+ * @param translator Translator
+ * @return Member names formatter that first uses original formatter and then translate member names
+ */
 inline auto make_translated_member_names(translator_cref translator)
 {
     return make_translated_member_names(make_member_names(default_member_names_traits_t{}),translator);
 }
 
+/**
+ * @brief Create member names with default traits using translator from translator repository
+ * @param rep Translator repository
+ * @param loc Locale
+ * @return Member names formatter that first uses original formatter and then translate member names
+ */
 inline auto make_translated_member_names(const translator_repository& rep, const std::string& loc=std::locale().name())
 {
     return make_translated_member_names(*rep.find_translator(loc));
@@ -203,6 +221,11 @@ auto make_decorated_member_names(OriginalMemberNamesT&& original_mn, DecoratorT&
             );
 }
 
+/**
+ * @brief Traits to format nested members as dot separated names decorated with brackets.
+ *
+ * For example: ["field1"]["subfield1_1"]["subfield1_1_1"] will be formatted as [field1].[subfield1_1].[subfield1_1_1]
+ */
 struct dotted_member_names_traits_t
 {
     /**

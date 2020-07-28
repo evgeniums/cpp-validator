@@ -204,24 +204,44 @@ struct member
         return typename decltype(next_member_tmpl)::type(std::forward<T1>(key),path);
     }
 
+    /**
+     * @brief Construct a member with explicit name from the current member.
+     * @param name Explicit name
+     * @return Member with explicit name
+     */
     template <typename T1>
-    auto operator () (T1&& v,
+    auto operator () (T1&& name,
                       std::enable_if_t<
                             std::is_constructible<concrete_phrase,T1>::value
                             &&
                             !hana::is_a<operator_tag,T1>
                          ,void*> =nullptr);
 
+    /**
+     * @brief Construct a member with explicit name and lexical attributes from the current member.
+     * @param name Explicit name
+     * @param attribute First lexical attribute of the name
+     * @param attributes The rest lexical attributes of the name
+     * @return Member with explicit name
+     */
     template <typename T1, typename ... Attributes>
-    auto operator () (T1&& v,
-                      word word_attr,
-                      Attributes&&... word_attributes);
+    auto operator () (T1&& name,
+                      word attribute,
+                      Attributes&&... attributes);
 
+    /**
+     * @brief Stub for getting explicit name
+     * @return Empty string
+     */
     constexpr static const char* name()
     {
         return "";
     }
 
+    /**
+     * @brief Strub for has_name() property
+     * @return Always false
+     */
     constexpr static bool has_name()
     {
         return false;
@@ -292,25 +312,25 @@ struct member_with_name : public member<T,ParentPathT...>
 template <typename T, typename ...ParentPathT>
 template <typename T1>
 auto member<T,ParentPathT...>::operator ()
-        (T1&& v,
+        (T1&& name,
           std::enable_if_t<
                 std::is_constructible<concrete_phrase,T1>::value
                 &&
                 !hana::is_a<operator_tag,T1>
              ,void*>)
 {
-    return member_with_name<T,ParentPathT...>(path,std::forward<T1>(v));
+    return member_with_name<T,ParentPathT...>(path,std::forward<T1>(name));
 }
 
 template <typename T, typename ...ParentPathT>
 template <typename T1, typename ... Attributes>
 auto member<T,ParentPathT...>::operator ()
-        (T1&& v,
-         word word_attr,
-         Attributes&&... word_attributes
+        (T1&& name,
+         word attribute,
+         Attributes&&... attributes
          )
 {
-    return member_with_name<T,ParentPathT...>(path,concrete_phrase(std::forward<T1>(v),word_attr,std::forward<Attributes>(word_attributes)...));
+    return member_with_name<T,ParentPathT...>(path,concrete_phrase(std::forward<T1>(name),attribute,std::forward<Attributes>(attributes)...));
 }
 
 //-------------------------------------------------------------

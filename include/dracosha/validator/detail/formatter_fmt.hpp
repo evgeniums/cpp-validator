@@ -35,7 +35,7 @@ struct formatter<concrete_phrase>
 {
     template <typename FormatContext>
     auto format(const concrete_phrase& ph, FormatContext& ctx) {
-        return format_to(ctx.out(),ph.phrase());
+        return format_to(ctx.out(),ph.text());
     }
 };
 }
