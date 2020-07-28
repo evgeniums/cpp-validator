@@ -21,13 +21,14 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/reference_wrapper.hpp>
+#include <dracosha/validator/operators/flag.hpp>
+#include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/reporting/strings.hpp>
+#include <dracosha/validator/reporting/member_operand.hpp>
 #include <dracosha/validator/reporting/member_names.hpp>
 #include <dracosha/validator/reporting/operand_formatter.hpp>
-#include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/reporting/report_aggregation.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
-#include <dracosha/validator/operators/flag.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -289,7 +290,7 @@ struct apply_reorder_present_4args_t
  */
 template <typename MemberT, typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_4args_t<
-                MemberT,PropT,OpT,T2,hana::when<hana::is_a<member_name_tag,T2>>
+                MemberT,PropT,OpT,T2,hana::when<hana::is_a<member_operand_tag,T2>>
             >
 {
     template <typename DstT, typename FormatterTs>

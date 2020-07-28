@@ -24,12 +24,22 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/reporting/decorator.hpp>
 #include <dracosha/validator/reporting/translate.hpp>
-#include <dracosha/validator/reporting/member_name.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
 #include <dracosha/validator/detail/to_string.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+
+//-------------------------------------------------------------
+
+/**
+ * @brief String to use for indexed elements
+ */
+struct string_element_t : public enable_to_string<string_element_t>
+{
+    constexpr static const char* description="element #";
+};
+constexpr string_element_t string_element{};
 
 //-------------------------------------------------------------
 

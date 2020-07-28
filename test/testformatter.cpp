@@ -103,7 +103,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     detail::reorder_and_present(
                 w11,
                 make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,get_default_member_names()),
-                "field2",value,lte,make_member_name("field1")
+                "field2",value,lte,make_member_operand("field1")
             );
     BOOST_CHECK_EQUAL(str11,std::string("field2 must be less than or equal to field1"));
 
@@ -112,7 +112,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     detail::reorder_and_present(
                 w12,
                 make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,get_default_member_names()),
-                "field2",size,lte,make_member_name("field1")
+                "field2",size,lte,make_member_operand("field1")
             );
     BOOST_CHECK_EQUAL(str12,std::string("size of field2 must be less than or equal to size of field1"));
 }

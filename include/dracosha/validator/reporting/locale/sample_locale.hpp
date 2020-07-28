@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/operators.hpp>
 #include <dracosha/validator/operators/invert_op.hpp>
-#include <dracosha/validator/reporting/member_name.hpp>
+#include <dracosha/validator/reporting/member_names.hpp>
 #include <dracosha/validator/reporting/operand_formatter.hpp>
 #include <dracosha/validator/reporting/aggregation_strings.hpp>
 #include <dracosha/validator/reporting/flag_presets.hpp>

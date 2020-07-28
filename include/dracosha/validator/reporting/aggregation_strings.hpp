@@ -23,7 +23,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/operators/aggregation.hpp>
-#include <dracosha/validator/reporting/member_name.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -70,15 +69,6 @@ struct aggregation_strings_t
     static std::string conjunction(const aggregation_op& aggregation)
     {
         return aggregation.conjunction_token;
-    }
-
-    /**
-     * @brief Get token for joining member names in member's path
-     * @return Separator token for join operation
-     */
-    static std::string member_names_conjunction()
-    {
-        return string_member_name_conjunction;
     }
 };
 constexpr aggregation_strings_t aggregation_strings{};

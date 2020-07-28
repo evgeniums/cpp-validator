@@ -5,7 +5,7 @@
 #include <dracosha/validator/reporting/no_translator.hpp>
 #include <dracosha/validator/reporting/mapped_translator.hpp>
 #include <dracosha/validator/reporting/translator_repository.hpp>
-#include <dracosha/validator/reporting/member_name.hpp>
+#include <dracosha/validator/reporting/member_operand.hpp>
 
 #include <dracosha/validator/reporting/locale/sample_locale.hpp>
 
