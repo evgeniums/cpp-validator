@@ -22,6 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <string>
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/reporting/word_attributtes.hpp>
+#include <dracosha/validator/reporting/concrete_phrase.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -46,16 +48,6 @@ class translator
         translator& operator= (translator&&)=default;
 
         /**
-         * @brief Translate a string
-         * @param id String ID
-         * @return Translation result
-         */
-        std::string operator() (const std::string& id) const
-        {
-            return translate(id);
-        }
-
-        /**
          * @brief Reset translator
          */
         virtual void reset()
@@ -64,15 +56,51 @@ class translator
         /**
          * @brief Translate a string
          * @param id String ID
+         * @param attr Word attributes
          * @return Translation result
          *
          * Must be overriden in derived class.
          */
-        virtual std::string translate(const std::string& id) const
+        virtual concrete_phrase translate(const std::string& id, word_attributes attr=0) const
+        {
+            std::ignore=attr;
+            return id;
+        }
+
+        /**
+         * @brief Bypass concrete phrase as is
+         * @param id Concrete phrase
+         * @return Input concrete phrase
+         */
+        concrete_phrase translate(const concrete_phrase& id, word_attributes =0) const
         {
             return id;
         }
+
+        /**
+         * @brief Translate a string
+         * @param id String ID
+         * @param attr Word attributes
+         * @return Translation result
+         */
+        concrete_phrase operator() (const std::string& id, word_attributes attr=0) const
+        {
+            std::ignore=attr;
+            return translate(id);
+        }
+
+        /**
+         * @brief Bypass concrete phrase as is
+         * @param id Concrete phrase
+         * @return Input concrete phrase
+         */
+        concrete_phrase operator() (const concrete_phrase& id, word_attributes =0) const
+        {
+            return translate(id);
+        }
 };
+
+using translator_cref=const translator&;
 
 //-------------------------------------------------------------
 

@@ -607,6 +607,8 @@ BOOST_AUTO_TEST_CASE(CheckIsMasterSample)
 
 @todo
     Member getter in adapter traits.
+    Remove trim_all.
+
     Localization of conjunctions, plurals and genders.
     String operators.
     Regular expressions operators.

@@ -32,4 +32,6 @@ namespace hana=boost::hana;
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
+#define DRACOSHA_VALIDATOR_NAMESPACE dracosha::validator
+
 #endif // DRACOSHA_VALIDATOR_CONFIG_HPP

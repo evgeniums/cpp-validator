@@ -249,7 +249,7 @@ struct member_with_name : public member<T,ParentPathT...>
      * @brief Get member's name
      * @return Name
      */
-    const concrete_phrase& name() const
+    concrete_phrase name() const
     {
         return _name;
     }

@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/reporting/decorator.hpp>
+#include <dracosha/validator/reporting/concrete_phrase.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -41,12 +42,26 @@ struct quotes_decorator_traits
 };
 template <typename T>
 struct quotes_decorator_traits<T,
-        hana::when<std::is_constructible<std::string,T>::value>>
+        hana::when<std::is_same<concrete_phrase,std::decay_t<T>>::value>>
 {
     static auto f(T&& val) -> decltype(auto)
     {
         std::string str;
-        backend_formatter.append(str,"\"",std::forward<T>(val),"\"");
+        backend_formatter.append(str,"\"",std::string(std::forward<T>(val)),"\"");
+        return concrete_phrase(std::move(str),val.attributes());
+    }
+};
+template <typename T>
+struct quotes_decorator_traits<T,
+        hana::when<std::is_constructible<std::string,T>::value
+        &&
+        !std::is_same<concrete_phrase,std::decay_t<T>>::value
+        >>
+{
+    static auto f(T&& val) -> decltype(auto)
+    {
+        std::string str;
+        backend_formatter.append(str,"\"",std::string(std::forward<T>(val)),"\"");
         return str;
     }
 };

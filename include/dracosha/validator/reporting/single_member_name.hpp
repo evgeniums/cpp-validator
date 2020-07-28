@@ -23,7 +23,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/reporting/decorator.hpp>
+#include <dracosha/validator/reporting/translate.hpp>
 #include <dracosha/validator/reporting/member_name.hpp>
+#include <dracosha/validator/reporting/concrete_phrase.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
 #include <dracosha/validator/detail/to_string.hpp>
 
@@ -48,83 +50,62 @@ struct can_single_member_name<T,TraitsT,
 };
 
 /**
- * @brief Default helper that forwards ID to strings and then decorates the result
+ * @brief Default helper when traits can not be used.
+ *
+ * Default helper converts ID to string, then translates it and after all decorates the result.
  */
 template <typename T, typename TraitsT, typename =hana::when<true>>
 struct single_member_name_t
 {
-    template <typename StringsT>
-    std::string operator() (const T& id, const TraitsT& traits, const StringsT& strings) const
+    auto operator() (const T& id, const TraitsT& traits) const -> decltype(auto)
     {
-        return decorate<TraitsT,decltype(strings(id))>(traits,strings(id));
+        return decorate(traits,translate(traits,detail::to_string(id)));
+    }
+};
+
+/**
+ * @brief Helper when traits can be used.
+ *
+ * ID is forwarded to traits, then the result goes to decorator.
+ */
+template <typename T, typename TraitsT>
+struct single_member_name_t<T,TraitsT,hana::when<can_single_member_name<T,TraitsT>::value>>
+{
+    auto operator() (const T& id, const TraitsT& traits) const -> decltype(auto)
+    {
+        return decorate(traits,translate(traits,traits(id)));
     }
 };
 
 /**
  * @brief Helper when traits can not be used and id is of inegral type.
  *
- * Integral ID is interpreted as index and formatted like "element #id".
+ * Integral ID is interpreted as index and formatted like "element #id", then it is translated and after all the result is decorated.
  */
 template <typename T, typename TraitsT>
 struct single_member_name_t<T,TraitsT,
-                                hana::when<!can_single_member_name<T,TraitsT>::value
-                                            && std::is_integral<std::decay_t<T>>::value
-                                           >
+                                hana::when<
+                                    !can_single_member_name<T,TraitsT>::value
+                                    && std::is_integral<std::decay_t<T>>::value
+                                >
                             >
 {
-    template <typename StringsT>
-    std::string operator() (const T& id, const TraitsT& traits, const StringsT& strings) const
+    auto operator() (const T& id, const TraitsT& traits) const
     {
         std::string dst;
-        backend_formatter.append(dst,strings(string_element),id);
-        return decorate<TraitsT,decltype(dst)>(traits,dst);
+        backend_formatter.append(dst,translate(traits,std::string(string_element)),id);
+        return decorate(traits,dst);
     }
 };
 
-/**
- * @brief Helper when traits can be used and id can be converted to string.
- *
- * If the result of traits is either empty or the same as id then the id is forwarded to strings.
- */
 template <typename T, typename TraitsT>
-struct single_member_name_t<T,TraitsT,hana::when<can_single_member_name<T,TraitsT>::value
-                                      && std::is_constructible<std::string,T>::value>>
+constexpr single_member_name_t<T,TraitsT> single_member_name_inst{};
+
+template <typename T, typename TraitsT>
+constexpr auto single_member_name(const T& id, const TraitsT& traits) -> decltype(auto)
 {
-    template <typename StringsT>
-    std::string operator() (const T& id, const TraitsT& traits, const StringsT& strings) const
-    {
-        auto str=traits(id);
-        if (!str.empty() && str!=std::string(id))
-        {
-            return decorate<TraitsT,decltype(str)>(traits,str);
-        }
-        return decorate<TraitsT,decltype(strings(id))>(traits,strings(id));
-    }
-};
-
-/**
- * @brief Helper when traits can be used but the id can not be converted to string.
- *
- * If the result of traits is empty then the id is forwarded to strings.
- */
-template <typename T, typename TraitsT>
-struct single_member_name_t<T,TraitsT,hana::when<can_single_member_name<T,TraitsT>::value
-                                     && !std::is_constructible<std::string,T>::value>>
-{
-    template <typename StringsT>
-    std::string operator() (const T& id, const TraitsT& traits, const StringsT& strings) const
-    {
-        auto str=traits(id);
-        if (!str.empty())
-        {
-            return decorate<TraitsT,decltype(str)>(traits,str);
-        }
-        return decorate<TraitsT,decltype(strings(id))>(traits,strings(id));
-    }
-};
-
-template <typename T, typename TraitsT>
-constexpr single_member_name_t<T,TraitsT> single_member_name{};
+    return single_member_name_inst<T,TraitsT>(id,traits);
+}
 
 //-------------------------------------------------------------
 

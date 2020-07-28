@@ -113,7 +113,13 @@ struct to_string_t<T,hana::when<can_to_string<T>::value>>
 };
 
 template <typename T>
-constexpr to_string_t<T> to_string{};
+constexpr to_string_t<T> to_string_inst{};
+
+template <typename T>
+std::string to_string(const T& v)
+{
+    return to_string_inst<T>(v);
+}
 
 }
 

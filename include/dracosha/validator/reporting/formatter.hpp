@@ -195,7 +195,11 @@ auto make_formatter(MemberNamesT&& mn, OperandsT&& operands, StringsT&& strings)
  * @return Formatter
  */
 template <typename MemberNamesT,typename OperandsT>
-auto make_formatter(MemberNamesT&& mn, OperandsT&& operands)
+auto make_formatter(MemberNamesT&& mn, OperandsT&& operands,
+                    std::enable_if_t<
+                        !std::is_same<translator_repository,std::decay_t<MemberNamesT>>::value
+                    ,void*
+                    > =nullptr)
 {
     return make_formatter(std::forward<MemberNamesT>(mn),std::forward<OperandsT>(operands),default_strings);
 }
@@ -218,10 +222,34 @@ auto make_formatter(MemberNamesT&& mn,
  * @return Formatter
  */
 template <typename StringsT>
-auto make_formatter(const StringsT& strings,
+auto make_formatter(StringsT&& strings,
                std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr)
 {
-    return make_formatter(make_member_names(strings),default_operand_formatter,strings);
+    auto&& translator=strings._translator;
+    return make_formatter(make_translated_member_names(translator),make_translated_operand_formatter(translator),std::forward<StringsT>(strings));
+}
+
+/**
+ * @brief Create formatter with translator
+ * @param translator Translator
+ * @return Formatter
+ */
+template <typename TranslatorT>
+auto make_formatter(const TranslatorT& translator,
+               std::enable_if_t<hana::is_a<translator_tag,TranslatorT>,void*> =nullptr)
+{
+    return make_formatter(make_translated_member_names(translator),make_translated_operand_formatter(translator),make_translated_strings(translator));
+}
+
+/**
+ * @brief Create formatter with translator repository
+ * @param translator Translator
+ * @return Formatter
+ */
+inline auto make_formatter(const translator_repository& rep, const std::string& loc=std::locale().name())
+{
+    const auto& translator=*rep.find_translator(loc);
+    return make_formatter(make_translated_member_names(translator),make_translated_operand_formatter(translator),make_translated_strings(translator));
 }
 
 /**

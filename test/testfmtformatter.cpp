@@ -112,6 +112,16 @@ BOOST_AUTO_TEST_CASE(CheckFmtFormatterFromStrings)
     checkFormatterFromStrings(make_backend_formatter);
 }
 
+BOOST_AUTO_TEST_CASE(CheckFmtFormatterFromTranslator)
+{
+    checkFormatterFromTranslator(make_backend_formatter);
+}
+
+BOOST_AUTO_TEST_CASE(CheckFmtFormatterFromTranslatorRepository)
+{
+    checkFormatterFromTranslatorRepository(make_backend_formatter);
+}
+
 BOOST_AUTO_TEST_CASE(CheckFmtFormatterFromMemberNames)
 {
     checkFormatterFromMemberNames(make_backend_formatter);

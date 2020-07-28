@@ -67,16 +67,6 @@ struct strings
     strings& operator =(const strings&)=delete;
 
     /**
-     * @brief Convert ID to string
-     * @param id ID that must be converted to string
-     */
-    template <typename T>
-    std::string to_string(const T& id) const
-    {
-        return detail::to_string<T>(id);
-    }
-
-    /**
      * @brief Convert ID to string and then translate it
      * @param id ID that must be converted to string
      * @return ID converted to string and then translated
@@ -84,7 +74,7 @@ struct strings
     template <typename T>
     std::string operator() (const T& id) const
     {
-        return _translator(to_string(id));
+        return _translator(detail::to_string(id));
     }
 
     /**
@@ -115,15 +105,6 @@ struct strings
     std::string aggregation_conjunction(const aggregation_op& aggregation) const
     {
         return _translator(_aggregation_strings.conjunction(aggregation));
-    }
-
-    /**
-     * @brief Get string for conjunction of nested member names
-     * @return String to use to join nested member names in the member's path
-     */
-    std::string member_names_conjunction() const
-    {
-        return _translator(_aggregation_strings.member_names_conjunction());
     }
 };
 

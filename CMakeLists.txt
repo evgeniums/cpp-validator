@@ -91,6 +91,7 @@ SET (HEADERS
     include/dracosha/validator/reporting/flag_presets.hpp
     include/dracosha/validator/reporting/word_attributes.hpp
     include/dracosha/validator/reporting/concrete_phrase.hpp
+    include/dracosha/validator/reporting/translate.hpp
 
     include/dracosha/validator/reporting/locale/sample_locale.hpp
 

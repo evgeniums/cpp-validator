@@ -41,10 +41,10 @@ struct operand_formatter_tag;
  * Sometimes operands require special formatting.
  * The obvious example is a boolean value which can be displayed
  * in different ways, e.g. as 1/0, true/false, yes/not, checked/unchecked, etc.
- * Also operands can be decorated, e.g. with font or HTML tags.
+ * Also operands can be decorated, e.g. with quotes or HTML tags.
  *
- * Default implementation of operand formatting handles only boolean and string types in special manner,
- * all the rest types are bypassed "as is". No special decorating is used.
+ * Default implementation of operand formatting handles and decorates only boolean and to-string-convertible types.
+ * All the rest types are bypassed "as is" and no special decorating is used.
  */
 template <typename TranslatorT, typename DecoratorT>
 struct operand_formatter
@@ -71,7 +71,7 @@ struct operand_formatter
 };
 
 /**
-  @brief Default operand formatter does not perform any translation.
+  @brief Default operand formatter does not perform any translation or decoration.
 */
 constexpr operand_formatter<const no_translator_t&,const no_decorator_t&> default_operand_formatter{no_translator,no_decorator};
 

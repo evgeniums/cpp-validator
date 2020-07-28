@@ -20,11 +20,13 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_MEMBER_NAMES_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/utils/reference_wrapper.hpp>
-#include <dracosha/validator/reporting/strings.hpp>
+#include <dracosha/validator/reporting/translator.hpp>
+#include <dracosha/validator/reporting/no_translator.hpp>
+#include <dracosha/validator/reporting/translator_repository.hpp>
 #include <dracosha/validator/reporting/decorator.hpp>
 #include <dracosha/validator/reporting/single_member_name.hpp>
 #include <dracosha/validator/reporting/nested_member_name.hpp>
+#include <dracosha/validator/reporting/decorator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -33,125 +35,148 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct member_names_tag;
 
 /**
- * @brief Traits for member names formatter that do not perform any formatting and just bypass names "as is".
- *
- * The only exception is inegral member name which is not bypassed but must be processed explicitly by
- * single_member_name helper.
- */
-struct bypass_member_names_t
-{
-    template <typename T>
-    std::string operator() (const T&,
-                            std::enable_if_t<!std::is_integral<std::decay_t<T>>::value,void*> =nullptr
-                            ) const
-    {
-        return std::string();
-    }
-};
-constexpr bypass_member_names_t bypass_member_names{};
-
-/**
  * @brief Member names formatter.
- *
- * Member names formatter forwards a name to traits that implement actual name formatting.
- *
  */
-template <typename StringsT, typename TraitsT>
+template <typename TraitsT>
 struct member_names
 {
     using hana_tag=member_names_tag;
-
-    using strings_type=StringsT;
     using traits_type=TraitsT;
 
-    StringsT _strings;
-    TraitsT _traits;
+    TraitsT traits;
 
     template <typename T>
-    std::string operator() (const T& name,
+    auto operator() (const T& name,
                             std::enable_if_t<hana::is_a<member_tag,T>,void*> =nullptr
-                            ) const
+                            ) const -> decltype(auto)
     {
-        return nested_member_name<T,TraitsT,StringsT>(name,_traits,_strings);
+        return nested_member_name(name,traits);
     }
 
     template <typename T>
-    std::string operator() (const T& name,
+    auto operator() (const T& name,
                             std::enable_if_t<!hana::is_a<member_tag,T>,void*> =nullptr
-                            ) const
+                            ) const -> decltype(auto)
     {
-        return single_member_name<T,TraitsT>(name,_traits,_strings);
+        return single_member_name(name,traits);
     }
 };
 
 /**
- * @brief Create member names formatter
- * @param traits Actual implementer of names formatting
- * @param strings Strings object the unprocessed names will be forwarded to
- * @return Formatter of member names
- */
-template <typename TraitsT,typename StringsT>
-auto make_member_names(TraitsT&& traits, StringsT&& strings,
-                    std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr
-                )
-{
-    return member_names<
-                StringsT,
-                TraitsT
-            >
-            {std::forward<StringsT>(strings),std::forward<TraitsT>(traits)};
-}
-
-/**
- * @brief Create member names formatter that bypasses names processing
- * @param strings Strings object the names will be forwarded to
- * @return Formatter of member names
- */
-template <typename StringsT>
-auto make_member_names(StringsT&& strings,
-                    std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr
-                )
-{
-    return member_names<
-                StringsT,
-                const bypass_member_names_t&
-            >
-            {std::forward<StringsT>(strings),bypass_member_names};
-}
-
-/**
- * @brief Create member names formatter with default strings object
+ * @brief Create member names
  * @param traits Actual implementer of names formatting
  * @return Formatter of member names
  */
 template <typename TraitsT>
-auto make_member_names(TraitsT&& traits,
-                std::enable_if_t<(!hana::is_a<strings_tag,TraitsT> && !hana::is_a<translator_tag,TraitsT>),void*> =nullptr
-            )
+auto make_member_names(TraitsT&& traits)
 {
-    return make_member_names(std::forward<TraitsT>(traits),default_strings);
+    return member_names<TraitsT>{std::forward<TraitsT>(traits)};
 }
 
 /**
- * @brief Get default member names formatter that just forwards names to default strings object
+ * @brief Default traits for member names formatter.
+ *
+ * Default traits join member names in reverse order using of conjunction,
+ * e.g. ["field1"]["subfield1_1"]["subfield1_1_1"] will be formatted as "subfield1_1_1 of subfield1_1 of field1".
+ */
+struct default_member_names_traits_t
+{
+    /**
+     * @brief Get string for conjunction of nested member names
+     * @return String to use to join nested member names in the member's path
+     *
+     * Default is " of ".
+     */
+    static auto member_names_conjunction() -> decltype(auto)
+    {
+        return string_member_name_conjunction;
+    }
+
+    /**
+     * @brief Check if nested memebr names must be joined in reverse order
+     * @return Boolean flag
+     *
+     * Member names can be joined either in direct order (e.g. ["field1"]["subfield1_1"]["subfield1_1_1"] joined as field1.subfield1_1.subfield1_1_1)
+     * or in reverse order (e.g. ["field1"]["subfield1_1"]["subfield1_1_1"] joined as subfield1_1_1 of subfield1_1 of field1).
+     *
+     * Default is reverse order.
+     */
+    constexpr static bool is_reverse_member_names_order()
+    {
+        return true;
+    }
+};
+constexpr default_member_names_traits_t default_member_names_traits{};
+
+/**
+ * @brief Get default member names formatter
  * @return Default formatter of member names
  */
 inline auto get_default_member_names()
     -> std::add_lvalue_reference_t<
-            std::add_const_t<decltype(make_member_names(default_strings))>
+            std::add_const_t<decltype(make_member_names(default_member_names_traits))>
         >
 {
-    static const auto default_member_names=make_member_names(default_strings);
+    static const auto default_member_names=make_member_names(default_member_names_traits);
     return default_member_names;
+}
+
+/**
+ * @brief Traits with translator for member names formatter
+ */
+template <typename TraitsT>
+struct translate_member_names_traits_t : public TraitsT
+{
+    translate_member_names_traits_t(
+                TraitsT&& traits,
+                translator_cref translator
+            ) : TraitsT(std::move(traits)),
+                translator(translator)
+    {}
+
+    translator_cref translator;
+};
+
+/**
+ * @brief Make translated member names from other member names using translator
+ * @param original_mn Original member names formatter
+ * @param translator Translator
+ * @return Member names formatter that first uses original formatter and then translate member names
+ */
+template <typename OriginalMemberNamesT>
+auto make_translated_member_names(OriginalMemberNamesT&& original_mn, translator_cref translator)
+{
+    return make_member_names(
+                translate_member_names_traits_t<typename std::decay_t<OriginalMemberNamesT>::traits_type>(
+                    std::move(original_mn.traits),
+                    translator
+                )
+            );
+}
+
+template <typename OriginalMemberNamesT>
+auto make_translated_member_names(OriginalMemberNamesT&& original_mn, const translator_repository& rep, const std::string& loc=std::locale().name())
+{
+    return make_translated_member_names(std::move(original_mn),*rep.find_translator(loc));
+}
+
+inline auto make_translated_member_names(translator_cref translator)
+{
+    return make_translated_member_names(make_member_names(default_member_names_traits_t{}),translator);
+}
+
+inline auto make_translated_member_names(const translator_repository& rep, const std::string& loc=std::locale().name())
+{
+    return make_translated_member_names(*rep.find_translator(loc));
 }
 
 /**
  * @brief Traits for member names formatter that decorates member name.
  */
 template <typename TraitsT, typename DecoratorT>
-struct decorate_member_names_traits : public TraitsT
+struct decorate_member_names_traits_t : public TraitsT
 {
-    decorate_member_names_traits(
+    decorate_member_names_traits_t(
                 TraitsT&& traits,
                 DecoratorT&& decorator
             ) : TraitsT(std::move(traits)),
@@ -160,6 +185,7 @@ struct decorate_member_names_traits : public TraitsT
 
     DecoratorT decorator;
 };
+
 /**
  * @brief Make decorated member names from other member names using decorator
  * @param original_mn Original member names formatter
@@ -167,16 +193,39 @@ struct decorate_member_names_traits : public TraitsT
  * @return Member names formatter that first uses original formatter and then decorates member names
  */
 template <typename OriginalMemberNamesT, typename DecoratorT>
-auto decorate_member_names(OriginalMemberNamesT&& original_mn, DecoratorT&& decorator)
+auto make_decorated_member_names(OriginalMemberNamesT&& original_mn, DecoratorT&& decorator)
 {
     return make_member_names(
-                decorate_member_names_traits<typename OriginalMemberNamesT::traits_type,DecoratorT>(
-                    std::move(original_mn._traits),
+                decorate_member_names_traits_t<typename std::decay_t<OriginalMemberNamesT>::traits_type,DecoratorT>(
+                    std::move(original_mn.traits),
                     std::forward<DecoratorT>(decorator)
-                ),
-                std::move(original_mn._strings)
+                )
             );
 }
+
+struct dotted_member_names_traits_t
+{
+    /**
+     * @brief Get string for conjunction of nested member names
+     * @return String "." to use to join nested member names in the member's path
+     */
+    static auto member_names_conjunction() -> decltype(auto)
+    {
+        return ".";
+    }
+
+    /**
+     * @brief Check if nested memebr names must be joined in reverse order
+     * @return Boolean flag
+     */
+    constexpr static bool is_reverse_member_names_order()
+    {
+        return false;
+    }
+
+    brackets_decorator_t decorator;
+};
+constexpr member_names<dotted_member_names_traits_t> dotted_member_names{dotted_member_names_traits_t{}};
 
 //-------------------------------------------------------------
 

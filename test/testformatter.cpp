@@ -313,6 +313,34 @@ auto make_test_strings(translator_repository& rep)
     return make_translated_strings(rep,"en");
 }
 
+const auto& make_test_translator(translator_repository& rep)
+{
+    // don't call it twice with the same rep because references to previous translators will be invalidated
+    std::map<std::string,std::string> m=
+    {
+        {"one","one_translated"},
+        {"two","two_translated"},
+        {"three","three_translated"}
+    };
+    auto translator1=std::make_shared<mapped_translator>(std::move(m));
+    std::set<std::string> locales1={"en_US.UTF-8","en_US","en"};
+    rep.add_translator(translator1,locales1);
+    return *rep.find_translator("en");
+}
+void fill_test_repository(translator_repository& rep)
+{
+    // don't call it twice with the same rep because references to previous translators will be invalidated
+    std::map<std::string,std::string> m=
+    {
+        {"one","one_translated"},
+        {"two","two_translated"},
+        {"three","three_translated"}
+    };
+    auto translator1=std::make_shared<mapped_translator>(std::move(m));
+    std::set<std::string> locales1={"en_US.UTF-8","en_US","en"};
+    rep.add_translator(translator1,locales1);
+}
+
 template <typename WrapStringFn>
 void checkDefaultFormatter(const WrapStringFn& wrapper)
 {
@@ -335,8 +363,39 @@ void checkFormatterFromStrings(const WrapStringFn& wrapper)
 
     using fm_type=decltype(fm);
     static_assert(!std::is_lvalue_reference<typename fm_type::member_names_type>::value,"");
-    static_assert(std::is_lvalue_reference<typename fm_type::operands_type>::value,"");
-    static_assert(std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
+    static_assert(!std::is_lvalue_reference<typename fm_type::operands_type>::value,"");
+    static_assert(!std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
+
+    testFormatter(fm,wrapper);
+}
+
+template <typename WrapStringFn>
+void checkFormatterFromTranslator(const WrapStringFn& wrapper)
+{
+    translator_repository rep;
+    auto fm=make_formatter(make_test_translator(rep));
+
+    using fm_type=decltype(fm);
+    static_assert(!std::is_lvalue_reference<typename fm_type::member_names_type>::value,"");
+    static_assert(!std::is_lvalue_reference<typename fm_type::operands_type>::value,"");
+    static_assert(!std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
+    static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
+
+    testFormatter(fm,wrapper);
+}
+
+template <typename WrapStringFn>
+void checkFormatterFromTranslatorRepository(const WrapStringFn& wrapper)
+{
+    translator_repository rep;
+    fill_test_repository(rep);
+    auto fm=make_formatter(rep,"en");
+
+    using fm_type=decltype(fm);
+    static_assert(!std::is_lvalue_reference<typename fm_type::member_names_type>::value,"");
+    static_assert(!std::is_lvalue_reference<typename fm_type::operands_type>::value,"");
+    static_assert(!std::is_lvalue_reference<typename fm_type::strings_type>::value,"");
     static_assert(std::is_lvalue_reference<typename fm_type::order_and_presentation_type>::value,"");
 
     testFormatter(fm,wrapper);

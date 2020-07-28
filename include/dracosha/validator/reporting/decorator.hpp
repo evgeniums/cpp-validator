@@ -22,6 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <string>
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/detail/to_string.hpp>
+#include <dracosha/validator/reporting/backend_formatter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -37,12 +39,26 @@ struct no_decorator_t
     using hana_tag=decorator_tag;
 
     template <typename T>
-    auto operator () (T&& val) const -> decltype(auto)
+    constexpr auto operator () (T&& val) const -> decltype(auto)
     {
         return hana::id(std::forward<T>(val));
     }
 };
 constexpr no_decorator_t no_decorator{};
+
+struct brackets_decorator_t
+{
+    using hana_tag=decorator_tag;
+
+    template <typename T>
+    auto operator () (T&& id) const
+    {
+        std::string dst;
+        backend_formatter.append(dst,"[",detail::to_string(std::forward<T>(id)),"]");
+        return dst;
+    }
+};
+constexpr brackets_decorator_t brackets_decorator{};
 
 /**
  * @brief Helper to work with object that can optionally have or not have decorators
@@ -53,7 +69,7 @@ template <typename T, typename Arg, typename =void>
 struct decorate_t
 {
     template <typename T1, typename Arg1>
-    auto operator() (T1&&, Arg1&& arg) const -> decltype(auto)
+    constexpr auto operator() (T1&&, Arg1&& arg) const -> decltype(auto)
     {
         return hana::id(std::forward<Arg1>(arg));
     }
@@ -80,7 +96,13 @@ struct decorate_t<T,Arg,
  * @brief Helper to work with object that can optionally have or not have decorators
  */
 template <typename T, typename Arg>
-constexpr decorate_t<T,Arg> decorate{};
+constexpr decorate_t<T,Arg> decorate_inst{};
+
+template <typename T, typename Arg>
+constexpr auto decorate(T&& obj, Arg&& arg) -> decltype(auto)
+{
+    return decorate_inst<T,Arg>(std::forward<T>(obj),std::forward<Arg>(arg));
+}
 
 //-------------------------------------------------------------
 

@@ -24,6 +24,21 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/hana_to_std_tuple.hpp>
+#include <dracosha/validator/reporting/concrete_phrase.hpp>
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+namespace fmt
+{
+template <>
+struct formatter<concrete_phrase>
+{
+    template <typename FormatContext>
+    auto format(const concrete_phrase& ph, FormatContext& ctx) {
+        return format_to(ctx.out(),ph.phrase());
+    }
+};
+}
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

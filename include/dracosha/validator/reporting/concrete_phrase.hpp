@@ -44,6 +44,20 @@ class concrete_phrase
 
         concrete_phrase(
                 std::string phrase,
+                word_attributes attributes
+            ) : _phrase(std::move(phrase)),
+                _attributes(attributes)
+        {}
+
+        concrete_phrase(
+                concrete_phrase&& phrase,
+                word_attributes attributes
+            ) : _phrase(std::move(phrase._phrase)),
+                _attributes(attributes)
+        {}
+
+        concrete_phrase(
+                std::string phrase,
                 word attributes
             ) : _phrase(std::move(phrase)),
                 _attributes(word_bitmask.bit(attributes))
@@ -74,6 +88,11 @@ class concrete_phrase
             return _phrase;
         }
 
+        const std::string& phrase_ref() const
+        {
+            return _phrase;
+        }
+
         operator std::string() const
         {
             return _phrase;
@@ -84,9 +103,19 @@ class concrete_phrase
             _phrase=std::move(phrase);
         }
 
-        void set_attributes(word_attributes attributes)
+        void set_attributes(word_attributes attributes) noexcept
         {
             _attributes=attributes;
+        }
+
+        bool empty() const noexcept
+        {
+            return _phrase.empty();
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const concrete_phrase& ph)
+        {
+            return os << ph.phrase();
         }
 
     private:

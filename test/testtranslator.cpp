@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(CheckBaseTranslator)
 {
     std::string str("Hello!");
     auto str1=translator()(str);
-    BOOST_CHECK_EQUAL(str,str1);
+    BOOST_CHECK_EQUAL(str,std::string(str1));
 }
 
 BOOST_AUTO_TEST_CASE(CheckMappedTranslator)
@@ -41,17 +41,17 @@ BOOST_AUTO_TEST_CASE(CheckMappedTranslator)
     tr1.strings()["one"]=m["one"];
     tr1.strings()["two"]=m["two"];
     tr1.strings()["three"]=m["three"];
-    BOOST_CHECK_EQUAL(m["one"],tr1("one"));
-    BOOST_CHECK_EQUAL(m["two"],tr1("two"));
-    BOOST_CHECK_EQUAL(m["three"],tr1("three"));
-    BOOST_CHECK_EQUAL(not_translated,tr1(not_translated));
+    BOOST_CHECK_EQUAL(m["one"],std::string(tr1("one")));
+    BOOST_CHECK_EQUAL(m["two"],std::string(tr1("two")));
+    BOOST_CHECK_EQUAL(m["three"],std::string(tr1("three")));
+    BOOST_CHECK_EQUAL(not_translated,std::string(tr1(not_translated)));
 
     auto m1=m;
     mapped_translator tr2{std::move(m1)};
-    BOOST_CHECK_EQUAL(m["one"],tr2("one"));
-    BOOST_CHECK_EQUAL(m["two"],tr2("two"));
-    BOOST_CHECK_EQUAL(m["three"],tr2("three"));
-    BOOST_CHECK_EQUAL(not_translated,tr2(not_translated));
+    BOOST_CHECK_EQUAL(m["one"],std::string(tr2("one")));
+    BOOST_CHECK_EQUAL(m["two"],std::string(tr2("two")));
+    BOOST_CHECK_EQUAL(m["three"],std::string(tr2("three")));
+    BOOST_CHECK_EQUAL(not_translated,std::string(tr2(not_translated)));
 }
 
 BOOST_AUTO_TEST_CASE(CheckTranslatorRepository)
@@ -80,26 +80,26 @@ BOOST_AUTO_TEST_CASE(CheckTranslatorRepository)
     {
         auto ok=[&not_translated,&m](const translator& tr)
         {
-            BOOST_CHECK_EQUAL(m["one"],tr("one"));
-            BOOST_CHECK_EQUAL(m["two"],tr("two"));
-            BOOST_CHECK_EQUAL(m["three"],tr("three"));
-            BOOST_CHECK_EQUAL(not_translated,tr(not_translated));
+            BOOST_CHECK_EQUAL(m["one"],std::string(tr("one")));
+            BOOST_CHECK_EQUAL(m["two"],std::string(tr("two")));
+            BOOST_CHECK_EQUAL(m["three"],std::string(tr("three")));
+            BOOST_CHECK_EQUAL(not_translated,std::string(tr(not_translated)));
         };
 
         auto second_tr=[&not_translated,&m_sec](const translator& tr)
         {
-            BOOST_CHECK_EQUAL(m_sec["one"],tr("one"));
-            BOOST_CHECK_EQUAL(m_sec["two"],tr("two"));
-            BOOST_CHECK_EQUAL(m_sec["three"],tr("three"));
-            BOOST_CHECK_EQUAL(not_translated,tr(not_translated));
+            BOOST_CHECK_EQUAL(m_sec["one"],std::string(tr("one")));
+            BOOST_CHECK_EQUAL(m_sec["two"],std::string(tr("two")));
+            BOOST_CHECK_EQUAL(m_sec["three"],std::string(tr("three")));
+            BOOST_CHECK_EQUAL(not_translated,std::string(tr(not_translated)));
         };
 
         auto default_tr=[&not_translated,&m_def](const translator& tr)
         {
-            BOOST_CHECK_EQUAL(m_def["one"],tr("one"));
-            BOOST_CHECK_EQUAL(m_def["two"],tr("two"));
-            BOOST_CHECK_EQUAL(m_def["three"],tr("three"));
-            BOOST_CHECK_EQUAL(not_translated,tr(not_translated));
+            BOOST_CHECK_EQUAL(m_def["one"],std::string(tr("one")));
+            BOOST_CHECK_EQUAL(m_def["two"],std::string(tr("two")));
+            BOOST_CHECK_EQUAL(m_def["three"],std::string(tr("three")));
+            BOOST_CHECK_EQUAL(not_translated,std::string(tr(not_translated)));
         };
 
         BOOST_TEST_CONTEXT("Full locale name with encoding")
@@ -206,6 +206,20 @@ BOOST_AUTO_TEST_CASE(CheckTranslatorRepository)
     auto tr2=rep.find_translator("en_US.UTF-8");
     BOOST_REQUIRE(tr2);
     BOOST_CHECK(tr2.get()==def_translator.get());
+}
+
+BOOST_AUTO_TEST_CASE(CheckConcretePhrase)
+{
+    std::map<std::string,std::string> m=
+    {
+        {"one","one_translated"},
+        {"two","two_translated"},
+        {"three","three_translated"}
+    };
+
+    mapped_translator tr1(m);
+    BOOST_CHECK_EQUAL(std::string(tr1("one")),"one_translated");
+    BOOST_CHECK_EQUAL(std::string(tr1(concrete_phrase("one"))),"one");
 }
 
 BOOST_AUTO_TEST_CASE(CheckSampleLocale)

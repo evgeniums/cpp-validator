@@ -20,6 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_FORMAT_OPERAND_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/reporting/concrete_phrase.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -46,9 +47,9 @@ template <typename T, typename =hana::when<true>>
 struct format_operand_t
 {
     template <typename T1, typename TranslatorT, typename DecoratorT>
-    auto operator () (T1&& val, const TranslatorT&, const DecoratorT& decorator) const -> decltype(auto)
+    auto operator () (T1&& val, const TranslatorT&, const DecoratorT&) const -> decltype(auto)
     {
-        return decorator(std::forward<T1>(val));
+        return hana::id(std::forward<T1>(val));
     }
 };
 
@@ -57,8 +58,10 @@ struct format_operand_t
  */
 template <typename T>
 struct format_operand_t<T,hana::when<
-            std::is_constructible<std::string,T>::value>
-        >
+            std::is_constructible<std::string,T>::value
+            ||
+            std::is_same<concrete_phrase,std::decay_t<T>>::value
+        >>
 {
     template <typename T1, typename TranslatorT, typename DecoratorT>
     auto operator () (T1&& val, const TranslatorT&, const DecoratorT& decorator) const -> decltype(auto)
@@ -71,7 +74,11 @@ struct format_operand_t<T,hana::when<
  * @brief  Formatter of boolean values
  */
 template <typename T>
-struct format_operand_t<T,hana::when<std::is_same<bool,std::decay_t<T>>::value>>
+struct format_operand_t<T,hana::when<
+            !std::is_same<concrete_phrase,std::decay_t<T>>::value
+            &&
+            std::is_same<bool,std::decay_t<T>>::value
+        >>
 {
     template <typename T1, typename TranslatorT, typename DecoratorT>
     auto operator () (T1&& val, const TranslatorT& translator, const DecoratorT& decorator) const -> decltype(auto)
