@@ -239,13 +239,9 @@ struct member
     }
 
     /**
-     * @brief Strub for has_name() property
-     * @return Always false
+     * @brief member does not have explicit name
      */
-    constexpr static bool has_name()
-    {
-        return false;
-    }
+    constexpr static bool has_name = false;
 };
 
 template <typename T, typename ...ParentPathT>
@@ -275,13 +271,9 @@ struct member_with_name : public member<T,ParentPathT...>
     }
 
     /**
-     * @brief Check if member has a name
-     * @return Always true
+     * @brief member_with_name has explicit name
      */
-    constexpr static bool has_name()
-    {
-        return true;
-    }
+    constexpr static bool has_name = true;
 
     /**
      * @brief Bind compound validator to current member

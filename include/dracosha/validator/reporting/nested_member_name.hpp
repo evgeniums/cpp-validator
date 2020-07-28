@@ -123,7 +123,7 @@ struct nested_member_name_t
  */
 template <typename T, typename TraitsT>
 struct nested_member_name_t<T,TraitsT,
-            hana::when<T::has_name()>
+            hana::when<T::has_name>
         >
 {
     auto operator() (const T& id, const TraitsT& traits) const
