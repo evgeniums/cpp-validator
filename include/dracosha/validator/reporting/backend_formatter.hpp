@@ -19,7 +19,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_BACKEND_FORMATTER_HPP
 #define DRACOSHA_VALIDATOR_BACKEND_FORMATTER_HPP
 
-#include <boost/algorithm/string/trim_all.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/reference_wrapper.hpp>
@@ -53,7 +53,7 @@ struct backend_formatter_t
     static void append_join_args(DstT& dst, SepT&& sep, Args&&... args)
     {
         detail::backend_formatter_helper<DstT>::append_join_args(dst,std::forward<SepT>(sep),std::forward<Args>(args)...);
-        boost::trim_all(detail::to_dst(dst));
+        boost::trim(detail::to_dst(dst));
     }
 
     /**
@@ -66,7 +66,7 @@ struct backend_formatter_t
     static void append_join(DstT& dst, SepT&& sep, PartsT&& parts)
     {
         detail::backend_formatter_helper<DstT>::append_join(dst,std::forward<SepT>(sep),std::forward<PartsT>(parts));
-        boost::trim_all(detail::to_dst(dst));
+        boost::trim(detail::to_dst(dst));
     }
 };
 constexpr backend_formatter_t backend_formatter{};
