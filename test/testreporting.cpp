@@ -412,7 +412,6 @@ BOOST_AUTO_TEST_CASE(CheckNestedValidationReport)
                 _[100](lt,5)
             );
     BOOST_CHECK(v3.apply(ra1));
-    BOOST_TEST_MESSAGE(rep1);
     rep1.clear();
 }
 
