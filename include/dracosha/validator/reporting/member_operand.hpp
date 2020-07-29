@@ -47,7 +47,7 @@ struct member_operand : public object_wrapper<T>
 template <typename T>
 auto make_member_operand(T&& b)
 {
-    return member_operand<reference_wrapper<T>>{std::forward<T>(b)};
+    return member_operand<T>{std::forward<T>(b)};
 }
 
 //-------------------------------------------------------------

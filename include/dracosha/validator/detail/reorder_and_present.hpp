@@ -19,6 +19,8 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_REORDER_AND_PRESENT_HPP
 #define DRACOSHA_VALIDATOR_REORDER_AND_PRESENT_HPP
 
+#include <iostream>
+
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/reference_wrapper.hpp>
 #include <dracosha/validator/operators/flag.hpp>
@@ -37,6 +39,31 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 namespace detail
 {
 
+template <typename DstT, typename FormatterTs, typename ... Args>
+auto format_join(DstT& dst, FormatterTs&& formatters, Args&&... args)
+{
+    auto pairs=hana::zip(
+        std::forward<FormatterTs>(formatters),
+        make_cref_tuple(std::forward<Args>(args)...)
+    );
+    auto parts=hana::fold(
+        pairs,
+        hana::make_tuple(),
+        [](auto&& prev, auto&& current)
+        {
+            return hana::append(std::forward<decltype(prev)>(prev),apply_ref(hana::front(current),hana::back(current),last_word_attributes(prev,0)));
+        }
+    );
+    return hana::unpack(
+        parts,
+        hana::partial(
+                formatter_append_join_args,
+                ref(dst),
+                " "
+            )
+    );
+}
+
 //-------------------------------------------------------------
 
 /**
@@ -45,23 +72,7 @@ namespace detail
 template <typename DstT, typename FormatterTs, typename ...Args>
 constexpr auto apply_reorder_present_fn(DstT& dst, FormatterTs&& formatters, Args&&... args) -> decltype(auto)
 {
-    // the remarkable composition below is about
-    // to apply each formatter to its corresponding argument
-    // and then forward the results to formatter_append_join_args handler
-
-    return hana::unpack(hana::transform( // transform all {formatter,arg} pairs to results of formatter(arg)
-                                            hana::zip( // pair each formatter with its argument
-                                                std::forward<FormatterTs>(formatters),
-                                                make_cref_tuple(std::forward<Args>(args)...)
-                                            ),
-                                            hana::fuse(apply_ref) // for each pair invoke a formatter with the argument from the same pair
-                                        ),
-                        hana::partial(     // send all formatter(pair) results to append_with_separator handler
-                                formatter_append_join_args,
-                                ref(dst),
-                                " "
-                            )
-                       );
+    return format_join(dst,std::forward<FormatterTs>(formatters),std::forward<Args>(args)...);
 }
 
 //-------------------------------------------------------------
@@ -69,28 +80,8 @@ constexpr auto apply_reorder_present_fn(DstT& dst, FormatterTs&& formatters, Arg
 /**
  * @brief Adjust presentation and order of validation report for 1 argument, which must be an aggregation operator
  */
-template <typename OpT, typename = hana::when<true>>
-struct apply_reorder_present_1arg_t
-{
-    template <typename DstT, typename FormatterTs>
-    constexpr auto operator () (
-                                    DstT& dst,
-                                    FormatterTs&& formatters,
-                                    const OpT& op
-                                ) const -> decltype(auto)
-    {
-        // op:
-        return backend_formatter.append(
-            dst,
-            apply_ref(hana::at(formatters,hana::size_c<0>),op),
-            apply_ref(hana::at(formatters,hana::size_c<0>),string_conjunction_aggregate)
-        );
-    }
-};
-
 template <typename AggregationItemT>
-struct apply_reorder_present_1arg_t<AggregationItemT,
-                                hana::when<hana::is_a<report_aggregation_tag,AggregationItemT>>>
+struct apply_reorder_present_1arg_t
 {
     template <typename DstT, typename StringsT>
     constexpr auto operator () (
@@ -169,11 +160,7 @@ struct apply_reorder_present_2args_t<
                                 const OpT& op, const T2& b
                                 ) const -> decltype(auto)
     {
-        backend_formatter.append_join_args(
-                dst,
-                " ",
-                apply_ref(hana::at(formatters,hana::size_c<0>),op.str(value,b))
-            );
+        format_join(dst,hana::make_tuple(hana::at(formatters,hana::size_c<0>)),op.str(value,b));
     }
 };
 
@@ -219,20 +206,16 @@ struct apply_reorder_present_3args_t<
             std::decay_t<OpT>::prepend_property(prop),
             [&dst,&formatters,&op,&prop,&b](auto&&)
             {
-                backend_formatter.append_join_args(
-                            dst,
-                            " ",
-                            apply_ref(hana::at(formatters,hana::size_c<0>),prop),
-                            apply_ref(hana::at(formatters,hana::size_c<0>),op.str(prop,b))
+                format_join(dst,
+                            hana::make_tuple(
+                                hana::at(formatters,hana::size_c<0>),hana::at(formatters,hana::size_c<0>)
+                            ),
+                                prop,op.str(prop,b)
                         );
             },
             [&dst,&formatters,&op,&prop,&b](auto&&)
             {
-                backend_formatter.append_join_args(
-                        dst,
-                        " ",
-                        apply_ref(hana::at(formatters,hana::size_c<0>),op.str(prop,b))
-                    );
+                format_join(dst,hana::make_tuple(hana::at(formatters,hana::size_c<0>)),op.str(prop,b));
             }
         );
     }
@@ -260,25 +243,33 @@ struct apply_reorder_present_4args_t
             [&](auto)
             {
                 // member op b
-                return backend_formatter.append_join_args(
-                    dst,
-                    " ",
-                    apply_ref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),std::forward<OpT>(op)),
-                    apply_ref(hana::at(formatters,hana::size_c<3>),b)
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<3>)
+                    ),
+                    member,
+                    op,
+                    b
                 );
             },
             [&](auto)
             {
                 // prop of member op b
-                return backend_formatter.append_join_args(
-                    dst,
-                    " ",
-                    apply_ref(hana::at(formatters,hana::size_c<1>),prop),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
-                    apply_ref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),std::forward<OpT>(op)),
-                    apply_ref(hana::at(formatters,hana::size_c<3>),b)
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<1>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<3>)
+                    ),
+                    prop,
+                    string_conjunction_of,
+                    member,
+                    op,
+                    b
                 );
             }
         );
@@ -303,28 +294,38 @@ struct apply_reorder_present_4args_t<
             std::is_same<std::decay_t<PropT>,type_p_value>::value,
             [&](auto)
             {
-                // member op b
-                return backend_formatter.append_join_args(
-                    dst,
-                    " ",
-                    apply_ref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),std::forward<OpT>(op)),
-                    apply_ref(hana::at(formatters,hana::size_c<3>),b.get())
+                // member op member_operand(b)
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<3>)
+                    ),
+                    member,
+                    op,
+                    b.get()
                 );
             },
             [&](auto)
             {
-                // prop of member op b
-                return backend_formatter.append_join_args(
-                    dst,
-                    " ",
-                    apply_ref(hana::at(formatters,hana::size_c<1>),prop),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
-                    apply_ref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),std::forward<OpT>(op)),
-                    apply_ref(hana::at(formatters,hana::size_c<1>),prop),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
-                    apply_ref(hana::at(formatters,hana::size_c<3>),b.get())
+                // prop of member op prop of member_operand(b)
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<1>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<1>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<3>)
+                    ),
+                    prop,
+                    string_conjunction_of,
+                    member,
+                    op,
+                    prop,
+                    string_conjunction_of,
+                    b.get()
                 );
             }
         );
@@ -355,31 +356,45 @@ struct apply_reorder_present_4args_t<
             [&](auto)
             {
                 // member op member of sample
-                return backend_formatter.append_join_args(
-                    dst,
-                    " ",
-                    apply_ref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),std::forward<OpT>(op)),
-                    apply_ref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
-                    apply_ref(hana::at(formatters,hana::size_c<3>),b)
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<3>)
+                    ),
+                    member,
+                    op,
+                    member,
+                    string_conjunction_of,
+                    b
                 );
             },
             [&](auto)
             {
                 // prop of member op prop of member of sample
-                return backend_formatter.append_join_args(
-                    dst,
-                    " ",
-                    apply_ref(hana::at(formatters,hana::size_c<1>),prop),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
-                    apply_ref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),std::forward<OpT>(op)),
-                    apply_ref(hana::at(formatters,hana::size_c<1>),prop),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
-                    apply_ref(hana::at(formatters,hana::size_c<0>),member),
-                    apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
-                    apply_ref(hana::at(formatters,hana::size_c<3>),b)
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<1>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<1>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<3>)
+                    ),
+                    prop,
+                    string_conjunction_of,
+                    member,
+                    op,
+                    prop,
+                    string_conjunction_of,
+                    member,
+                    string_conjunction_of,
+                    b
                 );
             }
         );
@@ -407,23 +422,29 @@ struct apply_reorder_present_4args_t<
             std::decay_t<OpT>::prepend_property(prop),
             [&dst,&member,&formatters,&op,&prop,&b](auto&&)
             {
-                backend_formatter.append_join_args(
-                            dst,
-                            " ",
-                            apply_ref(hana::at(formatters,hana::size_c<1>),prop),
-                            apply_ref(hana::at(formatters,hana::size_c<2>),string_conjunction_of),
-                            apply_ref(hana::at(formatters,hana::size_c<0>),member),
-                            apply_ref(hana::at(formatters,hana::size_c<1>),op.str(prop,b))
-                        );
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<1>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<1>)
+                    ),
+                    prop,
+                    string_conjunction_of,
+                    member,
+                    op.str(prop,b)
+                );
             },
             [&dst,&member,&formatters,&op,&prop,&b](auto&&)
             {
-                backend_formatter.append_join_args(
-                        dst,
-                        " ",
-                        apply_ref(hana::at(formatters,hana::size_c<0>),member),
-                        apply_ref(hana::at(formatters,hana::size_c<1>),op.str(prop,b))
-                    );
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<1>)
+                    ),
+                    member,
+                    op.str(prop,b)
+                );
             }
         );
     }

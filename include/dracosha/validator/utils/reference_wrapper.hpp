@@ -158,9 +158,9 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto extract_ref =[](auto&& vr) -> decltype(auto)
   @param vr Argument to fn or vref of argument to fn
   @return Result of fn invokation
 */
-BOOST_HANA_CONSTEXPR_LAMBDA auto apply_ref =[](auto&& fn,auto&& vr) -> decltype(auto)
+BOOST_HANA_CONSTEXPR_LAMBDA auto apply_ref =[](auto&& fn,auto&& vr, auto&&... args) -> decltype(auto)
 {
-    return extract_ref(fn)(extract_ref(std::forward<decltype(vr)>(vr)));
+    return extract_ref(fn)(extract_ref(std::forward<decltype(vr)>(vr)),std::forward<decltype(args)>(args)...);
 };
 
 /**

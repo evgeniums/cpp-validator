@@ -47,7 +47,8 @@ struct member_names
 
     template <typename T>
     auto operator() (const T& name,
-                            std::enable_if_t<hana::is_a<member_tag,T>,void*> =nullptr
+                     word_attributes=0,
+                     std::enable_if_t<hana::is_a<member_tag,T>,void*> =nullptr
                             ) const -> decltype(auto)
     {
         return nested_member_name(name,traits);
@@ -55,7 +56,8 @@ struct member_names
 
     template <typename T>
     auto operator() (const T& name,
-                            std::enable_if_t<!hana::is_a<member_tag,T>,void*> =nullptr
+                     word_attributes=0,
+                     std::enable_if_t<!hana::is_a<member_tag,T>,void*> =nullptr
                             ) const -> decltype(auto)
     {
         return single_member_name(name,traits);

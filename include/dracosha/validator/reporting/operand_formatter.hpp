@@ -64,7 +64,7 @@ struct operand_formatter
      * Note, that return type can be either a string or the same as input type.
      */
     template <typename T>
-    auto operator () (T&& val) const -> decltype(auto)
+    auto operator () (T&& val, word_attributes=0) const -> decltype(auto)
     {
         return detail::format_operand<T>(std::forward<T>(val),_translator,_decorator);
     }
