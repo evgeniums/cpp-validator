@@ -47,20 +47,20 @@ struct member_names
 
     template <typename T>
     auto operator() (const T& name,
-                     word_attributes=0,
+                     word_attributes attributes=0,
                      std::enable_if_t<hana::is_a<member_tag,T>,void*> =nullptr
                             ) const -> decltype(auto)
     {
-        return nested_member_name(name,traits);
+        return nested_member_name(name,traits,attributes);
     }
 
     template <typename T>
     auto operator() (const T& name,
-                     word_attributes=0,
+                     word_attributes attributes=0,
                      std::enable_if_t<!hana::is_a<member_tag,T>,void*> =nullptr
                             ) const -> decltype(auto)
     {
-        return single_member_name(name,traits);
+        return single_member_name(name,traits,attributes);
     }
 };
 

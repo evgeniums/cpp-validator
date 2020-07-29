@@ -189,6 +189,19 @@ struct phrase_attributes_t
 template <typename T>
 struct phrase_attributes_t<
             T,
+            hana::when<std::is_same<word_attributes,std::decay_t<T>>::value>
+        >
+{
+    template <typename T1>
+    auto operator() (T1&& attributes) const -> decltype(auto)
+    {
+        return hana::id(std::forward<T1>(attributes));
+    }
+};
+
+template <typename T>
+struct phrase_attributes_t<
+            T,
             hana::when<std::is_same<concrete_phrase,std::decay_t<T>>::value>
         >
 {
@@ -209,9 +222,19 @@ constexpr phrase_attributes_t<T> phrase_attributes_inst{};
  * @return Phrase attributes if applicabe or 0
  */
 template <typename T>
-word_attributes phrase_attributes(T&& phrase)
+auto phrase_attributes(T&& phrase) -> decltype(auto)
 {
     return detail::phrase_attributes_inst<T>(std::forward<T>(phrase));
+}
+
+template <typename Ts, typename T>
+auto last_word_attributes(Ts&& ts, T&& fallback)
+{
+    return hana::if_(
+        hana::is_empty(ts),
+        [&fallback](auto &&) {return phrase_attributes(fallback);},
+        [](auto&& ts) {return phrase_attributes(hana::back(ts));}
+    )(std::forward<Ts>(ts));
 }
 
 //-------------------------------------------------------------
