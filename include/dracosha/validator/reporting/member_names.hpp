@@ -94,17 +94,13 @@ struct default_member_names_traits_t
 
     /**
      * @brief Check if nested memebr names must be joined in reverse order
-     * @return Boolean flag
      *
      * Member names can be joined either in direct order (e.g. ["field1"]["subfield1_1"]["subfield1_1_1"] joined as field1.subfield1_1.subfield1_1_1)
      * or in reverse order (e.g. ["field1"]["subfield1_1"]["subfield1_1_1"] joined as subfield1_1_1 of subfield1_1 of field1).
      *
      * Default is reverse order.
      */
-    constexpr static bool is_reverse_member_names_order()
-    {
-        return true;
-    }
+    constexpr static bool is_reverse_member_names_order=true;
 };
 constexpr default_member_names_traits_t default_member_names_traits{};
 
@@ -239,12 +235,8 @@ struct dotted_member_names_traits_t
 
     /**
      * @brief Check if nested memebr names must be joined in reverse order
-     * @return Boolean flag
      */
-    constexpr static bool is_reverse_member_names_order()
-    {
-        return false;
-    }
+    constexpr static bool is_reverse_member_names_order=false;
 
     brackets_decorator_t decorator;
 };

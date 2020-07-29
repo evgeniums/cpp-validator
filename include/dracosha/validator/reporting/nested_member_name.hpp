@@ -68,54 +68,149 @@ struct has_nested<T,TraitsT,
 };
 
 template <typename T, typename TraitsT>
-constexpr auto member_names_path(const T& id, const TraitsT&,
-                       std::enable_if_t<!TraitsT::is_reverse_member_names_order(),void*> =nullptr)
-                -> std::add_lvalue_reference_t<
-                        std::add_const_t<
-                            std::decay_t<decltype(id.path)>
-                        >
-                    >
+constexpr auto member_names_path(T&& path, const TraitsT&,
+                       std::enable_if_t<!TraitsT::is_reverse_member_names_order,void*> =nullptr) -> decltype(auto)
 {
-    return id.path;
+    return hana::id(std::forward<T>(path));
 }
 
 template <typename T, typename TraitsT>
-constexpr auto member_names_path(const T& id, const TraitsT&,
-                       std::enable_if_t<TraitsT::is_reverse_member_names_order(),void*> =nullptr) -> decltype(auto)
+constexpr auto member_names_path(T&& path, const TraitsT&,
+                       std::enable_if_t<TraitsT::is_reverse_member_names_order,void*> =nullptr)
 {
-    return hana::reverse(id.path);
+    return hana::reverse(std::forward<T>(path));
+}
+
+template <typename T, typename TraitsT, typename =void>
+struct member_name_with_separator_t
+{
+    auto operator() (T&& id, const TraitsT& traits, const word_attributes& attributes) const
+    {
+        auto name=single_member_name(std::forward<T>(id),traits,attributes);
+        auto name_attributes=phrase_attributes(name);
+        return hana::make_tuple(std::move(name),translate(traits,detail::to_string(traits.member_names_conjunction()),name_attributes));
+    }
+};
+
+template <typename T, typename TraitsT>
+struct member_name_with_separator_t<T,TraitsT,
+        decltype(
+            (void)std::declval<std::decay_t<T>>().member_name_with_separator(std::declval<std::decay_t<T>>(),std::declval<word_attributes>())
+        )>
+{
+    auto operator() (T&& id, const TraitsT& traits, const word_attributes& attributes) const
+    {
+        return traits.member_name_with_separator(std::forward<T>(id),attributes);
+    }
+};
+
+template <typename T, typename TraitsT>
+constexpr member_name_with_separator_t<T,TraitsT> member_name_with_separator_inst{};
+
+template <typename T, typename TraitsT>
+auto member_name_with_separator(T&& id, const TraitsT& traits, const word_attributes& attributes=0)
+{
+    return member_name_with_separator_inst<T,TraitsT>(std::forward<T>(id),traits,attributes);
+}
+
+template <typename Ts, typename T>
+auto last_word_attributes(Ts&& ts, T&& fallback)
+{
+    return hana::if_(
+        hana::is_empty(ts),
+        [&fallback](auto &&) {return phrase_attributes(fallback);},
+        [](auto&& ts) {return phrase_attributes(hana::back(ts));}
+    )(std::forward<Ts>(ts));
+}
+
+template <typename T, typename TraitsT>
+auto intermediate_member_names(const T& id, const TraitsT& traits)
+{
+    // format intermediate keys without the last key
+    return hana::fold(
+        member_names_path(hana::drop_back(id.path),traits),
+        hana::tuple<>(),
+        [&traits](auto&& prev_parts, auto&& current_key)
+        {
+            auto attributes=last_word_attributes(prev_parts,0);
+            return hana::concat(
+                        std::forward<decltype(prev_parts)>(prev_parts),
+                        member_name_with_separator(current_key,traits,attributes)
+                   );
+        }
+    );
+}
+
+template <typename T, typename TraitsT, typename Ts>
+auto reverse_member_names(const T& id, const TraitsT& traits, Ts&&,
+                          std::enable_if_t<
+                          std::is_same<decltype(hana::tuple<>()),std::decay_t<Ts>>::value
+                          ,void*> =nullptr)
+{
+    // format last key
+    return hana::make_tuple(single_member_name(hana::back(id.path),traits));
+}
+
+template <typename T, typename TraitsT, typename Ts>
+auto reverse_member_names(const T& id, const TraitsT& traits, Ts&& ts,
+                          std::enable_if_t<
+                          !std::is_same<decltype(hana::tuple<>()),std::decay_t<Ts>>::value
+                          ,void*> =nullptr)
+{
+    // format last key and prepend to the list
+    return hana::concat(
+                member_name_with_separator(hana::back(id.path),traits),
+                std::forward<Ts>(ts)
+           );
+}
+
+template <typename T, typename TraitsT>
+auto list_member_names(const T& id, const TraitsT& traits,
+                       std::enable_if_t<
+                       TraitsT::is_reverse_member_names_order
+                       ,void*> =nullptr)
+{
+    // construct intermediate list and drop last separator
+    auto parts=hana::drop_back(intermediate_member_names(id,traits));
+
+    // construct reversed list
+    return reverse_member_names(id,traits,std::move(parts));
+}
+
+template <typename T, typename TraitsT>
+auto list_member_names(const T& id, const TraitsT& traits,
+                       std::enable_if_t<
+                       !TraitsT::is_reverse_member_names_order
+                       ,void*> =nullptr)
+{
+    // construct intermediate list
+    auto parts=intermediate_member_names(id,traits);
+
+    // format last key and append to the internmediate list
+    auto attributes=last_word_attributes(parts,0);
+    return hana::append(
+                std::move(parts),
+                single_member_name(hana::back(id.path),traits,attributes)
+           );
 }
 
 template <typename T, typename TraitsT>
 auto join_member_names(const T& id, const TraitsT& traits)
 {
+    auto parts=list_member_names(id,traits);
     std::string dst;
-
-    auto separator=translate(traits,detail::to_string(traits.member_names_conjunction()));
-    auto path=member_names_path(id,traits);
-    auto first=single_member_name(hana::front(path),traits);
-    auto the_rest=hana::transform(
-                    hana::drop_front(path),
-                    [&](const auto& current_key)
-                    {
-                        return single_member_name(current_key,traits,phrase_attributes(separator));
-                    }
-                  );
-    auto members=hana::prepend(the_rest,first);
-
     backend_formatter.append_join(
        dst,
-       separator,
-       members
+       "",
+       parts
     );
-
-    return concrete_phrase(dst,phrase_attributes(first));
+    return concrete_phrase(dst,last_word_attributes(parts,0));
 }
 
 }
 
 /**
- * @brief Default formatter of a member name to be used when member doesn't have explicit name and traits do not implement method nested(id,traits,translator)
+ * @brief Default formatter of a member name to be used when member doesn't have explicit name and traits do not implement method nested(id,traits)
  */
 template <typename T, typename TraitsT, typename =hana::when<true>>
 struct nested_member_name_t
