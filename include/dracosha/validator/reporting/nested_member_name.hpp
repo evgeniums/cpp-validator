@@ -90,18 +90,26 @@ template <typename T, typename TraitsT>
 auto join_member_names(const T& id, const TraitsT& traits)
 {
     std::string dst;
+
+    auto separator=translate(traits,detail::to_string(traits.member_names_conjunction()));
+    auto path=member_names_path(id,traits);
+    auto first=single_member_name(hana::front(path),traits);
+    auto the_rest=hana::transform(
+                    hana::drop_front(path),
+                    [&](const auto& current_key)
+                    {
+                        return single_member_name(current_key,traits,phrase_attributes(separator));
+                    }
+                  );
+    auto members=hana::prepend(the_rest,first);
+
     backend_formatter.append_join(
        dst,
-       translate(traits,detail::to_string(traits.member_names_conjunction())),
-       hana::transform(
-                       member_names_path(id,traits),
-                       [&](const auto& current_key)
-                       {
-                           return single_member_name(current_key,traits);
-                       }
-                     )
+       separator,
+       members
     );
-    return dst;
+
+    return concrete_phrase(dst,phrase_attributes(first));
 }
 
 }
@@ -143,31 +151,6 @@ struct nested_member_name_t<T,TraitsT,
     auto operator() (const T& id, const TraitsT& traits) const -> decltype(auto)
     {
         return traits.nested(id,traits);
-    }
-};
-
-/**
- * @brief Formatter of a member name to be used when name of the last key of the member can be converted to concrete phrase.
- */
-template <typename T, typename TraitsT>
-struct nested_member_name_t<T,TraitsT,
-        hana::when<
-            !detail::has_nested<T,TraitsT>::value
-            &&
-            std::is_same<
-                decltype(
-                    single_member_name(
-                        std::declval<std::decay_t<decltype(std::declval<T>().key())>>(),
-                        std::declval<TraitsT>()
-                        )
-                ),
-                concrete_phrase
-            >::value
-        >>
-{
-    auto operator() (const T& id, const TraitsT& traits) const
-    {
-        return concrete_phrase(detail::join_member_names(id,traits),single_member_name(id.key(),traits).attributes());
     }
 };
 

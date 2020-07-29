@@ -68,9 +68,9 @@ struct can_single_member_name<T,TraitsT,
 template <typename T, typename TraitsT, typename =hana::when<true>>
 struct single_member_name_t
 {
-    auto operator() (const T& id, const TraitsT& traits) const -> decltype(auto)
+    auto operator() (const T& id, const TraitsT& traits, word_attributes attributes) const -> decltype(auto)
     {
-        return decorate(traits,translate(traits,detail::to_string(id)));
+        return decorate(traits,translate(traits,detail::to_string(id),attributes));
     }
 };
 
@@ -82,9 +82,9 @@ struct single_member_name_t
 template <typename T, typename TraitsT>
 struct single_member_name_t<T,TraitsT,hana::when<can_single_member_name<T,TraitsT>::value>>
 {
-    auto operator() (const T& id, const TraitsT& traits) const -> decltype(auto)
+    auto operator() (const T& id, const TraitsT& traits, word_attributes attributes) const -> decltype(auto)
     {
-        return decorate(traits,translate(traits,traits(id)));
+        return decorate(traits,translate(traits,traits(id),attributes));
     }
 };
 
@@ -101,10 +101,10 @@ struct single_member_name_t<T,TraitsT,
                                 >
                             >
 {
-    auto operator() (const T& id, const TraitsT& traits) const
+    auto operator() (const T& id, const TraitsT& traits, word_attributes attributes) const
     {
         std::string dst;
-        backend_formatter.append(dst,translate(traits,std::string(string_element)),id);
+        backend_formatter.append(dst,translate(traits,std::string(string_element),attributes),id);
         return decorate(traits,dst);
     }
 };
@@ -119,9 +119,9 @@ constexpr single_member_name_t<T,TraitsT> single_member_name_inst{};
  * @return Processed member name
  */
 template <typename T, typename TraitsT>
-constexpr auto single_member_name(const T& id, const TraitsT& traits) -> decltype(auto)
+constexpr auto single_member_name(const T& id, const TraitsT& traits, word_attributes attributes=0) -> decltype(auto)
 {
-    return single_member_name_inst<T,TraitsT>(id,traits);
+    return single_member_name_inst<T,TraitsT>(id,traits,attributes);
 }
 
 //-------------------------------------------------------------

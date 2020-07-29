@@ -174,6 +174,46 @@ class concrete_phrase
         word_attributes _attributes;
 };
 
+namespace detail
+{
+template <typename T, typename = hana::when<true>>
+struct phrase_attributes_t
+{
+    template <typename T1>
+    constexpr word_attributes operator() (T1&&) const
+    {
+        return 0;
+    }
+};
+
+template <typename T>
+struct phrase_attributes_t<
+            T,
+            hana::when<std::is_same<concrete_phrase,std::decay_t<T>>::value>
+        >
+{
+    template <typename T1>
+    word_attributes operator() (T1&& phrase) const
+    {
+        return phrase.attributes();
+    }
+};
+
+template <typename T>
+constexpr phrase_attributes_t<T> phrase_attributes_inst{};
+}
+
+/**
+ * @brief Get phrase attributes
+ * @param phrase Phrase
+ * @return Phrase attributes if applicabe or 0
+ */
+template <typename T>
+word_attributes phrase_attributes(T&& phrase)
+{
+    return detail::phrase_attributes_inst<T>(std::forward<T>(phrase));
+}
+
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/strings.hpp
 *
-* Defines traits for strings formatting.
+* Defines formatter of miscellaneous strings.
 *
 */
 
@@ -40,9 +40,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct strings_tag;
 
 /**
- * @brief Traits for strings formatting.
+ * @brief Formatter of miscellaneous strings.
  *
- * Strings formatting is used in failuire reporting and may also be used in logging.
+ * This formatter is used to format operators and some other strings.
  *
  * Conversion of a generic ID to string is performed as follows.
  *   - If string ID is a property then name() of the property is used.

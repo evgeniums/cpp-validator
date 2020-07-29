@@ -20,6 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_TRANSLATE_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/reporting/word_attributtes.hpp>
 #include <dracosha/validator/reporting/translator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -35,11 +36,12 @@ template <typename T, typename Arg, typename =void>
 struct translate_t
 {
     template <typename T1, typename Arg1>
-    constexpr auto operator() (T1&&, Arg1&& arg) const -> decltype(auto)
+    constexpr auto operator() (T1&&, Arg1&& arg, word_attributes) const -> decltype(auto)
     {
         return hana::id(std::forward<Arg1>(arg));
     }
 };
+
 /**
  * @brief Helper to work with object that can optionally have or not have translator
  *
@@ -48,13 +50,13 @@ struct translate_t
 template <typename T, typename Arg>
 struct translate_t<T,Arg,
         decltype(
-            (void)std::declval<std::decay_t<T>>().translator(std::declval<std::decay_t<Arg>>())
+            (void)std::declval<std::decay_t<T>>().translator(std::declval<std::decay_t<Arg>>(),std::declval<word_attributes>())
         )>
 {
     template <typename T1, typename Arg1>
-    auto operator() (T1&& obj, Arg1&& arg) const -> decltype(auto)
+    auto operator() (T1&& obj, Arg1&& arg, word_attributes attributes=0) const -> decltype(auto)
     {
-        return obj.translator(std::forward<Arg1>(arg));
+        return obj.translator(std::forward<Arg1>(arg),attributes);
     }
 };
 
@@ -71,9 +73,9 @@ constexpr translate_t<T,Arg> translate_inst{};
  * @return If object has translator then translated phrase or phrase "as is" otherwise
  */
 template <typename T, typename PhraseT>
-constexpr auto translate(T&& obj, PhraseT&& phrase) -> decltype(auto)
+constexpr auto translate(T&& obj, PhraseT&& phrase, word_attributes attributes=0) -> decltype(auto)
 {
-    return translate_inst<T,PhraseT>(std::forward<T>(obj),std::forward<PhraseT>(phrase));
+    return translate_inst<T,PhraseT>(std::forward<T>(obj),std::forward<PhraseT>(phrase),attributes);
 }
 
 //-------------------------------------------------------------
