@@ -72,22 +72,6 @@ struct backend_formatter_t
 constexpr backend_formatter_t backend_formatter{};
 
 /**
- * @brief Join arguments and append to destination object
- * @param dst Destination object
- * @param sep Separator for joining
- * @param args Arguments to join and append
- */
-struct formatter_append_join_args_t
-{
-    template <typename DstT, typename SepT,typename ...Args>
-    void operator () (DstT&& dst, SepT&& sep, Args&&... args) const
-    {
-        backend_formatter.append_join_args(extract_ref(std::forward<DstT>(dst)),std::forward<SepT>(sep),std::forward<Args>(args)...);
-    }
-};
-constexpr formatter_append_join_args_t formatter_append_join_args{};
-
-/**
  * @brief Wrap destination object into backend formatter using default backend formatter
  * @param dsr Destination object
  * @return Backend formatter wrapping destination object

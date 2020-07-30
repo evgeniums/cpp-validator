@@ -54,13 +54,10 @@ void format_join(DstT& dst, FormatterTs&& formatters, Args&&... args)
             return hana::append(std::forward<decltype(prev)>(prev),apply_ref(hana::front(current),hana::back(current),last_word_attributes(prev,0)));
         }
     );
-    hana::unpack(
-        parts,
-        hana::partial(
-                formatter_append_join_args,
-                ref(dst),
-                " "
-            )
+    backend_formatter.append_join(
+       dst,
+       " ",
+       parts
     );
 }
 
