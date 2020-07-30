@@ -405,7 +405,7 @@ template <typename WrapStringFn>
 void checkFormatterFromMemberNames(const WrapStringFn& wrapper)
 {
     translator_repository rep;
-    auto fm=make_formatter(make_member_names(make_test_strings(rep)));
+    auto fm=make_formatter(make_translated_member_names(make_test_translator(rep)));
 
     using fm_type=decltype(fm);
     static_assert(!std::is_lvalue_reference<typename fm_type::member_names_type>::value,"");
@@ -421,7 +421,7 @@ void checkFormatterFromMemberNamesAndOperands(const WrapStringFn& wrapper)
 {
     translator_repository rep;
 
-    auto fm=make_formatter(make_member_names(make_test_strings(rep)),make_translated_operand_formatter(rep,"en"));
+    auto fm=make_formatter(make_translated_member_names(make_test_translator(rep)),make_translated_operand_formatter(rep,"en"));
 
     using fm_type=decltype(fm);
     static_assert(!std::is_lvalue_reference<typename fm_type::member_names_type>::value,"");
@@ -437,7 +437,7 @@ void checkFormatterWithRefs(const WrapStringFn& wrapper)
 {
     translator_repository rep;
     auto st=make_test_strings(rep);
-    auto mn=make_member_names(st);
+    auto mn=make_translated_member_names(rep);
     auto vs=make_translated_operand_formatter(rep,"en");
     auto fm=make_formatter(
                 mn,
@@ -459,7 +459,7 @@ void checkFormatterWithRvals(const WrapStringFn& wrapper)
 {
     mapped_translator tr1;
     auto fm=make_formatter(
-                make_member_names(make_translated_strings(tr1)),
+                make_translated_member_names(tr1),
                 make_translated_operand_formatter(tr1),
                 make_translated_strings(tr1)
                 );

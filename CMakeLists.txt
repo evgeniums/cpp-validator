@@ -43,6 +43,7 @@ SET (HEADERS
     include/dracosha/validator/with_check_member_exists.hpp
     include/dracosha/validator/check_member_exists_traits_proxy.hpp
     include/dracosha/validator/validators.hpp
+    include/dracosha/validator/member_property.hpp
 
     include/dracosha/validator/operators/operator.hpp
     include/dracosha/validator/operators/exists.hpp
@@ -92,6 +93,7 @@ SET (HEADERS
     include/dracosha/validator/reporting/word_attributes.hpp
     include/dracosha/validator/reporting/concrete_phrase.hpp
     include/dracosha/validator/reporting/translate.hpp
+    include/dracosha/validator/reporting/property_member_name.hpp
 
     include/dracosha/validator/reporting/locale/sample_locale.hpp
 

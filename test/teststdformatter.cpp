@@ -59,6 +59,11 @@ BOOST_AUTO_TEST_CASE(CheckStdFormatterFromMemberNames)
     checkFormatterFromMemberNames(make_backend_formatter);
 }
 
+BOOST_AUTO_TEST_CASE(CheckStdFormatterFromMemberNamesAndOperands)
+{
+    checkFormatterFromMemberNamesAndOperands(make_backend_formatter);
+}
+
 BOOST_AUTO_TEST_CASE(CheckStdFormatterWithRefs)
 {
     checkFormatterWithRefs(make_backend_formatter);

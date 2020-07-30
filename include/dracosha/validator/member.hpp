@@ -45,6 +45,7 @@ template <typename T, typename ...ParentPathT>
 struct member
 {
     using hana_tag=member_tag;
+
     using type=typename adjust_storable_type<T>::type;
     using path_type=hana::tuple<ParentPathT...,type>;
 
@@ -323,6 +324,22 @@ auto member<T,ParentPathT...>::operator ()
          )
 {
     return member_with_name<T,ParentPathT...>(path,concrete_phrase(std::forward<T1>(name),attribute,std::forward<Attributes>(attributes)...));
+}
+
+template <typename T>
+auto member_path(T&& v,
+                 std::enable_if_t<hana::is_a<member_tag,T>,void*> =nullptr
+                 ) -> decltype(auto)
+{
+    return v.path;
+}
+
+template <typename T>
+auto member_path(T&& v,
+                 std::enable_if_t<!hana::is_a<member_tag,T>,void*> =nullptr
+                 )
+{
+    return hana::make_tuple(std::forward<T>(v));
 }
 
 //-------------------------------------------------------------

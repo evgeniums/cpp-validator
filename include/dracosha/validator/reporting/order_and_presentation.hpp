@@ -36,9 +36,9 @@ struct order_and_presentation_t
     using hana_tag=order_and_presentation_tag;
 
     template <typename ...Args>
-    constexpr auto operator () (Args&&... args) const -> decltype(auto)
+    void operator () (Args&&... args) const
     {
-        return detail::reorder_and_present(std::forward<Args>(args)...);
+        detail::reorder_and_present(std::forward<Args>(args)...);
     }
 };
 constexpr order_and_presentation_t default_order_and_presentation{};

@@ -20,6 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_NESTED_MEMBER_NAME_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/member.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
 #include <dracosha/validator/reporting/single_member_name.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
@@ -43,7 +44,7 @@ namespace detail
 {
 
 /**
- * @brief Check if traits do not implement method nested(id,traits,translator)
+ * @brief Check if traits do not implement method nested(id,traits)
  */
 template <typename T, typename TraitsT,
           typename =void>
@@ -118,7 +119,7 @@ auto intermediate_member_names(const T& id, const TraitsT& traits, word_attribut
 {
     // format intermediate keys without the last key
     return hana::fold(
-        member_names_path(hana::drop_back(id.path),traits),
+        member_names_path(hana::drop_back(member_path(id)),traits),
         hana::tuple<>(),
         [&traits,&attributes](auto&& prev_parts, auto&& current_key)
         {
@@ -138,7 +139,7 @@ auto reverse_member_names(const T& id, const TraitsT& traits, Ts&&,
                           ,void*> =nullptr)
 {
     // format last key
-    return hana::make_tuple(single_member_name(hana::back(id.path),traits));
+    return hana::make_tuple(single_member_name(hana::back(member_path(id)),traits));
 }
 
 template <typename T, typename TraitsT, typename Ts>
@@ -149,7 +150,7 @@ auto reverse_member_names(const T& id, const TraitsT& traits, Ts&& ts,
 {
     // format last key and prepend to the list
     return hana::concat(
-                member_name_with_separator(hana::back(id.path),traits),
+                member_name_with_separator(hana::back(member_path(id)),traits),
                 std::forward<Ts>(ts)
            );
 }
@@ -180,7 +181,7 @@ auto list_member_names(const T& id, const TraitsT& traits, word_attributes attri
     auto attrs=last_word_attributes(parts,attributes);
     return hana::append(
                 std::move(parts),
-                single_member_name(hana::back(id.path),traits,attrs)
+                single_member_name(hana::back(member_path(id)),traits,attrs)
            );
 }
 

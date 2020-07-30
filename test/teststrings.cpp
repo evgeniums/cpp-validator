@@ -361,5 +361,14 @@ BOOST_AUTO_TEST_CASE(CheckInvertOp)
     BOOST_CHECK(!op2(10,2));
 }
 
+BOOST_AUTO_TEST_CASE(CheckMemberProperty)
+{
+    auto member=_["field1"];
+    auto mp=make_member_property(member,size);
+    auto&& mn=get_default_member_names();
+    auto str=mn(mp);
+    BOOST_CHECK_EQUAL(std::string(str),"size of field1");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 

@@ -20,12 +20,14 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_MEMBER_NAMES_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/member_property.hpp>
 #include <dracosha/validator/reporting/translator.hpp>
 #include <dracosha/validator/reporting/no_translator.hpp>
 #include <dracosha/validator/reporting/translator_repository.hpp>
 #include <dracosha/validator/reporting/decorator.hpp>
 #include <dracosha/validator/reporting/single_member_name.hpp>
 #include <dracosha/validator/reporting/nested_member_name.hpp>
+#include <dracosha/validator/reporting/property_member_name.hpp>
 #include <dracosha/validator/reporting/decorator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -46,21 +48,36 @@ struct member_names
     TraitsT traits;
 
     template <typename T>
-    auto operator() (const T& name,
+    auto operator() (const T& member,
                      word_attributes attributes=0,
                      std::enable_if_t<hana::is_a<member_tag,T>,void*> =nullptr
-                            ) const -> decltype(auto)
+            ) const -> decltype(auto)
     {
-        return nested_member_name(name,traits,attributes);
+        return nested_member_name(member,traits,attributes);
     }
 
     template <typename T>
-    auto operator() (const T& name,
+    auto operator() (const T& member_prop,
                      word_attributes attributes=0,
-                     std::enable_if_t<!hana::is_a<member_tag,T>,void*> =nullptr
-                            ) const -> decltype(auto)
+                     std::enable_if_t<hana::is_a<member_property_tag,T>,void*> =nullptr
+            ) const -> decltype(auto)
     {
-        return single_member_name(name,traits,attributes);
+        return property_member_name(member_prop,traits,attributes);
+    }
+
+    template <typename T>
+    auto operator() (const T& member,
+                     word_attributes attributes=0,
+                     std::enable_if_t<
+                            (
+                                !hana::is_a<member_tag,T>
+                                &&
+                                !hana::is_a<member_property_tag,T>
+                             )
+                     ,void*> =nullptr
+            ) const -> decltype(auto)
+    {
+        return single_member_name(member,traits,attributes);
     }
 };
 
@@ -94,6 +111,11 @@ struct default_member_names_traits_t
         return string_member_name_conjunction;
     }
 
+    static auto member_property_conjunction() -> decltype(auto)
+    {
+        return string_member_name_conjunction;
+    }
+
     /**
      * @brief Check if nested memebr names must be joined in reverse order
      *
@@ -102,7 +124,9 @@ struct default_member_names_traits_t
      *
      * Default is reverse order.
      */
-    constexpr static bool is_reverse_member_names_order=true;
+    constexpr static const bool is_reverse_member_names_order=true;
+
+    constexpr static const bool is_reverse_member_property_order=true;
 };
 constexpr default_member_names_traits_t default_member_names_traits{};
 
@@ -230,7 +254,12 @@ struct dotted_member_names_traits_t
      * @brief Get string for conjunction of nested member names
      * @return String "." to use to join nested member names in the member's path
      */
-    static auto member_names_conjunction() -> decltype(auto)
+    static auto member_names_conjunction()
+    {
+        return ".";
+    }
+
+    static auto member_property_conjunction()
     {
         return ".";
     }
@@ -238,7 +267,9 @@ struct dotted_member_names_traits_t
     /**
      * @brief Check if nested memebr names must be joined in reverse order
      */
-    constexpr static bool is_reverse_member_names_order=false;
+    constexpr static const bool is_reverse_member_names_order=false;
+
+    constexpr static const bool is_reverse_member_property_order=false;
 
     brackets_decorator_t decorator;
 };

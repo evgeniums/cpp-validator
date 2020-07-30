@@ -40,7 +40,7 @@ namespace detail
 {
 
 template <typename DstT, typename FormatterTs, typename ... Args>
-auto format_join(DstT& dst, FormatterTs&& formatters, Args&&... args)
+void format_join(DstT& dst, FormatterTs&& formatters, Args&&... args)
 {
     auto pairs=hana::zip(
         std::forward<FormatterTs>(formatters),
@@ -54,7 +54,7 @@ auto format_join(DstT& dst, FormatterTs&& formatters, Args&&... args)
             return hana::append(std::forward<decltype(prev)>(prev),apply_ref(hana::front(current),hana::back(current),last_word_attributes(prev,0)));
         }
     );
-    return hana::unpack(
+    hana::unpack(
         parts,
         hana::partial(
                 formatter_append_join_args,
@@ -67,28 +67,17 @@ auto format_join(DstT& dst, FormatterTs&& formatters, Args&&... args)
 //-------------------------------------------------------------
 
 /**
- * @brief Apply adjusting of order and presentation
- */
-template <typename DstT, typename FormatterTs, typename ...Args>
-constexpr auto apply_reorder_present_fn(DstT& dst, FormatterTs&& formatters, Args&&... args) -> decltype(auto)
-{
-    return format_join(dst,std::forward<FormatterTs>(formatters),std::forward<Args>(args)...);
-}
-
-//-------------------------------------------------------------
-
-/**
  * @brief Adjust presentation and order of validation report for 1 argument, which must be an aggregation operator
  */
 template <typename AggregationItemT>
 struct apply_reorder_present_1arg_t
 {
     template <typename DstT, typename StringsT>
-    constexpr auto operator () (
-                                    DstT& dst,
-                                    const StringsT& strings,
-                                    const AggregationItemT& aggregation_item
-                                ) const -> decltype(auto)
+    void operator () (
+                        DstT& dst,
+                        const StringsT& strings,
+                        const AggregationItemT& aggregation_item
+                     ) const
     {
         if ((!aggregation_item.single && aggregation_item.parts.size()>1)
                 ||
@@ -131,18 +120,18 @@ template <typename OpT, typename T2, typename = hana::when<true>>
 struct apply_reorder_present_2args_t
 {
     template <typename DstT, typename FormatterTs>
-    constexpr auto operator () (
-                                    DstT& dst,
-                                    FormatterTs&& formatters,
-                                    const OpT& op,
-                                    const T2& b
-                                ) const -> decltype(auto)
+    void operator () (
+                        DstT& dst,
+                        FormatterTs&& formatters,
+                        const OpT& op,
+                        const T2& b
+                     ) const
     {
-        return apply_reorder_present_fn(
-                                dst,
-                                std::forward<FormatterTs>(formatters),
-                                std::forward<OpT>(op),b
-                                );
+        format_join(dst,
+            std::forward<FormatterTs>(formatters),
+            op,
+            b
+        );
     }
 };
 
@@ -155,12 +144,17 @@ struct apply_reorder_present_2args_t<
                     >
 {
     template <typename DstT, typename FormatterTs>
-    constexpr auto operator () (
-                                DstT& dst, FormatterTs&& formatters,
-                                const OpT& op, const T2& b
-                                ) const -> decltype(auto)
+    void operator () (
+                        DstT& dst, FormatterTs&& formatters,
+                        const OpT& op, const T2& b
+                    ) const
     {
-        format_join(dst,hana::make_tuple(hana::at(formatters,hana::size_c<0>)),op.str(value,b));
+        format_join(dst,
+            hana::make_tuple(
+                hana::at(formatters,hana::size_c<0>)
+            ),
+            op.str(value,b)
+        );
     }
 };
 
@@ -176,15 +170,17 @@ template <typename PropT, typename OpT, typename T2, typename = hana::when<true>
 struct apply_reorder_present_3args_t
 {
     template <typename DstT, typename FormatterTs>
-    constexpr auto operator () (
-                                DstT& dst, FormatterTs&& formatters,
-                                const PropT& prop, const OpT& op, const T2& b
-                                ) const -> decltype(auto)
+    void operator () (
+                        DstT& dst, FormatterTs&& formatters,
+                        const PropT& prop, const OpT& op, const T2& b
+                     ) const
     {
-        return apply_reorder_present_fn(dst,
-                                std::forward<FormatterTs>(formatters),
-                                prop,std::forward<OpT>(op),b
-                                );
+        format_join(dst,
+            std::forward<FormatterTs>(formatters),
+            prop,
+            op,
+            b
+        );
     }
 };
 
@@ -197,25 +193,32 @@ struct apply_reorder_present_3args_t<
                     >
 {
     template <typename DstT, typename FormatterTs>
-    constexpr auto operator () (
-                                DstT& dst, FormatterTs&& formatters,
-                                const PropT& prop, const OpT& op, const T2& b
-                                ) const -> decltype(auto)
+    void operator () (
+                        DstT& dst, FormatterTs&& formatters,
+                        const PropT& prop, const OpT& op, const T2& b
+                    ) const
     {
-        return hana::eval_if(
+        hana::eval_if(
             std::decay_t<OpT>::prepend_property(prop),
             [&dst,&formatters,&op,&prop,&b](auto&&)
             {
                 format_join(dst,
-                            hana::make_tuple(
-                                hana::at(formatters,hana::size_c<0>),hana::at(formatters,hana::size_c<0>)
-                            ),
-                                prop,op.str(prop,b)
-                        );
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<0>)
+                    ),
+                    prop,
+                    op.str(prop,b)
+                );
             },
             [&dst,&formatters,&op,&prop,&b](auto&&)
             {
-                format_join(dst,hana::make_tuple(hana::at(formatters,hana::size_c<0>)),op.str(prop,b));
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<0>)
+                    ),
+                    op.str(prop,b)
+                );
             }
         );
     }
@@ -233,12 +236,12 @@ template <typename MemberT, typename PropT, typename OpT, typename T2, typename 
 struct apply_reorder_present_4args_t
 {
     template <typename DstT, typename FormatterTs>
-    constexpr auto operator () (
-                                DstT& dst, FormatterTs&& formatters,
-                                const MemberT& member, const PropT& prop, const OpT& op, const T2& b
-                                ) const -> decltype(auto)
+    void operator () (
+                        DstT& dst, FormatterTs&& formatters,
+                        const MemberT& member, const PropT& prop, const OpT& op, const T2& b
+                    ) const
     {
-        return hana::eval_if(
+        hana::eval_if(
             std::is_same<std::decay_t<PropT>,type_p_value>::value,
             [&](auto)
             {
@@ -259,15 +262,11 @@ struct apply_reorder_present_4args_t
                 // prop of member op b
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<1>),
-                        hana::at(formatters,hana::size_c<2>),
                         hana::at(formatters,hana::size_c<0>),
                         hana::at(formatters,hana::size_c<2>),
                         hana::at(formatters,hana::size_c<3>)
                     ),
-                    prop,
-                    string_conjunction_of,
-                    member,
+                    make_member_property(member,prop),
                     op,
                     b
                 );
@@ -285,12 +284,12 @@ struct apply_reorder_present_4args_t<
             >
 {
     template <typename DstT, typename FormatterTs>
-    constexpr auto operator () (
-                                DstT& dst, FormatterTs&& formatters,
-                                const MemberT& member, const PropT& prop, const OpT& op, const T2& b
-                                ) const -> decltype(auto)
+    void operator () (
+                    DstT& dst, FormatterTs&& formatters,
+                    const MemberT& member, const PropT& prop, const OpT& op, const T2& b
+                ) const
     {
-        return hana::eval_if(
+        hana::eval_if(
             std::is_same<std::decay_t<PropT>,type_p_value>::value,
             [&](auto)
             {
@@ -311,21 +310,13 @@ struct apply_reorder_present_4args_t<
                 // prop of member op prop of member_operand(b)
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<1>),
-                        hana::at(formatters,hana::size_c<2>),
                         hana::at(formatters,hana::size_c<0>),
                         hana::at(formatters,hana::size_c<2>),
-                        hana::at(formatters,hana::size_c<1>),
-                        hana::at(formatters,hana::size_c<2>),
-                        hana::at(formatters,hana::size_c<3>)
+                        hana::at(formatters,hana::size_c<0>)
                     ),
-                    prop,
-                    string_conjunction_of,
-                    member,
+                    make_member_property(member,prop),
                     op,
-                    prop,
-                    string_conjunction_of,
-                    b.get()
+                    make_member_property(b.get(),prop)
                 );
             }
         );
@@ -346,12 +337,12 @@ struct apply_reorder_present_4args_t<
             >
 {
     template <typename DstT, typename FormatterTs>
-    constexpr auto operator () (
-                                DstT& dst, FormatterTs&& formatters,
-                                const MemberT& member, const PropT& prop, const OpT& op, const T2& b
-                                ) const -> decltype(auto)
+    void operator () (
+                        DstT& dst, FormatterTs&& formatters,
+                        const MemberT& member, const PropT& prop, const OpT& op, const T2& b
+                    ) const
     {
-        return hana::eval_if(
+        hana::eval_if(
             std::is_same<std::decay_t<PropT>,type_p_value>::value,
             [&](auto)
             {
@@ -376,23 +367,15 @@ struct apply_reorder_present_4args_t<
                 // prop of member op prop of member of sample
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<1>),
-                        hana::at(formatters,hana::size_c<2>),
                         hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<2>),
-                        hana::at(formatters,hana::size_c<1>),
                         hana::at(formatters,hana::size_c<2>),
                         hana::at(formatters,hana::size_c<0>),
                         hana::at(formatters,hana::size_c<2>),
                         hana::at(formatters,hana::size_c<3>)
                     ),
-                    prop,
-                    string_conjunction_of,
-                    member,
+                    make_member_property(member,prop),
                     op,
-                    prop,
-                    string_conjunction_of,
-                    member,
+                    make_member_property(member,prop),
                     string_conjunction_of,
                     b
                 );
@@ -402,7 +385,7 @@ struct apply_reorder_present_4args_t<
 };
 
 /**
- * @brief Adjust presentation and order of validation report for property "empty" of a member
+ * @brief Adjust presentation and order of validation report for flag operator
  */
 template <typename MemberT, typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_4args_t<
@@ -413,24 +396,20 @@ struct apply_reorder_present_4args_t<
                     >
 {
     template <typename DstT, typename FormatterTs>
-    constexpr auto operator () (
-                                DstT& dst, FormatterTs&& formatters,
-                                const MemberT& member, const PropT& prop, const OpT& op, const T2& b
-                                ) const -> decltype(auto)
+    void operator () (
+                        DstT& dst, FormatterTs&& formatters,
+                        const MemberT& member, const PropT& prop, const OpT& op, const T2& b
+                    ) const
     {
-        return hana::eval_if(
-            std::decay_t<OpT>::prepend_property(prop),
+        hana::eval_if(
+            !std::decay_t<OpT>::prepend_property(prop),
             [&dst,&member,&formatters,&op,&prop,&b](auto&&)
             {
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<1>),
-                        hana::at(formatters,hana::size_c<2>),
                         hana::at(formatters,hana::size_c<0>),
                         hana::at(formatters,hana::size_c<1>)
                     ),
-                    prop,
-                    string_conjunction_of,
                     member,
                     op.str(prop,b)
                 );
@@ -442,7 +421,7 @@ struct apply_reorder_present_4args_t<
                         hana::at(formatters,hana::size_c<0>),
                         hana::at(formatters,hana::size_c<1>)
                     ),
-                    member,
+                    make_member_property(member,prop),
                     op.str(prop,b)
                 );
             }
@@ -461,13 +440,12 @@ template <typename ...Args>
 struct apply_reorder_present_t
 {
     template <typename DstT, typename FormatterTs>
-    constexpr auto operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const -> decltype(auto)
+    void operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const
     {
-        return apply_reorder_present_fn(
-                                dst,
-                                std::forward<FormatterTs>(formatters),
-                                std::forward<Args>(args)...
-                                );
+        format_join(dst,
+            std::forward<FormatterTs>(formatters),
+            std::forward<Args>(args)...
+        );
     }
 };
 
@@ -478,13 +456,13 @@ template <typename T1, typename T2, typename T3, typename T4>
 struct apply_reorder_present_t<T1,T2,T3,T4>
 {
     template <typename DstT, typename FormatterTs, typename ... Args>
-    constexpr auto operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const -> decltype(auto)
+    void operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const
     {
-        return apply_reorder_present_4args<T1,T2,T3,T4>(
-                                             dst,
-                                             std::forward<FormatterTs>(formatters),
-                                             std::forward<Args>(args)...
-                                             );
+        apply_reorder_present_4args<T1,T2,T3,T4>(
+            dst,
+            std::forward<FormatterTs>(formatters),
+            std::forward<Args>(args)...
+        );
     }
 };
 
@@ -495,12 +473,13 @@ template <typename T1, typename T2, typename T3>
 struct apply_reorder_present_t<T1,T2,T3>
 {
     template <typename DstT, typename FormatterTs, typename ... Args>
-    constexpr auto operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const -> decltype(auto)
+    void operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const
     {
-        return apply_reorder_present_3args<T1,T2,T3>(dst,
-                                             std::forward<FormatterTs>(formatters),
-                                             std::forward<Args>(args)...
-                                             );
+        apply_reorder_present_3args<T1,T2,T3>(
+            dst,
+            std::forward<FormatterTs>(formatters),
+            std::forward<Args>(args)...
+        );
     }
 };
 
@@ -511,13 +490,13 @@ template <typename T1, typename T2>
 struct apply_reorder_present_t<T1,T2>
 {
     template <typename DstT, typename FormatterTs, typename ... Args>
-    constexpr auto operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const -> decltype(auto)
+    void operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const
     {
-        return apply_reorder_present_2args<T1,T2>(
-                                             dst,
-                                             std::forward<FormatterTs>(formatters),
-                                             std::forward<Args>(args)...
-                                             );
+        apply_reorder_present_2args<T1,T2>(
+            dst,
+            std::forward<FormatterTs>(formatters),
+            std::forward<Args>(args)...
+        );
     }
 };
 
@@ -528,13 +507,13 @@ template <typename T1>
 struct apply_reorder_present_t<T1>
 {
     template <typename DstT, typename FormatterTs, typename ... Args>
-    constexpr auto operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const -> decltype(auto)
+    void operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const
     {
-        return apply_reorder_present_1arg<T1>(
-                                             dst,
-                                             std::forward<FormatterTs>(formatters),
-                                             std::forward<Args>(args)...
-                                             );
+        apply_reorder_present_1arg<T1>(
+            dst,
+            std::forward<FormatterTs>(formatters),
+            std::forward<Args>(args)...
+        );
     }
 };
 
@@ -549,9 +528,9 @@ constexpr apply_reorder_present_t<Args...> apply_reorder_present{};
 struct reorder_and_present_t
 {
     template <typename DstT, typename FormatterTs, typename ...Args>
-    constexpr auto operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const -> decltype(auto)
+    void operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const
     {
-        return apply_reorder_present<Args...>(dst,std::forward<FormatterTs>(formatters),std::forward<Args>(args)...);
+        apply_reorder_present<Args...>(dst,std::forward<FormatterTs>(formatters),std::forward<Args>(args)...);
     }
 };
 constexpr reorder_and_present_t reorder_and_present{};
