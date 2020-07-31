@@ -603,6 +603,42 @@ BOOST_AUTO_TEST_CASE(CheckIsMasterSample)
     BOOST_CHECK(!v01.apply(m));
 }
 
+namespace
+{
+
+template <typename T, typename=hana::when<true>>
+struct foo_tmpl_1arg
+{
+};
+
+template <typename T>
+struct foo_tmpl_1arg<T,hana::when<std::is_integral<T>::value>>
+{
+    using type=T;
+};
+
+
+template <typename ... Args>
+struct foo_tmpl
+{
+};
+template <typename T>
+struct foo_tmpl<T>
+{
+    using type=typename foo_tmpl_1arg<T>::type;
+};
+
+}
+
+BOOST_AUTO_TEST_CASE(CheckMemberHelper)
+{
+    static_assert(std::is_integral<int>::value,"");
+    using type=foo_tmpl<int>::type;
+    static_assert(std::is_same<type,int>::value,"");
+
+    auto v=_["field1"](gte,100);
+}
+
 /**
 
 @todo

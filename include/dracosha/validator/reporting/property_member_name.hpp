@@ -60,22 +60,22 @@ template <typename T, typename TraitsT, typename =void>
 struct property_with_separator_t
 {
     template <typename TraitsT1>
-    auto operator() (const T& id, const TraitsT1& traits, word_attributes attributes,
+    auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
                        std::enable_if_t<TraitsT1::is_reverse_member_property_order,void*> =nullptr
             ) const
     {
-        auto name=single_member_name(std::forward<T>(id),traits,attributes);
-        auto attrs=phrase_attributes(name);
+        auto name=single_member_name(std::forward<T>(id),traits,grammar_cats);
+        auto attrs=phrase_grammar_cats(name);
         return hana::make_tuple(std::move(name),translate(traits,detail::to_string(traits.member_property_conjunction()),attrs));
     }
 
     template <typename TraitsT1>
-    auto operator() (const T& id, const TraitsT1& traits, word_attributes attributes,
+    auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
                        std::enable_if_t<!TraitsT1::is_reverse_member_property_order,void*> =nullptr
             ) const
     {
-        auto separator=translate(traits,detail::to_string(traits.member_property_conjunction()),attributes);
-        auto name=single_member_name(std::forward<T>(id),traits,phrase_attributes(separator));
+        auto separator=translate(traits,detail::to_string(traits.member_property_conjunction()),grammar_cats);
+        auto name=single_member_name(std::forward<T>(id),traits,phrase_grammar_cats(separator));
         return hana::make_tuple(std::move(separator),std::move(name));
     }
 };
@@ -83,12 +83,12 @@ struct property_with_separator_t
 template <typename T, typename TraitsT>
 struct property_with_separator_t<T,TraitsT,
         decltype(
-            (void)std::declval<std::decay_t<T>>().property_with_separator(std::declval<std::decay_t<T>>(),std::declval<word_attributes>())
+            (void)std::declval<std::decay_t<T>>().property_with_separator(std::declval<std::decay_t<T>>(),std::declval<grammar_categories>())
         )>
 {
-    auto operator() (T&& id, const TraitsT& traits, const word_attributes& attributes) const
+    auto operator() (T&& id, const TraitsT& traits, const grammar_categories& grammar_cats) const
     {
-        return traits.property_with_separator(std::forward<T>(id),attributes);
+        return traits.property_with_separator(std::forward<T>(id),grammar_cats);
     }
 };
 
@@ -96,9 +96,9 @@ template <typename T, typename TraitsT>
 constexpr property_with_separator_t<T,TraitsT> property_with_separator_inst{};
 
 template <typename T, typename TraitsT>
-auto property_with_separator(T&& id, const TraitsT& traits, const word_attributes& attributes=0)
+auto property_with_separator(T&& id, const TraitsT& traits, const grammar_categories& grammar_cats=0)
 {
-    return property_with_separator_inst<T,TraitsT>(std::forward<T>(id),traits,attributes);
+    return property_with_separator_inst<T,TraitsT>(std::forward<T>(id),traits,grammar_cats);
 }
 
 }
@@ -107,12 +107,12 @@ template <typename T, typename TraitsT, typename =hana::when<true>>
 struct property_member_name_t
 {
     template <typename TraitsT1>
-    auto operator() (const T& id, const TraitsT1& traits, word_attributes attributes,
+    auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
                        std::enable_if_t<TraitsT1::is_reverse_member_property_order,void*> =nullptr
             ) const
     {
-        auto prop=detail::property_with_separator(id.property,traits,attributes);
-        auto attrs=phrase_attributes(prop);
+        auto prop=detail::property_with_separator(id.property,traits,grammar_cats);
+        auto attrs=phrase_grammar_cats(prop);
         auto parts=hana::concat(
                         std::move(prop),
                         detail::list_member_names(id.member,traits,attrs)
@@ -124,17 +124,17 @@ struct property_member_name_t
            "",
            parts
         );
-        return concrete_phrase(dst,last_word_attributes(parts,attrs));
+        return concrete_phrase(dst,last_grammar_categories(parts,attrs));
     }
 
     template <typename TraitsT1>
-    auto operator() (const T& id, const TraitsT1& traits, word_attributes attributes,
+    auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
                        std::enable_if_t<!TraitsT1::is_reverse_member_property_order,void*> =nullptr
             ) const
     {
-        auto member_parts=list_member_names(id.member,traits,attributes);
-        auto prop=detail::property_with_separator(id.property,traits,last_word_attributes(member_parts,attributes));
-        auto attrs=phrase_attributes(prop);
+        auto member_parts=list_member_names(id.member,traits,grammar_cats);
+        auto prop=detail::property_with_separator(id.property,traits,last_grammar_categories(member_parts,grammar_cats));
+        auto attrs=phrase_grammar_cats(prop);
 
         std::string dst;
         backend_formatter.append_join(
@@ -151,9 +151,9 @@ struct property_member_name_t<T,TraitsT,
             hana::when<detail::has_member_property<T,TraitsT>::value>
         >
 {
-    auto operator() (const T& id, const TraitsT& traits, word_attributes attributes) const -> decltype(auto)
+    auto operator() (const T& id, const TraitsT& traits, grammar_categories grammar_cats) const -> decltype(auto)
     {
-        return traits.member_property(id,traits,attributes);
+        return traits.member_property(id,traits,grammar_cats);
     }
 };
 
@@ -161,9 +161,9 @@ template <typename T, typename TraitsT>
 constexpr property_member_name_t<T,TraitsT> property_member_name_inst{};
 
 template <typename T, typename TraitsT>
-constexpr auto property_member_name(const T& id, const TraitsT& traits, word_attributes attributes=0) -> decltype(auto)
+constexpr auto property_member_name(const T& id, const TraitsT& traits, grammar_categories grammar_cats=0) -> decltype(auto)
 {
-    return property_member_name_inst<T,TraitsT>(id,traits,attributes);
+    return property_member_name_inst<T,TraitsT>(id,traits,grammar_cats);
 }
 
 //-------------------------------------------------------------

@@ -35,7 +35,7 @@ struct no_translator_t
 {
     using hana_tag=translator_tag;
 
-    std::string operator() (const std::string& id, word_attributes =0) const
+    std::string operator() (const std::string& id, grammar_categories =0) const
     {
         return hana::id(id);
     }

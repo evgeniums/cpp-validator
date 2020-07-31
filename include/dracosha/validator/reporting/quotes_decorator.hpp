@@ -48,7 +48,7 @@ struct quotes_decorator_traits<T,
     {
         std::string str;
         backend_formatter.append(str,"\"",std::string(std::forward<T>(val)),"\"");
-        return concrete_phrase(std::move(str),val.attributes());
+        return concrete_phrase(std::move(str),val.grammar_cats());
     }
 };
 template <typename T>

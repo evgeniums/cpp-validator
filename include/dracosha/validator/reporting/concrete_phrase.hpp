@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <string>
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/reporting/word_attributtes.hpp>
+#include <dracosha/validator/reporting/grammar_categories.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -33,7 +33,7 @@ struct concrete_phrase_tag;
 /**
  * @brief Final result of text processing that must not be altered any more.
  *
- * Concrete phrase contains text of the phrase and bitmask of lexical attributes of the phrase actual for current locale.
+ * Concrete phrase contains text of the phrase and bitmask of grammatical categories of the phrase actual for current locale.
  */
 class concrete_phrase
 {
@@ -48,77 +48,81 @@ class concrete_phrase
         concrete_phrase(
                 std::string text
             ) : _text(std::move(text)),
-                _attributes(0)
+                _grammar_cats(0)
         {}
 
         /**
          * @brief Conctructor
          * @param text Text of the phrase
-         * @param attributes Bitmask of lexical attributes of the phrase
+         * @param grammar_cats Bitmask of grammatical categories of the phrase
          */
         concrete_phrase(
                 std::string text,
-                word_attributes attributes
+                grammar_categories grammar_cats
             ) : _text(std::move(text)),
-                _attributes(attributes)
+                _grammar_cats(grammar_cats)
         {}
 
         /**
          * @brief Conctructor
          * @param phrase Other phrase to construct from
-         * @param attributes Bitmask of lexical attributes of the phrase
+         * @param grammar_cats Bitmask of grammatical categories of the phrase
          */
         concrete_phrase(
                 concrete_phrase&& phrase,
-                word_attributes attributes
+                grammar_categories grammar_cats
             ) : _text(std::move(phrase._text)),
-                _attributes(attributes)
+                _grammar_cats(grammar_cats)
         {}
 
         /**
          * @brief Conctructor
          * @param text Text of the phrase
-         * @param attributes Lexical attribute of the phrase
+         * @param grammar_cat Grammatic category of the phrase
          */
+        template <typename T>
         concrete_phrase(
                 std::string text,
-                word attributes
+                T grammar_cat
             ) : _text(std::move(text)),
-                _attributes(word_bitmask.bit(attributes))
+                _grammar_cats(grammar_category<T>.bit(grammar_cat))
         {}
 
         /**
          * @brief Conctructor
          * @param text Other phrase to construct from
-         * @param attributes Lexical attributes of the phrase
+         * @param grammar_cats Grammatical categories of the phrase
          */
+        template <typename T>
         concrete_phrase(
                 std::string text,
-                const std::initializer_list<word>& attributes
+                const std::initializer_list<T>& grammar_cats
             ) : _text(std::move(text)),
-                _attributes(word_bitmask.bits(attributes))
+                _grammar_cats(grammar_category<T>.bits(grammar_cats))
         {}
 
         /**
          * @brief Conctructor
          * @param text Other phrase to construct from
-         * @param attributes Lexical attributes of the phrase
+         * @param grammar_cats grammatical categories of the phrase
          */
-        template <typename ... Attributes>
+        template <typename ... GrammarCats>
         concrete_phrase(
                 std::string text,
-                Attributes&&... attributes
+                GrammarCats&&... grammar_cats
             ) : _text(std::move(text)),
-                _attributes(word_bitmask.bits(std::forward<Attributes>(attributes)...))
+                _grammar_cats(grammar_category<
+                                std::decay_t<typename std::tuple_element<0,std::tuple<GrammarCats...>>::type>
+                              >.bits(std::forward<GrammarCats>(grammar_cats)...))
         {}
 
         /**
-         * @brief Get lexical attributes of the phrase
-         * @return Bitmask of lexical attributes
+         * @brief Get grammatical categories of the phrase
+         * @return Bitmask of grammatical categories
          */
-        word_attributes attributes() const noexcept
+        grammar_categories grammar_cats() const noexcept
         {
-            return _attributes;
+            return _grammar_cats;
         }
 
         /**
@@ -149,12 +153,12 @@ class concrete_phrase
         }
 
         /**
-         * @brief Set lexical attributes of the phrase
-         * @param attributes Bitmask of lexical attributes
+         * @brief Set grammatical categories of the phrase
+         * @param grammar_cats Bitmask of grammatical categories
          */
-        void set_attributes(word_attributes attributes) noexcept
+        void set_grammar_cats(grammar_categories grammar_cats) noexcept
         {
-            _attributes=attributes;
+            _grammar_cats=grammar_cats;
         }
 
         /**
@@ -171,69 +175,69 @@ class concrete_phrase
     private:
 
         std::string _text;
-        word_attributes _attributes;
+        grammar_categories _grammar_cats;
 };
 
 namespace detail
 {
 template <typename T, typename = hana::when<true>>
-struct phrase_attributes_t
+struct phrase_grammar_cats_t
 {
     template <typename T1>
-    constexpr word_attributes operator() (T1&&) const
+    constexpr grammar_categories operator() (T1&&) const
     {
         return 0;
     }
 };
 
 template <typename T>
-struct phrase_attributes_t<
+struct phrase_grammar_cats_t<
             T,
-            hana::when<std::is_same<word_attributes,std::decay_t<T>>::value>
+            hana::when<std::is_same<grammar_categories,std::decay_t<T>>::value>
         >
 {
     template <typename T1>
-    auto operator() (T1&& attributes) const -> decltype(auto)
+    auto operator() (T1&& grammar_cats) const -> decltype(auto)
     {
-        return hana::id(std::forward<T1>(attributes));
+        return hana::id(std::forward<T1>(grammar_cats));
     }
 };
 
 template <typename T>
-struct phrase_attributes_t<
+struct phrase_grammar_cats_t<
             T,
             hana::when<std::is_same<concrete_phrase,std::decay_t<T>>::value>
         >
 {
     template <typename T1>
-    word_attributes operator() (T1&& phrase) const
+    grammar_categories operator() (T1&& phrase) const
     {
-        return phrase.attributes();
+        return phrase.grammar_cats();
     }
 };
 
 template <typename T>
-constexpr phrase_attributes_t<T> phrase_attributes_inst{};
+constexpr phrase_grammar_cats_t<T> phrase_grammar_cats_inst{};
 }
 
 /**
- * @brief Get phrase attributes
+ * @brief Get phrase grammar_cats
  * @param phrase Phrase
- * @return Phrase attributes if applicabe or 0
+ * @return Phrase grammar_cats if applicabe or 0
  */
 template <typename T>
-auto phrase_attributes(T&& phrase) -> decltype(auto)
+auto phrase_grammar_cats(T&& phrase) -> decltype(auto)
 {
-    return detail::phrase_attributes_inst<T>(std::forward<T>(phrase));
+    return detail::phrase_grammar_cats_inst<T>(std::forward<T>(phrase));
 }
 
 template <typename Ts, typename T>
-auto last_word_attributes(Ts&& ts, T&& fallback)
+auto last_grammar_categories(Ts&& ts, T&& fallback)
 {
     return hana::if_(
         hana::is_empty(ts),
-        [&fallback](auto &&) {return phrase_attributes(fallback);},
-        [](auto&& ts) {return phrase_attributes(hana::back(ts));}
+        [&fallback](auto &&) {return phrase_grammar_cats(fallback);},
+        [](auto&& ts) {return phrase_grammar_cats(hana::back(ts));}
     )(std::forward<Ts>(ts));
 }
 

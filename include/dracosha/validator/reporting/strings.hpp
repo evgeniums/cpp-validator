@@ -72,9 +72,9 @@ struct strings
      * @return ID converted to string and then translated
      */
     template <typename T>
-    concrete_phrase operator() (const T& id, word_attributes attributes=0) const
+    concrete_phrase operator() (const T& id, grammar_categories grammar_cats=0) const
     {
-        return _translator(detail::to_string(id),attributes);
+        return _translator(detail::to_string(id),grammar_cats);
     }
 
     /**

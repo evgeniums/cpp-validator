@@ -29,12 +29,184 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/operators/flag.hpp>
 #include <dracosha/validator/make_validator.hpp>
-#include <dracosha/validator/reporting/word_attributtes.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct member_tag;
+
+namespace detail
+{
+
+template <typename T1, typename = hana::when<true>>
+struct member_helper_1arg_t
+{
+};
+
+template <typename T1>
+struct member_helper_1arg_t<T1,
+            hana::when<
+                !(
+                    std::is_constructible<concrete_phrase,T1>::value
+                    &&
+                    !hana::is_a<operator_tag,T1>
+                )
+            >
+        >
+{
+    /**
+     * @brief Bind compound validator to current member
+     * @param member Current member
+     * @param v Prepared partial validator
+     * @return Prepared partial validator bound to current member
+     */
+    template <typename MemberT>
+    auto operator() (MemberT&& member, T1&& v) const
+    {
+        return make_validator(hana::reverse_partial(apply_member,std::forward<T1>(v),std::forward<MemberT>(member)));
+    }
+};
+
+template <typename T1>
+struct member_helper_1arg_t<T1,
+            hana::when<
+                (
+                    std::is_constructible<concrete_phrase,T1>::value
+                    &&
+                    !hana::is_a<operator_tag,T1>
+                )
+            >
+        >
+{
+    /**
+     * @brief Construct a member from the current member with explicit name
+     * @param member Current member
+     * @param name Explicit name
+     * @return Member with explicit name
+     */
+    template <typename MemberT>
+    auto operator() (MemberT&& member, T1&& name) const;
+};
+
+template <typename T1, typename T2, typename = hana::when<true>>
+struct member_helper_2args_t
+{
+};
+
+template <typename T1, typename T2>
+struct member_helper_2args_t<T1,T2,
+            hana::when<
+                std::is_enum<std::decay_t<T2>>::value
+            >
+        >
+{
+    /**
+     * @brief Construct a member from the current member with explicit name and grammatical category
+     * @param member Current member
+     * @param name Name and grammatical catrgories
+     * @param grammar_category Grammatical categoty of the name
+     * @return Member with explicit name
+     */
+    template <typename MemberT>
+    auto operator() (MemberT&& member, T1&& name, T2&& grammar_category) const;
+};
+
+template <typename OpT, typename T1>
+struct member_helper_2args_t<OpT,T1,
+            hana::when<
+                (
+                    hana::is_a<operator_tag,OpT>
+                    &&
+                    !std::is_base_of<flag_t,std::decay_t<OpT>>::value
+                )
+            >
+        >
+{
+    /**
+     * @brief Bind plain operator to current member
+     * @param member Current member
+     * @param op Operator
+     * @param b Argument to forward to operator
+     * @return Prepared partial validator of "value" property bound to current member
+     */
+    template <typename MemberT>
+    auto operator() (MemberT&& member, OpT&& op, T1&& b) const
+    {
+        return member(value(std::forward<OpT>(op),std::forward<T1>(b)));
+    }
+};
+
+template <typename OpT, typename T1>
+struct member_helper_2args_t<OpT,T1,
+            hana::when<
+                std::is_base_of<flag_t,std::decay_t<OpT>>::value
+            >
+        >
+{
+    /**
+     * @brief Rebind plain operator to the property validator if the last key in the path is a property and operator is a flag
+     * @param member Current member
+     * @param op Operator of flag type
+     * @param b Argument to forward to operator
+     * @return Prepared partial validator of the property corresponding to the last property key in the path
+     */
+    template <typename MemberT>
+    auto operator() (MemberT&& member, OpT&& op, T1&& b,
+                                std::enable_if_t<!MemberT::is_nested,void*> =nullptr
+                            ) const
+    {
+        return make_validator(member.key()(std::forward<OpT>(op),std::forward<T1>(b)));
+    }
+
+    /**
+     * @brief Rebind plain operator to the property validator of parent member if the last key in the path is a property and operator is a flag
+     * @param member Current member
+     * @param op Operator of flag type
+     * @param b Argument to forward to operator
+     * @return Prepared partial validator of the property of parent member corresponding to the last property key in the path
+     */
+    template <typename MemberT>
+    auto operator () (MemberT&& member, OpT&& op, T1&& b,
+                                std::enable_if_t<MemberT::is_nested,void*> =nullptr
+                            ) const
+    {
+        auto&& fn=[&member,&op,&b](auto&& key, auto&&... rpath)
+        {
+            return member.make_parent(hana::reverse(hana::make_tuple(std::forward<decltype(rpath)>(rpath)...)))(
+                            key(std::forward<OpT>(op),std::forward<T1>(b))
+                        );
+        };
+        return hana::unpack(hana::reverse(std::move(member.path)),std::move(fn));
+    }
+};
+
+template <typename ... Args>
+struct member_helper_t
+{
+    /**
+     * @brief Construct a member from the current member with explicit name and grammatical categories.
+     * @param member Current member
+     * @param args Name and grammatical catrgories
+     * @return Member with explicit name
+     */
+    template <typename MemberT>
+    auto operator() (MemberT&& member, Args&&... args) const;
+};
+
+template <typename T1>
+struct member_helper_t<T1> : public member_helper_1arg_t<T1>
+{
+};
+
+template <typename T1, typename T2>
+struct member_helper_t<T1,T2> : public member_helper_2args_t<T1,T2>
+{
+};
+
+template <typename ... Args>
+constexpr member_helper_t<Args...> member_helper{};
+
+}
 
 /**
  *  @brief Generic descriptor of a member to be validated.
@@ -49,7 +221,16 @@ struct member
     using type=typename adjust_storable_type<T>::type;
     using path_type=hana::tuple<ParentPathT...,type>;
 
+    constexpr static const bool is_nested=sizeof...(ParentPathT)!=0;
+
     path_type path;
+
+    template <template <typename ...> class T2,
+              typename ...Args>
+    static auto create_derived(Args&&... args)
+    {
+        return T2<T,ParentPathT...>(std::forward<Args>(args)...);
+    }
 
     /**
      * @brief Ctor of nested member
@@ -109,85 +290,30 @@ struct member
     }
 
     /**
-     * @brief Bind compound validator to current member
-     * @param v Prepared partial validator
-     * @return Prepared partial validator bound to current member
+     * @brief Callable operator
      */
-    template <typename T1>
-    constexpr auto operator () (T1&& v) const -> decltype(auto)
+    template <typename ... Args>
+    auto operator() (Args&&... args)
     {
-        return make_validator(hana::reverse_partial(apply_member,std::forward<T1>(v),*this));
+        return detail::member_helper<Args...>(std::move(*this),std::forward<Args>(args)...);
     }
 
     /**
-     * @brief Bind plain operator to current member
-     * @param op Operator
-     * @param b Argument to forward to operator
-     * @return Prepared partial validator of "value" property bound to current member
+     * @brief Make member of parent type
+     * @param path Path of new member
+     * @return Member of parent type
      */
-    template <typename OpT, typename T1>
-    constexpr auto operator () (OpT&& op, T1&& b,
-                                std::enable_if_t<
-                                hana::is_a<operator_tag,OpT>
-                                &&
-                                !(
-                                    hana::is_a<property_tag,type>
-                                    &&
-                                    std::is_base_of<flag_t,std::decay_t<OpT>>::value
-                                 )
-                                ,void*> =nullptr) const -> decltype(auto)
+    template <typename PathT>
+    static auto make_parent(PathT&& path)
     {
-        return (*this)(value(std::forward<OpT>(op),std::forward<T1>(b)));
-    }
-
-    /**
-     * @brief Rebind plain operator to the property validator if the last key in the path is a property and operator is a flag
-     * @param op Operator of flag type
-     * @param b Argument to forward to operator
-     * @return Prepared partial validator of the property corresponding to the last property key in the path
-     */
-    template <typename OpT, typename T1>
-    constexpr auto operator () (OpT&& op, T1&& b,
-                                std::enable_if_t<
-                                (
-                                    hana::is_a<property_tag,type>
-                                    &&
-                                    std::is_base_of<flag_t,std::decay_t<OpT>>::value
-                                    &&
-                                    sizeof...(ParentPathT)==0
-                                 )
-                                ,void*> =nullptr) const -> decltype(auto)
-    {
-        return make_validator(key()(std::forward<OpT>(op),std::forward<T1>(b)));
-    }
-
-    /**
-     * @brief Rebind plain operator to the property validator of parent member if the last key in the path is a property and operator is a flag
-     * @param op Operator of flag type
-     * @param b Argument to forward to operator
-     * @return Prepared partial validator of the property of parent member corresponding to the last property key in the path
-     */
-    template <typename OpT, typename T1>
-    constexpr auto operator () (OpT&& op, T1&& b,
-                                std::enable_if_t<
-                                (
-                                    hana::is_a<property_tag,type>
-                                    &&
-                                    std::is_base_of<flag_t,std::decay_t<OpT>>::value
-                                    &&
-                                    sizeof...(ParentPathT)!=0
-                                 )
-                                ,void*> =nullptr) const -> decltype(auto)
-    {
-        return member<ParentPathT...>(hana::drop_back(path,hana::size_c<1>))
-                (key()(std::forward<OpT>(op),std::forward<T1>(b)));
+        return member<ParentPathT...>(std::forward<PathT>(path));
     }
 
     /**
      * @brief Get the last key in the path corresponding to the member at current level
      * @return Key of current member
      */
-    constexpr const type& key() const
+    const type& key() const
     {
         return hana::back(path);
     }
@@ -206,45 +332,14 @@ struct member
     }
 
     /**
-     * @brief Construct a member with explicit name from the current member.
-     * @param name Explicit name
-     * @return Member with explicit name
-     */
-    template <typename T1>
-    auto operator () (T1&& name,
-                      std::enable_if_t<
-                            std::is_constructible<concrete_phrase,T1>::value
-                            &&
-                            !hana::is_a<operator_tag,T1>
-                         ,void*> =nullptr);
-
-    /**
-     * @brief Construct a member with explicit name and lexical attributes from the current member.
-     * @param name Explicit name
-     * @param attribute First lexical attribute of the name
-     * @param attributes The rest lexical attributes of the name
-     * @return Member with explicit name
-     */
-    template <typename T1, typename ... Attributes>
-    auto operator () (T1&& name,
-                      word attribute,
-                      Attributes&&... attributes);
-
-    /**
-     * @brief Stub for getting explicit name
-     * @return Empty string
-     */
-    constexpr static const char* name()
-    {
-        return "";
-    }
-
-    /**
      * @brief member does not have explicit name
      */
     constexpr static bool has_name = false;
 };
 
+/**
+ * @brief Member with excplicit name
+ */
 template <typename T, typename ...ParentPathT>
 struct member_with_name : public member<T,ParentPathT...>
 {
@@ -302,38 +397,75 @@ struct member_with_name : public member<T,ParentPathT...>
     concrete_phrase _name;
 };
 
-template <typename T, typename ...ParentPathT>
+template <typename MemberT, typename T>
+auto make_member_with_name(MemberT&& member, T&& name)
+{
+    return member.template create_derived<member_with_name>(std::move(member.path),std::forward<T>(name));
+}
+
+namespace detail
+{
+
 template <typename T1>
-auto member<T,ParentPathT...>::operator ()
-        (T1&& name,
-          std::enable_if_t<
-                std::is_constructible<concrete_phrase,T1>::value
-                &&
-                !hana::is_a<operator_tag,T1>
-             ,void*>)
+template <typename MemberT>
+auto member_helper_1arg_t<T1,hana::when<
+        (
+            std::is_constructible<concrete_phrase,T1>::value
+            &&
+            !hana::is_a<operator_tag,T1>
+        )
+    >>::operator ()
+        (
+            MemberT&& member,
+            T1&& name
+        ) const
 {
-    return member_with_name<T,ParentPathT...>(path,std::forward<T1>(name));
+    return make_member_with_name(std::forward<MemberT>(member),std::forward<T1>(name));
 }
 
-template <typename T, typename ...ParentPathT>
-template <typename T1, typename ... Attributes>
-auto member<T,ParentPathT...>::operator ()
-        (T1&& name,
-         word attribute,
-         Attributes&&... attributes
-         )
+template <typename T1, typename T2>
+template <typename MemberT>
+auto member_helper_2args_t<T1,T2,hana::when<std::is_enum<std::decay_t<T2>>::value>>::operator ()
+        (
+             MemberT&& member,
+             T1&& name,
+             T2&& grammar_category
+         ) const
 {
-    return member_with_name<T,ParentPathT...>(path,concrete_phrase(std::forward<T1>(name),attribute,std::forward<Attributes>(attributes)...));
+    return make_member_with_name(std::forward<MemberT>(member),concrete_phrase(std::forward<T1>(name),std::forward<T2>(grammar_category)));
 }
 
+template <typename ... Args>
+template <typename MemberT>
+auto member_helper_t<Args...>::operator ()
+      (
+           MemberT&& member,
+           Args&&... args
+       ) const
+{
+  return make_member_with_name(std::forward<MemberT>(member),concrete_phrase(std::forward<Args>(args)...));
+}
+
+}
+
+/**
+* @brief Extract path fro a member
+* @param member Member
+* @return Member's path
+*/
 template <typename T>
-auto member_path(T&& v,
+auto member_path(T&& member,
                  std::enable_if_t<hana::is_a<member_tag,T>,void*> =nullptr
                  ) -> decltype(auto)
 {
-    return v.path;
+    return member.path;
 }
 
+/**
+* @brief Stub to emulate extracting path fro a member for non-members
+* @param v Value
+* @return Value wrapped into hana::tuple
+*/
 template <typename T>
 auto member_path(T&& v,
                  std::enable_if_t<!hana::is_a<member_tag,T>,void*> =nullptr

@@ -73,7 +73,7 @@ SET (HEADERS
 
     include/dracosha/validator/reporting/reporter.hpp
     include/dracosha/validator/reporting/formatter.hpp
-    include/dracosha/validator/reporting/member_name.hpp
+    include/dracosha/validator/reporting/member_operand.hpp
     include/dracosha/validator/reporting/member_names.hpp
     include/dracosha/validator/reporting/strings.hpp
     include/dracosha/validator/reporting/translator.hpp
@@ -90,7 +90,7 @@ SET (HEADERS
     include/dracosha/validator/reporting/decorator.hpp
     include/dracosha/validator/reporting/quotes_decorator.hpp
     include/dracosha/validator/reporting/flag_presets.hpp
-    include/dracosha/validator/reporting/word_attributes.hpp
+    include/dracosha/validator/reporting/grammar_categories.hpp
     include/dracosha/validator/reporting/concrete_phrase.hpp
     include/dracosha/validator/reporting/translate.hpp
     include/dracosha/validator/reporting/property_member_name.hpp

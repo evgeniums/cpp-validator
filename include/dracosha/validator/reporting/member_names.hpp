@@ -49,25 +49,25 @@ struct member_names
 
     template <typename T>
     auto operator() (const T& member,
-                     word_attributes attributes=0,
+                     grammar_categories grammar_cats=0,
                      std::enable_if_t<hana::is_a<member_tag,T>,void*> =nullptr
             ) const -> decltype(auto)
     {
-        return nested_member_name(member,traits,attributes);
+        return nested_member_name(member,traits,grammar_cats);
     }
 
     template <typename T>
     auto operator() (const T& member_prop,
-                     word_attributes attributes=0,
+                     grammar_categories grammar_cats=0,
                      std::enable_if_t<hana::is_a<member_property_tag,T>,void*> =nullptr
             ) const -> decltype(auto)
     {
-        return property_member_name(member_prop,traits,attributes);
+        return property_member_name(member_prop,traits,grammar_cats);
     }
 
     template <typename T>
     auto operator() (const T& member,
-                     word_attributes attributes=0,
+                     grammar_categories grammar_cats=0,
                      std::enable_if_t<
                             (
                                 !hana::is_a<member_tag,T>
@@ -77,7 +77,7 @@ struct member_names
                      ,void*> =nullptr
             ) const -> decltype(auto)
     {
-        return single_member_name(member,traits,attributes);
+        return single_member_name(member,traits,grammar_cats);
     }
 };
 

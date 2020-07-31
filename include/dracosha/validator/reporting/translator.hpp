@@ -22,7 +22,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include <string>
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/reporting/word_attributtes.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -61,7 +60,7 @@ class translator
          *
          * Must be overriden in derived class.
          */
-        virtual concrete_phrase translate(const std::string& id, word_attributes attr=0) const
+        virtual concrete_phrase translate(const std::string& id, grammar_categories attr=0) const
         {
             std::ignore=attr;
             return id;
@@ -72,7 +71,7 @@ class translator
          * @param id Concrete phrase
          * @return Input concrete phrase
          */
-        concrete_phrase translate(const concrete_phrase& id, word_attributes =0) const
+        concrete_phrase translate(const concrete_phrase& id, grammar_categories =0) const
         {
             return id;
         }
@@ -83,7 +82,7 @@ class translator
          * @param attr Word attributes
          * @return Translation result
          */
-        concrete_phrase operator() (const std::string& id, word_attributes attr=0) const
+        concrete_phrase operator() (const std::string& id, grammar_categories attr=0) const
         {
             std::ignore=attr;
             return translate(id);
@@ -94,7 +93,7 @@ class translator
          * @param id Concrete phrase
          * @return Input concrete phrase
          */
-        concrete_phrase operator() (const concrete_phrase& id, word_attributes =0) const
+        concrete_phrase operator() (const concrete_phrase& id, grammar_categories =0) const
         {
             return translate(id);
         }

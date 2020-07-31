@@ -51,7 +51,7 @@ void format_join(DstT& dst, FormatterTs&& formatters, Args&&... args)
         hana::make_tuple(),
         [](auto&& prev, auto&& current)
         {
-            return hana::append(std::forward<decltype(prev)>(prev),apply_ref(hana::front(current),hana::back(current),last_word_attributes(prev,0)));
+            return hana::append(std::forward<decltype(prev)>(prev),apply_ref(hana::front(current),hana::back(current),last_grammar_categories(prev,0)));
         }
     );
     backend_formatter.append_join(

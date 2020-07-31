@@ -21,6 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <cstddef>
 #include <initializer_list>
+#include <bitset>
 
 #include <dracosha/validator/config.hpp>
 
@@ -34,6 +35,28 @@ template <typename FeatureEnumT, typename =hana::when<true>>
 struct feature_bitmask_helper
 {
     using type=uint32_t;
+};
+template <typename FeatureEnumT>
+struct feature_bitmask_helper<
+            FeatureEnumT,
+            hana::when<(
+                FeatureEnumT::END_ <= 8
+            )>
+        >
+{
+    using type=uint8_t;
+};
+template <typename FeatureEnumT>
+struct feature_bitmask_helper<
+            FeatureEnumT,
+            hana::when<(
+                FeatureEnumT::END_ > 8
+                &&
+                FeatureEnumT::END_ <= 16
+            )>
+        >
+{
+    using type=uint16_t;
 };
 template <typename FeatureEnumT>
 struct feature_bitmask_helper<
@@ -127,6 +150,28 @@ struct feature_bitmask_t
             mask|=(1<<i);
         }
         return mask;
+    }
+
+    /**
+     * @brief Count number of enabled features
+     * @param bitmask Bitmask of features to count
+     * @return Number of enabled features
+     */
+    constexpr static size_t count(const bitmask& mask) noexcept
+    {
+        std::bitset<FeatureEnumT::END_> bitset(mask);
+        return bitset.count();
+    }
+
+    /**
+     * @brief Count number of matched features
+     * @param features1 First bitmask of features
+     * @param features2 Second bitmask of features
+     * @return Number of matched features
+     */
+    constexpr static size_t count(const bitmask& features1, const bitmask& features2) noexcept
+    {
+        return count(features1&features2);
     }
 
     /**

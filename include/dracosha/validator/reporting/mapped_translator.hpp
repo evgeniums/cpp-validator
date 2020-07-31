@@ -57,10 +57,10 @@ class mapped_translator : public translator
         /**
          * @brief Translate a string
          * @param id String id
-         * @param attr Word attributes
+         * @param attr Word grammar_cats
          * @return Translated string or id if such string not found
          */
-        virtual concrete_phrase translate(const std::string& id, word_attributes =0) const override
+        virtual concrete_phrase translate(const std::string& id, grammar_categories =0) const override
         {
             auto it=_strings.find(id);
             if (it!=_strings.end())

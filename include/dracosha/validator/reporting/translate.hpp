@@ -20,7 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_TRANSLATE_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/reporting/word_attributtes.hpp>
+#include <dracosha/validator/reporting/grammar_categories.hpp>
 #include <dracosha/validator/reporting/translator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -36,7 +36,7 @@ template <typename T, typename Arg, typename =void>
 struct translate_t
 {
     template <typename T1, typename Arg1>
-    constexpr auto operator() (T1&&, Arg1&& arg, word_attributes) const -> decltype(auto)
+    constexpr auto operator() (T1&&, Arg1&& arg, grammar_categories) const -> decltype(auto)
     {
         return hana::id(std::forward<Arg1>(arg));
     }
@@ -50,13 +50,13 @@ struct translate_t
 template <typename T, typename Arg>
 struct translate_t<T,Arg,
         decltype(
-            (void)std::declval<std::decay_t<T>>().translator(std::declval<std::decay_t<Arg>>(),std::declval<word_attributes>())
+            (void)std::declval<std::decay_t<T>>().translator(std::declval<std::decay_t<Arg>>(),std::declval<grammar_categories>())
         )>
 {
     template <typename T1, typename Arg1>
-    auto operator() (T1&& obj, Arg1&& arg, word_attributes attributes=0) const -> decltype(auto)
+    auto operator() (T1&& obj, Arg1&& arg, grammar_categories grammar_cats=0) const -> decltype(auto)
     {
-        return obj.translator(std::forward<Arg1>(arg),attributes);
+        return obj.translator(std::forward<Arg1>(arg),grammar_cats);
     }
 };
 
@@ -70,12 +70,13 @@ constexpr translate_t<T,Arg> translate_inst{};
  * @brief Translate a phrase
  * @param obj Object that can have or not have a translator
  * @param phrase Phrase to translate if applicable
+ * @param
  * @return If object has translator then translated phrase or phrase "as is" otherwise
  */
 template <typename T, typename PhraseT>
-constexpr auto translate(T&& obj, PhraseT&& phrase, word_attributes attributes=0) -> decltype(auto)
+constexpr auto translate(T&& obj, PhraseT&& phrase, grammar_categories grammar_cats=0) -> decltype(auto)
 {
-    return translate_inst<T,PhraseT>(std::forward<T>(obj),std::forward<PhraseT>(phrase),attributes);
+    return translate_inst<T,PhraseT>(std::forward<T>(obj),std::forward<PhraseT>(phrase),grammar_cats);
 }
 
 //-------------------------------------------------------------
