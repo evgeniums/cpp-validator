@@ -64,7 +64,7 @@ void format_join(DstT& dst, FormatterTs&& formatters, Args&&... args)
 //-------------------------------------------------------------
 
 /**
- * @brief Adjust presentation and order of validation report for 1 argument, which must be an aggregation operator
+ * @brief Apply presentation and order of validation report for 1 argument, which must be an aggregation operator
  */
 template <typename AggregationItemT>
 struct apply_reorder_present_1arg_t
@@ -105,13 +105,10 @@ struct apply_reorder_present_1arg_t
     }
 };
 
-template <typename OpT>
-constexpr apply_reorder_present_1arg_t<OpT> apply_reorder_present_1arg{};
-
 //-------------------------------------------------------------
 
 /**
- * @brief Adjust presentation and order of validation report for 2 arguments without property and without member
+ * @brief Apply presentation and order of validation report for 2 arguments without property and without member
  */
 template <typename OpT, typename T2, typename = hana::when<true>>
 struct apply_reorder_present_2args_t
@@ -155,13 +152,10 @@ struct apply_reorder_present_2args_t<
     }
 };
 
-template <typename OpT, typename T2>
-constexpr apply_reorder_present_2args_t<OpT,T2> apply_reorder_present_2args{};
-
 //-------------------------------------------------------------
 
 /**
- * @brief Adjust presentation and order of validation report for 3 arguments with property but without member
+ * @brief Apply presentation and order of validation report for 3 arguments with property but without member
  */
 template <typename PropT, typename OpT, typename T2, typename = hana::when<true>>
 struct apply_reorder_present_3args_t
@@ -221,13 +215,10 @@ struct apply_reorder_present_3args_t<
     }
 };
 
-template <typename PropT, typename OpT, typename T2>
-constexpr apply_reorder_present_3args_t<PropT,OpT,T2> apply_reorder_present_3args{};
-
 //-------------------------------------------------------------
 
 /**
- * @brief Adjust presentation and order of validation report for 4 arguments with member
+ * @brief Apply presentation and order of validation report for 4 arguments with member
  */
 template <typename MemberT, typename PropT, typename OpT, typename T2, typename = hana::when<true>>
 struct apply_reorder_present_4args_t
@@ -273,7 +264,7 @@ struct apply_reorder_present_4args_t
 };
 
 /**
- * @brief Adjust presentation and order of validation report for 4 arguments with a member is compared to other member
+ * @brief Apply presentation and order of validation report for 4 arguments with a member is compared to other member
  */
 template <typename MemberT, typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_4args_t<
@@ -321,7 +312,7 @@ struct apply_reorder_present_4args_t<
 };
 
 /**
- * @brief Adjust presentation and order of validation report for 4 arguments with a member is compared to the same member of sample object
+ * @brief Apply presentation and order of validation report for 4 arguments with a member is compared to the same member of sample object
  */
 template <typename MemberT, typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_4args_t<
@@ -382,7 +373,7 @@ struct apply_reorder_present_4args_t<
 };
 
 /**
- * @brief Adjust presentation and order of validation report for flag operator
+ * @brief Apply presentation and order of validation report for flag operator
  */
 template <typename MemberT, typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_4args_t<
@@ -425,13 +416,11 @@ struct apply_reorder_present_4args_t<
         );
     }
 };
-template <typename MemberT, typename PropT, typename OpT, typename T2>
-constexpr apply_reorder_present_4args_t<MemberT,PropT,OpT,T2> apply_reorder_present_4args{};
 
 //-------------------------------------------------------------
 
 /**
- * @brief Adjust presentation and order of validation report for arbitrary number of arguments
+ * @brief Apply presentation and order of validation report for arbitrary number of arguments
  */
 template <typename ...Args>
 struct apply_reorder_present_t
@@ -447,71 +436,35 @@ struct apply_reorder_present_t
 };
 
 /**
- * @brief Adjust presentation and order of validation report for 4 arguments with member
+ * @brief Apply presentation and order of validation report for 4 arguments with member
  */
 template <typename T1, typename T2, typename T3, typename T4>
-struct apply_reorder_present_t<T1,T2,T3,T4>
+struct apply_reorder_present_t<T1,T2,T3,T4> : public apply_reorder_present_4args_t<T1,T2,T3,T4>
 {
-    template <typename DstT, typename FormatterTs, typename ... Args>
-    void operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const
-    {
-        apply_reorder_present_4args<T1,T2,T3,T4>(
-            dst,
-            std::forward<FormatterTs>(formatters),
-            std::forward<Args>(args)...
-        );
-    }
 };
 
 /**
- * @brief Adjust presentation and order of validation report for 3 arguments with property but without member
+ * @brief Apply presentation and order of validation report for 3 arguments with property but without member
  */
 template <typename T1, typename T2, typename T3>
-struct apply_reorder_present_t<T1,T2,T3>
+struct apply_reorder_present_t<T1,T2,T3> : public apply_reorder_present_3args_t<T1,T2,T3>
 {
-    template <typename DstT, typename FormatterTs, typename ... Args>
-    void operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const
-    {
-        apply_reorder_present_3args<T1,T2,T3>(
-            dst,
-            std::forward<FormatterTs>(formatters),
-            std::forward<Args>(args)...
-        );
-    }
 };
 
 /**
- * @brief Adjust presentation and order of validation report for 2 arguments without property and without member
+ * @brief Apply presentation and order of validation report for 2 arguments without property and without member
  */
 template <typename T1, typename T2>
-struct apply_reorder_present_t<T1,T2>
+struct apply_reorder_present_t<T1,T2> : public apply_reorder_present_2args_t<T1,T2>
 {
-    template <typename DstT, typename FormatterTs, typename ... Args>
-    void operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const
-    {
-        apply_reorder_present_2args<T1,T2>(
-            dst,
-            std::forward<FormatterTs>(formatters),
-            std::forward<Args>(args)...
-        );
-    }
 };
 
 /**
- * @brief Adjust presentation and order of validation report for 1 argument
+ * @brief Apply presentation and order of validation report for 1 argument
  */
 template <typename T1>
-struct apply_reorder_present_t<T1>
+struct apply_reorder_present_t<T1> : public apply_reorder_present_1arg_t<T1>
 {
-    template <typename DstT, typename FormatterTs, typename ... Args>
-    void operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const
-    {
-        apply_reorder_present_1arg<T1>(
-            dst,
-            std::forward<FormatterTs>(formatters),
-            std::forward<Args>(args)...
-        );
-    }
 };
 
 template <typename ... Args>
@@ -520,7 +473,7 @@ constexpr apply_reorder_present_t<Args...> apply_reorder_present{};
 //-------------------------------------------------------------
 
 /**
- * @brief Adjust presentation and order of validation report
+ * @brief Apply presentation and order of validation report
  */
 struct reorder_and_present_t
 {
