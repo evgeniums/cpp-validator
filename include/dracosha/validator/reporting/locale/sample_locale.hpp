@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/locale/sample_locale.hpp
 *
-*   Defines sample file to use for translations of default validator strings to different languages
+*   Defines sample file to use for translations of strings used in validator library to different languages
 *
 */
 
@@ -37,8 +37,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 /**
- * @brief Construct map of translated strings for sample locale.
- * @return Map with translated strings
+ * @brief Make translator for sample locale of phrases defined in validator library.
+ * @return Translator of phrases for sample locale
  *
  * To add new language rename this function like translator_of_<locale_name> (e.g. translator_of_de) and replace
  * phrases below with corresponding translated phrases.
@@ -97,7 +97,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  *
  * For convenience all translations must be in UTF-8 format.
  */
-inline phrase_translator translator_of_sample_locale()
+inline phrase_translator validator_translator_sample()
 {
     phrase_translator m;
 

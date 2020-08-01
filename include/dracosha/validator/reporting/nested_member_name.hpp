@@ -123,10 +123,10 @@ auto intermediate_member_names(const T& id, const TraitsT& traits, grammar_categ
         hana::tuple<>(),
         [&traits,&grammar_cats](auto&& prev_parts, auto&& current_key)
         {
-            auto&& attrs=last_grammar_categories(prev_parts,grammar_cats);
+            auto&& cats=last_grammar_categories(prev_parts,grammar_cats);
             return hana::concat(
                         std::forward<decltype(prev_parts)>(prev_parts),
-                        member_name_with_separator(current_key,traits,attrs)
+                        member_name_with_separator(current_key,traits,cats)
                    );
         }
     );
@@ -134,23 +134,25 @@ auto intermediate_member_names(const T& id, const TraitsT& traits, grammar_categ
 
 template <typename T, typename TraitsT, typename Ts>
 auto reverse_member_names(const T& id, const TraitsT& traits, Ts&&,
+                          grammar_categories grammar_cats,
                           std::enable_if_t<
                           std::is_same<decltype(hana::tuple<>()),std::decay_t<Ts>>::value
                           ,void*> =nullptr)
 {
     // format last key
-    return hana::make_tuple(single_member_name(hana::back(member_path(id)),traits));
+    return hana::make_tuple(single_member_name(hana::back(member_path(id)),traits,grammar_cats));
 }
 
 template <typename T, typename TraitsT, typename Ts>
 auto reverse_member_names(const T& id, const TraitsT& traits, Ts&& ts,
+                          grammar_categories grammar_cats,
                           std::enable_if_t<
                           !std::is_same<decltype(hana::tuple<>()),std::decay_t<Ts>>::value
                           ,void*> =nullptr)
 {
     // format last key and prepend to the list
     return hana::concat(
-                member_name_with_separator(hana::back(member_path(id)),traits),
+                member_name_with_separator(hana::back(member_path(id)),traits,grammar_cats),
                 std::forward<Ts>(ts)
            );
 }
@@ -161,11 +163,15 @@ auto list_member_names(const T& id, const TraitsT& traits, grammar_categories gr
                        TraitsT::is_reverse_member_names_order
                        ,void*> =nullptr)
 {
-    // construct intermediate list and drop last separator
-    auto parts=hana::drop_back(intermediate_member_names(id,traits,grammar_cats));
+    // separator
+    //! @todo Use grammar categories from formatted id to format separator instead of grammar_cats because the formatted id will be preceding to the separator
+    auto sep=translate(traits,detail::to_string(traits.member_names_conjunction()),grammar_cats);
+
+    // construct intermediate list using first grammar categories from the separator and drop last separator
+    auto parts=hana::drop_back(intermediate_member_names(id,traits,phrase_grammar_cats(sep)));
 
     // construct reversed list
-    return reverse_member_names(id,traits,std::move(parts));
+    return reverse_member_names(id,traits,std::move(parts),grammar_cats);
 }
 
 template <typename T, typename TraitsT>
@@ -178,10 +184,10 @@ auto list_member_names(const T& id, const TraitsT& traits, grammar_categories gr
     auto parts=intermediate_member_names(id,traits,grammar_cats);
 
     // format last key and append to the internmediate list
-    auto attrs=last_grammar_categories(parts,grammar_cats);
+    auto cats=last_grammar_categories(parts,grammar_cats);
     return hana::append(
                 std::move(parts),
-                single_member_name(hana::back(member_path(id)),traits,attrs)
+                single_member_name(hana::back(member_path(id)),traits,cats)
            );
 }
 
@@ -195,7 +201,11 @@ auto join_member_names(const T& id, const TraitsT& traits, grammar_categories gr
        "",
        parts
     );
-    return concrete_phrase(dst,last_grammar_categories(parts,grammar_cats));
+    if (!TraitsT::is_reverse_member_names_order)
+    {
+        return concrete_phrase(dst,last_grammar_categories(parts,grammar_cats));
+    }
+    return concrete_phrase(dst,first_grammar_categories(parts,grammar_cats));
 }
 
 }

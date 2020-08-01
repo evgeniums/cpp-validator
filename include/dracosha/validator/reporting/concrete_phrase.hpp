@@ -188,6 +188,11 @@ struct phrase_grammar_cats_t
     {
         return 0;
     }
+
+    template <typename T1>
+    void set(T1&, grammar_categories) const
+    {
+    }
 };
 
 template <typename T>
@@ -201,6 +206,11 @@ struct phrase_grammar_cats_t<
     {
         return hana::id(std::forward<T1>(grammar_cats));
     }
+
+    template <typename T1>
+    void set(T1&, grammar_categories) const
+    {
+    }
 };
 
 template <typename T>
@@ -213,6 +223,12 @@ struct phrase_grammar_cats_t<
     grammar_categories operator() (T1&& phrase) const
     {
         return phrase.grammar_cats();
+    }
+
+    template <typename T1>
+    void set(T1& phrase, grammar_categories cats) const
+    {
+        phrase.set_grammar_cats(cats);
     }
 };
 
@@ -231,6 +247,12 @@ auto phrase_grammar_cats(T&& phrase) -> decltype(auto)
     return detail::phrase_grammar_cats_inst<T>(std::forward<T>(phrase));
 }
 
+template <typename T>
+void set_phrase_grammar_cats(T& phrase, grammar_categories cats)
+{
+    detail::phrase_grammar_cats_inst<T>.set(phrase,cats);
+}
+
 template <typename Ts, typename T>
 auto last_grammar_categories(Ts&& ts, T&& fallback)
 {
@@ -238,6 +260,26 @@ auto last_grammar_categories(Ts&& ts, T&& fallback)
         hana::is_empty(ts),
         [&fallback](auto &&) {return phrase_grammar_cats(fallback);},
         [](auto&& ts) {return phrase_grammar_cats(hana::back(ts));}
+    )(std::forward<Ts>(ts));
+}
+
+template <typename Ts, typename T>
+auto first_grammar_categories(Ts&& ts, T&& fallback)
+{
+    return hana::if_(
+        hana::is_empty(ts),
+        [&fallback](auto &&) {return phrase_grammar_cats(fallback);},
+        [](auto&& ts) {return phrase_grammar_cats(hana::front(ts));}
+    )(std::forward<Ts>(ts));
+}
+
+template <typename Ts>
+void set_last_grammar_categories(Ts&& ts, grammar_categories cats)
+{
+    return hana::if_(
+        hana::is_empty(ts),
+        [&](auto &&) {},
+        [&cats](auto&& ts) {return set_phrase_grammar_cats(hana::back(ts),cats);}
     )(std::forward<Ts>(ts));
 }
 

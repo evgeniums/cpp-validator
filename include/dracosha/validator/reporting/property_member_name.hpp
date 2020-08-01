@@ -56,51 +56,6 @@ struct has_member_property<T,TraitsT,
     constexpr static const bool value=true;
 };
 
-template <typename T, typename TraitsT, typename =void>
-struct property_with_separator_t
-{
-    template <typename TraitsT1>
-    auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
-                       std::enable_if_t<TraitsT1::is_reverse_member_property_order,void*> =nullptr
-            ) const
-    {
-        auto name=single_member_name(std::forward<T>(id),traits,grammar_cats);
-        auto attrs=phrase_grammar_cats(name);
-        return hana::make_tuple(std::move(name),translate(traits,detail::to_string(traits.member_property_conjunction()),attrs));
-    }
-
-    template <typename TraitsT1>
-    auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
-                       std::enable_if_t<!TraitsT1::is_reverse_member_property_order,void*> =nullptr
-            ) const
-    {
-        auto separator=translate(traits,detail::to_string(traits.member_property_conjunction()),grammar_cats);
-        auto name=single_member_name(std::forward<T>(id),traits,phrase_grammar_cats(separator));
-        return hana::make_tuple(std::move(separator),std::move(name));
-    }
-};
-
-template <typename T, typename TraitsT>
-struct property_with_separator_t<T,TraitsT,
-        decltype(
-            (void)std::declval<std::decay_t<T>>().property_with_separator(std::declval<std::decay_t<T>>(),std::declval<grammar_categories>())
-        )>
-{
-    auto operator() (T&& id, const TraitsT& traits, const grammar_categories& grammar_cats) const
-    {
-        return traits.property_with_separator(std::forward<T>(id),grammar_cats);
-    }
-};
-
-template <typename T, typename TraitsT>
-constexpr property_with_separator_t<T,TraitsT> property_with_separator_inst{};
-
-template <typename T, typename TraitsT>
-auto property_with_separator(T&& id, const TraitsT& traits, const grammar_categories& grammar_cats=0)
-{
-    return property_with_separator_inst<T,TraitsT>(std::forward<T>(id),traits,grammar_cats);
-}
-
 }
 
 template <typename T, typename TraitsT, typename =hana::when<true>>
@@ -111,11 +66,16 @@ struct property_member_name_t
                        std::enable_if_t<TraitsT1::is_reverse_member_property_order,void*> =nullptr
             ) const
     {
-        auto prop=detail::property_with_separator(id.property,traits,grammar_cats);
-        auto attrs=phrase_grammar_cats(prop);
+        auto prop=single_member_name(id.property,traits,grammar_cats);
+        auto next_cats=phrase_grammar_cats(prop);
+        auto sep=translate(traits,detail::to_string(traits.member_property_conjunction()));
+        auto sep_cats=phrase_grammar_cats(sep);
+
+        auto members=detail::list_member_names(id.member,traits,sep_cats);
+
         auto parts=hana::concat(
-                        std::move(prop),
-                        detail::list_member_names(id.member,traits,attrs)
+                        hana::make_tuple(std::move(prop),std::move(sep)),
+                        std::move(members)
                     );
 
         std::string dst;
@@ -124,7 +84,7 @@ struct property_member_name_t
            "",
            parts
         );
-        return concrete_phrase(dst,last_grammar_categories(parts,attrs));
+        return concrete_phrase(dst,next_cats);
     }
 
     template <typename TraitsT1>
@@ -133,16 +93,17 @@ struct property_member_name_t
             ) const
     {
         auto member_parts=list_member_names(id.member,traits,grammar_cats);
-        auto prop=detail::property_with_separator(id.property,traits,last_grammar_categories(member_parts,grammar_cats));
-        auto attrs=phrase_grammar_cats(prop);
+        auto prop=single_member_name(id.property,traits,last_grammar_categories(member_parts,grammar_cats));
+        auto next_cats=phrase_grammar_cats(prop);
+        auto sep=translate(traits,detail::to_string(traits.member_property_conjunction()));
 
         std::string dst;
         backend_formatter.append_join(
            dst,
            "",
-           hana::concat(std::move(member_parts),std::move(prop))
+           hana::concat(std::move(member_parts),hana::make_tuple(std::move(sep),std::move(prop)))
         );
-        return concrete_phrase(dst,attrs);
+        return concrete_phrase(dst,next_cats);
     }
 };
 

@@ -97,6 +97,7 @@ SET (HEADERS
     include/dracosha/validator/reporting/phrase_translator.hpp
 
     include/dracosha/validator/reporting/locale/sample_locale.hpp
+    include/dracosha/validator/reporting/locale/ru.hpp
 
     include/dracosha/validator/detail/has_method.hpp
     include/dracosha/validator/detail/has_property.hpp
