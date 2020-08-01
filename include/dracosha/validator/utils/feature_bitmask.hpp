@@ -181,7 +181,8 @@ struct feature_bitmask_t
      * @param ft Feature to check for
      * @return Result
      */
-    constexpr static bool is_set(const bitmask& mask, const feature& ft) noexcept
+    template <typename T>
+    constexpr static bool is_set(const bitmask& mask, const T& ft) noexcept
     {
         return mask&bit(ft);
     }

@@ -81,6 +81,21 @@ template <typename DerivedT>
 struct logical_op
 {
     using hana_tag=aggregation_op_tag;
+
+    constexpr static const char* open_str()
+    {
+        return DerivedT::open_token;
+    }
+
+    constexpr static const char* close_str()
+    {
+        return DerivedT::close_token;
+    }
+
+    constexpr static const char* conjunction_str()
+    {
+        return DerivedT::conjunction_token;
+    }
 };
 
 /**

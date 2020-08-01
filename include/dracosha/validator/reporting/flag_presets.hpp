@@ -44,6 +44,16 @@ struct flag_preset
         }
         return DerivedT::n_description;
     }
+
+    constexpr static const char* str()
+    {
+        return DerivedT::description;
+    }
+
+    constexpr static const char* n_str()
+    {
+        return DerivedT::n_description;
+    }
 };
 
 /**

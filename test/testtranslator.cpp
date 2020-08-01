@@ -269,61 +269,70 @@ BOOST_AUTO_TEST_CASE(CheckPhraseTranslator)
     BOOST_CHECK_EQUAL(tr1("the word",grammar_categories_bitmask(grammar::plural,grammar::feminine)).text(),"feminine and plural the word");
     BOOST_CHECK_EQUAL(tr1("the word",grammar_categories_bitmask(grammar::masculine)).text(),str1);
     BOOST_CHECK_EQUAL(tr1("the word",grammar_categories_bitmask(grammar::masculine,grammar::plural)).text(),str2);
+
+    tr1[value.name()]={
+                        {"value"},
+                        {{"values",grammar::plural},grammar::plural}
+                    };
+    BOOST_CHECK_EQUAL(tr1("value").text(),"value");
+    auto plural_value=tr1("value",grammar_categories_bitmask(grammar::plural));
+    BOOST_CHECK_EQUAL(plural_value.text(),"values");
+    BOOST_CHECK(is_grammar_category_set(plural_value.grammar_cats(),grammar::plural));
+    BOOST_CHECK_EQUAL(tr1("value",grammar_categories_bitmask(grammar::feminine)).text(),"value");
 }
 
 BOOST_AUTO_TEST_CASE(CheckSampleLocale)
 {
     //! \todo Add additional strings
-    auto m=strings_sample_locale();
+    auto m=translator_of_sample_locale();
 
     // specials
-    BOOST_CHECK_EQUAL(m[string_true],std::string(string_true));
-    BOOST_CHECK_EQUAL(m[string_false],std::string(string_false));
-    BOOST_CHECK_EQUAL(m[string_master_sample],std::string(string_master_sample));
-    BOOST_CHECK_EQUAL(m[string_empty],std::string(string_empty));
-    BOOST_CHECK_EQUAL(m[string_not_empty],std::string(string_not_empty));
-    BOOST_CHECK_EQUAL(m[string_conjunction_of],std::string(string_conjunction_of));
-    BOOST_CHECK_EQUAL(m[string_conjunction_aggregate],std::string(string_conjunction_aggregate));
-    BOOST_CHECK_EQUAL(m[string_member_name_conjunction],std::string(string_member_name_conjunction));
-    BOOST_CHECK_EQUAL(m[string_element],std::string(string_element));
-    BOOST_CHECK_EQUAL(m[string_any],std::string(string_any));
-    BOOST_CHECK_EQUAL(m[string_all],std::string(string_all));
+    BOOST_CHECK_EQUAL(m(string_true).text(),std::string(string_true));
+    BOOST_CHECK_EQUAL(m(string_false).text(),std::string(string_false));
+    BOOST_CHECK_EQUAL(m(string_master_sample).text(),std::string(string_master_sample));
+    BOOST_CHECK_EQUAL(m(string_empty).text(),std::string(string_empty));
+    BOOST_CHECK_EQUAL(m(string_not_empty).text(),std::string(string_not_empty));
+    BOOST_CHECK_EQUAL(m(string_conjunction_of).text(),std::string(string_conjunction_of));
+    BOOST_CHECK_EQUAL(m(string_member_name_conjunction).text(),std::string(string_member_name_conjunction));
+    BOOST_CHECK_EQUAL(m(string_element).text(),std::string(string_element));
+    BOOST_CHECK_EQUAL(m(string_any).text(),std::string(string_any));
+    BOOST_CHECK_EQUAL(m(string_all).text(),std::string(string_all));
 
     // flag descriptions
-    BOOST_CHECK_EQUAL(m[flag_true_false_t::description],std::string(flag_true_false_t::description));
-    BOOST_CHECK_EQUAL(m[flag_true_false_t::n_description],std::string(flag_true_false_t::n_description));
-    BOOST_CHECK_EQUAL(m[flag_on_off_t::description],std::string(flag_on_off_t::description));
-    BOOST_CHECK_EQUAL(m[flag_on_off_t::n_description],std::string(flag_on_off_t::n_description));
-    BOOST_CHECK_EQUAL(m[flag_checked_unchecked_t::description],std::string(flag_checked_unchecked_t::description));
-    BOOST_CHECK_EQUAL(m[flag_checked_unchecked_t::n_description],std::string(flag_checked_unchecked_t::n_description));
-    BOOST_CHECK_EQUAL(m[flag_set_unset_t::description],std::string(flag_set_unset_t::description));
-    BOOST_CHECK_EQUAL(m[flag_set_unset_t::n_description],std::string(flag_set_unset_t::n_description));
-    BOOST_CHECK_EQUAL(m[flag_enable_disable_t::description],std::string(flag_enable_disable_t::description));
-    BOOST_CHECK_EQUAL(m[flag_enable_disable_t::n_description],std::string(flag_enable_disable_t::n_description));
+    BOOST_CHECK_EQUAL(m(flag_true_false_t::description).text(),std::string(flag_true_false_t::description));
+    BOOST_CHECK_EQUAL(m(flag_true_false_t::n_description).text(),std::string(flag_true_false_t::n_description));
+    BOOST_CHECK_EQUAL(m(flag_on_off_t::description).text(),std::string(flag_on_off_t::description));
+    BOOST_CHECK_EQUAL(m(flag_on_off_t::n_description).text(),std::string(flag_on_off_t::n_description));
+    BOOST_CHECK_EQUAL(m(flag_checked_unchecked_t::description).text(),std::string(flag_checked_unchecked_t::description));
+    BOOST_CHECK_EQUAL(m(flag_checked_unchecked_t::n_description).text(),std::string(flag_checked_unchecked_t::n_description));
+    BOOST_CHECK_EQUAL(m(flag_set_unset_t::description).text(),std::string(flag_set_unset_t::description));
+    BOOST_CHECK_EQUAL(m(flag_set_unset_t::n_description).text(),std::string(flag_set_unset_t::n_description));
+    BOOST_CHECK_EQUAL(m(flag_enable_disable_t::description).text(),std::string(flag_enable_disable_t::description));
+    BOOST_CHECK_EQUAL(m(flag_enable_disable_t::n_description).text(),std::string(flag_enable_disable_t::n_description));
 
     // properties
-    BOOST_CHECK_EQUAL(m[value.name()],value.name());
-    BOOST_CHECK_EQUAL(m[empty.name()],empty.name());
-    BOOST_CHECK_EQUAL(m[size.name()],size.name());
-    BOOST_CHECK_EQUAL(m[length.name()],length.name());
+    BOOST_CHECK_EQUAL(m(value.name()).text(),value.name());
+    BOOST_CHECK_EQUAL(m(empty.name()).text(),empty.name());
+    BOOST_CHECK_EQUAL(m(size.name()).text(),size.name());
+    BOOST_CHECK_EQUAL(m(length.name()).text(),length.name());
 
     // existance
-    BOOST_CHECK_EQUAL(m[string_exists],std::string(string_exists));
-    BOOST_CHECK_EQUAL(m[string_not_exists],std::string(string_not_exists));
+    BOOST_CHECK_EQUAL(m(string_exists).text(),std::string(string_exists));
+    BOOST_CHECK_EQUAL(m(string_not_exists).text(),std::string(string_not_exists));
 
     // logical
-    BOOST_CHECK_EQUAL(m[string_and_t::conjunction_token],std::string(string_and_t::conjunction_token));
-    BOOST_CHECK_EQUAL(m[string_or_t::conjunction_token],std::string(string_or_t::conjunction_token));
-    BOOST_CHECK_EQUAL(m[string_not_t::open_token],std::string(string_not_t::open_token));
-    BOOST_CHECK_EQUAL(m[string_invert_op],std::string(string_invert_op));
+    BOOST_CHECK_EQUAL(m(string_and_t::conjunction_token).text(),std::string(string_and_t::conjunction_token));
+    BOOST_CHECK_EQUAL(m(string_or_t::conjunction_token).text(),std::string(string_or_t::conjunction_token));
+    BOOST_CHECK_EQUAL(m(string_not_t::open_token).text(),std::string(string_not_t::open_token));
+    BOOST_CHECK_EQUAL(m(string_invert_op).text(),std::string(string_invert_op));
 
     // comparison
-    BOOST_CHECK_EQUAL(m[eq],std::string(eq));
-    BOOST_CHECK_EQUAL(m[ne],std::string(ne));
-    BOOST_CHECK_EQUAL(m[lt],std::string(lt));
-    BOOST_CHECK_EQUAL(m[lte],std::string(lte));
-    BOOST_CHECK_EQUAL(m[gt],std::string(gt));
-    BOOST_CHECK_EQUAL(m[gte],std::string(gte));
+    BOOST_CHECK_EQUAL(m(eq).text(),std::string(eq));
+    BOOST_CHECK_EQUAL(m(ne).text(),std::string(ne));
+    BOOST_CHECK_EQUAL(m(lt).text(),std::string(lt));
+    BOOST_CHECK_EQUAL(m(lte).text(),std::string(lte));
+    BOOST_CHECK_EQUAL(m(gt).text(),std::string(gt));
+    BOOST_CHECK_EQUAL(m(gte).text(),std::string(gte));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

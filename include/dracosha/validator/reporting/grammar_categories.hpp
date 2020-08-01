@@ -79,6 +79,12 @@ grammar_categories grammar_categories_bitmask(Args&&... args)
     return feature_bitmask_t<grammar>::bits(std::forward<Args>(args)...);
 }
 
+template <typename T>
+constexpr inline bool is_grammar_category_set(grammar_categories cats, T cat)
+{
+    return feature_bitmask_t<grammar>::is_set(cats,cat);
+}
+
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

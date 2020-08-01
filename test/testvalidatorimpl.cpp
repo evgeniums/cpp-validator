@@ -637,16 +637,17 @@ BOOST_AUTO_TEST_CASE(CheckMemberHelper)
     static_assert(std::is_same<type,int>::value,"");
 
     auto v=_["field1"](gte,100);
+    BOOST_CHECK(true);
 }
 
 /**
 
 @todo
-    Check intializer lists
-    Member getter in adapter traits.
-    Localization of conjunctions, plurals and genders.
     String operators.
     Regular expressions operators.
+    Set operators.
+    Sample translation.
+
     Generate config file.
     Remove legacy files.
 */

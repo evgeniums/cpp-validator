@@ -81,13 +81,6 @@ struct string_conjunction_of_t : public enable_to_string<string_conjunction_of_t
 };
 constexpr string_conjunction_of_t string_conjunction_of{};
 
-struct string_conjunction_aggregate_t : public enable_to_string<string_conjunction_aggregate_t>
-{
-    constexpr static const char* description=": ";
-};
-constexpr string_conjunction_aggregate_t string_conjunction_aggregate{};
-
-
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
