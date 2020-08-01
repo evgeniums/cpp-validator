@@ -642,6 +642,7 @@ BOOST_AUTO_TEST_CASE(CheckMemberHelper)
 /**
 
 @todo
+    Check intializer lists
     Member getter in adapter traits.
     Localization of conjunctions, plurals and genders.
     String operators.

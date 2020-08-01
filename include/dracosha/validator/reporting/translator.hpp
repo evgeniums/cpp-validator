@@ -55,14 +55,14 @@ class translator
         /**
          * @brief Translate a string
          * @param id String ID
-         * @param attr Word attributes
+         * @param cats Grammar categories to look for
          * @return Translation result
          *
          * Must be overriden in derived class.
          */
-        virtual concrete_phrase translate(const std::string& id, grammar_categories attr=0) const
+        virtual concrete_phrase translate(const std::string& id, grammar_categories cats=0) const
         {
-            std::ignore=attr;
+            std::ignore=cats;
             return id;
         }
 
@@ -79,13 +79,12 @@ class translator
         /**
          * @brief Translate a string
          * @param id String ID
-         * @param attr Word attributes
+         * @param cats Grammar categories to look for
          * @return Translation result
          */
-        concrete_phrase operator() (const std::string& id, grammar_categories attr=0) const
+        concrete_phrase operator() (const std::string& id, grammar_categories cats=0) const
         {
-            std::ignore=attr;
-            return translate(id);
+            return translate(id,cats);
         }
 
         /**

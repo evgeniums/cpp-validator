@@ -20,6 +20,8 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_MAPPED_TRANSLATOR_HPP
 
 #include <map>
+#include <vector>
+#include <algorithm>
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/reporting/translator.hpp>

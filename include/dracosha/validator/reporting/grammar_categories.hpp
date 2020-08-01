@@ -63,6 +63,22 @@ enum class grammar : uint8_t
  */
 using grammar_categories=typename feature_bitmask_t<grammar>::bitmask;
 
+constexpr inline size_t count_grammar_categories(grammar_categories cats)
+{
+    return feature_bitmask_t<grammar>::count(cats);
+}
+
+constexpr inline size_t count_grammar_categories(grammar_categories cats, grammar_categories cats_mask)
+{
+    return feature_bitmask_t<grammar>::count(cats,cats_mask);
+}
+
+template <typename ...Args>
+grammar_categories grammar_categories_bitmask(Args&&... args)
+{
+    return feature_bitmask_t<grammar>::bits(std::forward<Args>(args)...);
+}
+
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

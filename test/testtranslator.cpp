@@ -4,6 +4,7 @@
 #include <dracosha/validator/reporting/translator.hpp>
 #include <dracosha/validator/reporting/no_translator.hpp>
 #include <dracosha/validator/reporting/mapped_translator.hpp>
+#include <dracosha/validator/reporting/phrase_translator.hpp>
 #include <dracosha/validator/reporting/translator_repository.hpp>
 #include <dracosha/validator/reporting/member_operand.hpp>
 
@@ -220,6 +221,54 @@ BOOST_AUTO_TEST_CASE(CheckConcretePhrase)
     mapped_translator tr1(m);
     BOOST_CHECK_EQUAL(std::string(tr1("one")),"one_translated");
     BOOST_CHECK_EQUAL(std::string(tr1(concrete_phrase("one"))),"one");
+}
+
+BOOST_AUTO_TEST_CASE(CheckPhraseTranslator)
+{
+    phrase_and_grammar_cats pc1{"translated word1"};
+    phrase_and_grammar_cats pc2{"translated word2",grammar::plural};
+    phrase_and_grammar_cats pc3{{"translated word3",grammar::plural},grammar::feminine};
+    phrase_and_grammar_cats pc4{{"translated word4",grammar::feminine,grammar::plural},grammar::feminine,grammar::plural};
+    std::string str0="translated word5";
+    phrase_and_grammar_cats pc5{str0};
+
+    BOOST_CHECK_EQUAL(pc1.phrase.text(),"translated word1");
+    BOOST_CHECK_EQUAL(pc2.phrase.text(),"translated word2");
+    BOOST_CHECK_EQUAL(pc3.phrase.text(),"translated word3");
+    BOOST_CHECK_EQUAL(pc4.phrase.text(),"translated word4");
+    BOOST_CHECK_EQUAL(pc5.phrase.text(),str0);
+
+    phrase_translator tr1;
+
+    tr1["word1"]="translated word1";
+    tr1["word2"]=concrete_phrase("translated word2");
+    tr1["word3"]={{"translated word3"}};
+    tr1["word4"]={{"translated word4",grammar::plural}};
+    tr1["word5"]={{{"translated word5",grammar::plural,grammar::feminine},grammar::feminine,grammar::plural}};
+
+    BOOST_CHECK_EQUAL(std::string(tr1("word1")),"translated word1");
+    BOOST_CHECK_EQUAL(std::string(tr1("word2")),"translated word2");
+    BOOST_CHECK_EQUAL(std::string(tr1("word3")),"translated word3");
+    BOOST_CHECK_EQUAL(std::string(tr1("word4")),"translated word4");
+    BOOST_CHECK_EQUAL(std::string(tr1("word5")),"translated word5");
+
+    std::string str1="masculine the word";
+    std::string str2="masculine and plural the word";
+
+    tr1["the word"]={
+                        {"normal the word"},
+                        {"plural the word",grammar::plural},
+                        {"feminine the word",grammar::feminine},
+                        {{"feminine and plural the word",grammar::plural},grammar::plural,grammar::feminine},
+                        {str1,grammar::masculine},
+                        {str2,grammar::plural,grammar::masculine}
+                    };
+    BOOST_CHECK_EQUAL(tr1("the word").text(),"normal the word");
+    BOOST_CHECK_EQUAL(tr1("the word",grammar_categories_bitmask(grammar::plural)).text(),"plural the word");
+    BOOST_CHECK_EQUAL(tr1("the word",grammar_categories_bitmask(grammar::feminine)).text(),"feminine the word");
+    BOOST_CHECK_EQUAL(tr1("the word",grammar_categories_bitmask(grammar::plural,grammar::feminine)).text(),"feminine and plural the word");
+    BOOST_CHECK_EQUAL(tr1("the word",grammar_categories_bitmask(grammar::masculine)).text(),str1);
+    BOOST_CHECK_EQUAL(tr1("the word",grammar_categories_bitmask(grammar::masculine,grammar::plural)).text(),str2);
 }
 
 BOOST_AUTO_TEST_CASE(CheckSampleLocale)

@@ -94,6 +94,7 @@ SET (HEADERS
     include/dracosha/validator/reporting/concrete_phrase.hpp
     include/dracosha/validator/reporting/translate.hpp
     include/dracosha/validator/reporting/property_member_name.hpp
+    include/dracosha/validator/reporting/phrase_translator.hpp
 
     include/dracosha/validator/reporting/locale/sample_locale.hpp
 

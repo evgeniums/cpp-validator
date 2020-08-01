@@ -99,7 +99,8 @@ struct feature_bitmask_t
      * @param ft Feature for converting
      * @return Bitmask where bit corresponding to the feature is set to 1
      */
-    constexpr static bitmask bit(const feature& ft) noexcept
+    template <typename T>
+    constexpr static bitmask bit(const T& ft) noexcept
     {
         return bitmask(1)<<static_cast<size_t>(ft);
     }
@@ -130,7 +131,7 @@ struct feature_bitmask_t
         return hana::fold(
             hana::make_tuple(std::forward<Features>(fts)...),
             bitmask(0),
-            [](bitmask mask, const feature& ft)
+            [](bitmask mask, const auto& ft)
             {
                 mask|=bit(ft);
                 return mask;
@@ -159,7 +160,7 @@ struct feature_bitmask_t
      */
     constexpr static size_t count(const bitmask& mask) noexcept
     {
-        std::bitset<FeatureEnumT::END_> bitset(mask);
+        std::bitset<static_cast<size_t>(FeatureEnumT::END_)> bitset(mask);
         return bitset.count();
     }
 
