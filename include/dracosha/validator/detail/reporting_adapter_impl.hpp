@@ -115,7 +115,7 @@ class reporting_adapter_impl
             auto ok=_next_adapter_impl.validate_with_master_sample(adpt,member,prop,op,b);
             if (!ok || _reporter.current_not())
             {
-                _reporter.validate_with_master_sample(member,prop,op,b);
+                _reporter.validate_with_master_sample(member,prop,op,member,b);
             }
             return ok;
         }

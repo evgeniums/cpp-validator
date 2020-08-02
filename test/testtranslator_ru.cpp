@@ -3,6 +3,7 @@
 
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
+#include <dracosha/validator/reporting/reporter_with_object_name.hpp>
 
 #include <dracosha/validator/reporting/locale/ru.hpp>
 
@@ -158,6 +159,53 @@ BOOST_AUTO_TEST_CASE(CheckValidatorRu)
      );
     BOOST_CHECK(!v9.apply(ra2));
     BOOST_CHECK_EQUAL(rep,"вода озера планеты должна быть равна чистая");
+    rep.clear();
+}
+
+BOOST_AUTO_TEST_CASE(CheckValidatorWithObjectNameRu)
+{
+    auto tr=validator_translator_ru();
+
+    std::string rep;
+    std::map<std::string,std::string> m1={
+        {"password","123456"},
+        {"hyperlink","zzzzzzzzz"}
+    };
+
+    tr["password"]={
+                        {"пароль"},
+                        {"пароля",grammar_ru::roditelny_padezh}
+                   };
+    tr["hyperlink"]={
+                        {{"гиперссылка",grammar_ru::zhensky_rod}},
+                        {{"гиперссылки",grammar_ru::zhensky_rod},grammar_ru::roditelny_padezh}
+                    };
+    tr["service"]={
+                        {{"служба",grammar_ru::zhensky_rod}},
+                        {{"службы",grammar_ru::zhensky_rod},grammar_ru::roditelny_padezh}
+                    };
+
+    auto ra1=make_reporting_adapter(m1,make_reporter_with_object_name(rep,make_formatter(tr),"service"));
+
+    auto v1=validator(
+        value(eq,"apache")
+     );
+    BOOST_CHECK(!v1.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"служба должна быть равна apache");
+    rep.clear();
+
+    auto v2=validator(
+        size(gt,10)
+     );
+    BOOST_CHECK(!v2.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"размер службы должен быть больше 10");
+    rep.clear();
+
+    auto v3=validator(
+        _["password"](size(gt,10))
+     );
+    BOOST_CHECK(!v3.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"размер пароля службы должен быть больше 10");
     rep.clear();
 }
 

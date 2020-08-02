@@ -94,7 +94,7 @@ void checkOrderAndPresentation(const WrapStringFn& wrapper)
     detail::reorder_and_present(
                 w10,
                 make_cref_tuple(get_default_member_names(),get_default_member_names(),default_strings,default_strings),
-                "field2",value,lte,string_master_sample
+                "field2",value,lte,"field2",string_master_sample
             );
     BOOST_CHECK_EQUAL(str10,std::string("field2 must be less than or equal to field2 of sample"));
 
@@ -258,11 +258,11 @@ void testFormatter(const FormatterT& formatter1, const WrapStringFn& wrapper)
 
     std::string str16;
     auto w16=wrapper(str16);
-    formatter1.validate_with_master_sample(w16,"field1",value,gt,"");
+    formatter1.validate_with_master_sample(w16,"field1",value,gt,"field1","");
     BOOST_CHECK_EQUAL(str16,std::string("field1 must be greater than field1 of sample"));
     std::string str17;
     auto w17=wrapper(str17);
-    formatter1.validate_with_master_sample(w17,"field1",size,lte,"");
+    formatter1.validate_with_master_sample(w17,"field1",size,lte,"field1","");
     BOOST_CHECK_EQUAL(str17,std::string("size of field1 must be less than or equal to size of field1 of sample"));
 
     std::string str18;

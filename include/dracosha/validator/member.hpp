@@ -218,7 +218,7 @@ struct member
 {
     using hana_tag=member_tag;
 
-    using type=typename adjust_storable_type<T>::type;
+    using type=T;
     using path_type=hana::tuple<ParentPathT...,type>;
 
     constexpr static const bool is_nested=sizeof...(ParentPathT)!=0;
@@ -231,6 +231,8 @@ struct member
     {
         return T2<T,ParentPathT...>(std::forward<Args>(args)...);
     }
+
+    member()=default;
 
     /**
      * @brief Ctor of nested member
@@ -307,6 +309,18 @@ struct member
     static auto make_parent(PathT&& path)
     {
         return member<ParentPathT...>(std::forward<PathT>(path));
+    }
+
+    /**
+     * @brief Make super member prepending new key to the path
+     * @param key First key of super member
+     * @return Member of super type
+     */
+    template <typename KeyT>
+    auto make_super(KeyT&& first_key) const
+    {
+        using stype=typename adjust_storable_type<std::decay_t<KeyT>>::type;
+        return member<T,stype,ParentPathT...>(hana::prepend(path,stype(std::forward<KeyT>(first_key))));
     }
 
     /**

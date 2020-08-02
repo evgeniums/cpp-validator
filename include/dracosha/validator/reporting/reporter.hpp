@@ -223,20 +223,21 @@ class reporter
 
         /**
          *  @brief Report validation using the same member of a Sample object
-         *  @param member Member descriptor
+         *  @param member Member
          *  @param prop Property to validate
          *  @param op Operator for validation
+         *  @param member1 Member of sample object
          *  @param b Sample object whose member must be used as argument passed to validation operator
          */
-        template <typename T2, typename OpT, typename PropT, typename MemberT>
-        void validate_with_master_sample(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
+        template <typename T2, typename OpT, typename PropT, typename MemberT, typename MemberSampleT>
+        void validate_with_master_sample(const MemberT& member, const PropT& prop, const OpT& op, const MemberSampleT& member_sample, const T2& b)
         {
             if (skip_part() || skip_explicit_report())
             {
                 return;
             }
             auto wrapper=wrap_backend_formatter(current(),_dst);
-            _formatter.validate_with_master_sample(wrapper,member,prop,op,b);
+            _formatter.validate_with_master_sample(wrapper,member,prop,op,member_sample,b);
         }
 
         /**

@@ -312,67 +312,6 @@ struct apply_reorder_present_4args_t<
 };
 
 /**
- * @brief Apply presentation and order of validation report for 4 arguments with a member is compared to the same member of sample object
- */
-template <typename MemberT, typename PropT, typename OpT, typename T2>
-struct apply_reorder_present_4args_t<
-                MemberT,PropT,OpT,T2,hana::when<
-                    (std::is_same<std::decay_t<T2>,string_master_sample_t>::value
-                     ||
-                     is_master_sample<T2>::value
-                     )
-                >
-            >
-{
-    template <typename DstT, typename FormatterTs>
-    void operator () (
-                        DstT& dst, FormatterTs&& formatters,
-                        const MemberT& member, const PropT& prop, const OpT& op, const T2& b
-                    ) const
-    {
-        hana::eval_if(
-            std::is_same<std::decay_t<PropT>,type_p_value>::value,
-            [&](auto)
-            {
-                // member op member of sample
-                format_join(dst,
-                    hana::make_tuple(
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<2>),
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<2>),
-                        hana::at(formatters,hana::size_c<3>)
-                    ),
-                    member,
-                    op,
-                    member,
-                    string_conjunction_of,
-                    b
-                );
-            },
-            [&](auto)
-            {
-                // prop of member op prop of member of sample
-                format_join(dst,
-                    hana::make_tuple(
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<2>),
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<2>),
-                        hana::at(formatters,hana::size_c<3>)
-                    ),
-                    make_member_property(member,prop),
-                    op,
-                    make_member_property(member,prop),
-                    string_conjunction_of,
-                    b
-                );
-            }
-        );
-    }
-};
-
-/**
  * @brief Apply presentation and order of validation report for flag operator
  */
 template <typename MemberT, typename PropT, typename OpT, typename T2>
@@ -420,6 +359,62 @@ struct apply_reorder_present_4args_t<
 //-------------------------------------------------------------
 
 /**
+ * @brief Apply presentation and order of validation report for 4 arguments with a member is compared to the same member of sample object
+ */
+template <typename MemberT, typename PropT, typename OpT, typename MemberSampleT, typename T2>
+struct apply_reorder_present_5args_t
+{
+    template <typename DstT, typename FormatterTs>
+    void operator () (
+                        DstT& dst, FormatterTs&& formatters,
+                        const MemberT& member, const PropT& prop, const OpT& op, const MemberSampleT& member_sample, const T2& b
+                    ) const
+    {
+        hana::eval_if(
+            std::is_same<std::decay_t<PropT>,type_p_value>::value,
+            [&](auto)
+            {
+                // member op member of sample
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<3>)
+                    ),
+                    member,
+                    op,
+                    member_sample,
+                    string_conjunction_of,
+                    b
+                );
+            },
+            [&](auto)
+            {
+                // prop of member op prop of member of sample
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<2>),
+                        hana::at(formatters,hana::size_c<3>)
+                    ),
+                    make_member_property(member,prop),
+                    op,
+                    make_member_property(member_sample,prop),
+                    string_conjunction_of,
+                    b
+                );
+            }
+        );
+    }
+};
+
+//-------------------------------------------------------------
+
+/**
  * @brief Apply presentation and order of validation report for arbitrary number of arguments
  */
 template <typename ...Args>
@@ -433,6 +428,14 @@ struct apply_reorder_present_t
             std::forward<Args>(args)...
         );
     }
+};
+
+/**
+ * @brief Apply presentation and order of validation report for 5 arguments with member and sample member
+ */
+template <typename T1, typename T2, typename T3, typename T4, typename T5>
+struct apply_reorder_present_t<T1,T2,T3,T4,T5> : public apply_reorder_present_5args_t<T1,T2,T3,T4,T5>
+{
 };
 
 /**
