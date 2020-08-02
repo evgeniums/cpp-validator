@@ -172,10 +172,10 @@ struct phrase_translator_setter
 {
     std::map<std::string,std::vector<phrase_and_grammar_cats>>::iterator it;
 
-    template <typename ...Args>
-    phrase_translator_setter& operator = (Args&&... args)
+    template <typename T>
+    phrase_translator_setter& operator = (T&& arg)
     {
-        it->second=detail::phrase_translator_setter_helper<void,Args...>(std::forward<Args>(args)...);
+        it->second=detail::phrase_translator_setter_helper<void,T>(std::forward<T>(arg));
         return *this;
     }
 
