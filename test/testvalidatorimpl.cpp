@@ -646,10 +646,14 @@ BOOST_AUTO_TEST_CASE(CheckMemberHelper)
     Contains operator.
     Set operators.
     String operators.
-    Regular expressions operators.    
+    Regular expressions operators.
+
+    Refactor prpoerty_member_name.
+    Cleanup and split files.
 
     Generate config file.
     Remove legacy files.
+    Translate operands?
 */
 
 BOOST_AUTO_TEST_SUITE_END()
