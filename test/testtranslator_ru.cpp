@@ -4,6 +4,7 @@
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
 #include <dracosha/validator/reporting/reporter_with_object_name.hpp>
+#include <dracosha/validator/reporting/extend_translator.hpp>
 
 #include <dracosha/validator/reporting/locale/ru.hpp>
 
@@ -41,8 +42,6 @@ BOOST_AUTO_TEST_CASE(CheckValidatorRu)
     auto sep=m(string_member_name_conjunction);
     BOOST_CHECK(is_grammar_category_set(sep.grammar_cats(),grammar_ru::roditelny_padezh));
 
-    auto tr=validator_translator_ru();
-
     std::string rep;
     std::map<std::string,std::string> m1={
         {"password","123456"},
@@ -66,6 +65,7 @@ BOOST_AUTO_TEST_CASE(CheckValidatorRu)
         }
     };
 
+    phrase_translator tr;
     tr["password"]={
                         {"пароль"},
                         {"пароля",grammar_ru::roditelny_padezh}
@@ -94,7 +94,8 @@ BOOST_AUTO_TEST_CASE(CheckValidatorRu)
                         {{"воды",grammar_ru::zhensky_rod},grammar_ru::roditelny_padezh}
                     };
 
-    auto ra1=make_reporting_adapter(m1,make_reporter(rep,make_formatter(tr)));
+    auto tr1=extend_translator(validator_translator_ru(),tr);
+    auto ra1=make_reporting_adapter(m1,make_reporter(rep,make_formatter(tr1)));
 
     auto v1=validator(
         _["words"](exists,true)
@@ -124,7 +125,7 @@ BOOST_AUTO_TEST_CASE(CheckValidatorRu)
     BOOST_CHECK_EQUAL(rep,"длина гиперссылки должна быть меньше или равна 7");
     rep.clear();
 
-    auto ra2=make_reporting_adapter(m2,make_reporter(rep,make_formatter(tr)));
+    auto ra2=make_reporting_adapter(m2,make_reporter(rep,make_formatter(tr1)));
 
     auto v5=validator(
         _["planet"]["lake"]["bank"](eq,"пологий")
@@ -164,14 +165,13 @@ BOOST_AUTO_TEST_CASE(CheckValidatorRu)
 
 BOOST_AUTO_TEST_CASE(CheckValidatorWithObjectNameRu)
 {
-    auto tr=validator_translator_ru();
-
     std::string rep;
     std::map<std::string,std::string> m1={
         {"password","123456"},
         {"hyperlink","zzzzzzzzz"}
     };
 
+    phrase_translator tr;
     tr["password"]={
                         {"пароль"},
                         {"пароля",grammar_ru::roditelny_padezh}
@@ -185,7 +185,8 @@ BOOST_AUTO_TEST_CASE(CheckValidatorWithObjectNameRu)
                         {{"службы",grammar_ru::zhensky_rod},grammar_ru::roditelny_padezh}
                     };
 
-    auto ra1=make_reporting_adapter(m1,make_reporter_with_object_name(rep,make_formatter(tr),"service"));
+    auto tr1=extend_translator(validator_translator_ru(),tr);
+    auto ra1=make_reporting_adapter(m1,make_reporter_with_object_name(rep,make_formatter(tr1),"service"));
 
     auto v1=validator(
         value(eq,"apache")

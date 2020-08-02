@@ -89,14 +89,14 @@ class phrase_translator : public translator
          * @param cats Grammar categories to look for
          * @return Translated string or id if such string not found
          */
-        virtual concrete_phrase translate(const std::string& id, grammar_categories cats=0) const override
+        virtual translation_result translate(const std::string& id, grammar_categories cats=0) const override
         {
             auto it=_phrases.find(id);
             if (it!=_phrases.end())
             {
                 if (cats==0)
                 {
-                    return it->second.front().phrase;
+                    return translation_result{it->second.front().phrase,true};
                 }
                 // find element with max number of matching categories
                 auto max_el=std::max_element(it->second.begin(),it->second.end(),
@@ -107,13 +107,18 @@ class phrase_translator : public translator
                                     return l<r;
                                  }
                             );
-                return max_el->phrase;
+                return translation_result{max_el->phrase,true};
             }
-            return id;
+            return translation_result{id,false};
         }
 
         template <typename T>
         auto operator [] (T&& key);
+
+        bool empty() const noexcept
+        {
+            return _phrases.empty();
+        }
 
     private:
 

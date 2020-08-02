@@ -19,8 +19,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_SAMPLE_LOCALE_HPP
 #define DRACOSHA_VALIDATOR_SAMPLE_LOCALE_HPP
 
-#include <string>
-#include <map>
+#include <mutex>
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/master_sample.hpp>
@@ -97,57 +96,62 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  *
  * For convenience all translations must be in UTF-8 format.
  */
-inline phrase_translator validator_translator_sample()
+inline const phrase_translator& validator_translator_sample()
 {
-    phrase_translator m;
+    static std::mutex mutex;
+    std::lock_guard<std::mutex> lock(mutex);
 
-    // specials
-    m[string_true]="true"; // "true"
-    m[string_false]="false"; // "false"
-    m[string_master_sample]="sample"; // "sample"
-    m[string_empty]="must be empty"; // "must be empty"
-    m[string_not_empty]="must be not empty"; // "must be not empty"
-    m[string_conjunction_of]="of"; // "of"
-    m[string_member_name_conjunction]=" of "; // " of "
-    m[string_element]="element #"; // "element #"
-    m[string_any]="at least one element"; // "at least one element"
-    m[string_all]="each element"; // "each element"
+    static phrase_translator m;
+    if (m.empty())
+    {
+        // specials
+        m[string_true]="true"; // "true"
+        m[string_false]="false"; // "false"
+        m[string_master_sample]="sample"; // "sample"
+        m[string_empty]="must be empty"; // "must be empty"
+        m[string_not_empty]="must be not empty"; // "must be not empty"
+        m[string_conjunction_of]="of"; // "of"
+        m[string_member_name_conjunction]=" of "; // " of "
+        m[string_element]="element #"; // "element #"
+        m[string_any]="at least one element"; // "at least one element"
+        m[string_all]="each element"; // "each element"
 
-    // flag descriptions
-    m[flag_true_false.str()]="must be true"; // "must be true"
-    m[flag_true_false.n_str()]="must be false"; // "must be false"
-    m[flag_on_off.str()]="must be on"; // "must be on"
-    m[flag_on_off.n_str()]="must be off"; // "must be off"
-    m[flag_checked_unchecked.str()]="must be checked"; // "must be checked"
-    m[flag_checked_unchecked.n_str()]="must be unchecked"; // "must be unchecked"
-    m[flag_set_unset.str()]="must be set"; // "must be set"
-    m[flag_set_unset.n_str()]="must be unset"; // "must be unset"
-    m[flag_enable_disable.str()]="must be enabled"; // "must be enabled"
-    m[flag_enable_disable.n_str()]="must be disabled"; // "must be disabled"
+        // flag descriptions
+        m[flag_true_false.str()]="must be true"; // "must be true"
+        m[flag_true_false.n_str()]="must be false"; // "must be false"
+        m[flag_on_off.str()]="must be on"; // "must be on"
+        m[flag_on_off.n_str()]="must be off"; // "must be off"
+        m[flag_checked_unchecked.str()]="must be checked"; // "must be checked"
+        m[flag_checked_unchecked.n_str()]="must be unchecked"; // "must be unchecked"
+        m[flag_set_unset.str()]="must be set"; // "must be set"
+        m[flag_set_unset.n_str()]="must be unset"; // "must be unset"
+        m[flag_enable_disable.str()]="must be enabled"; // "must be enabled"
+        m[flag_enable_disable.n_str()]="must be disabled"; // "must be disabled"
 
-    // properties
-    m[value.name()]="value"; // "value"
-    m[empty.name()]="empty"; // "empty"
-    m[size.name()]="size"; // "size"
-    m[length.name()]="length"; // "length"
+        // properties
+        m[value.name()]="value"; // "value"
+        m[empty.name()]="empty"; // "empty"
+        m[size.name()]="size"; // "size"
+        m[length.name()]="length"; // "length"
 
-    // existance
-    m[string_exists]="must exist"; // "must exist"
-    m[string_not_exists]="must not exist"; // "must not exist"
+        // existance
+        m[string_exists]="must exist"; // "must exist"
+        m[string_not_exists]="must not exist"; // "must not exist"
 
-    // logical
-    m[string_and.conjunction_str()]=" AND "; // " AND "
-    m[string_or.conjunction_str()]=" OR "; // " OR "
-    m[string_not.open_str()]="NOT "; // "NOT "
-    m[string_invert_op]="NOT"; // "NOT"
+        // logical
+        m[string_and.conjunction_str()]=" AND "; // " AND "
+        m[string_or.conjunction_str()]=" OR "; // " OR "
+        m[string_not.open_str()]="NOT "; // "NOT "
+        m[string_invert_op]="NOT"; // "NOT"
 
-    // comparison
-    m[eq]="must be equal to"; // "must be equal to"
-    m[ne]="must be not equal to"; // "must be not equal to"
-    m[lt]="must be less than"; // "must be less than"
-    m[lte]="must be less than or equal to"; // "must be less than or equal to"
-    m[gt]="must be greater than"; // "must be greater than"
-    m[gte]="must be greater than or equal to"; // "must be greater than or equal to"
+        // comparison
+        m[eq]="must be equal to"; // "must be equal to"
+        m[ne]="must be not equal to"; // "must be not equal to"
+        m[lt]="must be less than"; // "must be less than"
+        m[lte]="must be less than or equal to"; // "must be less than or equal to"
+        m[gt]="must be greater than"; // "must be greater than"
+        m[gte]="must be greater than or equal to"; // "must be greater than or equal to"
+    }
 
     return m;
 }

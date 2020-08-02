@@ -41,6 +41,11 @@ class concrete_phrase
 
         using hana_tag=concrete_phrase_tag;
 
+        concrete_phrase(
+            ) : _grammar_cats(0),
+                _empty(true)
+        {}
+
         /**
          * @brief Conctructor
          * @param text Text of the phrase
@@ -48,7 +53,8 @@ class concrete_phrase
         concrete_phrase(
                 std::string text
             ) : _text(std::move(text)),
-                _grammar_cats(0)
+                _grammar_cats(0),
+                _empty(false)
         {}
 
         /**
@@ -60,7 +66,8 @@ class concrete_phrase
                 std::string text,
                 grammar_categories grammar_cats
             ) : _text(std::move(text)),
-                _grammar_cats(grammar_cats)
+                _grammar_cats(grammar_cats),
+                _empty(false)
         {}
 
         /**
@@ -72,7 +79,8 @@ class concrete_phrase
                 concrete_phrase&& phrase,
                 grammar_categories grammar_cats
             ) : _text(std::move(phrase._text)),
-                _grammar_cats(grammar_cats)
+                _grammar_cats(grammar_cats),
+                _empty(false)
         {}
 
         /**
@@ -85,7 +93,8 @@ class concrete_phrase
                 std::string text,
                 T grammar_cat
             ) : _text(std::move(text)),
-                _grammar_cats(grammar_category<T>.bit(grammar_cat))
+                _grammar_cats(grammar_category<T>.bit(grammar_cat)),
+                _empty(false)
         {}
 
         /**
@@ -98,7 +107,8 @@ class concrete_phrase
                 std::string text,
                 const std::initializer_list<T>& grammar_cats
             ) : _text(std::move(text)),
-                _grammar_cats(grammar_category<T>.bits(grammar_cats))
+                _grammar_cats(grammar_category<T>.bits(grammar_cats)),
+                _empty(false)
         {}
 
         /**
@@ -113,7 +123,8 @@ class concrete_phrase
             ) : _text(std::move(text)),
                 _grammar_cats(grammar_category<
                                 std::decay_t<typename std::tuple_element<0,std::tuple<GrammarCats...>>::type>
-                              >.bits(std::forward<GrammarCats>(grammar_cats)...))
+                              >.bits(std::forward<GrammarCats>(grammar_cats)...)),
+                _empty(false)
         {}
 
         /**
@@ -150,6 +161,7 @@ class concrete_phrase
         void set_text(std::string text)
         {
             _text=std::move(text);
+            _empty=false;
         }
 
         /**
@@ -159,6 +171,7 @@ class concrete_phrase
         void set_grammar_cats(grammar_categories grammar_cats) noexcept
         {
             _grammar_cats=grammar_cats;
+            _empty=false;
         }
 
         /**
@@ -172,10 +185,23 @@ class concrete_phrase
             return os << ph.text();
         }
 
+        bool empty() const noexcept
+        {
+            return _empty;
+        }
+
+        void clear()
+        {
+            _text.clear();
+            _grammar_cats=0;
+            _empty=true;
+        }
+
     private:
 
         std::string _text;
         grammar_categories _grammar_cats;
+        bool _empty;
 };
 
 namespace detail

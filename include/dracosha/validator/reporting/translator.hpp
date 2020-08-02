@@ -28,6 +28,31 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Translation result
+ */
+struct translation_result
+{
+    concrete_phrase phrase;
+    bool found;
+
+    /**
+     * @brief Move to rvalue concrete_phrase
+     */
+    operator concrete_phrase&& () && noexcept
+    {
+        return std::move(phrase);
+    }
+
+    /**
+     * @brief Check if phrase is found
+     */
+    operator bool() const noexcept
+    {
+        return found;
+    }
+};
+
 struct translator_tag;
 
 /**
@@ -60,10 +85,10 @@ class translator
          *
          * Must be overriden in derived class.
          */
-        virtual concrete_phrase translate(const std::string& id, grammar_categories cats=0) const
+        virtual translation_result translate(const std::string& id, grammar_categories cats=0) const
         {
             std::ignore=cats;
-            return id;
+            return translation_result{id,false};
         }
 
         /**

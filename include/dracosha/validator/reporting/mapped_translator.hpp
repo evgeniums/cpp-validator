@@ -62,14 +62,14 @@ class mapped_translator : public translator
          * @param attr Word grammar_cats
          * @return Translated string or id if such string not found
          */
-        virtual concrete_phrase translate(const std::string& id, grammar_categories =0) const override
+        virtual translation_result translate(const std::string& id, grammar_categories =0) const override
         {
             auto it=_strings.find(id);
             if (it!=_strings.end())
             {
-                return it->second;
+                return translation_result{it->second,true};
             }
-            return id;
+            return translation_result{id,false};
         }
 
         /**
