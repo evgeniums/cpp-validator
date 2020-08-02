@@ -643,10 +643,10 @@ BOOST_AUTO_TEST_CASE(CheckMemberHelper)
 /**
 
 @todo
-    String operators.
-    Regular expressions operators.
+    Contains operator.
     Set operators.
-    Sample translation.
+    String operators.
+    Regular expressions operators.    
 
     Generate config file.
     Remove legacy files.

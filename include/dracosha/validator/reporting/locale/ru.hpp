@@ -112,16 +112,66 @@ inline const phrase_translator& validator_translator_ru()
                       }; // "each element"
 
         // flag descriptions
-        m[flag_true_false.str()]="должен быть истинным"; // "must be true"
-        m[flag_true_false.n_str()]="должен быть ложным"; // "must be false"
-        m[flag_on_off.str()]="должен быть включен"; // "must be on"
-        m[flag_on_off.n_str()]="должен быть выключен"; // "must be off"
-        m[flag_checked_unchecked.str()]="должен быть отмечен"; // "must be checked"
-        m[flag_checked_unchecked.n_str()]="должен быть снят"; // "must be unchecked"
-        m[flag_set_unset.str()]="должен быть установлен"; // "must be set"
-        m[flag_set_unset.n_str()]="должен быть не установлен"; // "must be unset"
-        m[flag_enable_disable.str()]="должен быть активен"; // "must be enabled"
-        m[flag_enable_disable.n_str()]="должен быть не активен"; // "must be disabled"
+        m[flag_true_false.str()]={
+                                    {"должен быть истинным"},
+                                    {"должна быть истинна",grammar_ru::zhensky_rod},
+                                    {"должно быть истинно",grammar_ru::sredny_rod},
+                                    {"должны быть истинны",grammar_ru::mn_chislo}
+                                }; // "must be true"
+        m[flag_true_false.n_str()]={
+                                    {"должен быть ложным"},
+                                    {"должна быть ложна",grammar_ru::zhensky_rod},
+                                    {"должно быть ложно",grammar_ru::sredny_rod},
+                                    {"должны быть ложны",grammar_ru::mn_chislo}
+                                }; // "must be false"
+        m[flag_on_off.str()]={
+                                    {"должен быть включен"},
+                                    {"должна быть включена",grammar_ru::zhensky_rod},
+                                    {"должно быть включено",grammar_ru::sredny_rod},
+                                    {"должны быть включены",grammar_ru::mn_chislo}
+                             }; // "must be on"
+        m[flag_on_off.n_str()]={
+                                    {"должен быть выключен"},
+                                    {"должна быть выключена",grammar_ru::zhensky_rod},
+                                    {"должно быть выключено",grammar_ru::sredny_rod},
+                                    {"должны быть выключены",grammar_ru::mn_chislo}
+                               }; // "must be off"
+        m[flag_checked_unchecked.str()]={
+                                    {"должен быть отмечен"},
+                                    {"должна быть отмечена",grammar_ru::zhensky_rod},
+                                    {"должно быть отмечено",grammar_ru::sredny_rod},
+                                    {"должны быть отмечены",grammar_ru::mn_chislo}
+                               }; // "must be checked"
+        m[flag_checked_unchecked.n_str()]={
+                                    {"должен быть снят"},
+                                    {"должна быть снята",grammar_ru::zhensky_rod},
+                                    {"должно быть снято",grammar_ru::sredny_rod},
+                                    {"должны быть сняты",grammar_ru::mn_chislo}
+                               }; // "must be unchecked"
+        m[flag_set_unset.str()]={
+                                    {"должен быть установлен"},
+                                    {"должна быть установлена",grammar_ru::zhensky_rod},
+                                    {"должно быть установлено",grammar_ru::sredny_rod},
+                                    {"должны быть установлены",grammar_ru::mn_chislo}
+                               }; // "must be set"
+        m[flag_set_unset.n_str()]={
+                                    {"должен быть не установлен"},
+                                    {"должна быть не установлена",grammar_ru::zhensky_rod},
+                                    {"должно быть не установлено",grammar_ru::sredny_rod},
+                                    {"должны быть не установлены",grammar_ru::mn_chislo}
+                               }; // "must be unset"
+        m[flag_enable_disable.str()]={
+                                        {"должен быть активен"},
+                                        {"должна быть активна",grammar_ru::zhensky_rod},
+                                        {"должно быть активно",grammar_ru::sredny_rod},
+                                        {"должны быть активны",grammar_ru::mn_chislo}
+                                    }; // "must be enabled"
+        m[flag_enable_disable.n_str()]={
+                                        {"должен быть неактивен"},
+                                        {"должна быть неактивна",grammar_ru::zhensky_rod},
+                                        {"должно быть неактивно",grammar_ru::sredny_rod},
+                                        {"должны быть неактивны",grammar_ru::mn_chislo}
+                                    }; // "must be disabled"
 
         // properties
         m[value.name()]={{{"значение",grammar_ru::sredny_rod},grammar_ru::sredny_rod}}; // "value"
@@ -131,8 +181,14 @@ inline const phrase_translator& validator_translator_ru()
                             {"пустое",grammar_ru::sredny_rod},
                             {"пустые",grammar_ru::mn_chislo}
                         }; // "empty"
-        m[size.name()]="размер"; // "size"
-        m[length.name()]={{{"длина",grammar_ru::zhensky_rod},grammar_ru::sredny_rod}}; // "length"
+        m[size.name()]={
+                            {"размер"},
+                            {"размера",grammar_ru::roditelny_padezh}
+                        }; // "size"
+        m[length.name()]={
+                        {{"длина",grammar_ru::zhensky_rod},grammar_ru::sredny_rod},
+                        {{"длины",grammar_ru::zhensky_rod},grammar_ru::sredny_rod,grammar_ru::roditelny_padezh}
+                    }; // "length"
 
         // existance
         m[string_exists]={

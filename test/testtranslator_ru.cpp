@@ -35,13 +35,16 @@ BOOST_AUTO_TEST_CASE(CheckTranslatorRu)
     BOOST_CHECK_EQUAL(sys_tr(string_not_empty,grammar_categories_bitmask(grammar_ru::mn_chislo)).text(),"должны быть не пустыми");
 }
 
-BOOST_AUTO_TEST_CASE(CheckValidatorRu)
+BOOST_AUTO_TEST_CASE(CheckOfRu)
 {
     phrase_translator m;
     m[string_member_name_conjunction]={{{" ",grammar_ru::roditelny_padezh}}}; // " of "
     auto sep=m(string_member_name_conjunction);
     BOOST_CHECK(is_grammar_category_set(sep.grammar_cats(),grammar_ru::roditelny_padezh));
+}
 
+BOOST_AUTO_TEST_CASE(CheckValidatorRu)
+{
     std::string rep;
     std::map<std::string,std::string> m1={
         {"password","123456"},
@@ -161,6 +164,41 @@ BOOST_AUTO_TEST_CASE(CheckValidatorRu)
     BOOST_CHECK(!v9.apply(ra2));
     BOOST_CHECK_EQUAL(rep,"вода озера планеты должна быть равна чистая");
     rep.clear();
+
+    auto v10=validator(
+        _["planet"]["lake"]["bank"][size](gt,_(m2))
+     );
+    BOOST_CHECK(!v10.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"размер берега озера планеты должен быть больше размера берега озера планеты  образца");
+    rep.clear();
+
+    auto v11=validator(
+        _["planet"]["lake"]["bank"](size(lt,_["planet"]["lake"]["water"]))
+     );
+    BOOST_CHECK(!v11.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"размер берега озера планеты должен быть меньше размера воды озера планеты");
+    rep.clear();
+
+    auto v12=validator(
+        _["planet"]["lake"]["bank"](gt,_["planet"]["lake"]["water"])
+     );
+    BOOST_CHECK(!v12.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"берег озера планеты должен быть больше воды озера планеты");
+    rep.clear();
+
+    auto v13=validator(
+        _["planet"]["lake"]["bank"](length(lt,_["planet"]["lake"]["water"]))
+     );
+    BOOST_CHECK(!v13.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"длина берега озера планеты должна быть меньше длины воды озера планеты");
+    rep.clear();
+
+    auto v14=validator(
+        _["planet"]["lake"]["bank"](size(lt,_["planet"]))
+     );
+    BOOST_CHECK(!v14.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"размер берега озера планеты должен быть меньше размера планеты");
+    rep.clear();
 }
 
 BOOST_AUTO_TEST_CASE(CheckValidatorWithObjectNameRu)
@@ -207,6 +245,15 @@ BOOST_AUTO_TEST_CASE(CheckValidatorWithObjectNameRu)
      );
     BOOST_CHECK(!v3.apply(ra1));
     BOOST_CHECK_EQUAL(rep,"размер пароля службы должен быть больше 10");
+    rep.clear();
+
+    bool f=false;
+    auto ra2=make_reporting_adapter(f,make_reporter_with_object_name(rep,make_formatter(tr1),"service"));
+    auto v4=validator(
+        value(flag(flag_enable_disable),true)
+     );
+    BOOST_CHECK(!v4.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"служба должна быть активна");
     rep.clear();
 }
 
