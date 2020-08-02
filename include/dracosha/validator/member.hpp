@@ -225,11 +225,11 @@ struct member
 
     path_type path;
 
-    template <template <typename ...> class T2,
-              typename ...Args>
-    static auto create_derived(Args&&... args)
+    template <template <typename ...> class T1,
+              typename T2, typename PathT>
+    static auto create_derived(T2&& name, PathT&& path)
     {
-        return T2<T,ParentPathT...>(std::forward<Args>(args)...);
+        return T1<T2,T,ParentPathT...>(std::forward<PathT>(path),std::forward<T2>(name));
     }
 
     member()=default;
@@ -354,28 +354,28 @@ struct member
 /**
  * @brief Member with excplicit name
  */
-template <typename T, typename ...ParentPathT>
-struct member_with_name : public member<T,ParentPathT...>
+template <typename T1, typename T2, typename ...ParentPathT>
+struct member_with_name : public member<T2,ParentPathT...>
 {
-    using base_type=member<T,ParentPathT...>;
+    using base_type=member<T2,ParentPathT...>;
 
     /**
      * @brief Constructor with name
      * @param path Member's path
      * @name name member's name
      */
-    template <typename T1>
+    template <typename Tt1>
     member_with_name(typename base_type::path_type path,
-           T1&& name)
+           Tt1&& name)
          : base_type(std::move(path)),
-           _name(std::forward<T1>(name))
+           _name(std::forward<Tt1>(name))
     {}
 
     /**
      * @brief Get member's name
      * @return Name
      */
-    concrete_phrase name() const
+    auto name() const
     {
         return _name;
     }
@@ -390,10 +390,10 @@ struct member_with_name : public member<T,ParentPathT...>
      * @param v Prepared partial validator
      * @return Prepared partial validator bound to current member
      */
-    template <typename T1>
-    constexpr auto operator () (T1&& v) const -> decltype(auto)
+    template <typename Tt1>
+    constexpr auto operator () (Tt1&& v) const -> decltype(auto)
     {
-        return make_validator(hana::reverse_partial(apply_member,std::forward<T1>(v),*this));
+        return make_validator(hana::reverse_partial(apply_member,std::forward<Tt1>(v),*this));
     }
 
     /**
@@ -402,19 +402,19 @@ struct member_with_name : public member<T,ParentPathT...>
      * @param b Argument to forward to operator
      * @return Prepared partial validator of "value" property bound to current member
      */
-    template <typename OpT, typename T1>
-    constexpr auto operator () (OpT&& op, T1&& b) const -> decltype(auto)
+    template <typename OpT, typename Tt1>
+    constexpr auto operator () (OpT&& op, Tt1&& b) const -> decltype(auto)
     {
-        return (*this)(value(std::forward<OpT>(op),std::forward<T1>(b)));
+        return (*this)(value(std::forward<OpT>(op),std::forward<Tt1>(b)));
     }
 
-    concrete_phrase _name;
+    typename adjust_storable_concrete_phrase<T1>::type _name;
 };
 
 template <typename MemberT, typename T>
 auto make_member_with_name(MemberT&& member, T&& name)
 {
-    return member.template create_derived<member_with_name>(std::move(member.path),std::forward<T>(name));
+    return member.template create_derived<member_with_name>(std::forward<T>(name),std::move(member.path));
 }
 
 namespace detail

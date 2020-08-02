@@ -119,7 +119,7 @@ struct _t
                 ,void*> =nullptr
         ) const
     {
-        return wrap_op_with_string<T1>(std::forward<T1>(op),std::forward<T2>(description));
+        return wrap_op_with_string<T1,T2>(std::forward<T1>(op),std::forward<T2>(description));
     }
 
     /**

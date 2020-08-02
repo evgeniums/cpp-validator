@@ -34,6 +34,9 @@ struct member_property
 {
     using hana_tag=member_property_tag;
 
+    using member_type=MemberT;
+    using property_type=PropT;
+
     MemberT member;
     PropT property;
 };

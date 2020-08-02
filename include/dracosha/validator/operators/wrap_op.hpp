@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/operators/operator.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
+#include <dracosha/validator/utils/adjust_storable_type.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -86,11 +87,16 @@ class wrap_op : public object_wrapper<T>
         }
 };
 
+struct wrap_op_with_string_t
+{
+};
+
 /**
  * @brief Wrap operator with description
  */
-template <typename T>
-class wrap_op_with_string : public wrap_op<T>
+template <typename T1, typename T2>
+class wrap_op_with_string : public wrap_op<T1>,
+                            public wrap_op_with_string_t
 {
     public:
 
@@ -99,11 +105,12 @@ class wrap_op_with_string : public wrap_op<T>
          * @param val Operator
          * @param description String to use in report formatting to represent the operator
          */
+        template <typename Tt1, typename Tt2>
         wrap_op_with_string(
-                T&& val,
-                std::string description
-            ) : wrap_op<T>(std::forward<T>(val)),
-                _description(std::move(description))
+                Tt1&& val,
+                Tt2&& description
+            ) : wrap_op<T1>(std::forward<Tt1>(val)),
+                _description(std::forward<Tt2>(description))
         {}
 
         /**
@@ -117,7 +124,7 @@ class wrap_op_with_string : public wrap_op<T>
         /**
          * @brief Get explicit operator description
          */
-        constexpr auto str() const
+        auto str() const
         {
             return _description;
         }
@@ -125,14 +132,14 @@ class wrap_op_with_string : public wrap_op<T>
         /**
          * @brief Get explicit operator description
          */
-        constexpr auto n_str() const
+        auto n_str() const
         {
             return _description;
         }
 
     private:
 
-        concrete_phrase _description;
+        typename adjust_storable_concrete_phrase<T2>::type _description;
 };
 
 //-------------------------------------------------------------

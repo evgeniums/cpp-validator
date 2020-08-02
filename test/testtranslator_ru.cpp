@@ -96,6 +96,17 @@ BOOST_AUTO_TEST_CASE(CheckValidatorRu)
                         {{"вода",grammar_ru::zhensky_rod}},
                         {{"воды",grammar_ru::zhensky_rod},grammar_ru::roditelny_padezh}
                     };
+    tr["must be smaller"]={
+                        {{"должен быть мельче",grammar_ru::roditelny_padezh}},
+                        {{"должна быть мельче",grammar_ru::roditelny_padezh},grammar_ru::zhensky_rod}
+                    };
+    tr["sky"]={
+                    {{"небо",grammar_ru::sredny_rod}},
+                    {{"неба",grammar_ru::sredny_rod},grammar_ru::roditelny_padezh}
+                    };
+    tr["небес"]={
+                    {{"небеса",grammar_ru::mn_chislo},grammar_ru::mn_chislo}
+                    };
 
     auto tr1=extend_translator(validator_translator_ru(),tr);
     auto ra1=make_reporting_adapter(m1,make_reporter(rep,make_formatter(tr1)));
@@ -198,6 +209,55 @@ BOOST_AUTO_TEST_CASE(CheckValidatorRu)
      );
     BOOST_CHECK(!v14.apply(ra2));
     BOOST_CHECK_EQUAL(rep,"размер берега озера планеты должен быть меньше размера планеты");
+    rep.clear();
+
+    auto v15=validator(
+        _["planet"]["lake"]["bank"](size(_(lt,"must be smaller"),_["planet"]))
+     );
+    BOOST_CHECK(!v15.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"размер берега озера планеты должен быть мельче размера планеты");
+    rep.clear();
+
+    auto v16=validator(
+        _["planet"]["lake"]["bank"](length(_(lt,"must be smaller"),_["planet"]))
+     );
+    BOOST_CHECK(!v16.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"длина берега озера планеты должна быть мельче длины планеты");
+    rep.clear();
+
+    auto v17=validator(
+        _["planet"]["lake"]["bank"](length(_(lt,concrete_phrase("ожидается мельче",grammar_ru::roditelny_padezh)),_["planet"]))
+     );
+    BOOST_CHECK(!v17.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"длина берега озера планеты ожидается мельче длины планеты");
+    rep.clear();
+
+    auto v18=validator(
+        _["planet"]["lake"]["bank"]("sky")(gt,"zzzzzzz")
+     );
+    BOOST_CHECK(!v18.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"небо должно быть больше zzzzzzz");
+    rep.clear();
+
+    auto v19=validator(
+        _["planet"]["lake"]["bank"](concrete_phrase("небеса",grammar_ru::mn_chislo))(gt,"земли")
+     );
+    BOOST_CHECK(!v19.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"небеса должны быть больше земли");
+    rep.clear();
+
+    auto v20=validator(
+        _["planet"]["lake"]["bank"]("sky")(length(gt,100))
+     );
+    BOOST_CHECK(!v20.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"длина неба должна быть больше 100");
+    rep.clear();
+
+    auto v21=validator(
+        _["planet"]["lake"]["bank"](concrete_phrase("небес",grammar_ru::mn_chislo))(length(gt,100))
+     );
+    BOOST_CHECK(!v21.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"длина небес должна быть больше 100");
     rep.clear();
 }
 

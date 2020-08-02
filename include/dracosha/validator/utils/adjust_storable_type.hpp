@@ -40,7 +40,7 @@ struct adjust_storable_type
  */
 template <typename T>
 struct adjust_storable_type<T,
-                    hana::when<std::is_constructible<std::string,T>::value>
+                        hana::when<std::is_constructible<std::string,T>::value>
                     >
 {
     using type=std::string;
@@ -53,7 +53,7 @@ struct adjust_storable_type<T,
  */
 template <typename T>
 struct adjust_storable_type<T,
-                    hana::when<!std::is_constructible<std::string,T>::value>
+                        hana::when<!std::is_constructible<std::string,T>::value>
                     >
 {
     using type=std::decay_t<T>;

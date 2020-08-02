@@ -37,6 +37,42 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+namespace detail
+{
+
+template <typename T, typename = hana::when<true>>
+struct strings_helper_t
+{
+    template <typename TranslatorT, typename T1>
+    auto operator() (TranslatorT&& translator, T1&& val, grammar_categories grammar_cats) const
+    {
+        return translator(val,grammar_cats);
+    }
+};
+
+template <typename T>
+struct strings_helper_t<
+            T,
+            hana::when<std::is_same<T,concrete_phrase>::value>
+        >
+{
+    template <typename TranslatorT, typename T1>
+    auto operator() (TranslatorT&&, T1&& val, grammar_categories) const -> decltype(auto)
+    {
+        return hana::id(std::forward<T1>(val));
+    }
+};
+template <typename T>
+constexpr strings_helper_t<T> strings_helper_inst{};
+
+template <typename TranslatorT, typename T>
+auto strings_helper(TranslatorT&& translator, T&& val, grammar_categories grammar_cats) -> decltype(auto)
+{
+    return strings_helper_inst<std::decay_t<T>>(std::forward<TranslatorT>(translator),std::forward<T>(val),grammar_cats);
+}
+
+}
+
 struct strings_tag;
 
 /**
@@ -72,9 +108,33 @@ struct strings
      * @return ID converted to string and then translated
      */
     template <typename T>
-    concrete_phrase operator() (const T& id, grammar_categories grammar_cats=0) const
+    concrete_phrase operator() (const T& id, grammar_categories grammar_cats=0
+                                ,
+                                    std::enable_if_t<
+                                       !(
+                                        std::is_base_of<wrap_op_with_string_t,T>::value
+                                       )
+                                    ,void*> =nullptr
+                                ) const
     {
         return _translator(detail::to_string(id),grammar_cats);
+    }
+
+    /**
+     * @brief Convert ID to concrete phrase for wrapped operator with explicit string
+     * @param id Wrapped operator with explicit string
+     * @return ID converted to string and then translated
+     */
+    template <typename T>
+    concrete_phrase operator() (const T& id, grammar_categories grammar_cats=0,
+                                std::enable_if_t<
+                                   (
+                                    std::is_base_of<wrap_op_with_string_t,T>::value
+                                   )
+                                ,void*> =nullptr
+                                ) const
+    {
+        return detail::strings_helper(_translator,id.str(),grammar_cats);
     }
 
     /**

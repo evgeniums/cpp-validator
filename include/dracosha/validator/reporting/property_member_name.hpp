@@ -92,7 +92,7 @@ struct property_member_name_t
                        std::enable_if_t<!TraitsT1::is_reverse_member_property_order,void*> =nullptr
             ) const
     {
-        auto member_parts=list_member_names(id.member,traits,grammar_cats);
+        auto member_parts=detail::list_member_names(id.member,traits,grammar_cats);
         auto prop=single_member_name(id.property,traits,last_grammar_categories(member_parts,grammar_cats));
         auto next_cats=phrase_grammar_cats(prop);
         auto sep=translate(traits,detail::to_string(traits.member_property_conjunction()));
@@ -102,6 +102,113 @@ struct property_member_name_t
            dst,
            "",
            hana::concat(std::move(member_parts),hana::make_tuple(std::move(sep),std::move(prop)))
+        );
+        return concrete_phrase(dst,next_cats);
+    }
+};
+
+template <typename T, typename TraitsT>
+struct property_member_name_t<T,TraitsT,
+            hana::when<
+                !detail::has_member_property<T,TraitsT>::value
+                &&
+                std::decay_t<typename T::member_type>::has_name
+                &&
+                !std::is_same<decltype(std::declval<std::decay_t<typename T::member_type>>().name()),concrete_phrase>::value
+            >
+        >
+{
+    template <typename TraitsT1>
+    auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
+                       std::enable_if_t<TraitsT1::is_reverse_member_property_order,void*> =nullptr
+            ) const
+    {
+        auto prop=single_member_name(id.property,traits,grammar_cats);
+        auto next_cats=phrase_grammar_cats(prop);
+        auto sep=translate(traits,detail::to_string(traits.member_property_conjunction()));
+        auto sep_cats=phrase_grammar_cats(sep);
+
+        auto member=decorate(traits,translate(traits,id.member.name(),sep_cats));
+
+        auto parts=hana::make_tuple(std::move(prop),std::move(sep),std::move(member));
+
+        std::string dst;
+        backend_formatter.append_join(
+           dst,
+           "",
+           parts
+        );
+        return concrete_phrase(dst,next_cats);
+    }
+
+    template <typename TraitsT1>
+    auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
+                       std::enable_if_t<!TraitsT1::is_reverse_member_property_order,void*> =nullptr
+            ) const
+    {
+        auto member=decorate(traits,translate(traits,id.member.name(),grammar_cats));
+        auto prop=single_member_name(id.property,traits,phrase_grammar_cats(member,grammar_cats));
+        auto next_cats=phrase_grammar_cats(prop);
+        auto sep=translate(traits,detail::to_string(traits.member_property_conjunction()));
+
+        std::string dst;
+        backend_formatter.append_join(
+           dst,
+           "",
+           hana::make_tuple(std::move(member),std::move(sep),std::move(prop))
+        );
+        return concrete_phrase(dst,next_cats);
+    }
+};
+
+template <typename T, typename TraitsT>
+struct property_member_name_t<T,TraitsT,
+            hana::when<
+                !detail::has_member_property<T,TraitsT>::value
+                &&
+                std::decay_t<typename T::member_type>::has_name
+                &&
+                std::is_same<decltype(std::declval<std::decay_t<typename T::member_type>>().name()),concrete_phrase>::value
+            >
+        >
+{
+    template <typename TraitsT1>
+    auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
+                       std::enable_if_t<TraitsT1::is_reverse_member_property_order,void*> =nullptr
+            ) const
+    {
+        auto prop=single_member_name(id.property,traits,grammar_cats);
+        auto next_cats=phrase_grammar_cats(prop);
+        auto sep=translate(traits,detail::to_string(traits.member_property_conjunction()));
+
+        auto member=decorate(traits,id.member.name());
+
+        auto parts=hana::make_tuple(std::move(prop),std::move(sep),std::move(member));
+
+        std::string dst;
+        backend_formatter.append_join(
+           dst,
+           "",
+           parts
+        );
+        return concrete_phrase(dst,next_cats);
+    }
+
+    template <typename TraitsT1>
+    auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
+                       std::enable_if_t<!TraitsT1::is_reverse_member_property_order,void*> =nullptr
+            ) const
+    {
+        auto member=decorate(traits,id.member.name(),grammar_cats);
+        auto prop=single_member_name(id.property,traits,phrase_grammar_cats(member,grammar_cats));
+        auto next_cats=phrase_grammar_cats(prop);
+        auto sep=translate(traits,detail::to_string(traits.member_property_conjunction()));
+
+        std::string dst;
+        backend_formatter.append_join(
+           dst,
+           "",
+           hana::make_tuple(std::move(member),std::move(sep),std::move(prop))
         );
         return concrete_phrase(dst,next_cats);
     }

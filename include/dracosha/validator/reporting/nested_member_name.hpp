@@ -227,7 +227,24 @@ struct nested_member_name_t
  */
 template <typename T, typename TraitsT>
 struct nested_member_name_t<T,TraitsT,
-            hana::when<T::has_name>
+            hana::when<T::has_name
+                        &&
+                        !std::is_same<decltype(std::declval<T>().name()),concrete_phrase>::value
+                     >
+        >
+{
+    auto operator() (const T& id, const TraitsT& traits, grammar_categories grammar_cats) const
+    {
+        return decorate(traits,translate(traits,id.name(),grammar_cats));
+    }
+};
+
+template <typename T, typename TraitsT>
+struct nested_member_name_t<T,TraitsT,
+            hana::when<T::has_name
+                &&
+                std::is_same<decltype(std::declval<T>().name()),concrete_phrase>::value
+            >
         >
 {
     auto operator() (const T& id, const TraitsT& traits, grammar_categories) const

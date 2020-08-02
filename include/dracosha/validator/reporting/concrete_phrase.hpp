@@ -311,6 +311,29 @@ void set_last_grammar_categories(Ts&& ts, grammar_categories cats)
 
 //-------------------------------------------------------------
 
+template <typename T, typename=hana::when<true>>
+struct adjust_storable_concrete_phrase
+{
+};
+
+template <typename T>
+struct adjust_storable_concrete_phrase<T,
+                        hana::when<std::is_same<concrete_phrase,std::decay_t<T>>::value>
+                    >
+{
+    using type=concrete_phrase;
+};
+
+template <typename T>
+struct adjust_storable_concrete_phrase<T,
+                        hana::when<!std::is_same<concrete_phrase,std::decay_t<T>>::value>
+                    >
+{
+    using type=std::decay_t<T>;
+};
+
+//-------------------------------------------------------------
+
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
 #endif // DRACOSHA_VALIDATOR_CONCRETE_PHRASE_HPP
