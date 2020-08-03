@@ -408,7 +408,7 @@ struct member_with_name : public member<T2,ParentPathT...>
         return (*this)(value(std::forward<OpT>(op),std::forward<Tt1>(b)));
     }
 
-    typename adjust_storable_concrete_phrase<T1>::type _name;
+    std::decay_t<T1> _name;
 };
 
 template <typename MemberT, typename T>

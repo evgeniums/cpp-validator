@@ -139,7 +139,7 @@ class wrap_op_with_string : public wrap_op<T1>,
 
     private:
 
-        typename adjust_storable_concrete_phrase<T2>::type _description;
+        std::decay_t<T2> _description;
 };
 
 //-------------------------------------------------------------

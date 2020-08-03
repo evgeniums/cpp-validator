@@ -43,6 +43,9 @@ constexpr string_element_t string_element{};
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Check if traits have suitable operator ()(const T&) for name transforming in case when they don't
+ */
 template <typename T, typename TraitsT, typename=void>
 struct can_single_member_name
 {

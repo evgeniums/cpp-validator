@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/member.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
+#include <dracosha/validator/reporting/phrase_grammar_cats.hpp>
 #include <dracosha/validator/reporting/single_member_name.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
 

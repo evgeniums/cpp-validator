@@ -185,11 +185,18 @@ class concrete_phrase
             return os << ph.text();
         }
 
+        /**
+         * @brief Check if phrase is not set
+         * @return Flag
+         */
         bool empty() const noexcept
         {
             return _empty;
         }
 
+        /**
+         * @brief Clear phrase
+         */
         void clear()
         {
             _text.clear();
@@ -202,134 +209,6 @@ class concrete_phrase
         std::string _text;
         grammar_categories _grammar_cats;
         bool _empty;
-};
-
-namespace detail
-{
-template <typename T, typename = hana::when<true>>
-struct phrase_grammar_cats_t
-{
-    template <typename T1>
-    constexpr grammar_categories operator() (T1&&) const
-    {
-        return 0;
-    }
-
-    template <typename T1>
-    void set(T1&, grammar_categories) const
-    {
-    }
-};
-
-template <typename T>
-struct phrase_grammar_cats_t<
-            T,
-            hana::when<std::is_same<grammar_categories,std::decay_t<T>>::value>
-        >
-{
-    template <typename T1>
-    auto operator() (T1&& grammar_cats) const -> decltype(auto)
-    {
-        return hana::id(std::forward<T1>(grammar_cats));
-    }
-
-    template <typename T1>
-    void set(T1&, grammar_categories) const
-    {
-    }
-};
-
-template <typename T>
-struct phrase_grammar_cats_t<
-            T,
-            hana::when<std::is_same<concrete_phrase,std::decay_t<T>>::value>
-        >
-{
-    template <typename T1>
-    grammar_categories operator() (T1&& phrase) const
-    {
-        return phrase.grammar_cats();
-    }
-
-    template <typename T1>
-    void set(T1& phrase, grammar_categories cats) const
-    {
-        phrase.set_grammar_cats(cats);
-    }
-};
-
-template <typename T>
-constexpr phrase_grammar_cats_t<T> phrase_grammar_cats_inst{};
-}
-
-/**
- * @brief Get phrase grammar_cats
- * @param phrase Phrase
- * @return Phrase grammar_cats if applicabe or 0
- */
-template <typename T>
-auto phrase_grammar_cats(T&& phrase) -> decltype(auto)
-{
-    return detail::phrase_grammar_cats_inst<T>(std::forward<T>(phrase));
-}
-
-template <typename T>
-void set_phrase_grammar_cats(T& phrase, grammar_categories cats)
-{
-    detail::phrase_grammar_cats_inst<T>.set(phrase,cats);
-}
-
-template <typename Ts, typename T>
-auto last_grammar_categories(Ts&& ts, T&& fallback)
-{
-    return hana::if_(
-        hana::is_empty(ts),
-        [&fallback](auto &&) {return phrase_grammar_cats(fallback);},
-        [](auto&& ts) {return phrase_grammar_cats(hana::back(ts));}
-    )(std::forward<Ts>(ts));
-}
-
-template <typename Ts, typename T>
-auto first_grammar_categories(Ts&& ts, T&& fallback)
-{
-    return hana::if_(
-        hana::is_empty(ts),
-        [&fallback](auto &&) {return phrase_grammar_cats(fallback);},
-        [](auto&& ts) {return phrase_grammar_cats(hana::front(ts));}
-    )(std::forward<Ts>(ts));
-}
-
-template <typename Ts>
-void set_last_grammar_categories(Ts&& ts, grammar_categories cats)
-{
-    return hana::if_(
-        hana::is_empty(ts),
-        [&](auto &&) {},
-        [&cats](auto&& ts) {return set_phrase_grammar_cats(hana::back(ts),cats);}
-    )(std::forward<Ts>(ts));
-}
-
-//-------------------------------------------------------------
-
-template <typename T, typename=hana::when<true>>
-struct adjust_storable_concrete_phrase
-{
-};
-
-template <typename T>
-struct adjust_storable_concrete_phrase<T,
-                        hana::when<std::is_same<concrete_phrase,std::decay_t<T>>::value>
-                    >
-{
-    using type=concrete_phrase;
-};
-
-template <typename T>
-struct adjust_storable_concrete_phrase<T,
-                        hana::when<!std::is_same<concrete_phrase,std::decay_t<T>>::value>
-                    >
-{
-    using type=std::decay_t<T>;
 };
 
 //-------------------------------------------------------------
