@@ -199,6 +199,21 @@ struct wrap_validator
     {
         return hana::id(std::forward<T>(v));
     }
+
+    /**
+     * @brief Create validator form operator and operand
+     * @param op Operator
+     * @param b Operand
+     * @return Validator
+     */
+    template <typename OpT, typename T>
+    constexpr auto operator () (OpT&& op,
+                                T&& b,
+                                std::enable_if_t<hana::is_a<operator_tag,OpT>,void*> =nullptr
+            ) const
+    {
+        return make_validator(value(std::forward<OpT>(op),std::forward<T>(b)));
+    }
 };
 constexpr wrap_validator validator{};
 

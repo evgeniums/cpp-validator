@@ -1144,9 +1144,8 @@ BOOST_AUTO_TEST_CASE(CheckContainsValidationReport)
     std::map<std::string,size_t> m1={{"field1",1}};
 
     auto v1=validator(
-                value(contains,"field2")
+                contains,"field2"
             );
-
     auto ra1=make_reporting_adapter(m1,rep1);
     BOOST_CHECK(!v1.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"must contain field2");

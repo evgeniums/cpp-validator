@@ -643,13 +643,9 @@ BOOST_AUTO_TEST_CASE(CheckMemberHelper)
 /**
 
 @todo
-    Contains operator.
     Set operators.
     String operators.
     Regular expressions operators.
-
-    Refactor prpoerty_member_name.
-    Cleanup and split files.
 
     Generate config file.
     Remove legacy files.
