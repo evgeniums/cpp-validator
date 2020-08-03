@@ -42,7 +42,7 @@ struct has_member_property
 };
 
 /**
- * @brief Check if traits implement method nested(id,traits,translator)
+ * @brief Check if traits implement method member_property(id,traits)
  */
 template <typename T, typename TraitsT>
 struct has_member_property<T,TraitsT,
@@ -58,9 +58,19 @@ struct has_member_property<T,TraitsT,
 
 }
 
+/**
+ * @brief Default helper for construction property of the name of a member.
+ */
 template <typename T, typename TraitsT, typename =hana::when<true>>
 struct property_member_name_t
 {
+    /**
+     * @brief Reverse order of property name of a member like "property of member"
+     * @param id Pair of property and member
+     * @param traits Formatter traits
+     * @param grammar_cats Grammatical categories of preceding phrase
+     * @return Formatted property name of a member
+     */
     template <typename TraitsT1>
     auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
                        std::enable_if_t<TraitsT1::is_reverse_member_property_order,void*> =nullptr
@@ -87,6 +97,13 @@ struct property_member_name_t
         return concrete_phrase(dst,next_cats);
     }
 
+    /**
+     * @brief Direct order of property name of a member like "member.property"
+     * @param id Pair of property and member
+     * @param traits Formatter traits
+     * @param grammar_cats Grammatical categories of preceding phrase
+     * @return Formatted property name of a member
+     */
     template <typename TraitsT1>
     auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
                        std::enable_if_t<!TraitsT1::is_reverse_member_property_order,void*> =nullptr
@@ -107,17 +124,43 @@ struct property_member_name_t
     }
 };
 
+/**
+ * @brief Helper for construction of the property name of a member when the member has explicit name.
+ */
 template <typename T, typename TraitsT>
 struct property_member_name_t<T,TraitsT,
             hana::when<
                 !detail::has_member_property<T,TraitsT>::value
                 &&
                 std::decay_t<typename T::member_type>::has_name
-                &&
-                !std::is_same<decltype(std::declval<std::decay_t<typename T::member_type>>().name()),concrete_phrase>::value
             >
         >
 {
+    template <typename T1>
+    static auto member(const T1& id, const TraitsT& traits, grammar_categories grammar_cats,
+                          std::enable_if_t<!std::is_same<decltype(std::declval<std::decay_t<typename T1::member_type>>().name()),concrete_phrase>::value,
+                          void*> =nullptr
+                          )
+    {
+        return decorate(traits,translate(traits,id.member.name(),grammar_cats));
+    }
+
+    template <typename T1>
+    static auto member(const T1& id, const TraitsT& traits, grammar_categories,
+                          std::enable_if_t<std::is_same<decltype(std::declval<std::decay_t<typename T1::member_type>>().name()),concrete_phrase>::value,
+                          void*> =nullptr
+                          )
+    {
+        return decorate(traits,id.member.name());
+    }
+
+    /**
+     * @brief Reverse order of property name of a member like "property of member"
+     * @param id Pair of property and member
+     * @param traits Formatter traits
+     * @param grammar_cats Grammatical categories of preceding phrase
+     * @return Formatted property name of a member
+     */
     template <typename TraitsT1>
     auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
                        std::enable_if_t<TraitsT1::is_reverse_member_property_order,void*> =nullptr
@@ -128,9 +171,7 @@ struct property_member_name_t<T,TraitsT,
         auto sep=translate(traits,detail::to_string(traits.member_property_conjunction()));
         auto sep_cats=phrase_grammar_cats(sep);
 
-        auto member=decorate(traits,translate(traits,id.member.name(),sep_cats));
-
-        auto parts=hana::make_tuple(std::move(prop),std::move(sep),std::move(member));
+        auto parts=hana::make_tuple(std::move(prop),std::move(sep),member(id,traits,sep_cats));
 
         std::string dst;
         backend_formatter.append_join(
@@ -141,13 +182,20 @@ struct property_member_name_t<T,TraitsT,
         return concrete_phrase(dst,next_cats);
     }
 
+    /**
+     * @brief Direct order of property name of a member like "member.property"
+     * @param id Pair of property and member
+     * @param traits Formatter traits
+     * @param grammar_cats Grammatical categories of preceding phrase
+     * @return Formatted property name of a member
+     */
     template <typename TraitsT1>
     auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
                        std::enable_if_t<!TraitsT1::is_reverse_member_property_order,void*> =nullptr
             ) const
     {
-        auto member=decorate(traits,translate(traits,id.member.name(),grammar_cats));
-        auto prop=single_member_name(id.property,traits,phrase_grammar_cats(member,grammar_cats));
+        auto mmbr=member(id,traits,grammar_cats);
+        auto prop=single_member_name(id.property,traits,phrase_grammar_cats(mmbr,grammar_cats));
         auto next_cats=phrase_grammar_cats(prop);
         auto sep=translate(traits,detail::to_string(traits.member_property_conjunction()));
 
@@ -155,65 +203,15 @@ struct property_member_name_t<T,TraitsT,
         backend_formatter.append_join(
            dst,
            "",
-           hana::make_tuple(std::move(member),std::move(sep),std::move(prop))
+           hana::make_tuple(std::move(mmbr),std::move(sep),std::move(prop))
         );
         return concrete_phrase(dst,next_cats);
     }
 };
 
-template <typename T, typename TraitsT>
-struct property_member_name_t<T,TraitsT,
-            hana::when<
-                !detail::has_member_property<T,TraitsT>::value
-                &&
-                std::decay_t<typename T::member_type>::has_name
-                &&
-                std::is_same<decltype(std::declval<std::decay_t<typename T::member_type>>().name()),concrete_phrase>::value
-            >
-        >
-{
-    template <typename TraitsT1>
-    auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
-                       std::enable_if_t<TraitsT1::is_reverse_member_property_order,void*> =nullptr
-            ) const
-    {
-        auto prop=single_member_name(id.property,traits,grammar_cats);
-        auto next_cats=phrase_grammar_cats(prop);
-        auto sep=translate(traits,detail::to_string(traits.member_property_conjunction()));
-
-        auto member=decorate(traits,id.member.name());
-
-        auto parts=hana::make_tuple(std::move(prop),std::move(sep),std::move(member));
-
-        std::string dst;
-        backend_formatter.append_join(
-           dst,
-           "",
-           parts
-        );
-        return concrete_phrase(dst,next_cats);
-    }
-
-    template <typename TraitsT1>
-    auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
-                       std::enable_if_t<!TraitsT1::is_reverse_member_property_order,void*> =nullptr
-            ) const
-    {
-        auto member=decorate(traits,id.member.name(),grammar_cats);
-        auto prop=single_member_name(id.property,traits,phrase_grammar_cats(member,grammar_cats));
-        auto next_cats=phrase_grammar_cats(prop);
-        auto sep=translate(traits,detail::to_string(traits.member_property_conjunction()));
-
-        std::string dst;
-        backend_formatter.append_join(
-           dst,
-           "",
-           hana::make_tuple(std::move(member),std::move(sep),std::move(prop))
-        );
-        return concrete_phrase(dst,next_cats);
-    }
-};
-
+/**
+ * @brief Helper for construction of the property name of a member when traits have custom formatting method member_property.
+ */
 template <typename T, typename TraitsT>
 struct property_member_name_t<T,TraitsT,
             hana::when<detail::has_member_property<T,TraitsT>::value>
@@ -228,6 +226,15 @@ struct property_member_name_t<T,TraitsT,
 template <typename T, typename TraitsT>
 constexpr property_member_name_t<T,TraitsT> property_member_name_inst{};
 
+/**
+ * @brief Format property name of a member
+ * @param id Pair of property and member
+ * @param traits Formatter traits
+ * @param grammar_cats Grammatical categories of preceding phrase
+ * @return Formatted property name of a member
+ *
+ * Property name of a member is a conjunction of property's name and member's name.
+ */
 template <typename T, typename TraitsT>
 constexpr auto property_member_name(const T& id, const TraitsT& traits, grammar_categories grammar_cats=0) -> decltype(auto)
 {
