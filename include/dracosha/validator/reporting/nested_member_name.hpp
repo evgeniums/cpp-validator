@@ -68,6 +68,11 @@ struct has_nested<T,TraitsT,
     constexpr static const bool value=true;
 };
 
+/**
+ * @brief Construct member path for member name formating in case of direct order of levels in the path
+ * @param path Original member path
+ * @return Original member path
+ */
 template <typename T, typename TraitsT>
 constexpr auto member_names_path(T&& path, const TraitsT&,
                        std::enable_if_t<!TraitsT::is_reverse_member_names_order,void*> =nullptr) -> decltype(auto)
@@ -75,6 +80,11 @@ constexpr auto member_names_path(T&& path, const TraitsT&,
     return hana::id(std::forward<T>(path));
 }
 
+/**
+ * @brief Construct member path for member name formating in case of reverse order of levels in the path
+ * @param path Original member path
+ * @return Member path with reversed order
+ */
 template <typename T, typename TraitsT>
 constexpr auto member_names_path(T&& path, const TraitsT&,
                        std::enable_if_t<TraitsT::is_reverse_member_names_order,void*> =nullptr)
@@ -82,6 +92,9 @@ constexpr auto member_names_path(T&& path, const TraitsT&,
     return hana::reverse(std::forward<T>(path));
 }
 
+/**
+ * @brief Default helper to format a single key of member path with separator
+ */
 template <typename T, typename TraitsT, typename =void>
 struct member_name_with_separator_t
 {
@@ -93,10 +106,13 @@ struct member_name_with_separator_t
     }
 };
 
+/**
+ * @brief Helper to format a single key of member path with separator when traits implement method member_name_with_separator(id,grammar_cats)
+ */
 template <typename T, typename TraitsT>
 struct member_name_with_separator_t<T,TraitsT,
         decltype(
-            (void)std::declval<std::decay_t<T>>().member_name_with_separator(std::declval<std::decay_t<T>>(),std::declval<grammar_categories>())
+            (void)std::declval<std::decay_t<TraitsT>>().member_name_with_separator(std::declval<std::decay_t<T>>(),std::declval<grammar_categories>())
         )>
 {
     auto operator() (T&& id, const TraitsT& traits, const grammar_categories& grammar_cats) const
@@ -108,16 +124,29 @@ struct member_name_with_separator_t<T,TraitsT,
 template <typename T, typename TraitsT>
 constexpr member_name_with_separator_t<T,TraitsT> member_name_with_separator_inst{};
 
+/**
+ * @brief Format a single key of member path with separator
+ * @param id Single key of member path
+ * @param traits Formatter traits
+ * @param grammar_cats Grammatical categories of preceding phrase
+ * @return Formatted phrase
+ */
 template <typename T, typename TraitsT>
 auto member_name_with_separator(T&& id, const TraitsT& traits, const grammar_categories& grammar_cats=0)
 {
     return member_name_with_separator_inst<T,TraitsT>(std::forward<T>(id),traits,grammar_cats);
 }
 
+/**
+ * @brief Format names of intermediate keys of member path without the last key
+ * @param id Member
+ * @param traits Formatter traits
+ * @param grammar_cats Grammatical categories of preceding phrase
+ * @return Tuple of formatted names of intermediate keys
+ */
 template <typename T, typename TraitsT>
 auto intermediate_member_names(const T& id, const TraitsT& traits, grammar_categories grammar_cats)
 {
-    // format intermediate keys without the last key
     return hana::fold(
         member_names_path(hana::drop_back(member_path(id)),traits),
         hana::tuple<>(),
@@ -132,8 +161,15 @@ auto intermediate_member_names(const T& id, const TraitsT& traits, grammar_categ
     );
 }
 
+/**
+ * @brief Concat list of intermediate keys names with last key in case when the list is empty
+ * @param id Member
+ * @param traits Formatter traits
+ * @param grammar_cats Grammatical categories of preceding phrase
+ * @return Tuple with formatted last key of member path
+ */
 template <typename T, typename TraitsT, typename Ts>
-auto reverse_member_names(const T& id, const TraitsT& traits, Ts&&,
+auto member_names_with_last_key(const T& id, const TraitsT& traits, Ts&&,
                           grammar_categories grammar_cats,
                           std::enable_if_t<
                           std::is_same<decltype(hana::tuple<>()),std::decay_t<Ts>>::value
@@ -143,8 +179,16 @@ auto reverse_member_names(const T& id, const TraitsT& traits, Ts&&,
     return hana::make_tuple(single_member_name(hana::back(member_path(id)),traits,grammar_cats));
 }
 
+/**
+ * @brief Concat list of intermediate keys names with last key
+ * @param id Member
+ * @param traits Formatter traits
+ * @param ts Tuple of formatted names of intermediate keys
+ * @param grammar_cats Grammatical categories of preceding phrase
+ * @return Cpncatenation of formatted last key of member path and formatted names of intermediate keys
+ */
 template <typename T, typename TraitsT, typename Ts>
-auto reverse_member_names(const T& id, const TraitsT& traits, Ts&& ts,
+auto member_names_with_last_key(const T& id, const TraitsT& traits, Ts&& ts,
                           grammar_categories grammar_cats,
                           std::enable_if_t<
                           !std::is_same<decltype(hana::tuple<>()),std::decay_t<Ts>>::value
@@ -157,6 +201,13 @@ auto reverse_member_names(const T& id, const TraitsT& traits, Ts&& ts,
            );
 }
 
+/**
+ * @param Construct list of formatted names of keys of member path in reverse order
+ * @param id Member
+ * @param traits Formatter traits
+ * @param grammar_cats Grammatical categories of preceding phrase
+ * @return Tuple of formatted names of keys of member path
+ */
 template <typename T, typename TraitsT>
 auto list_member_names(const T& id, const TraitsT& traits, grammar_categories grammar_cats,
                        std::enable_if_t<
@@ -170,10 +221,17 @@ auto list_member_names(const T& id, const TraitsT& traits, grammar_categories gr
     // construct intermediate list using first grammar categories from the separator and drop last separator
     auto parts=hana::drop_back(intermediate_member_names(id,traits,phrase_grammar_cats(sep)));
 
-    // construct reversed list
-    return reverse_member_names(id,traits,std::move(parts),grammar_cats);
+    // construct final list
+    return member_names_with_last_key(id,traits,std::move(parts),grammar_cats);
 }
 
+/**
+ * @param Construct list of formatted names of keys of member path in direct order
+ * @param id Member
+ * @param traits Formatter traits
+ * @param grammar_cats Grammatical categories of preceding phrase
+ * @return Tuple of formatted names of keys of member path
+ */
 template <typename T, typename TraitsT>
 auto list_member_names(const T& id, const TraitsT& traits, grammar_categories grammar_cats,
                        std::enable_if_t<
@@ -191,6 +249,13 @@ auto list_member_names(const T& id, const TraitsT& traits, grammar_categories gr
            );
 }
 
+/**
+ * @brief Join list of formatted names of keys of member path to formatted string
+ * @param id Member
+ * @param traits Formatter traits
+ * @param grammar_cats Grammatical categories of preceding phrase
+ * @return Formatted full member name
+ */
 template <typename T, typename TraitsT>
 auto join_member_names(const T& id, const TraitsT& traits, grammar_categories grammar_cats)
 {
@@ -223,7 +288,7 @@ struct nested_member_name_t
 };
 
 /**
- * @brief Formatter of a member name to be used when the member has explicit name
+ * @brief Formatter of a member name to be used when the member has explicit name and it is not a concrete_phrase
  */
 template <typename T, typename TraitsT>
 struct nested_member_name_t<T,TraitsT,
@@ -239,6 +304,9 @@ struct nested_member_name_t<T,TraitsT,
     }
 };
 
+/**
+ * @brief Formatter of a member name to be used when the member has explicit name and it is a concrete_phrase
+ */
 template <typename T, typename TraitsT>
 struct nested_member_name_t<T,TraitsT,
             hana::when<T::has_name

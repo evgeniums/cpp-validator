@@ -463,7 +463,7 @@ auto member_helper_t<Args...>::operator ()
 }
 
 /**
-* @brief Extract path fro a member
+* @brief Extract path from a member
 * @param member Member
 * @return Member's path
 */
