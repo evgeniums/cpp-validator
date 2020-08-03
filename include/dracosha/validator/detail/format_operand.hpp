@@ -21,6 +21,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
+#include <dracosha/validator/reporting/decorator.hpp>
+#include <dracosha/validator/reporting/translate.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -46,8 +48,8 @@ namespace detail
 template <typename T, typename =hana::when<true>>
 struct format_operand_t
 {
-    template <typename T1, typename TranslatorT, typename DecoratorT>
-    auto operator () (T1&& val, const TranslatorT&, const DecoratorT&) const -> decltype(auto)
+    template <typename TraitsT, typename T1>
+    auto operator () (const TraitsT&, T1&& val, grammar_categories) const -> decltype(auto)
     {
         return hana::id(std::forward<T1>(val));
     }
@@ -63,10 +65,15 @@ struct format_operand_t<T,hana::when<
             std::is_same<concrete_phrase,std::decay_t<T>>::value
         >>
 {
-    template <typename T1, typename TranslatorT, typename DecoratorT>
-    auto operator () (T1&& val, const TranslatorT&, const DecoratorT& decorator) const -> decltype(auto)
+    template <typename TraitsT, typename T1>
+    auto operator () (const TraitsT& traits, T1&& val, grammar_categories cats) const -> decltype(auto)
     {
-        return decorator(std::string(std::forward<T1>(val)));
+        auto phrase=std::string(std::forward<T1>(val));
+        if (TraitsT::translate_string_operands && !std::is_same<concrete_phrase,std::decay_t<T>>::value)
+        {
+            phrase=translate(traits,std::move(phrase),cats);
+        }
+        return decorate(traits,std::move(phrase));
     }
 };
 
@@ -74,16 +81,12 @@ struct format_operand_t<T,hana::when<
  * @brief  Formatter of boolean values
  */
 template <typename T>
-struct format_operand_t<T,hana::when<
-            !std::is_same<concrete_phrase,std::decay_t<T>>::value
-            &&
-            std::is_same<bool,std::decay_t<T>>::value
-        >>
+struct format_operand_t<T,hana::when<std::is_same<bool,std::decay_t<T>>::value>>
 {
-    template <typename T1, typename TranslatorT, typename DecoratorT>
-    auto operator () (T1&& val, const TranslatorT& translator, const DecoratorT& decorator) const -> decltype(auto)
+    template <typename TraitsT, typename T1>
+    auto operator () (const TraitsT& traits, T1&& val, grammar_categories cats) const -> decltype(auto)
     {
-        return decorator(translator(val?std::string(string_true):std::string(string_false)));
+        return decorate(traits,translate(traits,val?std::string(string_true):std::string(string_false),cats));
     }
 };
 

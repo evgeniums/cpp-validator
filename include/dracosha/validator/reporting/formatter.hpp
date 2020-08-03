@@ -70,7 +70,7 @@ struct formatter
     {
         format(dst,
                make_cref_tuple(_strings,_operands),
-               op,b
+               op,prepare_operand_for_formatter(op,b)
                );
     }
 
@@ -79,7 +79,7 @@ struct formatter
     {
         format(dst,
                make_cref_tuple(_member_names,_strings,_operands),
-               prop,op,b
+               prop,op,prepare_operand_for_formatter(op,b)
                );
     }
 
@@ -88,7 +88,7 @@ struct formatter
     {
         format(dst,
                make_cref_tuple(_member_names,_member_names,_strings,_operands),
-               member,prop,op,b
+               member,prop,op,prepare_operand_for_formatter(op,b)
                );
     }
 
@@ -220,12 +220,12 @@ auto make_formatter(MemberNamesT&& mn,
  * @param strings Strings traits
  * @return Formatter
  */
-template <typename StringsT>
-auto make_formatter(StringsT&& strings,
+template <typename StringsT, typename TranslateOperandsT=std::false_type>
+auto make_formatter(StringsT&& strings, const TranslateOperandsT& translate_operands=std::false_type(),
                std::enable_if_t<hana::is_a<strings_tag,StringsT>,void*> =nullptr)
 {
     auto&& translator=strings._translator;
-    return make_formatter(make_translated_member_names(translator),make_translated_operand_formatter(translator),std::forward<StringsT>(strings));
+    return make_formatter(make_translated_member_names(translator),make_translated_operand_formatter(translator,translate_operands),std::forward<StringsT>(strings));
 }
 
 /**
@@ -233,11 +233,11 @@ auto make_formatter(StringsT&& strings,
  * @param translator Translator
  * @return Formatter
  */
-template <typename TranslatorT>
-auto make_formatter(const TranslatorT& translator,
+template <typename TranslatorT, typename TranslateOperandsT=std::false_type>
+auto make_formatter(const TranslatorT& translator, const TranslateOperandsT& translate_operands=std::false_type(),
                std::enable_if_t<hana::is_a<translator_tag,TranslatorT>,void*> =nullptr)
 {
-    return make_formatter(make_translated_member_names(translator),make_translated_operand_formatter(translator),make_translated_strings(translator));
+    return make_formatter(make_translated_member_names(translator),make_translated_operand_formatter(translator,translate_operands),make_translated_strings(translator));
 }
 
 /**
@@ -245,10 +245,11 @@ auto make_formatter(const TranslatorT& translator,
  * @param translator Translator
  * @return Formatter
  */
-inline auto make_formatter(const translator_repository& rep, const std::string& loc=std::locale().name())
+template <typename TranslateOperandsT=std::false_type>
+auto make_formatter(const translator_repository& rep, const std::string& loc=std::locale().name(), const TranslateOperandsT& translate_operands=std::false_type())
 {
     const auto& translator=*rep.find_translator(loc);
-    return make_formatter(make_translated_member_names(translator),make_translated_operand_formatter(translator),make_translated_strings(translator));
+    return make_formatter(make_translated_member_names(translator),make_translated_operand_formatter(translator,translate_operands),make_translated_strings(translator));
 }
 
 /**

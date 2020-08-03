@@ -51,7 +51,8 @@ struct translator_env
                             {std::string(gte),"gte_translated"},
                             {std::string("field1"),"field1_translated"},
                             {std::string("false"),"false_translated"},
-                            {std::string("true"),"true_translated"}
+                            {std::string("true"),"true_translated"},
+                            {std::string("Hello"),"Hello translated"}
                         }
                       )
     {
@@ -231,10 +232,10 @@ BOOST_AUTO_TEST_CASE(CheckOperands)
     BOOST_CHECK_EQUAL(operands4(true),"\"true_translated\"");
 
     mapped_translator tr5;
-    auto operands5=make_translated_operand_formatter(env._rep,"en",quotes_decorator);
+    auto operands5=make_translated_operand_formatter(env._rep,"en",quotes_decorator,std::true_type());
     BOOST_CHECK_EQUAL(std::string(operands5(true)),"\"true_translated\"");
     BOOST_CHECK_EQUAL(operands5(100),100);
-    BOOST_CHECK_EQUAL(operands5("Hello"),"\"Hello\"");
+    BOOST_CHECK_EQUAL(operands5("Hello"),"\"Hello translated\"");
 }
 
 

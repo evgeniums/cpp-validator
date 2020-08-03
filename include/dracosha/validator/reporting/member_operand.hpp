@@ -20,9 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_MEMBER_OPERAND_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/utils/reference_wrapper.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
-#include <dracosha/validator/utils/enable_to_string.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

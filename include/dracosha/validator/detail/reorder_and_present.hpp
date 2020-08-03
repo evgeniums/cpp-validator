@@ -31,6 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/operand_formatter.hpp>
 #include <dracosha/validator/reporting/report_aggregation.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
+#include <dracosha/validator/reporting/prepare_operand_for_formatter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -166,24 +167,41 @@ struct apply_reorder_present_3args_t
                         const PropT& prop, const OpT& op, const T2& b
                      ) const
     {
-        format_join(dst,
-            std::forward<FormatterTs>(formatters),
-            prop,
-            op,
-            b
+        hana::eval_if(
+            std::is_same<std::decay_t<PropT>,type_p_value>::value,
+            [&](auto)
+            {
+                // op b
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<1>),
+                        hana::at(formatters,hana::size_c<2>)
+                    ),
+                    op,
+                    b
+                );
+            },
+            [&](auto)
+            {
+                // prop of member op b
+                format_join(dst,
+                    std::forward<FormatterTs>(formatters),
+                    prop,
+                    op,
+                    b
+                );
+            }
         );
     }
 };
 
 /**
- * @brief Apply presentation and order of validation report for 3 arguments with property but without member
+ * @brief Apply presentation and order of validation report for 3 arguments when operator is a flag
  */
 template <typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_3args_t<
                         PropT,OpT,T2,
-                        hana::when<
-                            std::is_base_of<flag_t,std::decay_t<OpT>>::value
-                        >
+                        hana::when<std::is_base_of<flag_t,std::decay_t<OpT>>::value>
                     >
 {
     template <typename DstT, typename FormatterTs>
@@ -212,6 +230,53 @@ struct apply_reorder_present_3args_t<
                         hana::at(formatters,hana::size_c<0>)
                     ),
                     op.str(prop,b)
+                );
+            }
+        );
+    }
+};
+
+/**
+ * @brief Apply presentation and order of validation report for 3 arguments when operand is a member operand
+ */
+template <typename PropT, typename OpT, typename T2>
+struct apply_reorder_present_3args_t<
+                        PropT,OpT,T2,
+                        hana::when<hana::is_a<member_operand_tag,T2>>
+                    >
+{
+    template <typename DstT, typename FormatterTs>
+    void operator () (
+                        DstT& dst, FormatterTs&& formatters,
+                        const PropT& prop, const OpT& op, const T2& b
+                    ) const
+    {
+        hana::eval_if(
+            std::is_same<std::decay_t<PropT>,type_p_value>::value,
+            [&](auto)
+            {
+                // op b
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<1>),
+                        hana::at(formatters,hana::size_c<0>)
+                    ),
+                    op,
+                    b.get()
+                );
+            },
+            [&](auto)
+            {
+                // prop of member op b
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<1>),
+                        hana::at(formatters,hana::size_c<0>)
+                    ),
+                    prop,
+                    op,
+                    b.get()
                 );
             }
         );
@@ -289,7 +354,7 @@ struct apply_reorder_present_4args_t<
                     hana::make_tuple(
                         hana::at(formatters,hana::size_c<0>),
                         hana::at(formatters,hana::size_c<2>),
-                        hana::at(formatters,hana::size_c<3>)
+                        hana::at(formatters,hana::size_c<0>)
                     ),
                     member,
                     op,

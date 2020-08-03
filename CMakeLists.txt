@@ -99,6 +99,7 @@ SET (HEADERS
     include/dracosha/validator/reporting/reporter_with_object_name.hpp
     include/dracosha/validator/reporting/extend_translator.hpp
     include/dracosha/validator/reporting/phrase_grammar_cats.hpp
+    include/dracosha/validator/reporting/prepare_operand_for_formatter.hpp
 
     include/dracosha/validator/reporting/locale/sample_locale.hpp
     include/dracosha/validator/reporting/locale/ru.hpp

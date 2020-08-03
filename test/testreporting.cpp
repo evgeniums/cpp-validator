@@ -1137,4 +1137,35 @@ BOOST_AUTO_TEST_CASE(CheckExplicitValidationReport)
     BOOST_CHECK(!v6.apply(a3));
 }
 
+BOOST_AUTO_TEST_CASE(CheckContainsValidationReport)
+{
+    std::string rep1;
+
+    std::map<std::string,size_t> m1={{"field1",1}};
+
+    auto v1=validator(
+                value(contains,"field2")
+            );
+
+    auto ra1=make_reporting_adapter(m1,rep1);
+    BOOST_CHECK(!v1.apply(ra1));
+    BOOST_CHECK_EQUAL(rep1,"must contain field2");
+    rep1.clear();
+
+    std::map<std::string,std::map<size_t,std::string>> m2={
+            {"field1",
+             {
+                 {1,"value10"},{2,"value100"},{3,"hi"},{4,"hello"}
+             }
+            }
+        };
+    auto ra2=make_reporting_adapter(m2,rep1);
+    auto v2=validator(
+                _["field1"](contains,30)
+            );
+    BOOST_CHECK(!v2.apply(ra2));
+    BOOST_CHECK_EQUAL(rep1,std::string("field1 must contain element #30"));
+    rep1.clear();
+}
+
 BOOST_AUTO_TEST_SUITE_END()
