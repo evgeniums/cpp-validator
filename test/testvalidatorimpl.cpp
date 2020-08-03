@@ -644,7 +644,6 @@ BOOST_AUTO_TEST_CASE(CheckMemberHelper)
 
 @todo
     Set operators.
-    String operators.
     Regular expressions operators.
 
     Generate config file.

@@ -319,6 +319,8 @@ BOOST_AUTO_TEST_CASE(CheckSampleLocale)
     // existance
     BOOST_CHECK_EQUAL(m(string_exists).text(),std::string(string_exists));
     BOOST_CHECK_EQUAL(m(string_not_exists).text(),std::string(string_not_exists));
+    BOOST_CHECK_EQUAL(m(contains).text(),contains.str());
+    BOOST_CHECK_EQUAL(m(_n(contains)).text(),contains.n_str());
 
     // logical
     BOOST_CHECK_EQUAL(m(string_and_t::conjunction_token).text(),std::string(string_and_t::conjunction_token));
@@ -333,6 +335,12 @@ BOOST_AUTO_TEST_CASE(CheckSampleLocale)
     BOOST_CHECK_EQUAL(m(lte).text(),std::string(lte));
     BOOST_CHECK_EQUAL(m(gt).text(),std::string(gt));
     BOOST_CHECK_EQUAL(m(gte).text(),std::string(gte));
+
+    // lexicographical
+    BOOST_CHECK_EQUAL(m(lex_starts_with.str()).text(),lex_starts_with.str());
+    BOOST_CHECK_EQUAL(m(lex_starts_with.n_str()).text(),lex_starts_with.n_str());
+    BOOST_CHECK_EQUAL(m(lex_ends_with.str()).text(),lex_ends_with.str());
+    BOOST_CHECK_EQUAL(m(lex_ends_with.n_str()).text(),lex_ends_with.n_str());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

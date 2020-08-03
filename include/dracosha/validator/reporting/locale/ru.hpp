@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/master_sample.hpp>
 #include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/operators.hpp>
-#include <dracosha/validator/operators/invert_op.hpp>
+#include <dracosha/validator/operators/lexicographical.hpp>
 #include <dracosha/validator/reporting/member_names.hpp>
 #include <dracosha/validator/reporting/operand_formatter.hpp>
 #include <dracosha/validator/reporting/aggregation_strings.hpp>
@@ -203,6 +203,18 @@ inline const phrase_translator& validator_translator_ru()
                             {"не должно существовать",grammar_ru::sredny_rod},
                             {"не должны существовать",grammar_ru::mn_chislo}
                         }; // "must not exist"
+        m[contains.str()]={
+                            {{"должен содержать",grammar_ru::datelny_padezh}},
+                            {{"должна содержать",grammar_ru::datelny_padezh},grammar_ru::zhensky_rod},
+                            {{"должно содержать",grammar_ru::datelny_padezh},grammar_ru::sredny_rod},
+                            {{"должны сожержать",grammar_ru::datelny_padezh},grammar_ru::mn_chislo}
+                        }; // "must contain"
+        m[contains.n_str()]={
+                            {{"не должен содержать",grammar_ru::datelny_padezh}},
+                            {{"не должна содержать",grammar_ru::datelny_padezh},grammar_ru::zhensky_rod},
+                            {{"не должно содержать",grammar_ru::datelny_padezh},grammar_ru::sredny_rod},
+                            {{"не должны сожержать",grammar_ru::datelny_padezh},grammar_ru::mn_chislo}
+                        }; // "must not contain"
 
         // comparison
         m[eq]={
@@ -241,6 +253,32 @@ inline const phrase_translator& validator_translator_ru()
                 {{"должно быть больше или равно",grammar_ru::datelny_padezh},grammar_ru::sredny_rod},
                 {{"должны быть больше или равны",grammar_ru::datelny_padezh},grammar_ru::mn_chislo}
               }; // "must be greater than or equal to"
+
+        // lexicographical
+        m[lex_starts_with.str()]={
+                {{"должен начинаться с",grammar_ru::roditelny_padezh}},
+                {{"должна начинаться с",grammar_ru::roditelny_padezh},grammar_ru::zhensky_rod},
+                {{"должно начинаться с",grammar_ru::roditelny_padezh},grammar_ru::sredny_rod},
+                {{"должны начинаться с",grammar_ru::roditelny_padezh},grammar_ru::mn_chislo}
+              }; // "must start with"
+        m[lex_starts_with.n_str()]={
+                {{"не должен начинаться с",grammar_ru::roditelny_padezh}},
+                {{"не должна начинаться с",grammar_ru::roditelny_padezh},grammar_ru::zhensky_rod},
+                {{"не должно начинаться с",grammar_ru::roditelny_padezh},grammar_ru::sredny_rod},
+                {{"не должны начинаться с",grammar_ru::roditelny_padezh},grammar_ru::mn_chislo}
+              }; // "must not start with"
+        m[lex_ends_with.str()]={
+                {{"должен оканчиваться на",grammar_ru::roditelny_padezh}},
+                {{"должна оканчиваться на",grammar_ru::roditelny_padezh},grammar_ru::zhensky_rod},
+                {{"должно оканчиваться на",grammar_ru::roditelny_padezh},grammar_ru::sredny_rod},
+                {{"должны оканчиваться на",grammar_ru::roditelny_padezh},grammar_ru::mn_chislo}
+              }; // "must end with"
+        m[lex_ends_with.n_str()]={
+                {{"не должен оканчиваться на",grammar_ru::roditelny_padezh}},
+                {{"не должна оканчиваться на",grammar_ru::roditelny_padezh},grammar_ru::zhensky_rod},
+                {{"не должно оканчиваться на",grammar_ru::roditelny_padezh},grammar_ru::sredny_rod},
+                {{"не должны оканчиваться на",grammar_ru::roditelny_padezh},grammar_ru::mn_chislo}
+              }; // "must not end with"
     }
 
     return m;

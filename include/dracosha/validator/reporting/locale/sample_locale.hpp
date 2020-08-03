@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/master_sample.hpp>
 #include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/operators.hpp>
-#include <dracosha/validator/operators/invert_op.hpp>
+#include <dracosha/validator/operators/lexicographical.hpp>
 #include <dracosha/validator/reporting/member_names.hpp>
 #include <dracosha/validator/reporting/operand_formatter.hpp>
 #include <dracosha/validator/reporting/aggregation_strings.hpp>
@@ -137,6 +137,8 @@ inline const phrase_translator& validator_translator_sample()
         // existance
         m[string_exists]="must exist"; // "must exist"
         m[string_not_exists]="must not exist"; // "must not exist"
+        m[contains.str()]="must contain"; // "must contain"
+        m[contains.n_str()]="must not contain"; // "must not contain"
 
         // logical
         m[string_and.conjunction_str()]=" AND "; // " AND "
@@ -151,6 +153,12 @@ inline const phrase_translator& validator_translator_sample()
         m[lte]="must be less than or equal to"; // "must be less than or equal to"
         m[gt]="must be greater than"; // "must be greater than"
         m[gte]="must be greater than or equal to"; // "must be greater than or equal to"
+
+        // lexicographical
+        m[lex_starts_with.str()]="must start with"; // "must start with"
+        m[lex_starts_with.n_str()]="must not start with"; // "must not start with"
+        m[lex_ends_with.str()]="must end with"; // "must end with"
+        m[lex_ends_with.n_str()]="must not end with"; // "must not end with"
     }
 
     return m;
