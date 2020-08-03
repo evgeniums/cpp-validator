@@ -31,8 +31,16 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Pair of concrete phrase and grammatical categories of preceding phrase this phrase is suitable for
+ */
 struct phrase_and_grammar_cats
 {
+    /**
+     * @brief Constructor
+     * @param phrase Text of the phrase
+     * @param grammar_cats Grammatical categories of preceding phrase this phrase is suitable for
+     */
     template <typename ... GrammarCats>
     phrase_and_grammar_cats(
             const char* phrase,
@@ -41,6 +49,11 @@ struct phrase_and_grammar_cats
             categories(grammar_categories_bitmask(std::forward<GrammarCats>(grammar_cats)...))
     {}
 
+    /**
+     * @brief Constructor
+     * @param phrase Phrase
+     * @param grammar_cats Grammatical categories of preceding phrase this phrase is suitable for
+     */
     template <typename ... GrammarCats>
     phrase_and_grammar_cats(
             concrete_phrase phrase,
@@ -49,9 +62,16 @@ struct phrase_and_grammar_cats
             categories(grammar_categories_bitmask(std::forward<GrammarCats>(grammar_cats)...))
     {}
 
-    phrase_and_grammar_cats(concrete_phrase ph, grammar_categories cats)
-        : phrase(std::move(ph)),
-          categories(cats)
+    /**
+     * @brief Constructor
+     * @param phrase Phrase
+     * @param grammar_cats Grammatical categories of preceding phrase this phrase is suitable for
+     */
+    phrase_and_grammar_cats(
+            concrete_phrase phrase,
+            grammar_categories grammar_cats
+        ) : phrase(std::move(phrase)),
+            categories(grammar_cats)
     {}
 
     concrete_phrase phrase;
@@ -60,6 +80,19 @@ struct phrase_and_grammar_cats
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Translator that is aware of grammatical categories.
+ *
+ * Each string in translator can be bound to two types of grammatical categories:
+ *  - grammatical categories of preceding phrase that should be use to select current phrase;
+ *  - grammatical categories of this phrase that should be used for translation of successive phrase.
+ *
+ * Gramattical categories of the latter type are stored within concrete_phrase. Grammatical categories of the former type
+ * are used as selectors of the most suitable phrase translation of given string in the phrase_translator.
+ * Translator will select the phrase with the maximum number of matching grammatical categories of the former type.
+ *
+ * @see {validator_translator_sample()} for examples.
+ */
 class phrase_translator : public translator
 {
     public:
@@ -88,6 +121,10 @@ class phrase_translator : public translator
          * @param id String id
          * @param cats Grammar categories to look for
          * @return Translated string or id if such string not found
+         *
+         * Translator will select the phrase with the maximum number of matching grammatical categories
+         * (cats match phrase_and_grammar_cats.categories).
+         *
          */
         virtual translation_result translate(const std::string& id, grammar_categories cats=0) const override
         {
@@ -112,9 +149,18 @@ class phrase_translator : public translator
             return translation_result{id,false};
         }
 
+        /**
+         * @brief Override operator [] for filling the translator
+         * @param key Translatable string
+         * @return phrase_translator_setter used to put translations of the given string to translator
+         */
         template <typename T>
         auto operator [] (T&& key);
 
+        /**
+         * @brief Check if translator is empty
+         * @return Boolean flag
+         */
         bool empty() const noexcept
         {
             return _phrases.empty();
@@ -130,58 +176,72 @@ class phrase_translator : public translator
 namespace detail
 {
 
-template <typename  Enable, typename ... Args>
+/**
+ * @brief Helper of phrase translator setter
+ */
+template <typename T, typename =hana::when<true>>
 struct phrase_translator_setter_helper_t
 {
 };
 
-template <typename ... Args>
+/**
+ * @brief Helper of phrase translator setter for case when phrase_and_grammar_cats is constructible with input type
+ */
+template <typename T>
 struct phrase_translator_setter_helper_t<
-            std::enable_if_t<
-                std::is_constructible<phrase_and_grammar_cats,Args...>::value
-            >,
-            Args...
+            T,
+            hana::when<std::is_constructible<phrase_and_grammar_cats,T>::value>
         >
 {
-    auto operator () (Args&&... args) const
+    auto operator () (T&& arg) const
     {
-        return std::vector<phrase_and_grammar_cats>{phrase_and_grammar_cats(std::forward<Args>(args)...)};
+        return std::vector<phrase_and_grammar_cats>{phrase_and_grammar_cats(std::forward<T>(arg))};
+    }
+};
+
+/**
+ * @brief Helper of phrase translator setter for case when phrase_and_grammar_cats is initializer_list
+ */
+template <typename T>
+struct phrase_translator_setter_helper_t<
+            T,
+            hana::when<std::is_same<std::initializer_list<phrase_and_grammar_cats>,T>::value>
+        >
+{
+    auto operator () (T&& arg) const
+    {
+        return std::vector<phrase_and_grammar_cats>{std::forward<T>(arg)};
     }
 };
 
 template <typename T>
-struct phrase_translator_setter_helper_t<
-            std::enable_if_t<
-                std::is_same<std::initializer_list<phrase_and_grammar_cats>,T>::value
-            >,
-            T
-        >
-{
-    auto operator () (T&& args) const
-    {
-        return std::vector<phrase_and_grammar_cats>{std::forward<T>(args)};
-    }
-};
-
-template <typename ... Args>
-constexpr phrase_translator_setter_helper_t<Args...> phrase_translator_setter_helper{};
+constexpr phrase_translator_setter_helper_t<T> phrase_translator_setter_helper{};
 
 }
 
+/**
+ * @brief Setter of phrase translation
+ */
 struct phrase_translator_setter
 {
     std::map<std::string,std::vector<phrase_and_grammar_cats>>::iterator it;
 
+    /**
+     * @brief Default assignment operator
+     */
     template <typename T>
     phrase_translator_setter& operator = (T&& arg)
     {
-        it->second=detail::phrase_translator_setter_helper<void,T>(std::forward<T>(arg));
+        it->second=detail::phrase_translator_setter_helper<T>(std::forward<T>(arg));
         return *this;
     }
 
+    /**
+     * @brief Assignment from initializer_list
+     */
     phrase_translator_setter& operator = (std::initializer_list<phrase_and_grammar_cats>&& arg)
     {
-        it->second=detail::phrase_translator_setter_helper<void,std::initializer_list<phrase_and_grammar_cats>>(std::move(arg));
+        it->second=detail::phrase_translator_setter_helper<std::initializer_list<phrase_and_grammar_cats>>(std::move(arg));
         return *this;
     }
 };

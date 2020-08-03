@@ -47,6 +47,12 @@ struct member_names
 
     TraitsT traits;
 
+    /**
+     * @brief Format object of member or make_member_with_name types
+     * @param member Member object
+     * @param grammar_cats Gramatical categories to use for translation
+     * @return Formatted name of the member
+     */
     template <typename T>
     auto operator() (const T& member,
                      grammar_categories grammar_cats=0,
@@ -56,6 +62,12 @@ struct member_names
         return nested_member_name(member,traits,grammar_cats);
     }
 
+    /**
+     * @brief Format object of member_ptoperty type
+     * @param member Pair of member and property
+     * @param grammar_cats Gramatical categories to use for translation
+     * @return Formatted name of the member's property
+     */
     template <typename T>
     auto operator() (const T& member_prop,
                      grammar_categories grammar_cats=0,
@@ -65,8 +77,14 @@ struct member_names
         return property_member_name(member_prop,traits,grammar_cats);
     }
 
+    /**
+     * @brief Format single key of member path
+     * @param id Single key of member path
+     * @param grammar_cats Gramatical categories to use for translation
+     * @return Formatted name the key
+     */
     template <typename T>
-    auto operator() (const T& member,
+    auto operator() (const T& id,
                      grammar_categories grammar_cats=0,
                      std::enable_if_t<
                             (
@@ -77,7 +95,7 @@ struct member_names
                      ,void*> =nullptr
             ) const -> decltype(auto)
     {
-        return single_member_name(member,traits,grammar_cats);
+        return single_member_name(id,traits,grammar_cats);
     }
 };
 
@@ -101,8 +119,8 @@ auto make_member_names(TraitsT&& traits)
 struct default_member_names_traits_t
 {
     /**
-     * @brief Get string for conjunction of nested member names
-     * @return String to use to join nested member names in the member's path
+     * @brief Get string for conjunction of nested member names.
+     * @return String to use to join nested member names in the member's path.
      *
      * Default is " of ".
      */
@@ -111,13 +129,19 @@ struct default_member_names_traits_t
         return string_member_name_conjunction;
     }
 
+    /**
+     * @brief Get string for conjunction of member and its property.
+     * @return String to use to join property and its property.
+     *
+     * Default is the same as member_names_conjunction().
+     */
     static auto member_property_conjunction() -> decltype(auto)
     {
         return string_member_name_conjunction;
     }
 
     /**
-     * @brief Check if nested memebr names must be joined in reverse order
+     * @brief Check if nested memebr names must be joined in reverse order.
      *
      * Member names can be joined either in direct order (e.g. ["field1"]["subfield1_1"]["subfield1_1_1"] joined as field1.subfield1_1.subfield1_1_1)
      * or in reverse order (e.g. ["field1"]["subfield1_1"]["subfield1_1_1"] joined as subfield1_1_1 of subfield1_1 of field1).
@@ -126,6 +150,11 @@ struct default_member_names_traits_t
      */
     constexpr static const bool is_reverse_member_names_order=true;
 
+    /**
+     * @brief Check if property of a memebr must be joined in reverse order.
+     *
+     * Default is reverse order.
+     */
     constexpr static const bool is_reverse_member_property_order=true;
 };
 constexpr default_member_names_traits_t default_member_names_traits{};
@@ -269,6 +298,9 @@ struct dotted_member_names_traits_t
      */
     constexpr static const bool is_reverse_member_names_order=false;
 
+    /**
+     * @brief Check if property of a memebr must be joined in reverse order
+     */
     constexpr static const bool is_reverse_member_property_order=false;
 
     brackets_decorator_t decorator;

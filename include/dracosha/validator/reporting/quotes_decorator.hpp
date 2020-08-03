@@ -32,16 +32,23 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 namespace detail
 {
+/**
+ * @brief Default helper for quotes decorator
+ */
 template <typename T, typename = hana::when<true>>
-struct quotes_decorator_traits
+struct quotes_decorator_helper
 {
     static auto f(T&& val) -> decltype(auto)
     {
         return hana::id(std::forward<T>(val));
     }
 };
+
+/**
+ * @brief Helper for quotes decorator when argument is a concrete_phrase
+ */
 template <typename T>
-struct quotes_decorator_traits<T,
+struct quotes_decorator_helper<T,
         hana::when<std::is_same<concrete_phrase,std::decay_t<T>>::value>>
 {
     static auto f(T&& val) -> decltype(auto)
@@ -51,8 +58,12 @@ struct quotes_decorator_traits<T,
         return concrete_phrase(std::move(str),val.grammar_cats());
     }
 };
+
+/**
+ * @brief Helper for quotes decorator when argument can be used to construct std::string but is not a concrete_phrase
+ */
 template <typename T>
-struct quotes_decorator_traits<T,
+struct quotes_decorator_helper<T,
         hana::when<std::is_constructible<std::string,T>::value
         &&
         !std::is_same<concrete_phrase,std::decay_t<T>>::value
@@ -77,7 +88,7 @@ struct quotes_decorator_t
     template <typename T>
     auto operator() (T&& val) const -> decltype(auto)
     {
-        return detail::quotes_decorator_traits<T>::f(std::forward<T>(val));
+        return detail::quotes_decorator_helper<T>::f(std::forward<T>(val));
     }
 };
 constexpr quotes_decorator_t quotes_decorator{};
