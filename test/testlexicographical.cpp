@@ -160,8 +160,53 @@ BOOST_AUTO_TEST_CASE(CheckLexCompare)
     BOOST_CHECK(v8.apply(ra2i));
 }
 
-//BOOST_AUTO_TEST_CASE(CheckLexParts)
-//{
-//}
+BOOST_AUTO_TEST_CASE(CheckLexParts)
+{
+    std::string rep;
+    std::string str1="string one";
+
+    auto ra1=make_reporting_adapter(str1,rep);
+
+    auto v1=validator(lex_contains,"string");
+    BOOST_CHECK(v1.apply(ra1));
+    auto v2=validator(lex_contains,"ing");
+    BOOST_CHECK(v2.apply(ra1));
+    auto v3=validator(lex_contains,"ING");
+    BOOST_CHECK(!v3.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"must contain ING");
+    rep.clear();
+    auto v4=validator(ilex_contains,"ING");
+    BOOST_CHECK(v4.apply(ra1));
+    auto v5=validator(lex_contains,"something");
+    BOOST_CHECK(!v5.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"must contain something");
+    rep.clear();
+
+    auto v6=validator(lex_starts_with,"string");
+    BOOST_CHECK(v6.apply(ra1));
+    auto v7=validator(lex_starts_with,"STRING");
+    BOOST_CHECK(!v7.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"must start with STRING");
+    rep.clear();
+    auto v8=validator(ilex_starts_with,"STRING");
+    BOOST_CHECK(v8.apply(ra1));
+    auto v9=validator(ilex_starts_with,"one");
+    BOOST_CHECK(!v9.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"must start with one");
+    rep.clear();
+
+    auto v10=validator(lex_ends_with,"one");
+    BOOST_CHECK(v10.apply(ra1));
+    auto v11=validator(lex_ends_with,"ONE");
+    BOOST_CHECK(!v11.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"must end with ONE");
+    rep.clear();
+    auto v12=validator(ilex_ends_with,"ONE");
+    BOOST_CHECK(v12.apply(ra1));
+    auto v13=validator(ilex_ends_with,"string");
+    BOOST_CHECK(!v13.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"must end with string");
+    rep.clear();
+}
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/operators/comparison.hpp>
+#include <dracosha/validator/operators/contains.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -223,6 +224,102 @@ struct ilex_gte_t : public op<ilex_gte_t>
     }
 };
 constexpr ilex_gte_t ilex_gte{};
+
+/**
+ * @brief Operator "lexicoraphical contains"
+ */
+struct lex_contains_t : public op<lex_contains_t>
+{
+    constexpr static const char* description=contains_t::description;
+    constexpr static const char* n_description=contains_t::n_description;
+
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b) const
+    {
+        return boost::algorithm::contains(a,b);
+    }
+};
+constexpr lex_contains_t lex_contains{};
+
+/**
+ * @brief Operator "lexicoraphical case insensitive contains"
+ */
+struct ilex_contains_t : public op<ilex_contains_t>
+{
+    constexpr static const char* description=contains_t::description;
+    constexpr static const char* n_description=contains_t::n_description;
+
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b) const
+    {
+        return boost::algorithm::icontains(a,b);
+    }
+};
+constexpr ilex_contains_t ilex_contains{};
+
+/**
+ * @brief Operator "lexicoraphical starts with"
+ */
+struct lex_starts_with_t : public op<lex_starts_with_t>
+{
+    constexpr static const char* description="must start with";
+    constexpr static const char* n_description="must not start with";
+
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b) const
+    {
+        return boost::algorithm::starts_with(a,b);
+    }
+};
+constexpr lex_starts_with_t lex_starts_with{};
+
+/**
+ * @brief Operator "lexicoraphical case insensitive starts with"
+ */
+struct ilex_starts_with_t : public op<ilex_starts_with_t>
+{
+    constexpr static const char* description=lex_starts_with_t::description;
+    constexpr static const char* n_description=lex_starts_with_t::n_description;
+
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b) const
+    {
+        return boost::algorithm::istarts_with(a,b);
+    }
+};
+constexpr ilex_starts_with_t ilex_starts_with{};
+
+/**
+ * @brief Operator "lexicoraphical ends with"
+ */
+struct lex_ends_with_t : public op<lex_ends_with_t>
+{
+    constexpr static const char* description="must end with";
+    constexpr static const char* n_description="must not end with";
+
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b) const
+    {
+        return boost::algorithm::ends_with(a,b);
+    }
+};
+constexpr lex_ends_with_t lex_ends_with{};
+
+/**
+ * @brief Operator "lexicoraphical case insensitive ends with"
+ */
+struct ilex_ends_with_t : public op<ilex_ends_with_t>
+{
+    constexpr static const char* description=lex_ends_with_t::description;
+    constexpr static const char* n_description=lex_ends_with_t::n_description;
+
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b) const
+    {
+        return boost::algorithm::iends_with(a,b);
+    }
+};
+constexpr ilex_ends_with_t ilex_ends_with{};
 
 //-------------------------------------------------------------
 
