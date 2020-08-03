@@ -806,4 +806,36 @@ BOOST_AUTO_TEST_CASE(CheckValidateMmemberAll)
     BOOST_CHECK(!v10.apply(a5));
 }
 
+BOOST_AUTO_TEST_CASE(CheckContains)
+{
+    std::map<std::string,size_t> m1={{"field1",1}};
+    auto a1=make_default_adapter(m1);
+
+    auto v0=validator(
+                value(contains,"field1")
+            );
+    BOOST_CHECK(v0.apply(a1));
+    auto v1=validator(
+                value(contains,"field2")
+            );
+    BOOST_CHECK(!v1.apply(a1));
+
+    std::map<std::string,std::map<size_t,std::string>> m2={
+            {"field1",
+             {
+                 {1,"value10"},{2,"value100"},{3,"hi"},{4,"hello"}
+             }
+            }
+        };
+    auto a2=make_default_adapter(m2);
+    auto v3=validator(
+                _["field1"](contains,3)
+            );
+    BOOST_CHECK(v3.apply(a2));
+    auto v4=validator(
+                _["field1"](contains,10)
+            );
+    BOOST_CHECK(!v4.apply(a2));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

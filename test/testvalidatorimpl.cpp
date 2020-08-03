@@ -315,18 +315,18 @@ BOOST_AUTO_TEST_CASE(CheckContains)
     m["one"]="one_value";
     m["two"]="two_value";
 
-    BOOST_CHECK(contains(m,"one"));
-    BOOST_CHECK(!contains(m,"ten"));
-    BOOST_CHECK(contains(m,size));
+    BOOST_CHECK(check_contains(m,"one"));
+    BOOST_CHECK(!check_contains(m,"ten"));
+    BOOST_CHECK(check_contains(m,size));
 
     int dummy=0;
-    BOOST_CHECK(!contains(dummy,"one"));
+    BOOST_CHECK(!check_contains(dummy,"one"));
 
     std::map<int,int> ref1={{1,50},{2,40}};
-    BOOST_CHECK(contains(ref1,1));
-    BOOST_CHECK(!contains(ref1,3));
+    BOOST_CHECK(check_contains(ref1,1));
+    BOOST_CHECK(!check_contains(ref1,3));
 
-    BOOST_CHECK(contains(m,"one"));
+    BOOST_CHECK(check_contains(m,"one"));
 }
 
 BOOST_AUTO_TEST_CASE(CheckSimpleExists)

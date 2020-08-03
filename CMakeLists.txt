@@ -24,7 +24,7 @@ SET (HEADERS
     include/dracosha/validator/can_get.hpp
     include/dracosha/validator/get.hpp
     include/dracosha/validator/can_check_contains.hpp
-    include/dracosha/validator/contains.hpp
+    include/dracosha/validator/check_contains.hpp
     include/dracosha/validator/check_member.hpp
     include/dracosha/validator/check_exists.hpp
     include/dracosha/validator/lazy.hpp
@@ -58,6 +58,7 @@ SET (HEADERS
     include/dracosha/validator/operators/invert_op.hpp
     include/dracosha/validator/operators/flag.hpp
     include/dracosha/validator/operators/wrap_op.hpp
+    include/dracosha/validator/operators/contains.hpp
     include/dracosha/validator/operators.hpp
 
     include/dracosha/validator/properties/value.hpp

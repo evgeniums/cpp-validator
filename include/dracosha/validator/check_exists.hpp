@@ -47,7 +47,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 */
 BOOST_HANA_CONSTEXPR_LAMBDA auto get_member_ptr =[](auto&& obj,auto&& key)
 {
-    if (obj && contains(*obj,key))
+    if (obj && check_contains(*obj,key))
     {
         return detail::take_address_of<decltype(get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key)))>
                 (

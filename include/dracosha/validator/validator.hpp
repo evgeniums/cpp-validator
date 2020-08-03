@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/can_get.hpp>
 #include <dracosha/validator/get.hpp>
 #include <dracosha/validator/can_check_contains.hpp>
-#include <dracosha/validator/contains.hpp>
+#include <dracosha/validator/check_contains.hpp>
 #include <dracosha/validator/check_member.hpp>
 #include <dracosha/validator/operators/exists.hpp>
 #include <dracosha/validator/operators/comparison.hpp>
@@ -65,11 +65,9 @@ struct _t
      * @return Member
      */
     template <typename T>
-    constexpr auto operator [] (T&& key) const -> decltype(auto)
+    constexpr auto operator [] (T&& key) const
     {
-        return member<
-                    typename adjust_storable_type<std::decay_t<T>>::type
-                >(std::forward<T>(key));
+        return make_plain_member(std::forward<T>(key));
     }
 
     /**

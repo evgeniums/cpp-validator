@@ -175,6 +175,9 @@ struct apply_reorder_present_3args_t
     }
 };
 
+/**
+ * @brief Apply presentation and order of validation report for 3 arguments with property but without member
+ */
 template <typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_3args_t<
                         PropT,OpT,T2,

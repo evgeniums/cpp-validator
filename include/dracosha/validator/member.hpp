@@ -417,6 +417,14 @@ auto make_member_with_name(MemberT&& member, T&& name)
     return member.template create_derived<member_with_name>(std::forward<T>(name),std::move(member.path));
 }
 
+template <typename T>
+constexpr auto make_plain_member(T&& key)
+{
+    return member<
+                typename adjust_storable_type<std::decay_t<T>>::type
+            >(std::forward<T>(key));
+}
+
 namespace detail
 {
 

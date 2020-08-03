@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/contains.hpp
+/** \file validator/check_contains.hpp
 *
 *  Defines helper to check if object contains a member.
 *
@@ -16,8 +16,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_CONTAINS_HPP
-#define DRACOSHA_VALIDATOR_CONTAINS_HPP
+#ifndef DRACOSHA_VALIDATOR_CHECK_CONTAINS_HPP
+#define DRACOSHA_VALIDATOR_CHECK_CONTAINS_HPP
 
 #include <type_traits>
 
@@ -34,7 +34,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 /**
  * @brief Helper for checking if object contains a member
  */
-struct contains_t
+struct check_contains_t
 {
     /**
      * @brief Check if T2 is iterator
@@ -116,12 +116,12 @@ struct contains_t
     }
 };
 /**
-  Instance to be used as contains() operator.
+  Instance to be used as check_contains() callable
 */
-constexpr contains_t contains{};
+constexpr check_contains_t check_contains{};
 
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_CONTAINS_HPP
+#endif // DRACOSHA_VALIDATOR_CHECK_CONTAINS_HPP
