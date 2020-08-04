@@ -643,8 +643,7 @@ BOOST_AUTO_TEST_CASE(CheckMemberHelper)
 /**
 
 @todo
-    Set operators.
-    Regular expressions operators.
+    Move format_operand to other namespace and move file.
 
     Generate config file.
     Remove legacy files.

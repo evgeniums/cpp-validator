@@ -322,4 +322,88 @@ BOOST_AUTO_TEST_CASE(CheckLexInRange)
     BOOST_CHECK(!v18.apply(a1));
 }
 
+BOOST_AUTO_TEST_CASE(CheckInRangeReport)
+{
+    std::string rep;
+    size_t val=90;
+    auto a1=make_reporting_adapter(val,rep);
+
+    auto v1=validator(in,range({70,80,90,100}));
+    BOOST_CHECK(v1.apply(a1));
+
+    auto v2=validator(in,range({70,80,100,1000}));
+    BOOST_CHECK(!v2.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be in range [70,80,100,1000]");
+    rep.clear();
+
+    std::vector<size_t> vec3{70,80,90,100};
+    auto v3=validator(in,range(vec3));
+    BOOST_CHECK(v3.apply(a1));
+
+    std::vector<size_t> vec4{70,80,100,1000};
+    auto v4=validator(in,range(vec4));
+    BOOST_CHECK(!v4.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be in range [70,80,100,1000]");
+    rep.clear();
+
+    auto v5=validator(in,range({70,80,90,100},sorted));
+    BOOST_CHECK(v5.apply(a1));
+
+    auto v6=validator(in,range({70,80,100,1000},sorted));
+    BOOST_CHECK(!v6.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be in range [70,80,100,1000]");
+    rep.clear();
+
+    auto v7=validator(in,range(vec3,sorted));
+    BOOST_CHECK(v7.apply(a1));
+
+    auto v8=validator(in,range(vec4,sorted));
+    BOOST_CHECK(!v8.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be in range [70,80,100,1000]");
+    rep.clear();
+
+    auto v9=validator(nin,range({70,80,90,100}));
+    BOOST_CHECK(!v9.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be not in range [70,80,90,100]");
+    rep.clear();
+
+    auto v10=validator(nin,range({70,80,100,1000}));
+    BOOST_CHECK(v10.apply(a1));
+
+    auto v11=validator(nin,range(vec3));
+    BOOST_CHECK(!v11.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be not in range [70,80,90,100]");
+    rep.clear();
+
+    auto v12=validator(nin,range(vec4));
+    BOOST_CHECK(v12.apply(a1));
+
+    auto v13=validator(nin,range({70,80,90,100},sorted));
+    BOOST_CHECK(!v13.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be not in range [70,80,90,100]");
+    rep.clear();
+
+    auto v14=validator(nin,range({70,80,100,1000},sorted));
+    BOOST_CHECK(v14.apply(a1));
+
+    auto v15=validator(nin,range(vec3,sorted));
+    BOOST_CHECK(!v15.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be not in range [70,80,90,100]");
+    rep.clear();
+
+    auto v16=validator(nin,range(vec4,sorted));
+    BOOST_CHECK(v16.apply(a1));
+
+    auto v17=validator(in,range({70,80,100,1000,10000},3));
+    BOOST_CHECK(!v17.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be in range [70,80,100,...]");
+    rep.clear();
+
+    std::vector<size_t> vec18{70,80,100,1000,10000};
+    auto v18=validator(in,range(vec18,3));
+    BOOST_CHECK(!v18.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be in range [70,80,100,...]");
+    rep.clear();
+}
+
 BOOST_AUTO_TEST_SUITE_END()
