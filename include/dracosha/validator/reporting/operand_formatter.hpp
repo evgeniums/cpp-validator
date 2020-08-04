@@ -27,7 +27,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/no_translator.hpp>
 #include <dracosha/validator/reporting/translator_repository.hpp>
 #include <dracosha/validator/reporting/decorator.hpp>
-#include <dracosha/validator/detail/format_operand.hpp>
+#include <dracosha/validator/reporting/format_operand.hpp>
+#include <dracosha/validator/reporting/format_bool_operand.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -63,7 +64,7 @@ struct operand_formatter
     template <typename T>
     auto operator () (T&& val, grammar_categories cats=0) const -> decltype(auto)
     {
-        return detail::format_operand<T>(traits,std::forward<T>(val),cats);
+        return format_operand<T>(traits,std::forward<T>(val),cats);
     }
 };
 

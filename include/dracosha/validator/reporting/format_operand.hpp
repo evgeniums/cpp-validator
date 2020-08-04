@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/format_operand.hpp
+/** \file validator/reporting/format_operand.hpp
 *
 * Defines helper for operands formatting.
 *
@@ -28,22 +28,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-struct string_true_t : public enable_to_string<string_true_t>
-{
-    constexpr static const char* description="true";
-};
-constexpr string_true_t string_true{};
-struct string_false_t : public enable_to_string<string_false_t>
-{
-    constexpr static const char* description="false";
-};
-constexpr string_false_t string_false{};
-
-namespace detail
-{
-
 /**
- * @brief Helper for operands formatting
+ * @brief Default helper for operands formatting that returns operand as is
  */
 template <typename T, typename =hana::when<true>>
 struct format_operand_t
@@ -66,6 +52,13 @@ struct format_operand_t<T,hana::when<
             std::is_same<concrete_phrase,std::decay_t<T>>::value
         >>
 {
+    /**
+     * @brief Format operand with optional postprocessing
+     * @param traits Formatter traits
+     * @param val Operand value
+     * @param postprocess If true then try to translate and decorate string after formatting
+     * @return Formatted string
+     */
     template <typename TraitsT, typename T1>
     concrete_phrase operator () (const TraitsT& traits, T1&& val, grammar_categories cats, bool postprocess) const
     {
@@ -81,6 +74,12 @@ struct format_operand_t<T,hana::when<
         return decorate(traits,std::move(phrase));
     }
 
+    /**
+     * @brief Format operand with post processing
+     * @param traits Formatter traits
+     * @param val Operand value
+     * @return Formatted string
+     */
     template <typename TraitsT, typename T1>
     auto operator () (const TraitsT& traits, T1&& val, grammar_categories cats) const -> decltype(auto)
     {
@@ -90,31 +89,6 @@ struct format_operand_t<T,hana::when<
             phrase=translate(traits,std::move(phrase),cats);
         }
         return decorate(traits,std::move(phrase));
-    }
-};
-
-/**
- * @brief  Formatter of boolean values
- */
-template <typename T>
-struct format_operand_t<T,hana::when<std::is_same<bool,std::decay_t<T>>::value>>
-{
-    template <typename TraitsT, typename T1>
-    concrete_phrase operator () (const TraitsT& traits, T1&& val, grammar_categories cats, bool postprocess) const
-    {
-        auto phrase=val?std::string(string_true):std::string(string_false);
-        if (!postprocess)
-        {
-            return phrase;
-        }
-        return decorate(traits,translate(traits,std::move(phrase),cats));
-    }
-
-    template <typename TraitsT, typename T1>
-    auto operator () (const TraitsT& traits, T1&& val, grammar_categories cats) const -> decltype(auto)
-    {
-        auto phrase=val?std::string(string_true):std::string(string_false);
-        return decorate(traits,translate(traits,std::move(phrase),cats));
     }
 };
 
@@ -123,8 +97,6 @@ struct format_operand_t<T,hana::when<std::is_same<bool,std::decay_t<T>>::value>>
  */
 template <typename T>
 constexpr format_operand_t<T> format_operand{};
-
-}
 
 //-------------------------------------------------------------
 

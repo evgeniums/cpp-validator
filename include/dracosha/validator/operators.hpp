@@ -30,6 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/operators/all.hpp>
 #include <dracosha/validator/operators/comparison.hpp>
 #include <dracosha/validator/operators/contains.hpp>
+#include <dracosha/validator/operators/in.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

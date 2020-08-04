@@ -643,11 +643,9 @@ BOOST_AUTO_TEST_CASE(CheckMemberHelper)
 /**
 
 @todo
-    Move format_operand to other namespace and move file.
-
+    Move to separate project.
     Generate config file.
     Remove legacy files.
-    Translate operands?
 */
 
 BOOST_AUTO_TEST_SUITE_END()
