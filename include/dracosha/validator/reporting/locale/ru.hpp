@@ -26,6 +26,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/operators.hpp>
 #include <dracosha/validator/operators/lexicographical.hpp>
+#include <dracosha/validator/operators/in.hpp>
+#include <dracosha/validator/range.hpp>
+#include <dracosha/validator/interval.hpp>
 #include <dracosha/validator/reporting/member_names.hpp>
 #include <dracosha/validator/reporting/operand_formatter.hpp>
 #include <dracosha/validator/reporting/aggregation_strings.hpp>
@@ -279,6 +282,30 @@ inline const phrase_translator& validator_translator_ru()
                 {{"не должно оканчиваться на",grammar_ru::roditelny_padezh},grammar_ru::sredny_rod},
                 {{"не должны оканчиваться на",grammar_ru::roditelny_padezh},grammar_ru::mn_chislo}
               }; // "must not end with"
+
+        // ranges and intervals
+        m[in]={
+                {{"должен быть в",grammar_ru::predlozhny_padezh}},
+                {{"должна быть в",grammar_ru::predlozhny_padezh},grammar_ru::zhensky_rod},
+                {{"должно быть в",grammar_ru::predlozhny_padezh},grammar_ru::sredny_rod},
+                {{"должны быть в",grammar_ru::predlozhny_padezh},grammar_ru::mn_chislo}
+              }; // "must be in"
+        m[nin]={
+                {{"должен быть вне",grammar_ru::roditelny_padezh}},
+                {{"должна быть вне",grammar_ru::roditelny_padezh},grammar_ru::zhensky_rod},
+                {{"должно быть вне",grammar_ru::roditelny_padezh},grammar_ru::sredny_rod},
+                {{"должны быть вне",grammar_ru::roditelny_padezh},grammar_ru::mn_chislo}
+              }; // "must be not in"
+        m[range_str]={
+                {"список"},
+                {"списке",grammar_ru::predlozhny_padezh},
+                {"списка",grammar_ru::roditelny_padezh}
+              }; // range
+        m[interval_str]={
+                {"интервал"},
+                {"интервале",grammar_ru::predlozhny_padezh},
+                {"интервала",grammar_ru::roditelny_padezh}
+              }; // interval
     }
 
     return m;

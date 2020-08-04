@@ -167,14 +167,14 @@ struct format_operand_t<T,hana::when<hana::is_a<range_tag,T>>>
         std::string dst;
         backend_formatter.append_join(
            dst,
-           ",",
+           ", ",
             elements
         );
         if (append_ellipsis)
         {
             backend_formatter.append(
                dst,
-               ",..."
+               ", ... "
             );
         }
         std::string dst1;

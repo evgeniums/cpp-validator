@@ -26,6 +26,10 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/operators.hpp>
 #include <dracosha/validator/operators/lexicographical.hpp>
+#include <dracosha/validator/operators/in.hpp>
+#include <dracosha/validator/range.hpp>
+#include <dracosha/validator/interval.hpp>
+
 #include <dracosha/validator/reporting/member_names.hpp>
 #include <dracosha/validator/reporting/operand_formatter.hpp>
 #include <dracosha/validator/reporting/aggregation_strings.hpp>
@@ -159,6 +163,12 @@ inline const phrase_translator& validator_translator_sample()
         m[lex_starts_with.n_str()]="must not start with"; // "must not start with"
         m[lex_ends_with.str()]="must end with"; // "must end with"
         m[lex_ends_with.n_str()]="must not end with"; // "must not end with"
+
+        // ranges and intervals
+        m[range_str]="range"; // "range"
+        m[interval_str]="interval"; // "interval"
+        m[in]="must be in"; // "must be in"
+        m[nin]="must be not in"; // "must be not in"
     }
 
     return m;

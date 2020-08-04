@@ -283,7 +283,6 @@ BOOST_AUTO_TEST_CASE(CheckPhraseTranslator)
 
 BOOST_AUTO_TEST_CASE(CheckSampleLocale)
 {
-    //! \todo Add additional strings
     auto m=validator_translator_sample();
 
     // specials
@@ -341,6 +340,12 @@ BOOST_AUTO_TEST_CASE(CheckSampleLocale)
     BOOST_CHECK_EQUAL(m(lex_starts_with.n_str()).text(),lex_starts_with.n_str());
     BOOST_CHECK_EQUAL(m(lex_ends_with.str()).text(),lex_ends_with.str());
     BOOST_CHECK_EQUAL(m(lex_ends_with.n_str()).text(),lex_ends_with.n_str());
+
+    // ranges and intervals
+    BOOST_CHECK_EQUAL(m(range_str).text(),std::string(range_str));
+    BOOST_CHECK_EQUAL(m(interval_str).text(),std::string(interval_str));
+    BOOST_CHECK_EQUAL(m(in).text(),std::string(in));
+    BOOST_CHECK_EQUAL(m(nin).text(),std::string(nin));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

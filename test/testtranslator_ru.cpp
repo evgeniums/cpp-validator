@@ -317,4 +317,74 @@ BOOST_AUTO_TEST_CASE(CheckValidatorWithObjectNameRu)
     rep.clear();
 }
 
+BOOST_AUTO_TEST_CASE(CheckLexInIntervalRu)
+{
+    std::string rep;
+    size_t val=10;
+
+    auto&& tr1=validator_translator_ru();
+    auto ra1=make_reporting_adapter(val,make_reporter(rep,make_formatter(tr1)));
+
+    auto v1=validator(in,interval(100,200));
+    BOOST_CHECK(!v1.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"должен быть в интервале [100,200]");
+    rep.clear();
+
+    auto v2=validator(nin,interval(1,30));
+    BOOST_CHECK(!v2.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"должен быть вне интервала [1,30]");
+    rep.clear();
+
+    phrase_translator tr;
+    tr["service"]={
+                        {{"служба",grammar_ru::zhensky_rod}},
+                        {{"службы",grammar_ru::zhensky_rod},grammar_ru::roditelny_padezh}
+                    };
+    auto tr2=extend_translator(validator_translator_ru(),tr);
+    auto ra2=make_reporting_adapter(val,make_reporter_with_object_name(rep,make_formatter(tr2),"service"));
+
+    BOOST_CHECK(!v1.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"служба должна быть в интервале [100,200]");
+    rep.clear();
+
+    BOOST_CHECK(!v2.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"служба должна быть вне интервала [1,30]");
+    rep.clear();
+}
+
+BOOST_AUTO_TEST_CASE(CheckLexInRangeRu)
+{
+    std::string rep;
+    size_t val=10;
+
+    auto&& tr1=validator_translator_ru();
+    auto ra1=make_reporting_adapter(val,make_reporter(rep,make_formatter(tr1)));
+
+    auto v1=validator(in,range({100,200,300}));
+    BOOST_CHECK(!v1.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"должен быть в списке [100, 200, 300]");
+    rep.clear();
+
+    auto v2=validator(nin,range({10,20,30}));
+    BOOST_CHECK(!v2.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"должен быть вне списка [10, 20, 30]");
+    rep.clear();
+
+    phrase_translator tr;
+    tr["service"]={
+                        {{"служба",grammar_ru::zhensky_rod}},
+                        {{"службы",grammar_ru::zhensky_rod},grammar_ru::roditelny_padezh}
+                    };
+    auto tr2=extend_translator(validator_translator_ru(),tr);
+    auto ra2=make_reporting_adapter(val,make_reporter_with_object_name(rep,make_formatter(tr2),"service"));
+
+    BOOST_CHECK(!v1.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"служба должна быть в списке [100, 200, 300]");
+    rep.clear();
+
+    BOOST_CHECK(!v2.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"служба должна быть вне списка [10, 20, 30]");
+    rep.clear();
+}
+
 BOOST_AUTO_TEST_SUITE_END()
