@@ -16,8 +16,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_RANGE_HPP
-#define DRACOSHA_VALIDATOR_RANGE_HPP
+#ifndef DRACOSHA_VALIDATOR_OPERATOR_IN_HPP
+#define DRACOSHA_VALIDATOR_OPERATOR_IN_HPP
 
 #include <algorithm>
 
@@ -25,19 +25,23 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/operators/operator.hpp>
 #include <dracosha/validator/operators/comparison.hpp>
 #include <dracosha/validator/interval.hpp>
+#include <dracosha/validator/range.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
 /**
- * @brief Operator to check if value is in intrval or in range
+ * @brief Operator to check if value is in interval/range
  */
 struct in_t : public op<in_t>
 {
     constexpr static const char* description="must be in";
     constexpr static const char* n_description="must be not in";
 
+    /**
+     * @brief Call when operand is an interval
+     */
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b,
                                std::enable_if_t<hana::is_a<interval_tag,T2>,void*> =nullptr) const
@@ -61,16 +65,43 @@ struct in_t : public op<in_t>
         return gte(a,b.from) && lt(a,b.to);
     }
 
-//    template <typename T1, typename T2>
-//    constexpr bool operator() (const T1& a, const T2& b) const
-//    {
-//        return std::find(std::begin(b),std::end(b),a)!=std::end(b);
-//    }
+    /**
+     * @brief Call when operand is a range
+     */
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b,
+                               std::enable_if_t<
+                                 (hana::is_a<range_tag,T2> && !T2::is_sorted::value),
+                               void*> =nullptr
+                            ) const
+    {
+        const auto& container=b.container;
+        return std::find_if(std::begin(container),std::end(container),
+                         [&a](const auto& v)
+                         {
+                            return eq(a,v);
+                         }
+                         )!=std::end(container);
+    }
+
+    /**
+     * @brief Call when operand is a sorted range
+     */
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b,
+                               std::enable_if_t<
+                                 (hana::is_a<range_tag,T2> && T2::is_sorted::value),
+                               void*> =nullptr
+                            ) const
+    {
+        const auto& container=b.container;
+        return std::binary_search(std::begin(container),std::end(container),a,lt);
+    }
 };
 constexpr in_t in{};
 
 /**
- * @brief Operator to check if value is not in container
+ * @brief Operator to check if value is not in interval/range
  */
 struct nin_t : public op<nin_t>
 {
@@ -89,4 +120,4 @@ constexpr nin_t nin{};
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_RANGE_HPP
+#endif // DRACOSHA_VALIDATOR_OPERATOR_IN_HPP

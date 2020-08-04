@@ -225,4 +225,36 @@ BOOST_AUTO_TEST_CASE(CheckLexInIntervalReport)
     BOOST_CHECK(v24.apply(a1));
 }
 
+BOOST_AUTO_TEST_CASE(CheckInRange)
+{
+    size_t val=90;
+    auto a1=make_default_adapter(val);
+
+    auto v1=validator(in,range({70,80,90,100}));
+    BOOST_CHECK(v1.apply(a1));
+
+    auto v2=validator(in,range({70,80}));
+    BOOST_CHECK(!v2.apply(a1));
+
+    std::vector<size_t> vec3{70,80,90,100};
+    auto v3=validator(in,range(vec3));
+    BOOST_CHECK(v3.apply(a1));
+
+    std::vector<size_t> vec4{70,80};
+    auto v4=validator(in,range(vec4));
+    BOOST_CHECK(!v4.apply(a1));
+
+    auto v5=validator(in,range({70,80,90,100},sorted));
+    BOOST_CHECK(v5.apply(a1));
+
+    auto v6=validator(in,range({70,80},sorted));
+    BOOST_CHECK(!v6.apply(a1));
+
+    auto v7=validator(in,range(vec3,sorted));
+    BOOST_CHECK(v7.apply(a1));
+
+    auto v8=validator(in,range(vec4,sorted));
+    BOOST_CHECK(!v8.apply(a1));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

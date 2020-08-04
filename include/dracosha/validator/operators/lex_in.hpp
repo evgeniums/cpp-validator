@@ -32,13 +32,16 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Operator to check if value is in interval or in range using lexicographical comparison operators
+ * @brief Operator to check if value is interval/range using lexicographical comparison operators
  */
 struct lex_in_t : public op<lex_in_t>
 {
     constexpr static const char* description=in_t::description;
     constexpr static const char* n_description=in_t::n_description;
 
+    /**
+     * @brief Call when operand is an interval
+     */
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b,
                                std::enable_if_t<hana::is_a<interval_tag,T2>,void*> =nullptr) const
@@ -61,11 +64,44 @@ struct lex_in_t : public op<lex_in_t>
         // open_to
         return lex_gte(a,b.from) && lex_lt(a,b.to);
     }
+
+    /**
+     * @brief Call when operand is a range
+     */
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b,
+                               std::enable_if_t<
+                                 (hana::is_a<range_tag,T2> && !T2::is_sorted::value),
+                               void*> =nullptr
+                            ) const
+    {
+        const auto& container=b.container;
+        return std::find_if(std::begin(container),std::end(container),
+                         [&a](const auto& v)
+                         {
+                            return lex_eq(a,v);
+                         }
+                         )!=std::end(container);
+    }
+
+    /**
+     * @brief Call when operand is a sorted range
+     */
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b,
+                               std::enable_if_t<
+                                 (hana::is_a<range_tag,T2> && T2::is_sorted::value),
+                               void*> =nullptr
+                            ) const
+    {
+        const auto& container=b.container;
+        return std::binary_search(std::begin(container),std::end(container),a,lex_lt);
+    }
 };
 constexpr lex_in_t lex_in{};
 
 /**
- * @brief Operator to check if value is not in in interval or in range using lexicographical comparison operators
+ * @brief Operator to check if value is not in interval/range using lexicographical comparison operators
  */
 struct lex_nin_t : public op<lex_nin_t>
 {
@@ -81,13 +117,16 @@ struct lex_nin_t : public op<lex_nin_t>
 constexpr lex_nin_t lex_nin{};
 
 /**
- * @brief Operator to check if value is in interval or in range using case insensitive lexicographical comparison operators
+ * @brief Operator to check if value is interval/range using case insensitive lexicographical comparison operators
  */
 struct ilex_in_t : public op<ilex_in_t>
 {
     constexpr static const char* description=in_t::description;
     constexpr static const char* n_description=in_t::n_description;
 
+    /**
+     * @brief Call when operand is an interval
+     */
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b,
                                std::enable_if_t<hana::is_a<interval_tag,T2>,void*> =nullptr) const
@@ -110,11 +149,44 @@ struct ilex_in_t : public op<ilex_in_t>
         // open_to
         return ilex_gte(a,b.from) && ilex_lt(a,b.to);
     }
+
+    /**
+     * @brief Call when operand is a range
+     */
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b,
+                               std::enable_if_t<
+                                 (hana::is_a<range_tag,T2> && !T2::is_sorted::value),
+                               void*> =nullptr
+                            ) const
+    {
+        const auto& container=b.container;
+        return std::find_if(std::begin(container),std::end(container),
+                         [&a](const auto& v)
+                         {
+                            return ilex_eq(a,v);
+                         }
+                         )!=std::end(container);
+    }
+
+    /**
+     * @brief Call when operand is a sorted range
+     */
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b,
+                               std::enable_if_t<
+                                 (hana::is_a<range_tag,T2> && T2::is_sorted::value),
+                               void*> =nullptr
+                            ) const
+    {
+        const auto& container=b.container;
+        return std::binary_search(std::begin(container),std::end(container),a,ilex_lt);
+    }
 };
 constexpr ilex_in_t ilex_in{};
 
 /**
- * @brief Operator to check if value is not in in interval or in range using case insensitive lexicographical comparison operators
+ * @brief Operator to check if value is not in interval/range using case insensitive lexicographical comparison operators
  */
 struct ilex_nin_t : public op<ilex_nin_t>
 {
