@@ -49,8 +49,9 @@ template <typename T, typename =hana::when<true>>
 struct format_operand_t
 {
     template <typename TraitsT, typename T1>
-    auto operator () (const TraitsT&, T1&& val, grammar_categories) const -> decltype(auto)
+    auto operator () (const TraitsT&, T1&& val, grammar_categories, bool postprocess=true) const -> decltype(auto)
     {
+        std::ignore=postprocess;
         return hana::id(std::forward<T1>(val));
     }
 };
@@ -65,6 +66,21 @@ struct format_operand_t<T,hana::when<
             std::is_same<concrete_phrase,std::decay_t<T>>::value
         >>
 {
+    template <typename TraitsT, typename T1>
+    concrete_phrase operator () (const TraitsT& traits, T1&& val, grammar_categories cats, bool postprocess) const
+    {
+        auto phrase=std::string(std::forward<T1>(val));
+        if (!postprocess)
+        {
+            return phrase;
+        }
+        if (TraitsT::translate_string_operands && !std::is_same<concrete_phrase,std::decay_t<T>>::value)
+        {
+            phrase=translate(traits,std::move(phrase),cats);
+        }
+        return decorate(traits,std::move(phrase));
+    }
+
     template <typename TraitsT, typename T1>
     auto operator () (const TraitsT& traits, T1&& val, grammar_categories cats) const -> decltype(auto)
     {
@@ -84,9 +100,21 @@ template <typename T>
 struct format_operand_t<T,hana::when<std::is_same<bool,std::decay_t<T>>::value>>
 {
     template <typename TraitsT, typename T1>
+    concrete_phrase operator () (const TraitsT& traits, T1&& val, grammar_categories cats, bool postprocess) const
+    {
+        auto phrase=val?std::string(string_true):std::string(string_false);
+        if (!postprocess)
+        {
+            return phrase;
+        }
+        return decorate(traits,translate(traits,std::move(phrase),cats));
+    }
+
+    template <typename TraitsT, typename T1>
     auto operator () (const TraitsT& traits, T1&& val, grammar_categories cats) const -> decltype(auto)
     {
-        return decorate(traits,translate(traits,val?std::string(string_true):std::string(string_false),cats));
+        auto phrase=val?std::string(string_true):std::string(string_false);
+        return decorate(traits,translate(traits,std::move(phrase),cats));
     }
 };
 

@@ -44,6 +44,7 @@ SET (HEADERS
     include/dracosha/validator/check_member_exists_traits_proxy.hpp
     include/dracosha/validator/validators.hpp
     include/dracosha/validator/member_property.hpp
+    include/dracosha/validator/interval.hpp
 
     include/dracosha/validator/operators/operator.hpp
     include/dracosha/validator/operators/exists.hpp
@@ -59,6 +60,7 @@ SET (HEADERS
     include/dracosha/validator/operators/flag.hpp
     include/dracosha/validator/operators/wrap_op.hpp
     include/dracosha/validator/operators/contains.hpp
+    include/dracosha/validator/operators/in.hpp
     include/dracosha/validator/operators/lexicographical.hpp
     include/dracosha/validator/operators.hpp
 
