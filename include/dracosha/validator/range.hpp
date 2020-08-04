@@ -170,28 +170,31 @@ struct format_operand_t<T,hana::when<hana::is_a<range_tag,T>>>
            ",",
             elements
         );
-        auto formatted_operand=decorate(traits,std::move(dst));
-
-        auto descr=translate(traits,std::string(range_str),cats);
-        std::string dst1;
-        backend_formatter.append(
-           dst1,
-           descr,
-           " [",
-           formatted_operand
-        );
         if (append_ellipsis)
         {
             backend_formatter.append(
-               dst1,
+               dst,
                ",..."
             );
         }
+        std::string dst1;
         backend_formatter.append(
            dst1,
+           "[",
+           dst,
            "]"
         );
-        return dst1;
+        auto formatted_operand=decorate(traits,std::move(dst1));
+
+        auto descr=translate(traits,std::string(range_str),cats);
+        std::string dst2;
+        backend_formatter.append(
+           dst2,
+           descr,
+           " ",
+           formatted_operand
+        );
+        return dst2;
     }
 };
 
