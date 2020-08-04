@@ -62,6 +62,7 @@ SET (HEADERS
     include/dracosha/validator/operators/contains.hpp
     include/dracosha/validator/operators/in.hpp
     include/dracosha/validator/operators/lexicographical.hpp
+    include/dracosha/validator/operators/lex_in.hpp
     include/dracosha/validator/operators.hpp
 
     include/dracosha/validator/properties/value.hpp

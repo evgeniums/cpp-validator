@@ -8,9 +8,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operators/range.hpp
+/** \file validator/operators/in.hpp
 *
-*  Defines ranges operators
+*  Defines in/nin operators
 *
 */
 
@@ -31,7 +31,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Operator to check if value is in container
+ * @brief Operator to check if value is in intrval or in range
  */
 struct in_t : public op<in_t>
 {

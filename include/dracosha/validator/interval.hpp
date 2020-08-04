@@ -44,31 +44,30 @@ enum class interval_mode : int
 template <typename T>
 struct interval_t
 {
-    public:
+    using hana_tag=interval_tag;
+    using type=T;
 
-        using hana_tag=interval_tag;
+    template <typename T1, typename T2>
+    interval_t(
+            T1&& from,
+            T2&& to,
+            interval_mode mode=interval_mode::closed
+        ) : from(std::forward<T1>(from)),
+            to(std::forward<T2>(to)),
+            mode(mode)
+    {}
 
-        template <typename T1, typename T2>
-        interval_t(
-                T1&& from,
-                T2&& to,
-                interval_mode mode=interval_mode::closed
-            ) : from(std::forward<T1>(from)),
-                to(std::forward<T2>(to)),
-                mode(mode)
-        {}
-
-        T from;
-        T to;
-        interval_mode mode;
+    T from;
+    T to;
+    interval_mode mode;
 };
 
 struct interval_helper
 {
-    template <typename T>
-    auto operator() (T&& from, T&& to, interval_mode mode=interval_mode::closed) const
+    template <typename T1, typename T2>
+    auto operator() (T1&& from, T2&& to, interval_mode mode=interval_mode::closed) const
     {
-        return interval_t<typename adjust_storable_type<T>::type>(std::forward<T>(from),std::forward<T>(to),mode);
+        return interval_t<typename adjust_storable_type<T1>::type>(std::forward<T1>(from),std::forward<T2>(to),mode);
     }
 
     constexpr static interval_mode closed()

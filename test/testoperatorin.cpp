@@ -5,6 +5,7 @@
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
 #include <dracosha/validator/interval.hpp>
 #include <dracosha/validator/operators/in.hpp>
+#include <dracosha/validator/operators/lex_in.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -119,6 +120,109 @@ BOOST_AUTO_TEST_CASE(CheckInIntervalReport)
 
     auto v14=validator(nin,interval(80,90,interval.open_to()));
     BOOST_CHECK(v14.apply(a1));
+}
+
+BOOST_AUTO_TEST_CASE(CheckLexInIntervalReport)
+{
+    std::string rep;
+    std::string val("hello");
+    auto a1=make_reporting_adapter(val,rep);
+
+    auto v1=validator(lex_in,interval("a","z"));
+    BOOST_CHECK(v1.apply(a1));
+
+    auto v2=validator(lex_in,interval("A","Z"));
+    BOOST_CHECK(!v2.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be in interval [A,Z]");
+    rep.clear();
+
+    auto v3=validator(ilex_in,interval("A","Z"));
+    BOOST_CHECK(v3.apply(a1));
+
+    auto v4=validator(lex_in,interval("hello","z",interval.open()));
+    BOOST_CHECK(!v4.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be in interval (hello,z)");
+    rep.clear();
+
+    auto v5=validator(lex_in,interval("HELLO","z",interval.open()));
+    BOOST_CHECK(v5.apply(a1));
+
+    auto v6=validator(ilex_in,interval("HELLO","z",interval.open()));
+    BOOST_CHECK(!v6.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be in interval (HELLO,z)");
+    rep.clear();
+
+    auto v7=validator(lex_in,interval("hello","z",interval.open_from()));
+    BOOST_CHECK(!v7.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be in interval (hello,z]");
+    rep.clear();
+
+    auto v8=validator(lex_in,interval("HELLO","z",interval.open_from()));
+    BOOST_CHECK(v8.apply(a1));
+
+    auto v9=validator(ilex_in,interval("HELLO","z",interval.open_from()));
+    BOOST_CHECK(!v9.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be in interval (HELLO,z]");
+    rep.clear();
+
+    auto v10=validator(lex_in,interval("a","hello",interval.open_to()));
+    BOOST_CHECK(!v10.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be in interval [a,hello)");
+    rep.clear();
+
+    auto v11=validator(lex_in,interval("A","HELLO",interval.open_to()));
+    BOOST_CHECK(!v11.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be in interval [A,HELLO)");
+    rep.clear();
+
+    auto v12=validator(ilex_in,interval("A","HELLO",interval.open_to()));
+    BOOST_CHECK(!v12.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be in interval [A,HELLO)");
+    rep.clear();
+
+    auto v13=validator(lex_nin,interval("a","z"));
+    BOOST_CHECK(!v13.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be not in interval [a,z]");
+    rep.clear();
+
+    auto v14=validator(lex_nin,interval("A","Z"));
+    BOOST_CHECK(v14.apply(a1));
+
+    auto v15=validator(ilex_nin,interval("A","Z"));
+    BOOST_CHECK(!v15.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be not in interval [A,Z]");
+    rep.clear();
+
+    auto v16=validator(lex_nin,interval("hello","z",interval.open()));
+    BOOST_CHECK(v16.apply(a1));
+
+    auto v17=validator(lex_nin,interval("HELLO","z",interval.open()));
+    BOOST_CHECK(!v17.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be not in interval (HELLO,z)");
+    rep.clear();
+
+    auto v18=validator(ilex_nin,interval("HELLO","z",interval.open()));
+    BOOST_CHECK(v18.apply(a1));
+
+    auto v19=validator(lex_nin,interval("hello","z",interval.open_from()));
+    BOOST_CHECK(v19.apply(a1));
+
+    auto v20=validator(lex_nin,interval("HELLO","z",interval.open_from()));
+    BOOST_CHECK(!v20.apply(a1));
+    BOOST_CHECK_EQUAL(rep,"must be not in interval (HELLO,z]");
+    rep.clear();
+
+    auto v21=validator(ilex_nin,interval("HELLO","z",interval.open_from()));
+    BOOST_CHECK(v21.apply(a1));
+
+    auto v22=validator(lex_nin,interval("a","hello",interval.open_to()));
+    BOOST_CHECK(v22.apply(a1));
+
+    auto v23=validator(lex_nin,interval("A","HELLO",interval.open_to()));
+    BOOST_CHECK(v23.apply(a1));
+
+    auto v24=validator(ilex_nin,interval("A","HELLO",interval.open_to()));
+    BOOST_CHECK(v24.apply(a1));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
