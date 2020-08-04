@@ -257,4 +257,69 @@ BOOST_AUTO_TEST_CASE(CheckInRange)
     BOOST_CHECK(!v8.apply(a1));
 }
 
+BOOST_AUTO_TEST_CASE(CheckLexInRange)
+{
+    std::string val("hello");
+    auto a1=make_default_adapter(val);
+
+    auto v1=validator(lex_in,range({"one","two","hello","three"}));
+    BOOST_CHECK(v1.apply(a1));
+
+    auto v2=validator(lex_in,range({"HELLO","one","two"}));
+    BOOST_CHECK(!v2.apply(a1));
+
+    std::vector<std::string> vec3{"one","two","hello","three"};
+    auto v3=validator(lex_in,range(vec3));
+    BOOST_CHECK(v3.apply(a1));
+
+    std::vector<std::string> vec4{"HELLO","one","two"};
+    auto v4=validator(lex_in,range(vec4));
+    BOOST_CHECK(!v4.apply(a1));
+
+    auto v5=validator(lex_in,range({"book","cake","game","hello","tea","zero"},sorted));
+    BOOST_CHECK(v5.apply(a1));
+
+    auto v6=validator(lex_in,range({"HELLO","one","two"},sorted));
+    BOOST_CHECK(!v6.apply(a1));
+
+    std::vector<std::string> vec7{"book","cake","game","hello","tea","zero"};
+    auto v7=validator(lex_in,range(vec7,sorted));
+    BOOST_CHECK(v7.apply(a1));
+
+    auto v8=validator(lex_in,range(vec4,sorted));
+    BOOST_CHECK(!v8.apply(a1));
+
+    auto v9=validator(ilex_in,range({"one","two","hello","three"}));
+    BOOST_CHECK(v1.apply(a1));
+
+    auto v10=validator(ilex_in,range({"HELLO","one","two"}));
+    BOOST_CHECK(v10.apply(a1));
+
+    auto v11=validator(ilex_in,range(vec3));
+    BOOST_CHECK(v11.apply(a1));
+
+    std::vector<std::string> vec5{"HELLO","one","two"};
+    auto v12=validator(ilex_in,range(vec5));
+    BOOST_CHECK(v12.apply(a1));
+
+    auto v13=validator(ilex_in,range({"book","cake","game","hello","tea","zero"},sorted));
+    BOOST_CHECK(v13.apply(a1));
+
+    auto v14=validator(ilex_in,range({"HELLO","one","two"},sorted));
+    BOOST_CHECK(v14.apply(a1));
+
+    auto v15=validator(ilex_in,range(vec7,sorted));
+    BOOST_CHECK(v15.apply(a1));
+
+    auto v16=validator(ilex_in,range(vec5,sorted));
+    BOOST_CHECK(v16.apply(a1));
+
+    auto v17=validator(ilex_in,range({"one","two"}));
+    BOOST_CHECK(!v17.apply(a1));
+
+    std::vector<std::string> vec8{"one","two"};
+    auto v18=validator(ilex_in,range(vec8));
+    BOOST_CHECK(!v18.apply(a1));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
