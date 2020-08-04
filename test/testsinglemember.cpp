@@ -4,7 +4,7 @@
 #include <dracosha/validator/adapters/single_member_adapter.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
 
-using namespace dracosha::validator;
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 namespace
 {

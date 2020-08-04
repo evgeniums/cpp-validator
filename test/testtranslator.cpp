@@ -10,7 +10,7 @@
 
 #include <dracosha/validator/reporting/locale/sample_locale.hpp>
 
-using namespace dracosha::validator;
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestTranslator)
 

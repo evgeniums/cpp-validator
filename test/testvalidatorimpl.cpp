@@ -6,7 +6,7 @@
 
 #include <dracosha/validator/validator.hpp>
 
-using namespace dracosha::validator;
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestValidatorImpl)
 
