@@ -1,12 +1,8 @@
 PROJECT(dracoshavalidator-test)
 
-FIND_PACKAGE(Boost 1.65 COMPONENTS unit_test_framework REQUIRED)
+SET (Boost_USE_STATIC_LIBS OFF CACHE BOOL "Boost static libs")
 
-IF(MSVC)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W3 -DWIN32 -EHsc -DBOOST_ALL_NO_LIB")
-ELSE(MSVC)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstack-protector-all -fno-omit-frame-pointer")
-ENDIF(MSVC)
+FIND_PACKAGE(Boost 1.65 COMPONENTS unit_test_framework REQUIRED)
 
 SET(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp

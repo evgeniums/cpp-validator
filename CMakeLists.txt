@@ -163,11 +163,27 @@ ELSE (DRACOSHA_VALIDATOR_SRC)
 
     ADD_LIBRARY(${PROJECT_NAME} INTERFACE)
     TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include ${Boost_INCLUDE_DIR})
+    
+    IF(WIN32)
+        IF(MSVC)
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:ternary")
+        ELSE()
+            ADD_DEFINITIONS(-D_WIN32_WINNT=0x0600 -Dstrcasecmp=stricmp)            
+        ENDIF(MSVC)
+    ENDIF(WIN32)
+    
+    IF(NOT MSVC)
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstack-protector-all -fno-omit-frame-pointer")
+    ENDIF(MSVC)
 
     IF (VALIDATOR_WITH_FMT)
 
         MESSAGE(STATUS "Use libfmt for formatting in cpp-validator library")
         ADD_DEFINITIONS(-DDRACOSHA_VALIDATOR_FMT)
+
+        IF (NOT FMT_ROOT)
+            SET (FMT_ROOT $ENV{FMT_ROOT})
+        ENDIF()
 
         FIND_PATH(FMT_INCLUDE_DIRECTORY fmt/format.h
                 PATHS ${FMT_INCLUDE_DIR}
