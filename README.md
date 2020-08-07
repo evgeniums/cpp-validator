@@ -8,7 +8,7 @@ _The README and reference documentation is under construction yet._
 
 Currently only doxygen-style comments in sources are available. Tests in test folder can be used as a kind of examples. In sample-build you can find scripts and some description for tests building.
 
-## Some basic examples of usage
+## Some examples of basic usage
 
 ### Check if value is greater than constant
 
