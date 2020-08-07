@@ -1,3 +1,5 @@
+@ECHO OFF
+
 SET CMAKE_PATH=C:\Program Files\CMake\bin
 SET MSVC_ROOT=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community
 
@@ -36,4 +38,5 @@ cmake --build . --target install --config Release -- /m:1 /p:UseMultiToolTask=tr
 
 cd %BASE_DIR%
 
-%BUILD_DIR%\test\dracoshavalidator-test --log_level=test_suite
+SET PATH=%PATH%;%BOOST_ROOT%\lib
+%BUILD_DIR%\test\Release\dracoshavalidator-test --log_level=test_suite
