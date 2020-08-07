@@ -1,0 +1,4 @@
+CMakeLists.txt.user
+__pycache__
+*.pyc
+.DS_Store

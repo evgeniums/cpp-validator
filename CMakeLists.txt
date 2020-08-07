@@ -1,3 +1,4 @@
+CMAKE_MINIMUM_REQUIRED (VERSION 3.12)
 PROJECT(dracoshavalidator)
 
 SET (HEADERS
@@ -134,19 +135,81 @@ SET (HEADERS
     include/dracosha/validator/detail/default_adapter_impl.ipp
 )
 
-SET (SOURCES
-)
+IF (DRACOSHA_VALIDATOR_SRC)
 
-BUILD_DRACOSHA_MODULE()
+    MESSAGE(STATUS "Use cpp-validator library as part of Dracosha library")
 
-INCLUDE(dracosha/deps/fmt)
-IF (NOT FMT_HEADER_ONLY)
+    BUILD_DRACOSHA_MODULE()
+
+    INCLUDE(dracosha/deps/fmt)
     TARGET_LINK_LIBRARIES(${PROJECT_NAME} INTERFACE fmt)
-ENDIF(NOT FMT_HEADER_ONLY)
-IF (NOT SYSTEM_FMTLIB)
-    TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} INTERFACE "${DRACOSHA_SOURCE_DIR}/3rdparty/fmt/include")    
-ENDIF()
 
-IF (INSTALL_DEV)
-    INCLUDE(dracosha/Install)
-ENDIF (INSTALL_DEV)
+    IF (INSTALL_DEV)
+        INCLUDE(dracosha/Install)
+    ENDIF (INSTALL_DEV)
+
+    ADD_DEFINITIONS(-DDRACOSHA_VALIDATOR_FMT)
+
+ELSE (DRACOSHA_VALIDATOR_SRC)
+
+    MESSAGE(STATUS "Use standalone cpp-validator library")
+
+    FIND_PACKAGE(Boost 1.65 REQUIRED)
+
+    OPTION(VALIDATOR_WITH_TESTS "Build tests for cpp-validator library" OFF)
+    OPTION(VALIDATOR_WITH_EXAMPLES "Build examples for cpp-validator library" OFF)
+
+    OPTION(VALIDATOR_WITH_FMT "Use libfmt backend for formatting" On)
+
+    ADD_LIBRARY(${PROJECT_NAME} INTERFACE)
+    TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include ${Boost_INCLUDE_DIR})
+
+    IF (VALIDATOR_WITH_FMT)
+
+        MESSAGE(STATUS "Use libfmt for formatting in cpp-validator library")
+        ADD_DEFINITIONS(-DDRACOSHA_VALIDATOR_FMT)
+
+        FIND_PATH(FMT_INCLUDE_DIRECTORY fmt/format.h
+                PATHS ${FMT_INCLUDE_DIR}
+                      ${FMT_ROOT}/include
+                DOC "libfmt headers directory"
+        )
+        IF(NOT FMT_INCLUDE_DIRECTORY)
+            MESSAGE(FATAL_ERROR "Could not find libfmt headers: install libfmt (don't forget to set FMT_ROOT if not in system path) or run cmake with -DVALIDATOR_WITH_FMT=No")
+        ENDIF()
+
+        MESSAGE(STATUS "Using fmt headers from ${FMT_INCLUDE_DIRECTORY}")
+        TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} INTERFACE ${FMT_INCLUDE_DIRECTORY})
+
+        IF (NOT FMT_HEADER_ONLY)
+
+            FIND_LIBRARY(FMT_LIBRARY fmt
+                PATHS ${FMT_LIB_DIR}
+                      ${FMT_ROOT}/lib
+                DOC "libfmt library"
+            )
+            IF(NOT FMT_LIBRARY)
+                MESSAGE(FATAL_ERROR "Could not find libfmt library: install libfmt that is not header-only or run cmake with -DFMT_HEADER_ONLY=Yes")
+            ENDIF()
+
+            MESSAGE(STATUS "Using fmt library ${FMT_LIBRARY}")
+            TARGET_LINK_LIBRARIES(${PROJECT_NAME} INTERFACE ${FMT_LIBRARY})
+
+        ENDIF(NOT FMT_HEADER_ONLY)
+
+    ELSE(VALIDATOR_WITH_FMT)
+
+        MESSAGE(STATUS "Use std::stringstream for formatting in cpp-validator library")
+
+    ENDIF(VALIDATOR_WITH_FMT)
+
+    IF (VALIDATOR_WITH_TESTS)
+
+        MESSAGE(STATUS "Build tests for cpp-validator library")
+        ADD_SUBDIRECTORY(test)
+
+    ENDIF(VALIDATOR_WITH_TESTS)
+
+    INSTALL(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/dracosha" DESTINATION include)
+
+ENDIF(DRACOSHA_VALIDATOR_SRC)
