@@ -19,8 +19,6 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_CONFIG_HPP
 #define DRACOSHA_VALIDATOR_CONFIG_HPP
 
-#define DRACOSHA_VALIDATOR_FMT
-
 #include <boost/hana.hpp>
 
 #define DRACOSHA_VALIDATOR_NAMESPACE_BEGIN namespace dracosha { namespace validator {
