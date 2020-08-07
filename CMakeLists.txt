@@ -174,7 +174,7 @@ ELSE (DRACOSHA_VALIDATOR_SRC)
     
     IF(NOT MSVC)
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstack-protector-all -fno-omit-frame-pointer")
-    ENDIF(MSVC)
+    ENDIF(NOT MSVC)
 
     IF (VALIDATOR_WITH_FMT)
 
