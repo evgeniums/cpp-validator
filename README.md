@@ -183,3 +183,55 @@ if (!v.apply(ra))
 }
 
 ```
+
+### Validate value before updating object's member
+
+```cpp
+
+struct Foo
+{
+    std::string bar_value;
+    
+    uint32_t other_value;
+    size_t some_size;
+    
+    int set_bar_value(std::string val)
+    {
+        bar_value=std::move(val);
+    }
+};
+
+DRACOSHA_VALIDATOR_PROPERTY(bar_value);
+DRACOSHA_VALIDATOR_PROPERTY(other_value);
+
+auto v=validator(
+    _[bar_value](ilex_ne,"UNKNOWN"), // case insensitive lexicographical not equal
+    _[other_value](gte,1000)
+); // define validator
+
+Foo foo_instance;
+auto bar_value_setter = [&v,&foo_instance] (std::string val)
+{
+    std::string report;
+    auto sa=make_single_member_adapter(_[bar_value],val,report);
+    if (!v.apply(sa))
+    {
+        std::cerr << report << std::endl;
+        return false;
+    }
+
+    foo_instance.set_bar_value(std::move(val));
+    return true;
+};
+
+auto ok=bar_value_setter("Hello world");
+// ok == true
+
+ ok=bar_value_setter("unknown");
+ // ok == false
+ /* prints:
+ 
+ "bar_value must be not equal to UNKNOWN"
+ 
+ */
+```
