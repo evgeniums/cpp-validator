@@ -195,7 +195,7 @@ struct Foo
     uint32_t other_value;
     size_t some_size;
     
-    int set_bar_value(std::string val)
+    void set_bar_value(std::string val)
     {
         bar_value=std::move(val);
     }
