@@ -93,7 +93,7 @@ if (!v.apply(ra))
 }
 
 ```
-### Check object member and print report
+### Check container element and print report
 
 ```cpp
 
@@ -119,7 +119,7 @@ if (!v.apply(ra))
     
 ```
 
-### Check nested object members and print report
+### Check nested container elements and print report
 
 ```cpp
 
