@@ -112,7 +112,7 @@ auto v=validator(
                 _["field1"][1](in,range({10,20,30,40,50})),
                 _["field1"][2](lt,100),
                 _["field2"](exists,false),
-                _["field2"](empty,true)
+                _["field3"](empty,true)
             );
                 
 std::string report;
