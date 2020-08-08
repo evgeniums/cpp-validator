@@ -2,7 +2,9 @@
 
 ## Introduction
 
-Modern C++ header-only library for validation of variables, objects and containers. Basic usage of the library includes two steps:
+Modern C++ header-only library for validation of variables, objects and containers. 
+
+Basic usage of the library includes two steps:
 
 - first, define a validator using almost declarative syntax;
 - then, apply the validator to objects that must be validated and check the results.
