@@ -134,3 +134,37 @@ if (!v.apply(ra))
 }
     
 ```
+
+### Check custom object property and print report
+
+```cpp
+
+struct Foo
+{
+    bool red_color() const
+    {
+        return true;
+    }
+};
+
+DRACOSHA_VALIDATOR_PROPERTY_FLAG(red_color,"Must be red","Must be not red");
+
+auto v=validator(
+    _[red_color](flag,false)
+);
+
+std::string report;
+Foo foo_instance;
+auto ra=make_reporting_adapter(foo_instance,report);
+
+if (!v.apply(ra))
+{
+    std::cerr << report << std::endl;
+    /* will print:
+    
+    "Must be not red"
+    
+    */
+}
+
+```
