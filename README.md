@@ -7,7 +7,7 @@ Modern C++ header-only library for validation of variables, objects and containe
 - first, define a validator using almost declarative syntax;
 - then, apply the validator to objects that must be validated and check the results.
 
-There are a lot of options for validator extension and customization. During validation a text report describing an error can be constructed. Reports can be translated and widely customised.
+There are a lot of options for validator extension and customization. During validation a text report describing an error can be constructed. Reports can be widely customised and translated to supported languages.
 
 Cpp-validator can be used to validate:
 - plain variables;
