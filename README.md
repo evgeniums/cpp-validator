@@ -2,9 +2,20 @@
 
 ## Introduction
 
-Modern C++ header-only library for validation of variables, objects and containers. The library can be used with various platforms and compilers that support C++14 and/or C++17 standards. 
+Modern C++ header-only library for validation of variables, objects and containers. Basic usage of the library includes two steps:
 
-The library was tested with clang, gcc and msvc compilers. Tested operating systems include Linux, Windows, macOS, iOS and Android platforms.
+- first, define a validator using almost declarative syntax;
+- then, apply the validator to objects that must be validated and check the results.
+
+There are a lot of options for validator extension and customization. During validation a text report describing an error can be constructed. Reports can be translated and widely customised.
+
+Cpp-validator can be used to validate:
+- plain variables;
+- properties of objects, where a property can be accessed either as object's variable or object's method;
+- contents and properties of containers;
+- nested containers and objects.
+
+The library was tested with clang, gcc and msvc compilers that support C++14 and/or C++17 standards. Tested operating systems include Linux, Windows, macOS, iOS and Android platforms.
 
 _The README and reference documentation are under construction yet._
 
