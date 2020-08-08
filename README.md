@@ -21,7 +21,7 @@ The library was tested with clang, gcc and msvc compilers that support C++14 and
 
 _The README and reference documentation are under construction yet._
 
-Currently only doxygen-style comments in sources are available. Tests in test folder can be used as a kind of examples. In sample-build you can find scripts and some description for tests building.
+Currently only doxygen-style comments in sources are available. Tests in test folder can be used as a kind of examples. Scripts for tests budiling are in sample-build folder.
 
 ## Some examples of basic usage
 
@@ -34,13 +34,13 @@ auto v=validator(gt,100); // define validator
 int value1=90;
 if (!v.apply(value1))
 {
-// validation failed
+  // validation failed
 }
 
 int value2=200;
 if (v.apply(value2))
 {
-// validation succeeded
+  // validation succeeded
 }
 
 ```
@@ -57,19 +57,19 @@ auto v=validator(
 std::string str1="sample";
 if (!v.apply(str1))
 {
-// validation failed, string is less than sample string
+  // validation failed, string is less than sample string
 }
 
 std::string str2="sample string+";
 if (v.apply(str2))
 {
-// validation succeeded
+  // validation succeeded
 }
 
 std::string str3="too long sample string";
 if (!v.apply(str3))
 {
-// validation failed, string is too long
+  // validation failed, string is too long
 }
 
 ```
@@ -85,7 +85,7 @@ auto ra=make_reporting_adapter(val,report);
 if (!v.apply(ra))
 {
     std::cerr << report << std::endl; 
-    /* will print:
+    /* prints:
     
     "must be in interval [95,100]"
     
@@ -110,7 +110,7 @@ auto ra=make_reporting_adapter(test_map,report);
 if (!v.apply(ra))
 {
     std::cerr << report << std::endl;
-    /* will print:
+    /* prints:
     
     "field1 must be greater than or equal to xxxxxx OR size of field1 must be greater than or equal to 100 OR field1 must be greater than or equal to zzzzzzzzzzzz"
     
@@ -141,7 +141,7 @@ auto ra=make_reporting_adapter(nested_map,report);
 if (!v.apply(ra))
 {
     std::cerr << report << std::endl;
-    /* will print:
+    /* prints:
     
     "element #1 of field1 must be in range [10, 20, 30, 40, 50]"
     
@@ -175,7 +175,7 @@ auto ra=make_reporting_adapter(foo_instance,report);
 if (!v.apply(ra))
 {
     std::cerr << report << std::endl;
-    /* will print:
+    /* prints:
     
     "Must be not red"
     
