@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 /**
- * @brief Proxy wrapper that is used to get the object itself via property interface
+ * @brief Proxy wrapper that is used to get the object itself via property interface.
  */
 struct type_p_value
 {
