@@ -32,7 +32,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Traits of reporting adapter that validates only single member
+ * @brief Traits of reporting adapter that validates only single member.
  */
 template <typename MemberT, typename T, typename ReporterT>
 class single_member_adapter_traits : public object_wrapper<T>,
@@ -60,7 +60,7 @@ class single_member_adapter_traits : public object_wrapper<T>,
 };
 
 /**
- * @brief Reporting adapter that validates only single member
+ * @brief Reporting adapter that validates only single member.
  */
 template <typename MemberT, typename T, typename ReporterT>
 class single_member_adapter : public adapter<single_member_adapter_traits<MemberT,T,ReporterT>>
@@ -84,10 +84,10 @@ class single_member_adapter : public adapter<single_member_adapter_traits<Member
 };
 
 /**
- * @brief Create reporting adapter that validates only single member
- * @param member Member to validate
- * @param val Value to validate with
- * @param reporter Reporter to use for report construction if validation fails
+ * @brief Create reporting adapter that validates only single member.
+ * @param member Member to validate.
+ * @param val Value to validate with.
+ * @param reporter Reporter to use for report construction if validation fails.
  */
 template <typename MemberT, typename T, typename ReporterT>
 auto make_single_member_adapter(
@@ -103,10 +103,10 @@ auto make_single_member_adapter(
 }
 
 /**
- * @brief Create reporting adapter that validates only single member and uses default reporter
- * @param member Member to validate
- * @param val Value to validate with
- * @param dst Destination object where to put validation report if validation fails
+ * @brief Create reporting adapter that validates only single member and uses default reporter.
+ * @param member Member to validate.
+ * @param val Value to validate with.
+ * @param dst Destination object where to put validation report if validation fails.
  */
 template <typename MemberT, typename T, typename DstT>
 auto make_single_member_adapter(

@@ -32,7 +32,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Default adapter traits
+ * @brief Default adapter traits.
  */
 template <typename T>
 class default_adapter_traits :  public object_wrapper<T>,
@@ -42,9 +42,9 @@ class default_adapter_traits :  public object_wrapper<T>,
     public:
 
         /**
-         * @brief Constructor
-         * @param adpt Adapter the traits is used in
-         * @param obj Object to wrap into adapter
+         * @brief Constructor.
+         * @param adpt Adapter the traits is used in.
+         * @param obj Object to wrap into adapter.
          */
         default_adapter_traits(
                     const adapter<default_adapter_traits<T>>& adpt,
@@ -69,8 +69,8 @@ class default_adapter : public adapter<default_adapter_traits<T>>,
         using type=T;
 
         /**
-         * @brief Constructor
-         * @param obj COnstant reference to object under validation
+         * @brief Constructor.
+         * @param obj COnstant reference to object under validation.
          */
         default_adapter(T&& obj)
             : adapter<default_adapter_traits<T>>(std::forward<T>(obj)),
@@ -79,9 +79,9 @@ class default_adapter : public adapter<default_adapter_traits<T>>,
 };
 
 /**
-  @brief Make default validation adapter wrapping the embedded object
-  @param v Object to wrap into adapter
-  @return Validation adapter
+  @brief Make default validation adapter wrapping the embedded object.
+  @param v Object to wrap into adapter.
+  @return Validation adapter.
   */
 template <typename T>
 auto make_default_adapter(T&& v)

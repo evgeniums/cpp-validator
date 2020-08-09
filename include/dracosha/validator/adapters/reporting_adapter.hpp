@@ -30,7 +30,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Traits of reporting adapter
+ * @brief Traits of reporting adapter.
  */
 template <typename T, typename ReporterT>
 struct reporting_adapter_traits : public object_wrapper<T>,
@@ -40,10 +40,10 @@ struct reporting_adapter_traits : public object_wrapper<T>,
     public:
 
         /**
-         * @brief Constructor
-         * @param adpt Adapter
-         * @param obj Constant reference to object under validation
-         * @param reporter_args Parameters to forward to reporter's constructor
+         * @brief Constructor.
+         * @param adpt Adapter.
+         * @param obj Constant reference to object under validation.
+         * @param reporter_args Parameters to forward to reporter's constructor.
          */
         reporting_adapter_traits(
                     adapter<reporting_adapter_traits<T,ReporterT>>& adpt,
@@ -57,7 +57,7 @@ struct reporting_adapter_traits : public object_wrapper<T>,
 };
 
 /**
- * @brief Reporting adapter that constructs report if validation by default adapter fails.
+ * @brief Reporting adapter that constructs report if validation fails.
  */
 template <typename T, typename ReporterT>
 class reporting_adapter : public adapter<reporting_adapter_traits<T,ReporterT>>,
@@ -68,9 +68,9 @@ class reporting_adapter : public adapter<reporting_adapter_traits<T,ReporterT>>,
         using reporter_type=ReporterT;
 
         /**
-         * @brief Constructor
-         * @param obj Constant reference to object under validation
-         * @param reporter_args Parameters to forward to reporter's constructor
+         * @brief Constructor.
+         * @param obj Constant reference to object under validation.
+         * @param reporter_args Parameters to forward to reporter's constructor.
          */
         reporting_adapter(
                 T&& obj,
@@ -82,10 +82,10 @@ class reporting_adapter : public adapter<reporting_adapter_traits<T,ReporterT>>,
 };
 
 /**
- * @brief Create reporting adapter using default adapter
- * @param reporter Reporter
- * @param obj Object to validate
- * @return Reporting adapter
+ * @brief Create reporting adapter using default adapter.
+ * @param reporter Reporter.
+ * @param obj Object to validate.
+ * @return Reporting adapter.
  */
 template <typename ObjT, typename ReporterT>
 auto make_reporting_adapter(ObjT&& obj,
@@ -99,10 +99,10 @@ auto make_reporting_adapter(ObjT&& obj,
 }
 
 /**
- * @brief Create reporting adapter using default reporter and default adapter
- * @param dst Destination object where to put report
- * @param obj Object to validate
- * @return Reporting adapter
+ * @brief Create reporting adapter using default reporter and default adapter.
+ * @param dst Destination object where to put report.
+ * @param obj Object to validate.
+ * @return Reporting adapter.
  */
 template <typename ObjT, typename DstT>
 auto make_reporting_adapter(ObjT&& obj,
