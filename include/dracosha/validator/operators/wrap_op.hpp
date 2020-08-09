@@ -87,7 +87,7 @@ class wrap_op : public object_wrapper<T>
         }
 };
 
-struct wrap_op_with_string_t
+struct wrap_op_with_string_tag
 {
 };
 
@@ -96,7 +96,7 @@ struct wrap_op_with_string_t
  */
 template <typename T1, typename T2>
 class wrap_op_with_string : public wrap_op<T1>,
-                            public wrap_op_with_string_t
+                            public wrap_op_with_string_tag
 {
     public:
 

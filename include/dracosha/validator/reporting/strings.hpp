@@ -112,7 +112,7 @@ struct strings
                                 ,
                                     std::enable_if_t<
                                        !(
-                                        std::is_base_of<wrap_op_with_string_t,T>::value
+                                        std::is_base_of<wrap_op_with_string_tag,T>::value
                                        )
                                     ,void*> =nullptr
                                 ) const
@@ -129,7 +129,7 @@ struct strings
     concrete_phrase operator() (const T& id, grammar_categories grammar_cats=0,
                                 std::enable_if_t<
                                    (
-                                    std::is_base_of<wrap_op_with_string_t,T>::value
+                                    std::is_base_of<wrap_op_with_string_tag,T>::value
                                    )
                                 ,void*> =nullptr
                                 ) const
