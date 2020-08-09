@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/utils/hana_to_std_tuple.hpp
 *
-*  Defines converter of hana::tuple to std::tuple
+*  Defines converter of hana::tuple to std::tuple.
 *
 */
 
@@ -27,7 +27,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
-  @brief Wrapper for making std::tuple
+  @brief Wrapper for making std::tuple.
 */
 BOOST_HANA_CONSTEXPR_LAMBDA auto make_std_tuple= [] (auto&&... args)
 {
@@ -35,7 +35,7 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto make_std_tuple= [] (auto&&... args)
 };
 
 /**
-  @brief Create std::tuple from hana::tuple
+  @brief Convert hana::tuple to std::tuple.
   */
 BOOST_HANA_CONSTEXPR_LAMBDA auto hana_to_std_tuple= [] (auto&& ts)
 {
