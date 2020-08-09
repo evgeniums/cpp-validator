@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/or.hpp
 *
-*  Defines logical pseudo operator OR
+*  Defines logical pseudo operator OR.
 *
 */
 
@@ -29,11 +29,11 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Logical pseudo operator OR
- * @param xs Intermediate validators whose result must be forwarded to logical OR
- * @return Logical "or" of intermediate validator results
+ * @brief Logical pseudo operator OR.
+ * @param xs Intermediate validators whose result must be forwarded to logical OR.
+ * @return Logical "or" of intermediate validator results.
  *
- * Can be used both in functioin call notation OR(...) and in infix notation (... ^OR^ ...)
+ * Can be used both in functioin call notation OR(...) and in infix notation (... ^OR^ ...).
  */
 BOOST_HANA_CONSTEXPR_LAMBDA auto OR=hana::infix([](auto&& ...xs) -> decltype(auto)
 {
@@ -46,6 +46,10 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto OR=hana::infix([](auto&& ...xs) -> decltype(aut
 });
 
 //-------------------------------------------------------------
+
+/**
+ * @brief String descriptions helper for operator OR.
+ */
 struct string_or_t : public logical_op<string_or_t>
 {
     constexpr static const aggregation_id id=aggregation_id::OR;
@@ -53,6 +57,10 @@ struct string_or_t : public logical_op<string_or_t>
     constexpr static const char* close_token=")";
     constexpr static const char* conjunction_token=" OR ";
 };
+
+/**
+  @brief Instance of string description helper for operator OR.
+*/
 constexpr string_or_t string_or{};
 
 //-------------------------------------------------------------

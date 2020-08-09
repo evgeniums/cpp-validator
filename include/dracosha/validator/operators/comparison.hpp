@@ -28,7 +28,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Operator "=="
+ * @brief Definition of operator "equal to".
  */
 struct eq_t : public op<eq_t>
 {
@@ -41,10 +41,13 @@ struct eq_t : public op<eq_t>
     constexpr static const char* description="must be equal to";
     constexpr static const char* n_description="must be not equal to";
 };
+/**
+  @brief Operator "equal to".
+*/
 constexpr eq_t eq{};
 
 /**
- * @brief Operator "!="
+ * @brief Definition of operator "not equal to".
  */
 struct ne_t : public op<ne_t>
 {
@@ -57,10 +60,13 @@ struct ne_t : public op<ne_t>
     constexpr static const char* description="must be not equal to";
     constexpr static const char* n_description="must be equal to";
 };
+/**
+  @brief Operator "not equal to".
+*/
 constexpr ne_t ne{};
 
 /**
- * @brief Operator "<"
+ * @brief Definition of operator "less than".
  */
 struct lt_t : public op<lt_t>
 {
@@ -73,10 +79,13 @@ struct lt_t : public op<lt_t>
     constexpr static const char* description="must be less than";
     constexpr static const char* n_description="must be greater than or equal to";
 };
+/**
+  @brief Operator "less than".
+*/
 constexpr lt_t lt{};
 
 /**
- * @brief Operator "<="
+ * @brief Definition of operator "less than or equal to".
  */
 struct lte_t : public op<lte_t>
 {
@@ -89,10 +98,13 @@ struct lte_t : public op<lte_t>
     constexpr static const char* description="must be less than or equal to";
     constexpr static const char* n_description="must be greater than";
 };
+/**
+  @brief Operator "less than or equal to".
+*/
 constexpr lte_t lte{};
 
 /**
- * @brief Operator ">"
+ * @brief Definition of operator "greater than".
  */
 struct gt_t : public op<gt_t>
 {
@@ -105,10 +117,13 @@ struct gt_t : public op<gt_t>
     constexpr static const char* description="must be greater than";
     constexpr static const char* n_description="must be less than or equal to";
 };
+/**
+  @brief Operator "greater than".
+*/
 constexpr gt_t gt{};
 
 /**
- * @brief Operator ">="
+ * @brief Definition of operator "greater than or equal to"
  */
 struct gte_t : public op<gte_t>
 {
@@ -121,6 +136,9 @@ struct gte_t : public op<gte_t>
     constexpr static const char* description="must be greater than or equal to";
     constexpr static const char* n_description="must be less than";
 };
+/**
+  @brief Operator "greater than or equal to".
+*/
 constexpr gte_t gte{};
 
 //-------------------------------------------------------------

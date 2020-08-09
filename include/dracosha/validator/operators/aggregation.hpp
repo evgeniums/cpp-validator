@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/aggregation.hpp
 *
-*  Defines aggregation used for logical operators
+*  Defines aggregation used for logical operators.
 *
 */
 
@@ -27,7 +27,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Codes of aggregation operators
+ * @brief Codes of aggregation operators.
  */
 enum class aggregation_id : int
 {
@@ -41,7 +41,7 @@ enum class aggregation_id : int
 struct aggregation_op_tag;
 
 /**
- * @brief Aggregation operator descriptor
+ * @brief Aggregation operator descriptor.
  */
 struct aggregation_op
 {
@@ -60,8 +60,8 @@ struct aggregation_op
     aggregation_op& operator= (aggregation_op&& other)=default;
 
     /**
-     * @brief Constructor
-     * @param other Source descriptor
+     * @brief Constructor.
+     * @param other Source descriptor.
      */
     template <typename T>
     aggregation_op(const T& other)
@@ -75,7 +75,7 @@ struct aggregation_op
 //-------------------------------------------------------------
 
 /**
- * @brief Pseudo logical operator
+ * @brief Pseudo logical operator.
  */
 template <typename DerivedT>
 struct logical_op
@@ -99,7 +99,7 @@ struct logical_op
 };
 
 /**
- * @brief Pseudo aggregation operator
+ * @brief Pseudo aggregation operator.
  */
 template <typename DerivedT>
 struct aggregate_op

@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/and.hpp
 *
-*  Defines logical pseudo operator AND
+*  Defines logical pseudo operator AND.
 *
 */
 
@@ -29,11 +29,11 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Logical pseudo operator AND
- * @param xs Intermediate validators whose result must be forwarded to logical AND
- * @return Logical "and" of intermediate validator results
+ * @brief Logical pseudo operator AND.
+ * @param xs Intermediate validators whose result must be forwarded to logical AND.
+ * @return Logical "and" of intermediate validator results.
  *
- * Can be used both as function call notation AND(...) and as infix notation (... ^AND^ ...)
+ * Can be used both as function call notation AND(...) and as infix notation (... ^AND^ ...).
  */
 BOOST_HANA_CONSTEXPR_LAMBDA auto AND=hana::infix([](auto&& ...xs) -> decltype(auto)
 {
@@ -46,6 +46,10 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto AND=hana::infix([](auto&& ...xs) -> decltype(au
 });
 
 //-------------------------------------------------------------
+
+/**
+ * @brief String descriptions helper for operator AND.
+ */
 struct string_and_t : public logical_op<string_and_t>
 {
     constexpr static const aggregation_id id=aggregation_id::AND;
@@ -53,6 +57,10 @@ struct string_and_t : public logical_op<string_and_t>
     constexpr static const char* close_token=")";
     constexpr static const char* conjunction_token=" AND ";
 };
+
+/**
+  @brief Instance of string description helper for operator AND.
+*/
 constexpr string_and_t string_and{};
 
 //-------------------------------------------------------------

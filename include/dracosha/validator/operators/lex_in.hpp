@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/lex_in.hpp
 *
-*  Defines lexicographical lex_in/lex_nin operators
+*  Defines lexicographical lex_in/lex_nin operators.
 *
 */
 
@@ -32,7 +32,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Operator to check if value is interval/range using lexicographical comparison operators
+ * @brief Definition of operator "lex_in" for checking if value is in interval/range using lexicographical comparison operators.
  */
 struct lex_in_t : public op<lex_in_t>
 {
@@ -40,7 +40,7 @@ struct lex_in_t : public op<lex_in_t>
     constexpr static const char* n_description=in_t::n_description;
 
     /**
-     * @brief Call when operand is an interval
+     * @brief Call when operand is an interval.
      */
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b,
@@ -66,7 +66,7 @@ struct lex_in_t : public op<lex_in_t>
     }
 
     /**
-     * @brief Call when operand is a range
+     * @brief Call when operand is a range.
      */
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b,
@@ -85,7 +85,7 @@ struct lex_in_t : public op<lex_in_t>
     }
 
     /**
-     * @brief Call when operand is a sorted range
+     * @brief Call when operand is a sorted range.
      */
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b,
@@ -98,10 +98,14 @@ struct lex_in_t : public op<lex_in_t>
         return std::binary_search(std::begin(container),std::end(container),a,lex_lt);
     }
 };
+
+/**
+  @brief Operator for checking if value is in interval or range using lexicographical comparison operators
+*/
 constexpr lex_in_t lex_in{};
 
 /**
- * @brief Operator to check if value is not in interval/range using lexicographical comparison operators
+ * @brief Definition of operator "lex_non" to check if value is not in interval/range using lexicographical comparison operators.
  */
 struct lex_nin_t : public op<lex_nin_t>
 {
@@ -114,10 +118,14 @@ struct lex_nin_t : public op<lex_nin_t>
         return !lex_in(a,b);
     }
 };
+
+/**
+  @brief Operator for checking if value is not in interval or range using lexicographical comparison operators
+*/
 constexpr lex_nin_t lex_nin{};
 
 /**
- * @brief Operator to check if value is interval/range using case insensitive lexicographical comparison operators
+ * @brief Definition of operator "ilex_in" for checking if value is in interval/range using case insensitive lexicographical comparison operators
  */
 struct ilex_in_t : public op<ilex_in_t>
 {
@@ -183,11 +191,15 @@ struct ilex_in_t : public op<ilex_in_t>
         return std::binary_search(std::begin(container),std::end(container),a,ilex_lt);
     }
 };
+
+/**
+  @brief Operator for checking if value is in interval or range using case insensitive lexicographical comparison operators.
+*/
 constexpr ilex_in_t ilex_in{};
 
 /**
- * @brief Operator to check if value is not in interval/range using case insensitive lexicographical comparison operators
- */
+  @brief Definition of operator "ilex_nin" for checking if value is not in interval or range using case insensitive lexicographical comparison operators.
+*/
 struct ilex_nin_t : public op<ilex_nin_t>
 {
     constexpr static const char* description=ilex_in_t::n_description;
@@ -199,6 +211,10 @@ struct ilex_nin_t : public op<ilex_nin_t>
         return !ilex_in(a,b);
     }
 };
+
+/**
+  @brief Operator for checking if value is not in interval or range using case insensitive lexicographical comparison operators.
+*/
 constexpr ilex_nin_t ilex_nin{};
 
 //-------------------------------------------------------------

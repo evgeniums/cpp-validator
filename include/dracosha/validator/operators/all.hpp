@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/all.hpp
 *
-*  Defines aggregation pseudo operator ALL
+*  Defines aggregation pseudo operator ALL.
 *
 */
 
@@ -29,9 +29,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Aggregation pseudo operator ALL to check if all elements of a container satisfy condition
- * @param op Validator to apply to each element of the container
- * @return Success if all elements of the container passed validator
+ * @brief Definition of aggregation pseudo operator ALL for checking if all elements of a container satisfy condition.
+ * @param op Validator to apply to each element of the container.
+ * @return Success if all elements of the container passed validator.
  */
 struct all_t
 {
@@ -52,9 +52,16 @@ struct all_t
                );
     }
 };
+/**
+  @brief Aggregation operator ALL that requires for all container elements to satisfy a condition.
+*/
 constexpr all_t ALL{};
 
 //-------------------------------------------------------------
+
+/**
+ * @brief String descriptions helper for operator ALL.
+ */
 struct string_all_t : public aggregate_op<string_all_t>,
                       public enable_to_string<string_all_t>
 {
@@ -65,6 +72,10 @@ struct string_all_t : public aggregate_op<string_all_t>,
 
     constexpr static const char* description="each element";
 };
+
+/**
+  @brief Instance of string description helper for operator ALL.
+*/
 constexpr string_all_t string_all{};
 
 //-------------------------------------------------------------

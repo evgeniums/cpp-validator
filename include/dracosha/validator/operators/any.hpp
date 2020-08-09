@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/any.hpp
 *
-*  Defines aggregation pseudo operator ANY
+*  Defines aggregation pseudo operator ANY.
 *
 */
 
@@ -29,9 +29,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Aggregation pseudo operator ANY to check if any element of a container satisfies condition
- * @param op Validator to apply to elements of the container
- * @return Success if any element of the container passed validator
+ * @brief Definition of aggregation pseudo operator ANY to check if any element of a container satisfies condition.
+ * @param op Validator to apply to elements of the container.
+ * @return Success if any element of the container passed validator.
  */
 struct any_t
 {
@@ -52,9 +52,17 @@ struct any_t
                );
     }
 };
+
+/**
+  @brief Aggregation operator ANY that requires for at least one of container elements to satisfy a condition.
+*/
 constexpr any_t ANY{};
 
 //-------------------------------------------------------------
+
+/**
+ * @brief String descriptions helper for operator ANY.
+ */
 struct string_any_t : public aggregate_op<string_any_t>,
                       public enable_to_string<string_any_t>
 {
@@ -65,6 +73,10 @@ struct string_any_t : public aggregate_op<string_any_t>,
 
     constexpr static const char* description="at least one element";
 };
+
+/**
+  @brief Instance of string description helper for operator ANY.
+*/
 constexpr string_any_t string_any{};
 
 //-------------------------------------------------------------

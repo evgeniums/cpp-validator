@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/wrap_op.hpp
 *
-*  Defines operator wrapper
+*  Defines operator wrapper.
 *
 */
 
@@ -30,7 +30,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Wrap operator
+ * @brief Wrap operator.
  */
 template <typename T>
 class wrap_op : public object_wrapper<T>
@@ -40,8 +40,8 @@ class wrap_op : public object_wrapper<T>
         using hana_tag=operator_tag;
 
         /**
-         * @brief Constructor
-         * @param val Operator
+         * @brief Constructor.
+         * @param val Operator.
          */
         wrap_op(
                 T&& val
@@ -49,7 +49,7 @@ class wrap_op : public object_wrapper<T>
         {}
 
         /**
-         * @brief Operator of conversion to std::string
+         * @brief Operator of conversion to std::string.
          */
         operator std::string() const
         {
@@ -57,8 +57,8 @@ class wrap_op : public object_wrapper<T>
         }
 
         /**
-         * @brief Get operator description for reporting
-         * @return Description of embedded operator
+         * @brief Get operator description for reporting.
+         * @return Description of embedded operator.
          */
         constexpr auto str() const
         {
@@ -66,8 +66,8 @@ class wrap_op : public object_wrapper<T>
         }
 
         /**
-         * @brief Get negative operator description for reporting
-         * @return Negative description of embedded operator
+         * @brief Get negative operator description for reporting.
+         * @return Negative description of embedded operator.
          */
         constexpr auto n_str() const
         {
@@ -75,10 +75,10 @@ class wrap_op : public object_wrapper<T>
         }
 
         /**
-         * @brief Apply operator
-         * @param Value to validate
-         * @param Sample vaue
-         * @return Validation status
+         * @brief Apply operator.
+         * @param Value to validate.
+         * @param Sample vaue.
+         * @return Validation status.
          */
         template <typename T1, typename T2>
         constexpr bool operator() (const T1& a, const T2& b) const
@@ -92,7 +92,7 @@ struct wrap_op_with_string_t
 };
 
 /**
- * @brief Wrap operator with description
+ * @brief Wrap operator with description.
  */
 template <typename T1, typename T2>
 class wrap_op_with_string : public wrap_op<T1>,
@@ -101,9 +101,9 @@ class wrap_op_with_string : public wrap_op<T1>,
     public:
 
         /**
-         * @brief Constructor
-         * @param val Operator
-         * @param description String to use in report formatting to represent the operator
+         * @brief Constructor.
+         * @param val Operator to wrap.
+         * @param description String to use in report formatting to represent the operator.
          */
         template <typename Tt1, typename Tt2>
         wrap_op_with_string(
@@ -114,7 +114,7 @@ class wrap_op_with_string : public wrap_op<T1>,
         {}
 
         /**
-         * @brief Operator of conversion to std::string
+         * @brief Operator of conversion to std::string.
          */
         operator std::string() const
         {
@@ -122,7 +122,7 @@ class wrap_op_with_string : public wrap_op<T1>,
         }
 
         /**
-         * @brief Get explicit operator description
+         * @brief Get explicit operator description.
          */
         auto str() const
         {
@@ -130,7 +130,7 @@ class wrap_op_with_string : public wrap_op<T1>,
         }
 
         /**
-         * @brief Get explicit operator description
+         * @brief Get explicit operator description.
          */
         auto n_str() const
         {

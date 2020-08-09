@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/contains.hpp
 *
-*  Defines operator "contains"
+*  Defines operator "contains".
 *
 */
 
@@ -29,7 +29,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Operator to check if object contains a member
+ * @brief Definition of operator "contains" for checking if object contains a member.
  */
 struct contains_t : public op<contains_t>
 {
@@ -42,6 +42,10 @@ struct contains_t : public op<contains_t>
         return check_exists(a,hana::make_tuple(b));
     }
 };
+
+/**
+  @brief Operator for checking if object contains a member.
+*/
 constexpr contains_t contains{};
 
 //-------------------------------------------------------------

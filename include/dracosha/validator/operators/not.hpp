@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/not.hpp
 *
-*  Defines logical pseudo operator NOT
+*  Defines logical pseudo operator NOT.
 *
 */
 
@@ -29,9 +29,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Logical pseudo operator NOT
- * @param op Intermediate validator whose result must be negated
- * @return Logical "not" of intermediate validator result
+ * @brief Definition of logical pseudo operator NOT.
+ * @param op Intermediate validator whose result must be negated.
+ * @return Logical "not" of intermediate validator result.
  *
  */
 struct not_t
@@ -53,9 +53,16 @@ struct not_t
                );
     }
 };
+/**
+  @brief Logical pseudo operator NOT
+*/
 constexpr not_t NOT{};
 
 //-------------------------------------------------------------
+
+/**
+ * @brief String descriptions helper for operator NOT.
+ */
 struct string_not_t : public logical_op<string_not_t>
 {
     constexpr static const aggregation_id id=aggregation_id::NOT;
@@ -63,6 +70,10 @@ struct string_not_t : public logical_op<string_not_t>
     constexpr static const char* close_token="";
     constexpr static const char* conjunction_token="";
 };
+
+/**
+  @brief Instance of string description helper for operator NOT.
+*/
 constexpr string_not_t string_not{};
 
 //-------------------------------------------------------------

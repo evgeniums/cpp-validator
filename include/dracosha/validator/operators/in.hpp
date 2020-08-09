@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/in.hpp
 *
-*  Defines in/nin operators
+*  Defines in/nin operators.
 *
 */
 
@@ -32,7 +32,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Operator to check if value is in interval/range
+ * @brief Definition of operator "in" for checking if value is in interval/range.
  */
 struct in_t : public op<in_t>
 {
@@ -40,7 +40,7 @@ struct in_t : public op<in_t>
     constexpr static const char* n_description="must be not in";
 
     /**
-     * @brief Call when operand is an interval
+     * @brief Call when operand is an interval.
      */
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b,
@@ -85,7 +85,7 @@ struct in_t : public op<in_t>
     }
 
     /**
-     * @brief Call when operand is a sorted range
+     * @brief Call when operand is a sorted range.
      */
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b,
@@ -98,10 +98,14 @@ struct in_t : public op<in_t>
         return std::binary_search(std::begin(container),std::end(container),a,lt);
     }
 };
+
+/**
+    @brief Operator for checking if value is in interval or range.
+*/
 constexpr in_t in{};
 
 /**
- * @brief Operator to check if value is not in interval/range
+ * @brief Definition of operator "nin" for checking if value is not in interval/range.
  */
 struct nin_t : public op<nin_t>
 {
@@ -114,6 +118,10 @@ struct nin_t : public op<nin_t>
         return !in(a,b);
     }
 };
+
+/**
+    @brief Operator for checking if value is not in interval or range.
+*/
 constexpr nin_t nin{};
 
 //-------------------------------------------------------------

@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/lexicographical.hpp
 *
-*  Defines lexigrophical operators
+*  Defines lexigrophical operators.
 *
 */
 
@@ -30,7 +30,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Operator "lexicoraphical equal"
+ * @brief Definition of operator "lexicographically equal to".
  */
 struct lex_eq_t : public op<lex_eq_t>
 {
@@ -43,10 +43,14 @@ struct lex_eq_t : public op<lex_eq_t>
         return boost::algorithm::equals(a,b);
     }
 };
+
+/**
+    @brief Operator "lexicographically equal to".
+*/
 constexpr lex_eq_t lex_eq{};
 
 /**
- * @brief Operator "lexicoraphical not equal"
+ * @brief Definition of operator "lexicographically not equal to".
  */
 struct lex_ne_t : public op<lex_ne_t>
 {
@@ -59,10 +63,14 @@ struct lex_ne_t : public op<lex_ne_t>
         return !boost::algorithm::equals(a,b);
     }
 };
+
+/**
+    @brief Operator "lexicographically not equal to".
+*/
 constexpr lex_ne_t lex_ne{};
 
 /**
- * @brief Operator "lexicoraphical less than"
+ * @brief Definition of operator "lexicographically less than".
  */
 struct lex_lt_t : public op<lex_lt_t>
 {
@@ -75,10 +83,14 @@ struct lex_lt_t : public op<lex_lt_t>
         return boost::algorithm::lexicographical_compare(a,b);
     }
 };
+
+/**
+    @brief Operator "lexicographically less than".
+*/
 constexpr lex_lt_t lex_lt{};
 
 /**
- * @brief Operator "lexicoraphical less than or equal"
+ * @brief Definition of operator "lexicographically less than or equal to".
  */
 struct lex_lte_t : public op<lex_lte_t>
 {
@@ -93,10 +105,14 @@ struct lex_lte_t : public op<lex_lte_t>
                boost::algorithm::equals(a,b);
     }
 };
+
+/**
+    @brief Operator "lexicographically less than or equal to".
+*/
 constexpr lex_lte_t lex_lte{};
 
 /**
- * @brief Operator "lexicoraphical greater than"
+ * @brief Definition of operator "lexicographically greater than".
  */
 struct lex_gt_t : public op<lex_gt_t>
 {
@@ -109,10 +125,14 @@ struct lex_gt_t : public op<lex_gt_t>
         return !lex_lte(a,b);
     }
 };
+
+/**
+    @brief Operator "lexicographically greater than".
+*/
 constexpr lex_gt_t lex_gt{};
 
 /**
- * @brief Operator "lexicoraphical greater than or equal"
+ * @brief Definition of operator "lexicographically greater than or equal to".
  */
 struct lex_gte_t : public op<lex_gte_t>
 {
@@ -125,10 +145,14 @@ struct lex_gte_t : public op<lex_gte_t>
         return !lex_lt(a,b);
     }
 };
+
+/**
+ * @brief Operator "lexicographically greater than or equal to".
+ */
 constexpr lex_gte_t lex_gte{};
 
 /**
- * @brief Operator "lexicoraphical case insensitive equal"
+ * @brief Definition of operator "lexicographically case insensitive equal to".
  */
 struct ilex_eq_t : public op<ilex_eq_t>
 {
@@ -141,10 +165,14 @@ struct ilex_eq_t : public op<ilex_eq_t>
         return boost::algorithm::iequals(a,b);
     }
 };
+
+/**
+ * @brief Operator "lexicographically case insensitive equal to".
+ */
 constexpr ilex_eq_t ilex_eq{};
 
 /**
- * @brief Operator "lexicoraphical case insensitive not equal"
+ * @brief Definition of operator "lexicographically case insensitive not equal to".
  */
 struct ilex_ne_t : public op<ilex_ne_t>
 {
@@ -157,10 +185,14 @@ struct ilex_ne_t : public op<ilex_ne_t>
         return !boost::algorithm::iequals(a,b);
     }
 };
+
+/**
+ * @brief Operator "lexicographically case insensitive not equal to".
+ */
 constexpr ilex_ne_t ilex_ne{};
 
 /**
- * @brief Operator "lexicoraphical case insensitive less than"
+ * @brief Definition of operator "lexicographically case insensitive less than".
  */
 struct ilex_lt_t : public op<ilex_lt_t>
 {
@@ -173,10 +205,14 @@ struct ilex_lt_t : public op<ilex_lt_t>
         return boost::algorithm::ilexicographical_compare(a,b);
     }
 };
+
+/**
+ * @brief Operator "lexicographically case insensitive less than".
+ */
 constexpr ilex_lt_t ilex_lt{};
 
 /**
- * @brief Operator "lexicoraphical case insensitive less than or equal"
+ * @brief Definition of operator "lexicographically case insensitive less than or equal to".
  */
 struct ilex_lte_t : public op<ilex_lte_t>
 {
@@ -191,10 +227,14 @@ struct ilex_lte_t : public op<ilex_lte_t>
                boost::algorithm::iequals(a,b);
     }
 };
+
+/**
+ * @brief Operator "lexicographically case insensitive less than or equal to".
+ */
 constexpr ilex_lte_t ilex_lte{};
 
 /**
- * @brief Operator "lexicoraphical case insensitive greater than"
+ * @brief Definition of operator "lexicographically case insensitive greater than".
  */
 struct ilex_gt_t : public op<ilex_gt_t>
 {
@@ -207,10 +247,14 @@ struct ilex_gt_t : public op<ilex_gt_t>
         return !ilex_lte(a,b);
     }
 };
+
+/**
+ * @brief Operator "lexicographically case insensitive greater than".
+ */
 constexpr ilex_gt_t ilex_gt{};
 
 /**
- * @brief Operator "lexicoraphical case insensitive greater than or equal"
+ * @brief Definition of operator "lexicographically case insensitive greater than or equal to".
  */
 struct ilex_gte_t : public op<ilex_gte_t>
 {
@@ -223,10 +267,14 @@ struct ilex_gte_t : public op<ilex_gte_t>
         return !ilex_lt(a,b);
     }
 };
+
+/**
+ * @brief Operator "lexicographically case insensitive greater than or equal to".
+ */
 constexpr ilex_gte_t ilex_gte{};
 
 /**
- * @brief Operator "lexicoraphical contains"
+ * @brief Definition of operator "lexicographically contains".
  */
 struct lex_contains_t : public op<lex_contains_t>
 {
@@ -239,10 +287,14 @@ struct lex_contains_t : public op<lex_contains_t>
         return boost::algorithm::contains(a,b);
     }
 };
+
+/**
+ * @brief Operator "lexicographically contains".
+ */
 constexpr lex_contains_t lex_contains{};
 
 /**
- * @brief Operator "lexicoraphical case insensitive contains"
+ * @brief Definition of operator "lexicographically case insensitive contains".
  */
 struct ilex_contains_t : public op<ilex_contains_t>
 {
@@ -255,10 +307,14 @@ struct ilex_contains_t : public op<ilex_contains_t>
         return boost::algorithm::icontains(a,b);
     }
 };
+
+/**
+ * @brief Operator "lexicographically case insensitive contains".
+ */
 constexpr ilex_contains_t ilex_contains{};
 
 /**
- * @brief Operator "lexicoraphical starts with"
+ * @brief Definition of operator "lexicographically starts with".
  */
 struct lex_starts_with_t : public op<lex_starts_with_t>
 {
@@ -271,10 +327,14 @@ struct lex_starts_with_t : public op<lex_starts_with_t>
         return boost::algorithm::starts_with(a,b);
     }
 };
+
+/**
+ * @brief Operator "lexicographically starts with".
+ */
 constexpr lex_starts_with_t lex_starts_with{};
 
 /**
- * @brief Operator "lexicoraphical case insensitive starts with"
+ * @brief Definition of operator "lexicographically case insensitive starts with".
  */
 struct ilex_starts_with_t : public op<ilex_starts_with_t>
 {
@@ -287,10 +347,14 @@ struct ilex_starts_with_t : public op<ilex_starts_with_t>
         return boost::algorithm::istarts_with(a,b);
     }
 };
+
+/**
+ * @brief Operator "lexicographically case insensitive starts with".
+ */
 constexpr ilex_starts_with_t ilex_starts_with{};
 
 /**
- * @brief Operator "lexicoraphical ends with"
+ * @brief Definition of operator "lexicographically ends with".
  */
 struct lex_ends_with_t : public op<lex_ends_with_t>
 {
@@ -303,10 +367,14 @@ struct lex_ends_with_t : public op<lex_ends_with_t>
         return boost::algorithm::ends_with(a,b);
     }
 };
+
+/**
+ * @brief Operator "lexicographically ends with".
+ */
 constexpr lex_ends_with_t lex_ends_with{};
 
 /**
- * @brief Operator "lexicoraphical case insensitive ends with"
+ * @brief Definition of operator "lexicographically case insensitive ends with".
  */
 struct ilex_ends_with_t : public op<ilex_ends_with_t>
 {
@@ -319,6 +387,10 @@ struct ilex_ends_with_t : public op<ilex_ends_with_t>
         return boost::algorithm::iends_with(a,b);
     }
 };
+
+/**
+ * @brief Operator "lexicographically case insensitive ends with".
+ */
 constexpr ilex_ends_with_t ilex_ends_with{};
 
 //-------------------------------------------------------------

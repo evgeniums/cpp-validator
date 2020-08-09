@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/exists.hpp
 *
-*  Defines operator "exists"
+*  Defines operator "exists".
 *
 */
 
@@ -29,7 +29,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Operator to check if member exists in object
+ * @brief Definition of operator "exists" for checking if member exists in object.
  */
 struct exists_t
 {
@@ -49,8 +49,15 @@ struct exists_t
         return check_exists(a,b);
     }
 };
+
+/**
+ * @brief Operator for checking if member exists in object.
+ */
 constexpr exists_t exists{};
 
+/**
+ * @brief Wrapper of operator "exists" with explicit string description.
+ */
 struct exists_op_with_string_t
 {
     using hana_tag=operator_tag;
@@ -70,17 +77,33 @@ struct exists_op_with_string_t
 };
 
 //-------------------------------------------------------------
+
+/**
+ * @brief String descriptions helper for operator "exists".
+ */
 struct string_exists_t : public enable_to_string<string_exists_t>
 {
     constexpr static const char* description="must exist";
 };
+
+/**
+ * @brief Instance of string descriptions helper for operator "exists".
+ */
 constexpr string_exists_t string_exists{};
 
 //-------------------------------------------------------------
+
+/**
+ * @brief String descriptions helper for invertion of operator "exists".
+ */
 struct string_not_exists_t : public enable_to_string<string_not_exists_t>
 {
     constexpr static const char* description="must not exist";
 };
+
+/**
+ * @brief Instance of string descriptions helper for invertion of operator "exists".
+ */
 constexpr string_not_exists_t string_not_exists{};
 
 //-------------------------------------------------------------

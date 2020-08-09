@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/operator.hpp
 *
-*  Defines base operator
+*  Defines base operator class.
 *
 */
 
@@ -28,22 +28,31 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Tag for all operator clases
+ * @brief Tag for all operator clases.
  */
 struct operator_tag;
 
 /**
- * @brief Base operator class
+ * @brief Base operator class.
  */
 template <typename DerivedT>
 struct op : public enable_to_string<DerivedT>
 {
     using hana_tag=operator_tag;
 
+    /**
+     * @brief Get description of the operator to be used in reports.
+     * @return String description of the operator.
+     */
     constexpr static const char* str()
     {
         return DerivedT::description;
     }
+
+    /**
+     * @brief Get description of inverted operator to be used in reports.
+     * @return String description of inverted operator.
+     */
     constexpr static const char* n_str()
     {
         return DerivedT::n_description;

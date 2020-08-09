@@ -10,16 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/flag.hpp
 *
-* Defines flag pseudo operator for boolean validation.
-* Examples of flag operator usage:
-* <pre>
-  empty(flag,true) -> must be empty
-  empty(flag,false) -> must be not empty
-  empty(flag(flag_on_off),true) -> must be on
-  empty(flag(flag_on_off),false) -> must be off
-  empty(flag("custom description"),true) -> custom description
-  </pre>
-*
+* Defines flag operator for validation of booleans.
 */
 
 /****************************************************************************/
@@ -50,10 +41,10 @@ struct flag_t
     using hana_tag=operator_tag;
 
     /**
-     * @brief Comparison operator
-     * @param a Left operand
-     * @param b Right operand
-     * @return Result of "is equal" operator
+     * @brief Comparison operator.
+     * @param a Left operand.
+     * @param b Right operand.
+     * @return Result of "is equal" operator.
      */
     constexpr bool operator() (const bool& a, const bool& b) const
     {
@@ -62,8 +53,8 @@ struct flag_t
 
     /**
      * @brief Get flag description if flag is used with a property and property is not a value.
-     * @param prop Property
-     * @param Operand
+     * @param prop Property.
+     * @param Operand.
      * @return Flag description taken from the property if it has flag strings or default preset flag description otherwise.
      */
     template <typename PropT>
@@ -79,8 +70,8 @@ struct flag_t
 
     /**
      * @brief Get flag description if flag is used with either value property or no property.
-     * @param Operand
-     * @return Flag description
+     * @param Operand.
+     * @return Flag description.
      */
     template <typename PropT>
     std::string str(PropT&&,
@@ -114,17 +105,17 @@ struct flag_op_with_preset : public flag_t
     public:
 
         /**
-         * @brief Constructor
-         * @param v Preset descriptions helper
+         * @brief Constructor.
+         * @param v Preset descriptions helper.
          */
         template <typename T1>
         flag_op_with_preset(T1&& v) : _preset(std::forward<T1>(v))
         {}
 
         /**
-         * @brief Get flag description
-         * @param b Operand
-         * @return Preset flag description
+         * @brief Get flag description.
+         * @param b Operand.
+         * @return Preset flag description.
          */
         template <typename PropT>
         std::string str(PropT&&,const bool& b) const
@@ -156,16 +147,16 @@ struct flag_op_with_string : public flag_t
     public:
 
         /**
-         * @brief Constructor
-         * @param v Explicit flag description
+         * @brief Constructor.
+         * @param v Explicit flag description.
          */
         template <typename T1>
         flag_op_with_string(T1&& v) : _string(std::forward<T1>(v))
         {}
 
         /**
-         * @brief Get flag description
-         * @return Explicit flag description
+         * @brief Get flag description.
+         * @return Explicit flag description.
          */
         template <typename PropT>
         std::string str(PropT&&,const bool&) const
@@ -190,16 +181,16 @@ struct flag_op_with_string : public flag_t
 };
 
 /**
- * @brief Flag operator to be used in validators
+ * @brief Flag operator to be used in validators.
  */
 struct flag_op : public flag_t
 {
     using flag_t::operator ();
 
     /**
-     * @brief Create flag operator with preset descriptions
-     * @param v Preset descriptions helper
-     * @return flag operator
+     * @brief Create flag operator with preset descriptions.
+     * @param v Preset descriptions helper.
+     * @return flag operator.
      */
     template <typename T>
     auto operator() (T&& v,
@@ -212,9 +203,9 @@ struct flag_op : public flag_t
     }
 
     /**
-     * @brief Create flag operator with explicit string descriptions
-     * @param v Explicit string description
-     * @return flag operator
+     * @brief Create flag operator with explicit string descriptions.
+     * @param v Explicit string description.
+     * @return flag operator.
      */
     template <typename T>
     auto operator() (T&& v,
@@ -226,6 +217,21 @@ struct flag_op : public flag_t
         return flag_op_with_string{std::forward<T>(v)};
     }
 };
+
+/**
+* @brief Flag operator for validation of booleans.
+*
+* Examples of operator usage:
+*
+* <pre>
+  empty(flag,true) -> must be empty
+  empty(flag,false) -> must be not empty
+  empty(flag(flag_on_off),true) -> must be on
+  empty(flag(flag_on_off),false) -> must be off
+  empty(flag("custom description"),true) -> explicit custom description
+  </pre>
+*
+*/
 constexpr flag_op flag{};
 
 //-------------------------------------------------------------

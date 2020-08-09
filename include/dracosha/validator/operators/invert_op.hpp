@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/invert_op.hpp
 *
-*  Defines invertion operator
+*  Defines invertion operator.
 *
 */
 
@@ -33,14 +33,20 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief String descriptions helper operator inversion.
+ */
 struct string_invert_op_t : public enable_to_string<string_invert_op_t>
 {
     constexpr static const char* description="NOT";
 };
+/**
+  @brief Instance of string description helper for operator inversion.
+*/
 constexpr string_invert_op_t string_invert_op{};
 
 /**
- * @brief Invert operator
+ * @brief Inverted operator.
  */
 template <typename T>
 class invert_op : public object_wrapper<T>
@@ -55,8 +61,8 @@ class invert_op : public object_wrapper<T>
                       "Invertion _n() can not be applied to operator flag");
 
         /**
-         * @brief Constructor
-         * @param val Operator
+         * @brief Constructor.
+         * @param val Operator to invert.
          */
         invert_op(
                 T&& val
@@ -64,7 +70,7 @@ class invert_op : public object_wrapper<T>
         {}
 
         /**
-         * @brief Operator of conversion to std::string
+         * @brief Operator of conversion to std::string.
          */
         operator std::string() const
         {
@@ -72,8 +78,8 @@ class invert_op : public object_wrapper<T>
         }
 
         /**
-         * @brief Get operator description for reporting
-         * @return Negative description of embedded operator
+         * @brief Get operator description for reporting.
+         * @return Negative description of embedded operator.
          */
         constexpr auto str() const
         {
@@ -81,8 +87,8 @@ class invert_op : public object_wrapper<T>
         }
 
         /**
-         * @brief Get negative operator description for reporting
-         * @return Description of embedded operator
+         * @brief Get negative operator description for reporting.
+         * @return Description of embedded operator.
          */
         constexpr auto n_str() const
         {
@@ -90,10 +96,10 @@ class invert_op : public object_wrapper<T>
         }
 
         /**
-         * @brief Apply and invert operator
-         * @param Value to validate
-         * @param Sample vaue
-         * @return Validation status
+         * @brief Apply and invert operator.
+         * @param Value to validate.
+         * @param Sample vaue.
+         * @return Validation status.
          */
         template <typename T1, typename T2>
         constexpr bool operator() (const T1& a, const T2& b) const
@@ -103,7 +109,7 @@ class invert_op : public object_wrapper<T>
 };
 
 /**
- * @brief Invert operator with explicit description
+ * @brief Invert operator with explicit description.
  */
 template <typename T>
 class invert_op_with_string : public invert_op<T>
@@ -111,9 +117,9 @@ class invert_op_with_string : public invert_op<T>
     public:
 
         /**
-         * @brief Constructor
-         * @param val Operator
-         * @param description String to use in report formatting to represent the operator
+         * @brief Constructor.
+         * @param val Operator.
+         * @param description String to use in report formatting to represent the operator.
          */
         invert_op_with_string(
                 T&& val,
@@ -123,7 +129,7 @@ class invert_op_with_string : public invert_op<T>
         {}
 
         /**
-         * @brief Operator of conversion to std::string
+         * @brief Operator of conversion to std::string.
          */
         operator std::string() const
         {
@@ -131,7 +137,7 @@ class invert_op_with_string : public invert_op<T>
         }
 
         /**
-         * @brief Get explicit operator description
+         * @brief Get explicit operator description.
          */
         constexpr auto str() const
         {
@@ -139,7 +145,7 @@ class invert_op_with_string : public invert_op<T>
         }
 
         /**
-         * @brief Get explicit operator description
+         * @brief Get explicit operator description.
          */
         constexpr auto n_str() const
         {
@@ -152,9 +158,9 @@ class invert_op_with_string : public invert_op<T>
 };
 
 /**
- * @brief Create inverted operator
- * @param v Operator
- * @return Inverted perator
+ * @brief Create inverted operator.
+ * @param v Operator.
+ * @return Inverted perator.
  */
 template <typename T>
 constexpr auto _n(T&& v)
@@ -163,10 +169,10 @@ constexpr auto _n(T&& v)
 }
 
 /**
- * @brief Create inverted operator with custom description
- * @param v Operator
- * @param description Custom description
- * @return Inverted perator
+ * @brief Create inverted operator with custom description.
+ * @param v Operator.
+ * @param description Custom description.
+ * @return Inverted perator.
  */
 template <typename T>
 auto _n(T&& v, std::string description)
