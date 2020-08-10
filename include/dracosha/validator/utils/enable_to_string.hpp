@@ -8,9 +8,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/enable_to_string.hpp
+/** \file validator/utils/enable_to_string.hpp
 *
-*  Defines base template for types that can be string convertible using description
+*  Defines base template for types that can be string convertible using description.
 *
 */
 
@@ -27,7 +27,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Base template for types that can be string convertible using static description
+ * @brief Base template for types that can be string convertible using static description.
  */
 template <typename DerivedT>
 struct enable_to_string

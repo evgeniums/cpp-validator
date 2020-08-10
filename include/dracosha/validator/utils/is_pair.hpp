@@ -26,13 +26,17 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Helper to check if object has property "first"
+ * @brief Default helper to check if object has property "first".
  */
 template <typename T, typename=void>
 struct has_first
 {
     constexpr static const bool value=false;
 };
+
+/**
+ * @brief Helper to check if object has property "first" when it has.
+ */
 template <typename T>
 struct has_first<T,
         decltype((void)std::declval<std::decay_t<T>>().first)
@@ -42,13 +46,17 @@ struct has_first<T,
 };
 
 /**
- * @brief Helper to check if object has property "second"
+ * @brief Default helper to check if object has property "second".
  */
 template <typename T, typename=void>
 struct has_second
 {
     constexpr static const bool value=false;
 };
+
+/**
+ * @brief Helper to check if object has property "second" when it has.
+ */
 template <typename T>
 struct has_second<T,
         decltype((void)std::declval<std::decay_t<T>>().second)>
@@ -57,13 +65,17 @@ struct has_second<T,
 };
 
 /**
- * @brief Helper to check if object is of std::pair type. i.e has "first" and "second" properties.
+ * @brief Default helper to check if object is of std::pair type. i.e has "first" and "second" properties.
  */
 template <typename T, typename =hana::when<true>>
 struct is_pair_t
 {
     constexpr static const bool value=false;
 };
+
+/**
+ * @brief Helper to check if object is of std::pair type. i.e has "first" and "second" properties when it has.
+ */
 template <typename T>
 struct is_pair_t<T,
             hana::when<has_first<T>::value && has_second<T>::value>
@@ -73,11 +85,14 @@ struct is_pair_t<T,
 };
 
 /**
- * @brief Check if object is of std::pair type.
+ * @brief Check if object is a std::pair.
+ * @param v Variable to check.
+ * @return true if the object has first and second member variables defined.
  */
 template <typename T>
-constexpr auto is_pair(T&&)
+constexpr auto is_pair(T&& v)
 {
+    std::ignore=v;
     return is_pair_t<T>::value;
 }
 

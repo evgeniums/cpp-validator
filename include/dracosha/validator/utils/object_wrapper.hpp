@@ -26,7 +26,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Wrapper of object, can wrap either object or reference to the object
+ * @brief Wrapper of object that can wrap either object or reference to the object.
  */
 template <typename T>
 class object_wrapper
@@ -36,8 +36,8 @@ class object_wrapper
         using type=T;
 
         /**
-         * @brief Constructor
-         * @param obj Object to wrap
+         * @brief Constructor.
+         * @param obj Object to wrap.
          */
         object_wrapper(
                 T&& obj
@@ -45,8 +45,8 @@ class object_wrapper
         {}
 
         /**
-         * @brief Get const reference to object
-         * @return Constant reference to wrapped object
+         * @brief Get const reference to object.
+         * @return Constant reference to wrapped object.
          */
         constexpr const std::remove_reference_t<T>& get() const
         {
@@ -54,8 +54,8 @@ class object_wrapper
         }
 
         /**
-         * @brief Get reference to object
-         * @return Reference to wrapped object
+         * @brief Get reference to object.
+         * @return Reference to wrapped object.
          */
         std::remove_reference_t<T>& get()
         {

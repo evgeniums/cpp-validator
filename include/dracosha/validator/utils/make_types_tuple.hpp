@@ -8,9 +8,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/make_types_tuple.hpp
+/** \file validator/utils/make_types_tuple.hpp
 *
-*  Defines helper to create a tuple of types from variadic arguments
+*  Defines helper to create a tuple of types from variadic arguments.
 *
 */
 
@@ -26,7 +26,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
-  @brief Make tuple of hana::type_c<> from variadic arguments
+  @brief Make tuple of hana::type_c<> from variadic arguments.
  */
 BOOST_HANA_CONSTEXPR_LAMBDA auto make_types_tuple =[](auto&&... args)
 {

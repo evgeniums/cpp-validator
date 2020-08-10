@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/utils/string_view.hpp
 *
-*  Defines wrapper for string_view
+*  Defines alias for string_view: boost::string_view is used for C++14 standard and std::string_view is used for C++17 and newer stansards.
 *
 */
 
@@ -41,19 +41,28 @@ namespace detail
 {
 
 /**
- * @brief Helper to adjust value to string view if applicable
+ * @brief Default helper to adjust value to string view if applicable.
  */
 template <typename T, typename=hana::when<true>>
 struct adjust_view_type_t
 {
 };
 
+/**
+ * @brief Helper to adjust value to string view if string_view is constructible from the type.
+ */
 template <typename T>
 struct adjust_view_type_t<T,
                     hana::when<std::is_constructible<string_view,T>::value>
                     >
 {
     using type=string_view;
+
+    /**
+     * @brief Construct string_view from argument.
+     * @param v Input variable.
+     * @return string_view of input variable.
+     */
     template <typename T1>
     constexpr auto operator() (T1&& v) const
     {
@@ -61,6 +70,9 @@ struct adjust_view_type_t<T,
     }
 };
 
+/**
+ * @brief Helper to adjust value to string view if string_view is not constructible from the type.
+ */
 template <typename T>
 struct adjust_view_type_t<T,
                     hana::when<!std::is_constructible<string_view,T>::value>
@@ -68,20 +80,29 @@ struct adjust_view_type_t<T,
 {
     using type=std::decay_t<T>;
 
+    /**
+     * @brief Bypass input.
+     * @param v Input argument.
+     * @return Bypassed input argument.
+     */
     template <typename T1>
     constexpr auto operator() (T1&& v) const -> decltype(auto)
     {
         return hana::id(std::forward<T1>(v));
     }
 };
+
+/**
+ * @brief Instance of helper for adjusting value to string view.
+ */
 template <typename T>
 constexpr adjust_view_type_t<T> adjust_view_type{};
 }
 
 /**
  * @brief Convert value to string_view type if applicable.
- * @param v Value
- * @return string view of value if applicable or value itself otherwise
+ * @param v Value.
+ * @return String view of value if applicable or value itself otherwise.
  */
 template <typename T>
 constexpr auto adjust_view_type (T&& v) -> decltype(auto)

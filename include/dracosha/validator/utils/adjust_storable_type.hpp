@@ -8,9 +8,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operators/operator.hpp
+/** \file validator/utils/adjust_storable_type.hpp
 *
-*  Defines templates to adjust types to be used as storable elements in tuples.
+*  Defines helpers for adjusting types used as storable elements in tuples.
 *
 */
 
@@ -47,7 +47,7 @@ struct adjust_storable_type<T,
 };
 
 /**
- * @brief Adjust non-stringable type
+ * @brief Adjust non-stringable type.
  *
  * Decay to base type that can store a value as a tuple's element.
  */

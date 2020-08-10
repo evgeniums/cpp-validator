@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/wrap_it.hpp
+/** \file validator/utils/wrap_it.hpp
 *
 *  Defines wrapper of container's iterator.
 *
@@ -29,7 +29,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct wrap_iterator_tag;
 
 /**
- * @brief Wrapper of container's iterator
+ * @brief Wrapper of container's iterator paired with explicit name or description.
  */
 template <typename T>
 struct wrap_it_t
@@ -37,7 +37,7 @@ struct wrap_it_t
     using hana_tag=wrap_iterator_tag;
 
     /**
-      @brief Get value from wrapped iterator
+      @brief Get value from wrapped iterator.
       */
     auto get() -> decltype(auto)
     {
@@ -45,7 +45,7 @@ struct wrap_it_t
     }
 
     /**
-      @brief Get value from wrapped iterator
+      @brief Get constant value from wrapped iterator.
       */
     auto get() const -> decltype(auto)
     {
@@ -53,8 +53,8 @@ struct wrap_it_t
     }
 
     /**
-     * @brief Get iterator name
-     * @return Iterator name to use in report
+     * @brief Get iterator name.
+     * @return Iterator name to use in report.
      */
     std::string name() const
     {
@@ -66,10 +66,10 @@ struct wrap_it_t
 };
 
 /**
-  @brief Wrap iterator
-  @param it Iterator
-  @param aggregation Aggregation descriptor to take iterator name from
-  @return Wrapped iterator
+  @brief Wrap iterator and pair it with explicit name or description.
+  @param it Iterator.
+  @param aggregation Aggregation descriptor to take iterator name or desctiption from.
+  @return Wrapped iterator.
   */
 BOOST_HANA_CONSTEXPR_LAMBDA auto wrap_it=[](auto&& it, auto&& aggregation)
 {

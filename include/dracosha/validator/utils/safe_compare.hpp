@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/utils/safe_compare.hpp
 *
-*  Defines type safe operators to compare values
+*  Defines type safe operators to compare values.
 *
 */
 
@@ -28,7 +28,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Safe less than or equal to if operation is not possible
+ * @brief Safe less than or equal to if operation is not possible.
  */
 template <typename LeftT, typename RightT, typename=void>
 struct safe_lte
@@ -39,7 +39,7 @@ struct safe_lte
     }
 };
 /**
- * @brief Safe less or equal to if operation is possible
+ * @brief Safe less or equal to if operation is possible.
  */
 template <typename LeftT, typename RightT>
 struct safe_lte<LeftT,RightT,
@@ -61,7 +61,7 @@ struct safe_lte<LeftT,RightT,
 };
 
 /**
- * @brief Safe less than if operation is not possible
+ * @brief Safe less than if operation is not possible.
  */
 template <typename LeftT, typename RightT, typename=void>
 struct safe_lt
@@ -73,7 +73,7 @@ struct safe_lt
 };
 
 /**
- * @brief Safe less than if operation is possible
+ * @brief Safe less than if operation is possible.
  */
 template <typename LeftT, typename RightT>
 struct safe_lt<LeftT,RightT,
@@ -95,7 +95,7 @@ struct safe_lt<LeftT,RightT,
 };
 
 /**
- * @brief Safe equal to if operation is not possible
+ * @brief Safe equal to if operation is not possible.
  */
 template <typename LeftT, typename RightT, typename=void>
 struct safe_eq
@@ -107,7 +107,7 @@ struct safe_eq
 };
 
 /**
- * @brief Safe equal to if operation is possible
+ * @brief Safe equal to if operation is possible.
  */
 template <typename LeftT, typename RightT>
 struct safe_eq<LeftT,RightT,
@@ -129,9 +129,9 @@ struct safe_eq<LeftT,RightT,
 };
 
 /**
- *  @brief Compare two values of comparable or not comparable types  types
+ *  @brief Helper for comparing two values of comparable or not comparable types.
  *
- * If types are not comparable then comparation result is always false.
+ * If types are not comparable then comparison result is always false.
  */
 template <typename LeftT, typename RightT, typename=void>
 struct safe_compare
@@ -151,7 +151,7 @@ struct safe_compare
 };
 
 /**
- *  @brief Compare signed and unsigned values except for floating and boolean types
+ *  @brief Helper for comparing signed and unsigned values except for floating and boolean types.
  *
  */
 template <typename LeftT, typename RightT>
@@ -187,7 +187,7 @@ struct safe_compare<LeftT,RightT,
 };
 
 /**
- *  @brief Compare unsigned and signed values except for floating and boolean types
+ *  @brief Helper for comparing unsigned and signed values except for floating and boolean types.
  *
  */
 template <typename LeftT, typename RightT>
@@ -222,7 +222,7 @@ struct safe_compare<LeftT, RightT,
 };
 
 /**
- *  @brief Compare non-boolean and boolean values
+ *  @brief Helper for comparing non-boolean and boolean values.
  *
  */
 template <typename LeftT,typename RightT>
@@ -245,7 +245,7 @@ struct safe_compare<LeftT,RightT,
 };
 
 /**
- *  @brief Compare boolean and non-boolean values
+ *  @brief Helper for comparing boolean and non-boolean values.
  *
  */
 template <typename LeftT, typename RightT>
@@ -270,7 +270,10 @@ struct safe_compare<LeftT, RightT,
 //-------------------------------------------------------------
 
 /**
- * @brief Compare if left value is less than right value
+ * @brief Compare if left value is less than right value.
+ * @param a First value to compare.
+ * @param b Second valut to compare.
+ * @return Operation result.
  */
 template <typename LeftT, typename RightT>
 constexpr bool safe_compare_less(const LeftT& a, const RightT& b)

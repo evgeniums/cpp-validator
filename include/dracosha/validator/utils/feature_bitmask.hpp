@@ -95,9 +95,9 @@ struct feature_bitmask_t
     using feature=FeatureEnumT;
 
     /**
-     * @brief Convert feature to bitmask
-     * @param ft Feature for converting
-     * @return Bitmask where bit corresponding to the feature is set to 1
+     * @brief Convert feature to bitmask.
+     * @param ft Feature for converting.
+     * @return Bitmask where bit corresponding to the feature is set to 1.
      */
     template <typename T>
     constexpr static bitmask bit(const T& ft) noexcept
@@ -106,9 +106,9 @@ struct feature_bitmask_t
     }
 
     /**
-     * @brief Convert list of features to bitmask
-     * @param bitmask Features for converting
-     * @return Bitmask where bits corresponding to the bitmask are set to 1
+     * @brief Convert list of features to bitmask.
+     * @param bitmask Features for converting.
+     * @return Bitmask where bits corresponding to the bitmask are set to 1.
      */
     constexpr static bitmask bits(const std::initializer_list<feature>& fts) noexcept
     {
@@ -121,9 +121,9 @@ struct feature_bitmask_t
     }
 
     /**
-     * @brief Convert list of features to bitmask
-     * @param bitmask Features for converting
-     * @return Bitmask where bits corresponding to the bitmask are set to 1
+     * @brief Convert list of features to bitmask.
+     * @param bitmask Features for converting.
+     * @return Bitmask where bits corresponding to the bitmask are set to 1.
      */
     template <typename ... Features>
     constexpr static bitmask bits(Features&&... fts) noexcept
@@ -140,8 +140,8 @@ struct feature_bitmask_t
     }
 
     /**
-     * @brief Get bitmask where all bitmask are set
-     * @return Bitmask with all bitmask enabled
+     * @brief Get bitmask where all bitmask are set.
+     * @return Bitmask with all bitmask enabled.
      */
     constexpr static bitmask all_bits() noexcept
     {
@@ -154,9 +154,9 @@ struct feature_bitmask_t
     }
 
     /**
-     * @brief Count number of enabled features
-     * @param bitmask Bitmask of features to count
-     * @return Number of enabled features
+     * @brief Count number of enabled features.
+     * @param bitmask Bitmask of features to count.
+     * @return Number of enabled features.
      */
     constexpr static size_t count(const bitmask& mask) noexcept
     {
@@ -165,10 +165,10 @@ struct feature_bitmask_t
     }
 
     /**
-     * @brief Count number of matched features
-     * @param features1 First bitmask of features
-     * @param features2 Second bitmask of features
-     * @return Number of matched features
+     * @brief Count number of matched features.
+     * @param features1 First bitmask of features.
+     * @param features2 Second bitmask of features.
+     * @return Number of matched features.
      */
     constexpr static size_t count(const bitmask& features1, const bitmask& features2) noexcept
     {
@@ -176,10 +176,10 @@ struct feature_bitmask_t
     }
 
     /**
-     * @brief Check if a feature is set in bitmask
-     * @param mask Bitmask to query
-     * @param ft Feature to check for
-     * @return Result
+     * @brief Check if a feature is set in bitmask.
+     * @param mask Bitmask to query.
+     * @param ft Feature to check for.
+     * @return Result.
      */
     template <typename T>
     constexpr static bool is_set(const bitmask& mask, const T& ft) noexcept
@@ -187,6 +187,10 @@ struct feature_bitmask_t
         return mask&bit(ft);
     }
 };
+
+/**
+ * @brief Helper for operations with feature bitmasks.
+ */
 template <typename FeatureEnumT>
 constexpr feature_bitmask_t<FeatureEnumT> feature_bitmask{};
 
