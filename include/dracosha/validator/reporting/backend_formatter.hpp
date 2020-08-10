@@ -28,14 +28,16 @@ Distributed under the Boost Software License, Version 1.0.
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 /**
- * @brief Backend formatter
+ * @brief Backend formatter.
+ *
+ * Backend formatter performs actual formatting and constructs final reporting string.
  */
 struct backend_formatter_t
 {
     /**
-     * @brief Append arguments to destination object
-     * @param dst Destination object
-     * @param args Arguments to append
+     * @brief Append arguments to destination object.
+     * @param dst Destination object.
+     * @param args Arguments to append.
      */
     template <typename DstT, typename ...Args>
     static void append(DstT& dst, Args&&... args)
@@ -44,10 +46,10 @@ struct backend_formatter_t
     }
 
     /**
-     * @brief Join arguments and append to destination object
-     * @param dst Destination object
-     * @param sep Separator for joining
-     * @param args Arguments to join and append
+     * @brief Join arguments and append to destination object.
+     * @param dst Destination object.
+     * @param sep Separator for joining.
+     * @param args Arguments to join and append.
      */
     template <typename DstT, typename SepT, typename ...Args>
     static void append_join_args(DstT& dst, SepT&& sep, Args&&... args)
@@ -57,10 +59,10 @@ struct backend_formatter_t
     }
 
     /**
-     * @brief Join parts and append to destination object
-     * @param dst Destination object
-     * @param sep Separator for joining
-     * @param parts Parts to join and append, can be either std::vector or hana::tuple
+     * @brief Join parts and append to destination object.
+     * @param dst Destination object.
+     * @param sep Separator for joining.
+     * @param parts Parts to join and append, can be either std::vector or hana::tuple.
      */
     template <typename DstT,  typename SepT, typename PartsT>
     static void append_join(DstT& dst, SepT&& sep, PartsT&& parts)
@@ -69,12 +71,16 @@ struct backend_formatter_t
         boost::trim(detail::to_dst(dst));
     }
 };
+
+/**
+  Instance of backend formatter.
+*/
 constexpr backend_formatter_t backend_formatter{};
 
 /**
- * @brief Wrap destination object into backend formatter using default backend formatter
- * @param dsr Destination object
- * @return Backend formatter wrapping destination object
+ * @brief Wrap destination object into backend formatter using default backend formatter.
+ * @param dst Destination object.
+ * @return Backend formatter wrapping destination object.
  */
 template <typename DstT>
 auto wrap_backend_formatter(DstT& dst)
@@ -83,9 +89,10 @@ auto wrap_backend_formatter(DstT& dst)
 }
 
 /**
- * @brief Wrap destination object into backend formatter using sample backend formatter
- * @param dsr Destination object
- * @return Backend formatter wrapping destination object
+ * @brief Wrap destination object into backend formatter using sample backend formatter.
+ * @param dst Destination object.
+ * @param fm Sample backend formatter to clone from.
+ * @return Backend formatter wrapping destination object.
  */
 template <typename DstT, typename BackendFormatterSampleT>
 auto wrap_backend_formatter(DstT& dst, BackendFormatterSampleT& fm)

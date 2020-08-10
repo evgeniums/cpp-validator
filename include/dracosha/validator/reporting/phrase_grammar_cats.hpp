@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/phrase_grammar_cats.hpp
 *
-* Defines heplers for working with grammar categories of phrases.
+* Defines Helpers for working with grammar categories of phrases.
 *
 */
 
@@ -32,7 +32,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 namespace detail
 {
 /**
- * @brief Hepler for working with grammar categories of a phrase in case the type is neither grammar_categories nor a concrete phrase
+ * @brief Default helper for working with grammar categories of a phrase in case the type is neither grammar_categories nor a concrete phrase.
  */
 template <typename T, typename = hana::when<true>>
 struct phrase_grammar_cats_t
@@ -50,7 +50,7 @@ struct phrase_grammar_cats_t
 };
 
 /**
- * @brief Hepler for working with grammar categories of a phrase in case the type is grammar_categories
+ * @brief Helper for working with grammar categories of a phrase in case the type is grammar_categories.
  */
 template <typename T>
 struct phrase_grammar_cats_t<
@@ -59,9 +59,9 @@ struct phrase_grammar_cats_t<
         >
 {
     /**
-     * @brief Get grammatical categories
-     * @param grammar_cats
-     * @return Input grammar_cats
+     * @brief Get grammatical categories.
+     * @param grammar_cats Grammar categories to return.
+     * @return Input grammar_cats.
      */
     template <typename T1>
     auto operator() (T1&& grammar_cats) const -> decltype(auto)
@@ -76,7 +76,7 @@ struct phrase_grammar_cats_t<
 };
 
 /**
- * @brief Hepler for working with grammar categories of a phrase in case the type is concrete_phrase
+ * @brief Helper for working with grammar categories of a phrase in case the type is a concrete_phrase.
  */
 template <typename T>
 struct phrase_grammar_cats_t<
@@ -85,9 +85,9 @@ struct phrase_grammar_cats_t<
         >
 {
     /**
-     * @brief Get grammatical categories from concrete_phrase
-     * @param phrase Phrase
-     * @return Grammatical categories of the phrase
+     * @brief Get grammatical categories from concrete_phrase.
+     * @param phrase Phrase.
+     * @return Grammatical categories of the phrase.
      */
     template <typename T1>
     grammar_categories operator() (T1&& phrase) const
@@ -96,9 +96,9 @@ struct phrase_grammar_cats_t<
     }
 
     /**
-     * @brief Set grammatical categories in concrete_phrase
-     * @param phrase Phrase
-     * @param cats Grammatical categories to set
+     * @brief Set grammatical categories in concrete_phrase.
+     * @param phrase Phrase.
+     * @param cats Grammatical categories to set.
      */
     template <typename T1>
     void set(T1& phrase, grammar_categories cats) const
@@ -107,14 +107,17 @@ struct phrase_grammar_cats_t<
     }
 };
 
+/**
+ * Template instance of helper for working with grammar categories.
+ */
 template <typename T>
 constexpr phrase_grammar_cats_t<T> phrase_grammar_cats_inst{};
 }
 
 /**
- * @brief Get grammatical categories of a phrase
- * @param phrase Phrase
- * @return Grammatical categories of the phrase if applicabe or 0
+ * @brief Get grammatical categories of a phrase.
+ * @param phrase Phrase.
+ * @return Grammatical categories of the phrase if applicabe or 0.
  */
 template <typename T>
 auto phrase_grammar_cats(T&& phrase) -> decltype(auto)
@@ -123,9 +126,9 @@ auto phrase_grammar_cats(T&& phrase) -> decltype(auto)
 }
 
 /**
- * @brief Set grammatical categories in a phrase if applicable
- * @param phrase Phrase
- * @param cats Grammatical categories to set
+ * @brief Set grammatical categories in a phrase if applicable.
+ * @param phrase Phrase.
+ * @param cats Grammatical categories to set.
  */
 template <typename T>
 void set_phrase_grammar_cats(T& phrase, grammar_categories cats)
@@ -134,10 +137,10 @@ void set_phrase_grammar_cats(T& phrase, grammar_categories cats)
 }
 
 /**
- * @brief Get grammatical categories of the last phrase in tuple if applicable
- * @param ts Tuple
- * @param fallback Fallback grammatical categories to use if operation is not applicable
- * @return Grammatical categories of the last phrase in the tuple if applicable or fallback otherwise
+ * @brief Get grammatical categories of the last phrase in tuple if applicable.
+ * @param ts Tuple.
+ * @param fallback Fallback grammatical categories to use if operation is not applicable.
+ * @return Grammatical categories of the last phrase in the tuple if applicable or fallback otherwise.
  */
 template <typename Ts, typename T>
 auto last_grammar_categories(Ts&& ts, T&& fallback)
@@ -150,10 +153,10 @@ auto last_grammar_categories(Ts&& ts, T&& fallback)
 }
 
 /**
- * @brief Get grammatical categories of the first phrase in tuple if applicable
- * @param ts Tuple
- * @param fallback Fallback grammatical categories to use if operation is not applicable
- * @return Grammatical categories of the first phrase in the tuple if applicable or fallback otherwise
+ * @brief Get grammatical categories of the first phrase in tuple if applicable.
+ * @param ts Tuple.
+ * @param fallback Fallback grammatical categories to use if operation is not applicable.
+ * @return Grammatical categories of the first phrase in the tuple if applicable or fallback otherwise.
  */
 template <typename Ts, typename T>
 auto first_grammar_categories(Ts&& ts, T&& fallback)

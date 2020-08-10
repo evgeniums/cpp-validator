@@ -41,14 +41,17 @@ class concrete_phrase
 
         using hana_tag=concrete_phrase_tag;
 
+        /**
+         * @brief Default constructor.
+         */
         concrete_phrase(
             ) : _grammar_cats(0),
                 _empty(true)
         {}
 
         /**
-         * @brief Conctructor
-         * @param text Text of the phrase
+         * @brief Constructor.
+         * @param text Text of the phrase.
          */
         concrete_phrase(
                 std::string text
@@ -58,9 +61,9 @@ class concrete_phrase
         {}
 
         /**
-         * @brief Conctructor
-         * @param text Text of the phrase
-         * @param grammar_cats Bitmask of grammatical categories of the phrase
+         * @brief Constructor.
+         * @param text Text of the phrase.
+         * @param grammar_cats Bitmask of grammatical categories of the phrase.
          */
         concrete_phrase(
                 std::string text,
@@ -71,9 +74,9 @@ class concrete_phrase
         {}
 
         /**
-         * @brief Conctructor
-         * @param phrase Other phrase to construct from
-         * @param grammar_cats Bitmask of grammatical categories of the phrase
+         * @brief Constructor.
+         * @param phrase Other phrase to construct from.
+         * @param grammar_cats Bitmask of grammatical categories of the phrase.
          */
         concrete_phrase(
                 concrete_phrase&& phrase,
@@ -84,9 +87,9 @@ class concrete_phrase
         {}
 
         /**
-         * @brief Conctructor
-         * @param text Text of the phrase
-         * @param grammar_cat Grammatic category of the phrase
+         * @brief Constructor.
+         * @param text Text of the phrase.
+         * @param grammar_cat Grammatic category of the phrase.
          */
         template <typename T>
         concrete_phrase(
@@ -98,9 +101,9 @@ class concrete_phrase
         {}
 
         /**
-         * @brief Conctructor
-         * @param text Other phrase to construct from
-         * @param grammar_cats Grammatical categories of the phrase
+         * @brief Constructor.
+         * @param text Other phrase to construct from.
+         * @param grammar_cats Grammatical categories of the phrase.
          */
         template <typename T>
         concrete_phrase(
@@ -112,9 +115,9 @@ class concrete_phrase
         {}
 
         /**
-         * @brief Conctructor
-         * @param text Other phrase to construct from
-         * @param grammar_cats grammatical categories of the phrase
+         * @brief Constructor.
+         * @param text Other phrase to construct from.
+         * @param grammar_cats grammatical categories of the phrase.
          */
         template <typename ... GrammarCats>
         concrete_phrase(
@@ -128,8 +131,8 @@ class concrete_phrase
         {}
 
         /**
-         * @brief Get grammatical categories of the phrase
-         * @return Bitmask of grammatical categories
+         * @brief Get grammatical categories of the phrase.
+         * @return Bitmask of grammatical categories.
          */
         grammar_categories grammar_cats() const noexcept
         {
@@ -137,8 +140,8 @@ class concrete_phrase
         }
 
         /**
-         * @brief Get text of the phrase
-         * @return Text
+         * @brief Get text of the phrase.
+         * @return Text.
          */
         std::string text() const
         {
@@ -146,8 +149,8 @@ class concrete_phrase
         }
 
         /**
-         * @brief Convert the phrase to string
-         * @return Text
+         * @brief Convert the phrase to string.
+         * @return Text.
          */
         operator std::string() const
         {
@@ -155,8 +158,8 @@ class concrete_phrase
         }
 
         /**
-         * @brief Set text of the phrase
-         * @param Text
+         * @brief Set text of the phrase.
+         * @param text Text.
          */
         void set_text(std::string text)
         {
@@ -165,8 +168,8 @@ class concrete_phrase
         }
 
         /**
-         * @brief Set grammatical categories of the phrase
-         * @param grammar_cats Bitmask of grammatical categories
+         * @brief Set grammatical categories of the phrase.
+         * @param grammar_cats Bitmask of grammatical categories.
          */
         void set_grammar_cats(grammar_categories grammar_cats) noexcept
         {
@@ -175,10 +178,10 @@ class concrete_phrase
         }
 
         /**
-         * @brief Friend operator << for phrase formatting to ostream
-         * @param os Output stream
-         * @param ph Phrase
-         * @return Output stream
+         * @brief Friend operator << for phrase formatting to ostream.
+         * @param os Output stream.
+         * @param ph Phrase.
+         * @return Output stream.
          */
         friend std::ostream& operator<<(std::ostream& os, const concrete_phrase& ph)
         {
@@ -186,8 +189,8 @@ class concrete_phrase
         }
 
         /**
-         * @brief Check if phrase is not set
-         * @return Flag
+         * @brief Check if phrase is not set.
+         * @return Flag.
          */
         bool empty() const noexcept
         {
@@ -195,7 +198,7 @@ class concrete_phrase
         }
 
         /**
-         * @brief Clear phrase
+         * @brief Clear phrase.
          */
         void clear()
         {

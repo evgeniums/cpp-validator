@@ -32,7 +32,7 @@ namespace detail
 {
 
 /**
- * @brief Check if traits do not implement method member_property(id,traits)
+ * @brief Check if traits do not implement method member_property(id,traits).
  */
 template <typename T, typename TraitsT,
           typename =void>
@@ -42,7 +42,7 @@ struct has_member_property
 };
 
 /**
- * @brief Check if traits implement method member_property(id,traits)
+ * @brief Check if traits implement method member_property(id,traits).
  */
 template <typename T, typename TraitsT>
 struct has_member_property<T,TraitsT,
@@ -59,17 +59,17 @@ struct has_member_property<T,TraitsT,
 }
 
 /**
- * @brief Default helper for construction property of the name of a member.
+ * @brief Default helper for constructing name of member's property.
  */
 template <typename T, typename TraitsT, typename =hana::when<true>>
 struct property_member_name_t
 {
     /**
-     * @brief Reverse order of property name of a member like "property of member"
-     * @param id Pair of property and member
-     * @param traits Formatter traits
-     * @param grammar_cats Grammatical categories of preceding phrase
-     * @return Formatted property name of a member
+     * @brief Reverse order of property name of a member like "property of member".
+     * @param id Pair of property and member.
+     * @param traits Formatter traits.
+     * @param grammar_cats Grammatical categories of preceding phrase.
+     * @return Formatted property name of a member.
      */
     template <typename TraitsT1>
     auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
@@ -98,11 +98,11 @@ struct property_member_name_t
     }
 
     /**
-     * @brief Direct order of property name of a member like "member.property"
-     * @param id Pair of property and member
-     * @param traits Formatter traits
-     * @param grammar_cats Grammatical categories of preceding phrase
-     * @return Formatted property name of a member
+     * @brief Direct order of property name of a member like "member.property".
+     * @param id Pair of property and member.
+     * @param traits Formatter traits.
+     * @param grammar_cats Grammatical categories of preceding phrase.
+     * @return Formatted property name of a member.
      */
     template <typename TraitsT1>
     auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
@@ -125,7 +125,7 @@ struct property_member_name_t
 };
 
 /**
- * @brief Helper for construction of the property name of a member when the member has explicit name.
+ * @brief Helper for constructing name of member's property when the member has explicit name.
  */
 template <typename T, typename TraitsT>
 struct property_member_name_t<T,TraitsT,
@@ -155,11 +155,11 @@ struct property_member_name_t<T,TraitsT,
     }
 
     /**
-     * @brief Reverse order of property name of a member like "property of member"
-     * @param id Pair of property and member
-     * @param traits Formatter traits
-     * @param grammar_cats Grammatical categories of preceding phrase
-     * @return Formatted property name of a member
+     * @brief Reverse order of property name of a member like "property of member".
+     * @param id Pair of property and member.
+     * @param traits Formatter traits.
+     * @param grammar_cats Grammatical categories of preceding phrase.
+     * @return Formatted property name of a member.
      */
     template <typename TraitsT1>
     auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
@@ -183,11 +183,11 @@ struct property_member_name_t<T,TraitsT,
     }
 
     /**
-     * @brief Direct order of property name of a member like "member.property"
-     * @param id Pair of property and member
-     * @param traits Formatter traits
-     * @param grammar_cats Grammatical categories of preceding phrase
-     * @return Formatted property name of a member
+     * @brief Direct order of property name of a member like "member.property".
+     * @param id Pair of property and member.
+     * @param traits Formatter traits.
+     * @param grammar_cats Grammatical categories of preceding phrase.
+     * @return Formatted property name of a member.
      */
     template <typename TraitsT1>
     auto operator() (const T& id, const TraitsT1& traits, grammar_categories grammar_cats,
@@ -210,7 +210,7 @@ struct property_member_name_t<T,TraitsT,
 };
 
 /**
- * @brief Helper for construction of the property name of a member when traits have custom formatting method member_property.
+ * @brief Helper for constructing name of member's property when traits have custom formatting method member_property.
  */
 template <typename T, typename TraitsT>
 struct property_member_name_t<T,TraitsT,
@@ -223,17 +223,20 @@ struct property_member_name_t<T,TraitsT,
     }
 };
 
+/**
+ * @brief Template instance of helper for constructing name of member's property.
+ */
 template <typename T, typename TraitsT>
 constexpr property_member_name_t<T,TraitsT> property_member_name_inst{};
 
 /**
- * @brief Format property name of a member
- * @param id Pair of property and member
- * @param traits Formatter traits
- * @param grammar_cats Grammatical categories of preceding phrase
- * @return Formatted property name of a member
+ * @brief Format name of member's property.
+ * @param id Pair of property and member.
+ * @param traits Formatter traits.
+ * @param grammar_cats Grammatical categories of preceding phrase.
+ * @return Formatted property name of a member.
  *
- * Property name of a member is a conjunction of property's name and member's name.
+ * Name of member's property is a conjunction of property's name and member's name.
  */
 template <typename T, typename TraitsT>
 constexpr auto property_member_name(const T& id, const TraitsT& traits, grammar_categories grammar_cats=0) -> decltype(auto)

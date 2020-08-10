@@ -155,12 +155,12 @@ struct formatter
 };
 
 /**
- * @brief Create formatter
- * @param mn Formatter of member names
- * @param operands Formatter of operands
- * @param strings Strings traits
- * @param order Reordering and presentation traits
- * @return Formatter
+ * @brief Create formatter.
+ * @param mn Formatter of member names.
+ * @param operands Formatter of operands.
+ * @param strings Strings traits.
+ * @param order Reordering and presentation traits.
+ * @return Formatter.
  */
 template <typename MemberNamesT,typename OperandsT,typename StringsT, typename OrderAndPresentationT>
 auto make_formatter(MemberNamesT&& mn, OperandsT&& operands, StringsT&& strings, OrderAndPresentationT&& order)
@@ -175,11 +175,11 @@ auto make_formatter(MemberNamesT&& mn, OperandsT&& operands, StringsT&& strings,
 }
 
 /**
- * @brief Create formatter with default order and presentation traits
- * @param mn Formatter of member names
- * @param operands Formatter of operands
- * @param strings Strings traits
- * @return Formatter
+ * @brief Create formatter with default order and presentation traits.
+ * @param mn Formatter of member names.
+ * @param operands Formatter of operands.
+ * @param strings Strings traits.
+ * @return Formatter.
  */
 template <typename MemberNamesT,typename OperandsT,typename StringsT>
 auto make_formatter(MemberNamesT&& mn, OperandsT&& operands, StringsT&& strings)
@@ -188,10 +188,10 @@ auto make_formatter(MemberNamesT&& mn, OperandsT&& operands, StringsT&& strings)
 }
 
 /**
- * @brief Create formatter with default strings traits and order and presentation traits
- * @param mn Formatter of member names
- * @param operands Formatter of operands
- * @return Formatter
+ * @brief Create formatter with default strings traits and order and presentation traits.
+ * @param mn Formatter of member names.
+ * @param operands Formatter of operands.
+ * @return Formatter.
  */
 template <typename MemberNamesT,typename OperandsT>
 auto make_formatter(MemberNamesT&& mn, OperandsT&& operands,
@@ -204,9 +204,9 @@ auto make_formatter(MemberNamesT&& mn, OperandsT&& operands,
 }
 
 /**
- * @brief Create formatter with default operands formatter, strings traits and order and presentation traits
- * @param mn Formatter of member names
- * @return Formatter
+ * @brief Create formatter with default operands formatter, strings traits and order and presentation traits.
+ * @param mn Formatter of member names.
+ * @return Formatter.
  */
 template <typename MemberNamesT>
 auto make_formatter(MemberNamesT&& mn,
@@ -216,9 +216,9 @@ auto make_formatter(MemberNamesT&& mn,
 }
 
 /**
- * @brief Create formatter with default operands formatter, member names formatter and order and presentation traits
- * @param strings Strings traits
- * @return Formatter
+ * @brief Create formatter with default operands formatter, member names formatter and order and presentation traits.
+ * @param strings Strings traits.
+ * @return Formatter.
  */
 template <typename StringsT, typename TranslateOperandsT=std::false_type>
 auto make_formatter(StringsT&& strings, const TranslateOperandsT& translate_operands=std::false_type(),
@@ -229,9 +229,9 @@ auto make_formatter(StringsT&& strings, const TranslateOperandsT& translate_oper
 }
 
 /**
- * @brief Create formatter with translator
- * @param translator Translator
- * @return Formatter
+ * @brief Create formatter with translator.
+ * @param translator Translator.
+ * @return Formatter.
  */
 template <typename TranslatorT, typename TranslateOperandsT=std::false_type>
 auto make_formatter(const TranslatorT& translator, const TranslateOperandsT& translate_operands=std::false_type(),
@@ -241,9 +241,9 @@ auto make_formatter(const TranslatorT& translator, const TranslateOperandsT& tra
 }
 
 /**
- * @brief Create formatter with translator repository
- * @param translator Translator
- * @return Formatter
+ * @brief Create formatter with translator repository.
+ * @param translator Translator.
+ * @return Formatter.
  */
 template <typename TranslateOperandsT=std::false_type>
 auto make_formatter(const translator_repository& rep, const std::string& loc=std::locale().name(), const TranslateOperandsT& translate_operands=std::false_type())
@@ -253,8 +253,8 @@ auto make_formatter(const translator_repository& rep, const std::string& loc=std
 }
 
 /**
- * @brief Get defautt formatter with default traits
- * @return Default formatter
+ * @brief Get defautt formatter with default traits.
+ * @return Default formatter.
  */
 inline auto get_default_formatter() ->
     std::add_lvalue_reference_t<

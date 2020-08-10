@@ -48,9 +48,9 @@ class reporter
         using hana_tag=reporter_tag;
 
         /**
-         * @brief Constructor
-         * @param dst Destination object wrapped into backend formatter
-         * @param formatter Formatter to use for reports formatting
+         * @brief Constructor.
+         * @param dst Destination object wrapped into backend formatter.
+         * @param formatter Formatter to use for reports formatting.
          */
         reporter(
                     DstT dst,
@@ -62,8 +62,8 @@ class reporter
         {}
 
         /**
-         * @brief Open validation step for aggregation operator
-         * @param aggregation Descriptor of aggregation operator
+         * @brief Open validation step for aggregation operator.
+         * @param aggregation Descriptor of aggregation operator.
          */
         template <typename AggregationT>
         void aggregate_open(AggregationT&& aggregation)
@@ -80,9 +80,9 @@ class reporter
         }
 
         /**
-         * @brief Open validation step for aggregation operator with member
-         * @param aggregation Descriptor of aggregation operator
-         * @param member Member the validation operation is performed for
+         * @brief Open validation step for aggregation operator with member.
+         * @param aggregation Descriptor of aggregation operator.
+         * @param member Member the validation operation is performed for.
          */
         template <typename AggregationT, typename MemberT>
         void aggregate_open(AggregationT&& aggregation, MemberT&& member)
@@ -100,8 +100,8 @@ class reporter
         }
 
         /**
-         * @brief Close validation step for aggregation operator
-         * @param ok Validation status of the aggregation operator
+         * @brief Close validation step for aggregation operator.
+         * @param ok Validation status of the aggregation operator.
          */
         void aggregate_close(bool ok)
         {
@@ -137,9 +137,9 @@ class reporter
         }
 
         /**
-         *  @brief Report validation of object at one level without member nesting
-         *  @param op Operator for validation
-         *  @param b Sample argument for validation
+         *  @brief Report validation of object at one level without member nesting.
+         *  @param op Operator for validation.
+         *  @param b Sample argument for validation.
          */
         template <typename T2, typename OpT>
         void validate_operator(const OpT& op, const T2& b)
@@ -153,10 +153,10 @@ class reporter
         }
 
         /**
-         *  @brief Report validation of object's property at one level without member nesting
-         *  @param prop Property to validate
-         *  @param op Operator for validation
-         *  @param b Sample argument for validation
+         *  @brief Report validation of object's property at one level without member nesting.
+         *  @param prop Property to validate.
+         *  @param op Operator for validation.
+         *  @param b Sample argument for validation.
          */
         template <typename T2, typename OpT, typename PropT>
         void validate_property(const PropT& prop, const OpT& op, const T2& b)
@@ -170,9 +170,9 @@ class reporter
         }
 
         /**
-         *  @brief Report validation of existance of a member
-         *  @param member Member descriptor
-         *  @param b Boolean flag, when true check if member exists, when false check if member does not exist
+         *  @brief Report validation of existance of a member.
+         *  @param member Member descriptor.
+         *  @param b Boolean flag, when true check if member exists, when false check if member does not exist.
          */
         template <typename T2, typename OpT, typename MemberT>
         void validate_exists(const MemberT& member, const OpT& op, const T2& b)
@@ -186,11 +186,11 @@ class reporter
         }
 
         /**
-         *  @brief Report normal validation of a member
-         *  @param member Member descriptor
-         *  @param prop Property to validate
-         *  @param op Operator for validation
-         *  @param b Sample argument for validation
+         *  @brief Report normal validation of a member.
+         *  @param member Member descriptor.
+         *  @param prop Property to validate.
+         *  @param op Operator for validation.
+         *  @param b Sample argument for validation.
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
@@ -204,11 +204,11 @@ class reporter
         }
 
         /**
-         *  @brief Report validation using other member of the same object as a reference argument for validation
-         *  @param member Member descriptor
-         *  @param prop Property to validate
-         *  @param op Operator for validation
-         *  @param b Descriptor of sample member of the same object
+         *  @brief Report validation using other member of the same object as a reference argument for validation.
+         *  @param member Member descriptor.
+         *  @param prop Property to validate.
+         *  @param op Operator for validation.
+         *  @param b Descriptor of sample member of the same object.
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate_with_other_member(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
@@ -222,12 +222,12 @@ class reporter
         }
 
         /**
-         *  @brief Report validation using the same member of a Sample object
-         *  @param member Member
-         *  @param prop Property to validate
-         *  @param op Operator for validation
-         *  @param member1 Member of sample object
-         *  @param b Sample object whose member must be used as argument passed to validation operator
+         *  @brief Report validation using the same member of a Sample object.
+         *  @param member Member.
+         *  @param prop Property to validate.
+         *  @param op Operator for validation.
+         *  @param member1 Member of sample object.
+         *  @param b Sample object whose member must be used as argument passed to validation operator.
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT, typename MemberSampleT>
         void validate_with_master_sample(const MemberT& member, const PropT& prop, const OpT& op, const MemberSampleT& member_sample, const T2& b)
@@ -241,8 +241,8 @@ class reporter
         }
 
         /**
-         * @brief Get object where the reports go to
-         * @return Reference to destination object
+         * @brief Get object where the reports go to.
+         * @return Reference to destination object.
          */
         template <typename T>
         T& destination()
@@ -251,19 +251,26 @@ class reporter
         }
 
         /**
-         * @brief Check if current validation step is within NOT operator
-         * @return True if NOT aggregation operator is opened at any parent level
+         * @brief Check if current validation step is within NOT operator.
+         * @return True if NOT aggregation operator is opened at any parent level.
          */
         bool current_not() const
         {
             return _not_count!=0;
         }
 
+        /**
+         * @brief Begin report that uses reporting hint and ignores reportings from all next levels.
+         */
         void begin_explicit_report()
         {
             ++_explicit_reporting_count;
         }
 
+        /**
+         * @brief End report that uses reporting hint and ignores reportings from all next levels.
+         * @param description Reporting hint that overrides report of the current level.
+         */
         void end_explicit_report(const std::string& description)
         {
             --_explicit_reporting_count;
@@ -357,10 +364,10 @@ class reporter
 };
 
 /**
- * @brief Make a reporter with formatter
- * @param dst Destination object where to put reports
- * @param formatter Formatter to use for reports formatting
- * @return Reporter wrapping the destination object
+ * @brief Make a reporter with formatter.
+ * @param dst Destination object where to put reports.
+ * @param formatter Formatter to use for reports formatting.
+ * @return Reporter wrapping the destination object.
  */
 template <typename DstT, typename FormatterT>
 auto make_reporter(DstT& dst, FormatterT&& formatter)
@@ -370,9 +377,9 @@ auto make_reporter(DstT& dst, FormatterT&& formatter)
 }
 
 /**
- * @brief Make a reporter with default formatter
- * @param dst Destination object where to put reports
- * @return Reporter wrapping the destination object
+ * @brief Make a reporter with default formatter.
+ * @param dst Destination object where to put reports.
+ * @return Reporter wrapping the destination object.
  */
 template <typename DstT>
 auto make_reporter(DstT& dst)

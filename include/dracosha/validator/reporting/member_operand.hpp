@@ -28,7 +28,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct member_operand_tag;
 
 /**
- * @brief Wrapper of member used as operand
+ * @brief Wrapper of member used as operand.
  */
 template <typename T>
 struct member_operand : public object_wrapper<T>
@@ -38,9 +38,9 @@ struct member_operand : public object_wrapper<T>
 };
 
 /**
-  @brief Make a member operand wrapper around member
-  @param b ID to wrap into member operand
-  @return Member operand
+  @brief Make a member operand wrapper around member.
+  @param b ID to wrap into member operand.
+  @return Member operand.
   */
 template <typename T>
 auto make_member_operand(T&& b)

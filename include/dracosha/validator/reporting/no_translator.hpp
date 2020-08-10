@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/no_translator.hpp
 *
-*   Defines translator stub
+*   Defines translator stub.
 *
 */
 
@@ -29,7 +29,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Translator stub to use when no translation is needed
+ * @brief Translator stub to use when no translation is needed.
  */
 struct no_translator_t
 {
@@ -40,6 +40,10 @@ struct no_translator_t
         return hana::id(id);
     }
 };
+
+/**
+  @brief Instance of translator stub to use when no translation is needed.
+*/
 constexpr no_translator_t no_translator{};
 
 //-------------------------------------------------------------

@@ -33,7 +33,10 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 /**
  * @brief Mapped translator uses map of translated strings.
  *
- * Translator can be constructed with prepared map as mapped_translator{map};
+ * Translator can be constructed with prepared map as
+ * @code
+ * mapped_translator{map};
+ * @endcode
  */
 class mapped_translator : public translator
 {
@@ -42,14 +45,14 @@ class mapped_translator : public translator
         mapped_translator()=default;
 
         /**
-         * @brief Ctor
-         * @param Translated strings
+         * @brief Constructor.
+         * @param Translated strings.
          */
         mapped_translator(std::map<std::string,std::string> strings):_strings(std::move(strings))
         {}
 
         /**
-         * @brief Reset map
+         * @brief Reset map.
          */
         virtual void reset() override
         {
@@ -57,10 +60,9 @@ class mapped_translator : public translator
         }
 
         /**
-         * @brief Translate a string
-         * @param id String id
-         * @param attr Word grammar_cats
-         * @return Translated string or id if such string not found
+         * @brief Translate a string.
+         * @param id String id.
+         * @return Translated string or id if such string not found.
          */
         virtual translation_result translate(const std::string& id, grammar_categories =0) const override
         {
@@ -73,8 +75,8 @@ class mapped_translator : public translator
         }
 
         /**
-         * @brief Get map of translated strings
-         * @return Map of translated strings
+         * @brief Get map of translated strings.
+         * @return Map of translated strings.
          */
         std::map<std::string,std::string>& strings() noexcept
         {

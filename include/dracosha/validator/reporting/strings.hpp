@@ -103,9 +103,9 @@ struct strings
     strings& operator =(const strings&)=delete;
 
     /**
-     * @brief Convert ID to string and then translate it
-     * @param id ID that must be converted to string
-     * @return ID converted to string and then translated
+     * @brief Convert ID to string and then translate it.
+     * @param id ID that must be converted to string.
+     * @return ID converted to string and then translated.
      */
     template <typename T>
     concrete_phrase operator() (const T& id, grammar_categories grammar_cats=0
@@ -121,9 +121,9 @@ struct strings
     }
 
     /**
-     * @brief Convert ID to concrete phrase for wrapped operator with explicit string
-     * @param id Wrapped operator with explicit string
-     * @return ID converted to string and then translated
+     * @brief Convert ID to concrete phrase for wrapped operator with explicit string.
+     * @param id Wrapped operator with explicit string.
+     * @return ID converted to string and then translated.
      */
     template <typename T>
     concrete_phrase operator() (const T& id, grammar_categories grammar_cats=0,
@@ -138,9 +138,9 @@ struct strings
     }
 
     /**
-     * @brief Get string for step that opens aggregation operator
-     * @param aggregation Aggregation descriptor
-     * @return String to use for opening aggregation operator
+     * @brief Get string for step that opens aggregation operator.
+     * @param aggregation Aggregation descriptor.
+     * @return String to use for opening aggregation operator.
      */
     std::string aggregation_open(const aggregation_op& aggregation) const
     {
@@ -148,9 +148,9 @@ struct strings
     }
 
     /**
-     * @brief Get string for step that closes aggregation operator
-     * @param aggregation Aggregation descriptor
-     * @return String to use for closing aggregation operator
+     * @brief Get string for step that closes aggregation operator.
+     * @param aggregation Aggregation descriptor.
+     * @return String to use for closing aggregation operator.
      */
     std::string aggregation_close(const aggregation_op& aggregation) const
     {
@@ -158,9 +158,9 @@ struct strings
     }
 
     /**
-     * @brief Get string for conjunction of intermediate validators within aggregation operator
-     * @param aggregation Aggregation descriptor
-     * @return String to use to join intermediate validators within aggregation operator
+     * @brief Get string for conjunction of intermediate validators within aggregation operator.
+     * @param aggregation Aggregation descriptor.
+     * @return String to use to join intermediate validators within aggregation operator.
      */
     std::string aggregation_conjunction(const aggregation_op& aggregation) const
     {
@@ -169,7 +169,7 @@ struct strings
 };
 
 /**
-  @brief Default strings object does not perform any translation.
+  @brief Default strings object that does not perform any translation.
 */
 constexpr strings<const no_translator_t&,const aggregation_strings_t&> default_strings{no_translator,aggregation_strings};
 
@@ -177,14 +177,14 @@ template <typename AggregationStringsT>
 using translated_strings=strings<const translator&,AggregationStringsT>;
 
 /**
- * @brief Helper for making translated strings
+ * @brief Helper for making translated strings.
  */
 struct make_translated_strings_t
 {
     /**
-     * @brief Make strings object using a given translator
-     * @param tr Translator to use
-     * @return Strings object
+     * @brief Make strings object using a given translator.
+     * @param tr Translator to use.
+     * @return Strings object.
      */
     auto operator() (const translator& tr) const
     {
@@ -192,10 +192,10 @@ struct make_translated_strings_t
     }
 
     /**
-     * @brief Make strings object using translator found in translator repository by locale name
-     * @param rep Translator repository
-     * @param loc Locale name
-     * @return Strings object with translator for given locale name from the repository
+     * @brief Make strings object using translator found in translator repository by locale name.
+     * @param rep Translator repository.
+     * @param loc Locale name.
+     * @return Strings object with translator for given locale name from the repository.
      */
     auto operator() (const translator_repository& rep,const std::string& loc=std::locale().name()) const
     {
@@ -203,11 +203,11 @@ struct make_translated_strings_t
     }
 
     /**
-     * @brief Make strings object using translator found in translator repository by locale name
-     * @param aggregation_str Formatter of aggregation strings
-     * @param rep Translator repository
-     * @param loc Locale name
-     * @return Strings object with translator for given locale name from the repository
+     * @brief Make strings object using translator found in translator repository by locale name.
+     * @param aggregation_str Formatter of aggregation strings.
+     * @param rep Translator repository.
+     * @param loc Locale name.
+     * @return Strings object with translator for given locale name from the repository.
      */
     template <typename T>
     auto operator() (T&& aggregation_str,const translator_repository& rep,const std::string& loc=std::locale().name()) const
@@ -215,6 +215,9 @@ struct make_translated_strings_t
         return translated_strings<T>{*rep.find_translator(loc),std::forward<T>(aggregation_str)};
     }
 };
+/**
+  Callable object for creating translated strings formatter.
+ */
 constexpr make_translated_strings_t make_translated_strings{};
 
 //-------------------------------------------------------------

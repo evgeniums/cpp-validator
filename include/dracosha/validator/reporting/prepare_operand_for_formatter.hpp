@@ -29,7 +29,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Default helper to prepare operand for formatter
+ * @brief Default helper to prepare operand for formatter.
  */
 template <typename OpT, typename T, typename =hana::when<true>>
 struct prepare_operand_for_formatter_t
@@ -41,7 +41,7 @@ struct prepare_operand_for_formatter_t
 };
 
 /**
- * @brief Helper to prepare operand for formatter for operator contains
+ * @brief Helper to prepare operand for formatter for operator contains.
  */
 template <typename OpT, typename T>
 struct prepare_operand_for_formatter_t<OpT,T,
@@ -55,14 +55,18 @@ struct prepare_operand_for_formatter_t<OpT,T,
         return make_member_operand(make_plain_member(std::forward<T>(b)));
     }
 };
+
+/**
+ * @brief Template instance of helper for preparing operand for formatter.
+ */
 template <typename OpT, typename T>
 constexpr prepare_operand_for_formatter_t<OpT,T> prepare_operand_for_formatter_inst{};
 
 /**
- * @brief Prepare operand for formatter taking into account operator
- * @param op Operator
- * @param b Original operand
- * @return Operand prepared for formatting
+ * @brief Prepare operand for formatter taking into account operator.
+ * @param op Operator.
+ * @param b Original operand.
+ * @return Operand prepared for formatting.
  */
 template <typename OpT, typename T>
 auto prepare_operand_for_formatter(OpT&& op, T&& b)

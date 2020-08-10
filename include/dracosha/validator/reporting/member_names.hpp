@@ -48,10 +48,10 @@ struct member_names
     TraitsT traits;
 
     /**
-     * @brief Format object of member or make_member_with_name types
-     * @param member Member object
-     * @param grammar_cats Gramatical categories to use for translation
-     * @return Formatted name of the member
+     * @brief Format object of member or make_member_with_name types.
+     * @param member Member object.
+     * @param grammar_cats Gramatical categories to use for translation.
+     * @return Formatted name of the member.
      */
     template <typename T>
     auto operator() (const T& member,
@@ -63,10 +63,10 @@ struct member_names
     }
 
     /**
-     * @brief Format object of member_ptoperty type
-     * @param member Pair of member and property
-     * @param grammar_cats Gramatical categories to use for translation
-     * @return Formatted name of the member's property
+     * @brief Format object of member_ptoperty type.
+     * @param member Pair of member and property.
+     * @param grammar_cats Gramatical categories to use for translation.
+     * @return Formatted name of the member's property.
      */
     template <typename T>
     auto operator() (const T& member_prop,
@@ -78,10 +78,10 @@ struct member_names
     }
 
     /**
-     * @brief Format single key of member path
-     * @param id Single key of member path
-     * @param grammar_cats Gramatical categories to use for translation
-     * @return Formatted name the key
+     * @brief Format single key of member path.
+     * @param id Single key of member path.
+     * @param grammar_cats Gramatical categories to use for translation.
+     * @return Formatted name the key.
      */
     template <typename T>
     auto operator() (const T& id,
@@ -100,9 +100,9 @@ struct member_names
 };
 
 /**
- * @brief Create member names
- * @param traits Actual implementer of names formatting
- * @return Formatter of member names
+ * @brief Create member names.
+ * @param traits Actual implementer of names formatting.
+ * @return Formatter of member names.
  */
 template <typename TraitsT>
 auto make_member_names(TraitsT&& traits)
@@ -160,8 +160,8 @@ struct default_member_names_traits_t
 constexpr default_member_names_traits_t default_member_names_traits{};
 
 /**
- * @brief Get default member names formatter
- * @return Default formatter of member names
+ * @brief Get default member names formatter.
+ * @return Default formatter of member names.
  */
 inline auto get_default_member_names()
     -> std::add_lvalue_reference_t<
@@ -173,7 +173,7 @@ inline auto get_default_member_names()
 }
 
 /**
- * @brief Traits with translator for member names formatter
+ * @brief Traits with translator for member names formatter.
  */
 template <typename TraitsT>
 struct translate_member_names_traits_t : public TraitsT
@@ -189,10 +189,10 @@ struct translate_member_names_traits_t : public TraitsT
 };
 
 /**
- * @brief Create translated member names from other member names using translator
- * @param original_mn Original member names formatter
- * @param translator Translator
- * @return Member names formatter that first uses original formatter and then translate member names
+ * @brief Create translated member names from other member names using translator.
+ * @param original_mn Original member names formatter.
+ * @param translator Translator.
+ * @return Member names formatter that first uses original formatter and then translate member names.
  */
 template <typename OriginalMemberNamesT>
 auto make_translated_member_names(OriginalMemberNamesT&& original_mn, translator_cref translator)
@@ -206,11 +206,11 @@ auto make_translated_member_names(OriginalMemberNamesT&& original_mn, translator
 }
 
 /**
- * @brief Create translated member names from other member names using translator from translator repository
- * @param original_mn Original member names formatter
- * @param rep Translator repository
- * @param loc Locale
- * @return Member names formatter that first uses original formatter and then translate member names
+ * @brief Create translated member names from other member names using translator from translator repository.
+ * @param original_mn Original member names formatter.
+ * @param rep Translator repository.
+ * @param loc Locale.
+ * @return Member names formatter that first uses original formatter and then translate member names.
  */
 template <typename OriginalMemberNamesT>
 auto make_translated_member_names(OriginalMemberNamesT&& original_mn, const translator_repository& rep, const std::string& loc=std::locale().name())
@@ -229,10 +229,10 @@ inline auto make_translated_member_names(translator_cref translator)
 }
 
 /**
- * @brief Create member names with default traits using translator from translator repository
- * @param rep Translator repository
- * @param loc Locale
- * @return Member names formatter that first uses original formatter and then translate member names
+ * @brief Create member names with default traits using translator from translator repository.
+ * @param rep Translator repository.
+ * @param loc Locale.
+ * @return Member names formatter that first uses original formatter and then translate member names.
  */
 inline auto make_translated_member_names(const translator_repository& rep, const std::string& loc=std::locale().name())
 {
@@ -256,10 +256,10 @@ struct decorate_member_names_traits_t : public TraitsT
 };
 
 /**
- * @brief Make decorated member names from other member names using decorator
- * @param original_mn Original member names formatter
- * @param decorator Decorator
- * @return Member names formatter that first uses original formatter and then decorates member names
+ * @brief Make decorated member names from other member names using decorator.
+ * @param original_mn Original member names formatter.
+ * @param decorator Decorator.
+ * @return Member names formatter that first uses original formatter and then decorates member names.
  */
 template <typename OriginalMemberNamesT, typename DecoratorT>
 auto make_decorated_member_names(OriginalMemberNamesT&& original_mn, DecoratorT&& decorator)
@@ -280,8 +280,8 @@ auto make_decorated_member_names(OriginalMemberNamesT&& original_mn, DecoratorT&
 struct dotted_member_names_traits_t
 {
     /**
-     * @brief Get string for conjunction of nested member names
-     * @return String "." to use to join nested member names in the member's path
+     * @brief Get string for conjunction of nested member names.
+     * @return String "." to use to join nested member names in the member's path.
      */
     static auto member_names_conjunction()
     {
@@ -294,17 +294,23 @@ struct dotted_member_names_traits_t
     }
 
     /**
-     * @brief Check if nested memebr names must be joined in reverse order
+     * @brief Check if nested memebr names must be joined in reverse order.
      */
     constexpr static const bool is_reverse_member_names_order=false;
 
     /**
-     * @brief Check if property of a memebr must be joined in reverse order
+     * @brief Check if property of a memebr must be joined in reverse order.
      */
     constexpr static const bool is_reverse_member_property_order=false;
 
     brackets_decorator_t decorator;
 };
+
+/**
+  @brief Formatter of member names in direct dotted format.
+
+  For example: ["field1"]["subfield1_1"]["subfield1_1_1"] will be formatted as [field1].[subfield1_1].[subfield1_1_1]
+*/
 constexpr member_names<dotted_member_names_traits_t> dotted_member_names{dotted_member_names_traits_t{}};
 
 //-------------------------------------------------------------

@@ -32,13 +32,18 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct report_aggregation_tag;
 
 /**
- * @brief Descriptor of aggregation operator used in validation report
+ * @brief Descriptor of aggregation operator used in validation report.
  */
 template <typename DstT>
 struct report_aggregation
 {
     using hana_tag=report_aggregation_tag;
 
+    /**
+     * @brief Constructor.
+     * @param aggregation Aggregation operation.
+     * @param member Member the operation is applied to.
+     */
     report_aggregation(
             aggregation_op aggregation,
             std::string member=std::string()

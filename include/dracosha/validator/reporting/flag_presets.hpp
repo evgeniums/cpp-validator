@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/flag_presets.hpp
 *
-*  Defines some presets of flag descriptions
+*  Defines some presets of flag descriptions.
 *
 */
 
@@ -66,7 +66,14 @@ struct flag_true_false_t : public flag_preset<flag_true_false_t>
     constexpr static const char* description="must be true";
     constexpr static const char* n_description="must be false";
 };
+/**
+ * @brief Instance of preset flag descriptions with on/off words.
+ */
 constexpr flag_true_false_t flag_true_false{};
+
+/**
+ * @brief Default flag descriptions that uses true/false words.
+ */
 constexpr flag_true_false_t default_flag_preset{};
 
 /**
@@ -77,6 +84,10 @@ struct flag_on_off_t : public flag_preset<flag_on_off_t>
     constexpr static const char* description="must be on";
     constexpr static const char* n_description="must be off";
 };
+
+/**
+ * @brief Instance of preset flag descriptions with on/off words.
+ */
 constexpr flag_on_off_t flag_on_off{};
 
 /**
@@ -87,6 +98,10 @@ struct flag_checked_unchecked_t : public flag_preset<flag_checked_unchecked_t>
     constexpr static const char* description="must be checked";
     constexpr static const char* n_description="must be unchecked";
 };
+
+/**
+ * @brief Instance of preset flag descriptions with checked/unchecked words.
+ */
 constexpr flag_checked_unchecked_t flag_checked_unchecked{};
 
 /**
@@ -97,6 +112,10 @@ struct flag_set_unset_t : public flag_preset<flag_set_unset_t>
     constexpr static const char* description="must be set";
     constexpr static const char* n_description="must be unset";
 };
+
+/**
+ * @brief Instance of preset flag descriptions with set/unset words.
+ */
 constexpr flag_set_unset_t flag_set_unset{};
 
 /**
@@ -107,6 +126,10 @@ struct flag_enable_disable_t : public flag_preset<flag_enable_disable_t>
     constexpr static const char* description="must be enabled";
     constexpr static const char* n_description="must be disabled";
 };
+
+/**
+ * @brief Instance of preset flag descriptions with enabled/disabled words.
+ */
 constexpr flag_enable_disable_t flag_enable_disable{};
 
 //-------------------------------------------------------------

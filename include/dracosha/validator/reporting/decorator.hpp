@@ -47,7 +47,7 @@ struct no_decorator_t
 constexpr no_decorator_t no_decorator{};
 
 /**
- * @brief Decorator that adds brackets around initial string
+ * @brief Decorator that adds brackets around initial string.
  */
 struct brackets_decorator_t
 {
@@ -64,9 +64,9 @@ struct brackets_decorator_t
 constexpr brackets_decorator_t brackets_decorator{};
 
 /**
- * @brief Helper to work with object that can optionally have or not have decorators
+ * @brief Helper to work with object that can optionally have or not have decorators.
  *
- * Version for object that does not have decorator
+ * Version for object that does not have decorator.
  */
 template <typename T, typename Arg, typename =void>
 struct decorate_t
@@ -78,9 +78,9 @@ struct decorate_t
     }
 };
 /**
- * @brief Helper to work with object that can optionally have or not have decorators
+ * @brief Helper to work with object that can optionally have or not have decorators.
  *
- * Version for object that has decorator
+ * Version for object that has decorator.
  */
 template <typename T, typename Arg>
 struct decorate_t<T,Arg,
@@ -96,16 +96,16 @@ struct decorate_t<T,Arg,
 };
 
 /**
- * @brief Helper to work with object that can optionally have or not have decorators
+ * @brief Helper to work with object that can optionally have or not have decorators.
  */
 template <typename T, typename Arg>
 constexpr decorate_t<T,Arg> decorate_inst{};
 
 /**
- * @brief Decorate argument
- * @param obj Object that can have or not have a decorator
- * @param arg Argument to decorate if applicable
- * @return If object has decorator then decorated argument or argument "as is" otherwise
+ * @brief Decorate argument.
+ * @param obj Object that can have or not have a decorator.
+ * @param arg Argument to decorate if applicable.
+ * @return If object has decorator then decorated argument or argument "as is" otherwise.
  */
 template <typename T, typename Arg>
 constexpr auto decorate(T&& obj, Arg&& arg) -> decltype(auto)

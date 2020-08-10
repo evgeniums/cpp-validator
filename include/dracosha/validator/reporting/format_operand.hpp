@@ -29,7 +29,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Default helper for operands formatting that returns operand as is
+ * @brief Default helper for operands formatting that returns operand as is.
  */
 template <typename T, typename =hana::when<true>>
 struct format_operand_t
@@ -43,7 +43,10 @@ struct format_operand_t
 };
 
 /**
- * @brief  Formatter of operands from which the std::string can be constructed
+ * @brief Formatter of operands from which the std::string can be constructed.
+ *
+ * Formatter uses input string and then translates and decorates it
+ * if "postprocess" argument is not false.
  */
 template <typename T>
 struct format_operand_t<T,hana::when<
@@ -53,11 +56,11 @@ struct format_operand_t<T,hana::when<
         >>
 {
     /**
-     * @brief Format operand with optional postprocessing
-     * @param traits Formatter traits
-     * @param val Operand value
-     * @param postprocess If true then try to translate and decorate string after formatting
-     * @return Formatted string
+     * @brief Format operand with optional postprocessing.
+     * @param traits Formatter traits.
+     * @param val Operand value.
+     * @param postprocess If true then try to translate and decorate string after formatting.
+     * @return Formatted string.
      */
     template <typename TraitsT, typename T1>
     concrete_phrase operator () (const TraitsT& traits, T1&& val, grammar_categories cats, bool postprocess) const
@@ -75,10 +78,10 @@ struct format_operand_t<T,hana::when<
     }
 
     /**
-     * @brief Format operand with post processing
-     * @param traits Formatter traits
-     * @param val Operand value
-     * @return Formatted string
+     * @brief Format operand with post processing.
+     * @param traits Formatter traits.
+     * @param val Operand value.
+     * @return Formatted string.
      */
     template <typename TraitsT, typename T1>
     auto operator () (const TraitsT& traits, T1&& val, grammar_categories cats) const -> decltype(auto)
@@ -93,7 +96,7 @@ struct format_operand_t<T,hana::when<
 };
 
 /**
- * @brief Default formatter of values
+ * @brief Default formatter of operands.
  */
 template <typename T>
 constexpr format_operand_t<T> format_operand{};

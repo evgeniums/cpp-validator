@@ -40,10 +40,10 @@ class reporter_with_object_name : public reporter<DstT,FormatterT>
         using base_type=reporter<DstT,FormatterT>;
 
         /**
-         * @brief Constructor
-         * @param dst Destination object wrapped into backend formatter
-         * @param formatter Formatter to use for reports formatting
-         * @param obj Object name to prepend to report
+         * @brief Constructor.
+         * @param dst Destination object wrapped into backend formatter.
+         * @param formatter Formatter to use for reports formatting.
+         * @param obj Object name to prepend to report.
          */
         template <typename T>
         reporter_with_object_name(
@@ -55,9 +55,9 @@ class reporter_with_object_name : public reporter<DstT,FormatterT>
         {}
 
         /**
-         *  @brief Report validation of object at one level without member nesting
-         *  @param op Operator for validation
-         *  @param b Sample argument for validation
+         *  @brief Report validation of object at one level without member nesting.
+         *  @param op Operator for validation.
+         *  @param b Sample argument for validation.
          */
         template <typename T2, typename OpT>
         void validate_operator(const OpT& op, const T2& b)
@@ -66,10 +66,10 @@ class reporter_with_object_name : public reporter<DstT,FormatterT>
         }
 
         /**
-         *  @brief Report validation of object's property at one level without member nesting
-         *  @param prop Property to validate
-         *  @param op Operator for validation
-         *  @param b Sample argument for validation
+         *  @brief Report validation of object's property at one level without member nesting.
+         *  @param prop Property to validate.
+         *  @param op Operator for validation.
+         *  @param b Sample argument for validation.
          */
         template <typename T2, typename OpT, typename PropT>
         void validate_property(const PropT& prop, const OpT& op, const T2& b)
@@ -78,9 +78,9 @@ class reporter_with_object_name : public reporter<DstT,FormatterT>
         }
 
         /**
-         *  @brief Report validation of existance of a member
-         *  @param member Member descriptor
-         *  @param b Boolean flag, when true check if member exists, when false check if member does not exist
+         *  @brief Report validation of existance of a member.
+         *  @param member Member descriptor.
+         *  @param b Boolean flag, when true check if member exists, when false check if member does not exist.
          */
         template <typename T2, typename OpT, typename MemberT>
         void validate_exists(const MemberT& member, const OpT& op, const T2& b)
@@ -89,11 +89,11 @@ class reporter_with_object_name : public reporter<DstT,FormatterT>
         }
 
         /**
-         *  @brief Report normal validation of a member
-         *  @param member Member descriptor
-         *  @param prop Property to validate
-         *  @param op Operator for validation
-         *  @param b Sample argument for validation
+         *  @brief Report normal validation of a member.
+         *  @param member Member descriptor.
+         *  @param prop Property to validate.
+         *  @param op Operator for validation.
+         *  @param b Sample argument for validation.
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
@@ -102,11 +102,11 @@ class reporter_with_object_name : public reporter<DstT,FormatterT>
         }
 
         /**
-         *  @brief Report validation using other member of the same object as a reference argument for validation
-         *  @param member Member descriptor
-         *  @param prop Property to validate
-         *  @param op Operator for validation
-         *  @param b Descriptor of sample member of the same object
+         *  @brief Report validation using other member of the same object as a reference argument for validation.
+         *  @param member Member descriptor.
+         *  @param prop Property to validate.
+         *  @param op Operator for validation.
+         *  @param b Descriptor of sample member of the same object.
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate_with_other_member(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
@@ -115,12 +115,12 @@ class reporter_with_object_name : public reporter<DstT,FormatterT>
         }
 
         /**
-         *  @brief Report validation using the same member of a Sample object
-         *  @param member Member
-         *  @param prop Property to validate
-         *  @param op Operator for validation
-         *  @param member1 Member of sample object
-         *  @param b Sample object whose member must be used as argument passed to validation operator
+         *  @brief Report validation using the same member of a Sample object.
+         *  @param member Member.
+         *  @param prop Property to validate.
+         *  @param op Operator for validation.
+         *  @param member1 Member of sample object.
+         *  @param b Sample object whose member must be used as argument passed to validation operator.
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT, typename MemberSampleT>
         void validate_with_master_sample(const MemberT& member, const PropT& prop, const OpT& op, const MemberSampleT& member_sample, const T2& b)
@@ -140,11 +140,11 @@ class reporter_with_object_name : public reporter<DstT,FormatterT>
 };
 
 /**
- * @brief Make a reporter with object name and given formatter
- * @param dst Destination object where to put reports
- * @param formatter Formatter to use for reports formatting
- * @param obj Name of the object under validation that must be included to report
- * @return Reporter wrapping the destination object
+ * @brief Make a reporter with object name and given formatter.
+ * @param dst Destination object where to put reports.
+ * @param formatter Formatter to use for reports formatting.
+ * @param obj Name of the object under validation that must be included to report.
+ * @return Reporter wrapping the destination object.
  */
 template <typename DstT, typename FormatterT, typename ObjectT>
 auto make_reporter_with_object_name(DstT& dst, FormatterT&& formatter, ObjectT&& obj)
@@ -154,10 +154,10 @@ auto make_reporter_with_object_name(DstT& dst, FormatterT&& formatter, ObjectT&&
 }
 
 /**
- * @brief Make a reporter with object name and default formatter
- * @param dst Destination object where to put reports
- * @param obj Name of the object under validation that must be included to report
- * @return Reporter wrapping the destination object
+ * @brief Make a reporter with object name and default formatter.
+ * @param dst Destination object where to put reports.
+ * @param obj Name of the object under validation that must be included to report.
+ * @return Reporter wrapping the destination object.
  */
 template <typename DstT, typename ObjectT>
 auto make_reporter_with_object_name(DstT& dst, ObjectT&& obj)

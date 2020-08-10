@@ -29,7 +29,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct order_and_presentation_tag;
 
 /**
- * @brief Helper to adjust strings ordering and presentation
+ * @brief Default helper for adjusting strings ordering and presentation.
  */
 struct order_and_presentation_t
 {
@@ -41,6 +41,10 @@ struct order_and_presentation_t
         detail::reorder_and_present(std::forward<Args>(args)...);
     }
 };
+
+/**
+  @brief Instance of default helper for adjusting strings ordering and presentation.
+*/
 constexpr order_and_presentation_t default_order_and_presentation{};
 
 //-------------------------------------------------------------

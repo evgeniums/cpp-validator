@@ -37,11 +37,11 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  *
  * A name of locale can be either in more generic form like "en" or in more specific form like "en_US.UTF-8".
  * When looking for a translator the repository will first try to use the most specific name of locale,
- * and then if it is not found the repository will try to use further less specific names down to the name of language only.
- * If still no translator is found then the default translator will be returned.
+ * and if that is not found then the repository will try to use further less specific names down to the name of language only.
+ * If still no translator is found then the default translator will be used.
  *
  * A translator should be added to the repository with the full list of all forms of locale names
- * this translator can be suitable for. See example below.
+ * this translator is suitable for. See example below.
 
 \code{.cpp}
 
@@ -58,9 +58,9 @@ class translator_repository
     public:
 
         /**
-         * @brief Full constructor
-         * @param default_translator Default translator to be used if requested locale is not found
-         * @param translators Map of translators
+         * @brief Full constructor.
+         * @param default_translator Default translator to be used if requested locale is not found.
+         * @param translators Map of translators.
          */
         translator_repository(
                 std::shared_ptr<translator> default_translator,
@@ -70,8 +70,8 @@ class translator_repository
         {}
 
         /**
-         * @brief Constructor with default translator
-         * @param default_translator Default translator to be used if requested locale is not found
+         * @brief Constructor with default translator.
+         * @param default_translator Default translator to be used if requested locale is not found.
          */
         translator_repository(
                 std::shared_ptr<translator> default_translator
@@ -79,8 +79,8 @@ class translator_repository
         {}
 
         /**
-         * @brief Constructor with map of translators
-         * @param translators Map of translators
+         * @brief Constructor with map of translators.
+         * @param translators Map of translators.
          */
         translator_repository(
                 std::map<std::string,std::shared_ptr<translator>> translators
@@ -89,16 +89,16 @@ class translator_repository
         {}
 
         /**
-         * @brief Default consturctor
+         * @brief Default consturctor.
          */
         translator_repository(
             ) : _default_translator(std::make_shared<translator>())
         {}
 
         /**
-         * @brief Add translator to repository
-         * @param tr Translator
-         * @param locales Names of locales this translator can be used for
+         * @brief Add translator to repository.
+         * @param tr Translator.
+         * @param locales Names of locales this translator can be used for.
          */
         void add_translator(
                 const std::shared_ptr<translator>& tr,
@@ -116,9 +116,9 @@ class translator_repository
          * @param loc Locale name, examples: "en_US.UTF-8", "en_US", "en". Default is name of global locale.
          * @param Translator suitable of this locale.
          *
-         * First, it will try to find the most specific name of the locale.
-         * The the name will be repeatedly truncated down to the name of language only.
-         * If still no translator is found then the default translator will be returned.
+         * First, it tries to find the most specific name of the locale.
+         * The the name is repeatedly truncated down to the name of language only.
+         * If still no translator is found then the default translator is returned.
          */
         std::shared_ptr<translator> find_translator(std::string loc=std::locale().name()) const
         {
@@ -137,8 +137,8 @@ class translator_repository
         }
 
         /**
-         * @brief Set default translator
-         * @param default_translator Default translator
+         * @brief Set default translator.
+         * @param default_translator Default translator.
          */
         void set_default_translator(std::shared_ptr<translator> default_translator) noexcept
         {
@@ -146,8 +146,8 @@ class translator_repository
         }
 
         /**
-         * @brief Get default translator
-         * @return Default translator
+         * @brief Get default translator.
+         * @return Default translator.
          */
         std::shared_ptr<translator> default_translator() const noexcept
         {
@@ -155,7 +155,7 @@ class translator_repository
         }
 
         /**
-         * @brief Clear repository
+         * @brief Clear repository.
          */
         void clear() noexcept
         {

@@ -29,7 +29,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Translation result
+ * @brief Translation result.
  */
 struct translation_result
 {
@@ -37,7 +37,7 @@ struct translation_result
     bool found;
 
     /**
-     * @brief Move to rvalue concrete_phrase
+     * @brief Move embedded phrase to rvalue concrete_phrase.
      */
     operator concrete_phrase&& () && noexcept
     {
@@ -45,7 +45,7 @@ struct translation_result
     }
 
     /**
-     * @brief Check if phrase is found
+     * @brief Check if phrase is found.
      */
     operator bool() const noexcept
     {
@@ -56,7 +56,7 @@ struct translation_result
 struct translator_tag;
 
 /**
- * @brief Base translator class
+ * @brief Base translator class.
  */
 class translator
 {
@@ -72,16 +72,16 @@ class translator
         translator& operator= (translator&&)=default;
 
         /**
-         * @brief Reset translator
+         * @brief Reset translator.
          */
         virtual void reset()
         {}
 
         /**
-         * @brief Translate a string
-         * @param id String ID
-         * @param cats Grammar categories to look for
-         * @return Translation result
+         * @brief Translate a string.
+         * @param id String.
+         * @param cats Grammar categories to look for.
+         * @return Translation result.
          *
          * Must be overriden in derived class.
          */
@@ -92,9 +92,9 @@ class translator
         }
 
         /**
-         * @brief Bypass concrete phrase as is
-         * @param id Concrete phrase
-         * @return Input concrete phrase
+         * @brief Bypass concrete phrase as is.
+         * @param id Concrete phrase.
+         * @return Input concrete phrase.
          */
         concrete_phrase translate(const concrete_phrase& id, grammar_categories =0) const
         {
@@ -102,10 +102,10 @@ class translator
         }
 
         /**
-         * @brief Translate a string
-         * @param id String ID
-         * @param cats Grammar categories to look for
-         * @return Translation result
+         * @brief Translate a string.
+         * @param id String ID.
+         * @param cats Grammar categories to look for.
+         * @return Translation result.
          */
         concrete_phrase operator() (const std::string& id, grammar_categories cats=0) const
         {
@@ -113,9 +113,9 @@ class translator
         }
 
         /**
-         * @brief Bypass concrete phrase as is
-         * @param id Concrete phrase
-         * @return Input concrete phrase
+         * @brief Bypass concrete phrase as is.
+         * @param id Concrete phrase.
+         * @return Input concrete phrase.
          */
         concrete_phrase operator() (const concrete_phrase& id, grammar_categories =0) const
         {

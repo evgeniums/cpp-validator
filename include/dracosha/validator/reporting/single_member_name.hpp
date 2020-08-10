@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/single_member_name.hpp
 *
-* Defines helper to format single member name.
+* Defines helper for singe member name formatting.
 *
 */
 
@@ -33,7 +33,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief String to use for indexed elements
+ * @brief String to use for indexed elements.
  */
 struct string_element_t : public enable_to_string<string_element_t>
 {
@@ -44,7 +44,7 @@ constexpr string_element_t string_element{};
 //-------------------------------------------------------------
 
 /**
- * @brief Check if traits have suitable operator ()(const T&) for name transforming in case when they don't
+ * @brief Check if traits have suitable operator ()(const T&) for name transforming in case when they don't.
  */
 template <typename T, typename TraitsT, typename=void>
 struct can_single_member_name
@@ -53,7 +53,7 @@ struct can_single_member_name
 };
 
 /**
- * @brief Check if traits have suitable operator ()(const T&) for name transforming
+ * @brief Check if traits have suitable operator ()(const T&) for name transforming.
  */
 template <typename T, typename TraitsT>
 struct can_single_member_name<T,TraitsT,
@@ -64,7 +64,7 @@ struct can_single_member_name<T,TraitsT,
 };
 
 /**
- * @brief Default helper when traits can not be used.
+ * @brief Default helper for singe member name formatting when traits can not be used.
  *
  * Default helper converts ID to string, then translates it and after all decorates the result.
  */
@@ -78,7 +78,7 @@ struct single_member_name_t
 };
 
 /**
- * @brief Helper when traits can be used.
+ * @brief Helper for singe member name formatting when traits can be used.
  *
  * ID is forwarded to traits, then the result goes to decorator.
  */
@@ -92,7 +92,7 @@ struct single_member_name_t<T,TraitsT,hana::when<can_single_member_name<T,Traits
 };
 
 /**
- * @brief Helper when traits can not be used and id is of inegral type.
+ * @brief Helper for singe member name formatting when traits can not be used and id is of inegral type.
  *
  * Integral ID is interpreted as index and formatted like "element #id", then it is translated and after all the result is decorated.
  */
@@ -112,14 +112,18 @@ struct single_member_name_t<T,TraitsT,
     }
 };
 
+/**
+ * @brief Template instance of for singe member name formatting.
+ */
 template <typename T, typename TraitsT>
 constexpr single_member_name_t<T,TraitsT> single_member_name_inst{};
 
 /**
- * @brief Process key of a member at one level
- * @param id Member key
- * @param traits Traits of member names formatter
- * @return Processed member name
+ * @brief Process key of a member at one level.
+ * @param id Member key.
+ * @param traits Traits of member names formatter.
+ * @param grammar_cats Grammatical categories to use in name translation.
+ * @return Processed member name.
  */
 template <typename T, typename TraitsT>
 constexpr auto single_member_name(const T& id, const TraitsT& traits, grammar_categories grammar_cats=0) -> decltype(auto)

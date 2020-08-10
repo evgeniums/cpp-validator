@@ -55,9 +55,9 @@ struct operand_formatter
     TraitsT traits;
 
     /**
-     * @brief Format operand
-     * @param val Operand to be formatted
-     * @return Formatted operand or original operand "as is"
+     * @brief Format operand.
+     * @param val Operand to be formatted.
+     * @return Formatted operand or original operand "as is".
      *
      * Note, that return type can be either a string or the same as input type.
      */
@@ -68,16 +68,25 @@ struct operand_formatter
     }
 };
 
+/**
+ * @brief Traits for default operand formatter.
+ */
 struct default_operand_formatter_traits
 {
     constexpr static const bool translate_string_operands=false;
 };
 
 /**
-  @brief Default operand formatter does not perform any translation or decoration.
+  @brief Default operand formatter that does not perform any translation or decoration.
 */
 constexpr operand_formatter<default_operand_formatter_traits> default_operand_formatter{default_operand_formatter_traits{}};
 
+/**
+  @brief Operand formatter traits with translator and decorator.
+
+  When TranslateAllStrings is false then only predefined strings will be translated.
+  When TranslateAllStrings is true then all strings provided as operands will be translated.
+*/
 template <typename TranslatorT, typename DecoratorT, bool TranslateAllStrings=true>
 struct operand_formatter_traits
 {
@@ -89,22 +98,35 @@ struct operand_formatter_traits
     DecoratorT decorator;
 };
 
+/**
+ * @brief Create traits for operand fromatter with decorator.
+ * @param decorator Decorator.
+ * @return Traits with decorator.
+ */
 template <typename DecoratorT>
 auto make_operand_formatter_traits(DecoratorT&& decorator)
 {
     return operand_formatter_traits<const no_translator_t&,DecoratorT,false>{no_translator,std::forward<DecoratorT>(decorator)};
 }
 
+/**
+ * @brief Create traits for operand fromatter with translator and decorator.
+ * @param tr Translator.
+ * @param decorator Decorator.
+ * @param translate_operands Mode of string operands translation, can by only either std::true_type() or std::false_type().
+ * @return Traits with translator and decorator.
+ */
 template <typename DecoratorT, typename TranslateAllStringsT>
-auto make_operand_formatter_traits(const translator& tr, DecoratorT&& decorator, const TranslateAllStringsT&)
+auto make_operand_formatter_traits(const translator& tr, DecoratorT&& decorator, const TranslateAllStringsT& translate_operands)
 {
+    std::ignore=translate_operands;
     return operand_formatter_traits<const translator&,DecoratorT,TranslateAllStringsT::value>{tr,std::forward<DecoratorT>(decorator)};
 }
 
 /**
- * @brief Make operand formatter
- * @param decorator Decorator to decorate operands
- * @return Operands formatter
+ * @brief Make operand formatter.
+ * @param decorator Decorator to decorate operands.
+ * @return Operands formatter.
  */
 template <typename DecoratorT>
 auto make_operand_formatter(DecoratorT&& decorator)
@@ -114,10 +136,11 @@ auto make_operand_formatter(DecoratorT&& decorator)
 }
 
 /**
- * @brief Make operands formatter using a given translator
- * @param tr Translator to use
- * @param decorator Decorator to decorate operands after translating
- * @return Operands formatter
+ * @brief Make operands formatter using a given translator.
+ * @param tr Translator to use.
+ * @param decorator Decorator to decorate operands after translating.
+ * @param translate_operands Mode of string operands translation, can by only either std::true_type() or std::false_type().
+ * @return Operands formatter.
  */
 template <typename DecoratorT=const no_decorator_t&, typename TranslateAllStringsT=std::false_type>
 auto make_translated_operand_formatter(const translator& tr, DecoratorT&& decorator=no_decorator, const TranslateAllStringsT& translate_operands=std::false_type())
@@ -127,11 +150,12 @@ auto make_translated_operand_formatter(const translator& tr, DecoratorT&& decora
 }
 
 /**
- * @brief Make operands formatter using translator found in translator repository by locale name
- * @param rep Translator repository
- * @param loc Locale name
- * @param decorator Decorator to decorate operands after translating
- * @return Operands formatter with translator for given locale name from the repository
+ * @brief Make operands formatter using translator found in translator repository by locale name.
+ * @param rep Translator repository.
+ * @param loc Locale name.
+ * @param decorator Decorator to decorate operands after translating.
+ * @param translate_operands Mode of string operands translation, can by only either std::true_type() or std::false_type().
+ * @return Operands formatter with translator for given locale name from the repository.
  */
 template <typename DecoratorT=const no_decorator_t&, typename TranslateAllStringsT=std::false_type>
 inline auto make_translated_operand_formatter(const translator_repository& rep,const std::string& loc=std::locale().name(),

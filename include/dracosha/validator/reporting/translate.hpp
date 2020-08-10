@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/translate.hpp
 *
-* Defines helper for translating using object that can optionally have or not have translators
+* Defines helper for translating using object that can optionally have or not have translators.
 *
 */
 
@@ -28,9 +28,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Helper to work with object that can optionally have or not have translator
+ * @brief Helper for translating strings with object that can optionally have or not have translator.
  *
- * Version for object that does not have translator
+ * Version for object that does not have translator.
  */
 template <typename T, typename Arg, typename =void>
 struct translate_t
@@ -43,9 +43,9 @@ struct translate_t
 };
 
 /**
- * @brief Helper to work with object that can optionally have or not have translator
+ * @brief Helper for translating strings with object that can optionally have or not have translator
  *
- * Version for object that has translator
+ * Version for object that has translator.
  */
 template <typename T, typename Arg>
 struct translate_t<T,Arg,
@@ -61,17 +61,17 @@ struct translate_t<T,Arg,
 };
 
 /**
- * @brief Helper to work with object that can optionally have or not have translator
+ * @brief Instance of helper for translating strings with object that can optionally have or not have translator.
  */
 template <typename T, typename Arg>
 constexpr translate_t<T,Arg> translate_inst{};
 
 /**
- * @brief Translate a phrase
- * @param obj Object that can have or not have a translator
- * @param phrase Phrase to translate if applicable
+ * @brief Translate a phrase.
+ * @param obj Object that can have or not have a translator.
+ * @param phrase Phrase to translate if applicable.
  * @param
- * @return If object has translator then translated phrase or phrase "as is" otherwise
+ * @return If object has translator then translated phrase or phrase "as is" otherwise.
  */
 template <typename T, typename PhraseT>
 constexpr auto translate(T&& obj, PhraseT&& phrase, grammar_categories grammar_cats=0) -> decltype(auto)

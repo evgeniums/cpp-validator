@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/phrase_translator.hpp
 *
-*   Defines translator that translates phrases awaring of grammar categories
+*   Defines translator that translates phrases awaring of grammar categories.
 *
 */
 
@@ -32,14 +32,14 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Pair of concrete phrase and grammatical categories of preceding phrase this phrase is suitable for
+ * @brief Pair of concrete phrase and grammatical categories of preceding phrase this phrase is suitable for.
  */
 struct phrase_and_grammar_cats
 {
     /**
-     * @brief Constructor
-     * @param phrase Text of the phrase
-     * @param grammar_cats Grammatical categories of preceding phrase this phrase is suitable for
+     * @brief Constructor.
+     * @param phrase Text of the phrase.
+     * @param grammar_cats Grammatical categories of preceding phrase this phrase is suitable for.
      */
     template <typename ... GrammarCats>
     phrase_and_grammar_cats(
@@ -50,9 +50,9 @@ struct phrase_and_grammar_cats
     {}
 
     /**
-     * @brief Constructor
-     * @param phrase Phrase
-     * @param grammar_cats Grammatical categories of preceding phrase this phrase is suitable for
+     * @brief Constructor.
+     * @param phrase Phrase.
+     * @param grammar_cats Grammatical categories of preceding phrase this phrase is suitable for.
      */
     template <typename ... GrammarCats>
     phrase_and_grammar_cats(
@@ -63,9 +63,9 @@ struct phrase_and_grammar_cats
     {}
 
     /**
-     * @brief Constructor
-     * @param phrase Phrase
-     * @param grammar_cats Grammatical categories of preceding phrase this phrase is suitable for
+     * @brief Constructor.
+     * @param phrase Phrase.
+     * @param grammar_cats Grammatical categories of preceding phrase this phrase is suitable for.
      */
     phrase_and_grammar_cats(
             concrete_phrase phrase,
@@ -102,14 +102,14 @@ class phrase_translator : public translator
         phrase_translator()=default;
 
         /**
-         * @brief Ctor
-         * @param phrases Translated strings
+         * @brief Constructor.
+         * @param phrases Translated strings.
          */
         phrase_translator(container_type phrases):_phrases(std::move(phrases))
         {}
 
         /**
-         * @brief Reset map
+         * @brief Reset map.
          */
         virtual void reset() override
         {
@@ -117,10 +117,10 @@ class phrase_translator : public translator
         }
 
         /**
-         * @brief Translate a string
-         * @param id String id
-         * @param cats Grammar categories to look for
-         * @return Translated string or id if such string not found
+         * @brief Translate a string.
+         * @param id String id.
+         * @param cats Grammar categories to look for.
+         * @return Translated string or id if such string not found.
          *
          * Translator will select the phrase with the maximum number of matching grammatical categories
          * (cats match phrase_and_grammar_cats.categories).
@@ -150,16 +150,16 @@ class phrase_translator : public translator
         }
 
         /**
-         * @brief Override operator [] for filling the translator
-         * @param key Translatable string
-         * @return phrase_translator_setter used to put translations of the given string to translator
+         * @brief Override operator [] for filling the translator.
+         * @param key Translatable string.
+         * @return phrase_translator_setter used to put translations of the given string to translator.
          */
         template <typename T>
         auto operator [] (T&& key);
 
         /**
-         * @brief Check if translator is empty
-         * @return Boolean flag
+         * @brief Check if translator is empty.
+         * @return Boolean flag.
          */
         bool empty() const noexcept
         {

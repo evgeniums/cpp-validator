@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/decorator.hpp
 *
-* Defines decorator.
+* Defines quotes decorator.
 *
 */
 
@@ -33,7 +33,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 namespace detail
 {
 /**
- * @brief Default helper for quotes decorator
+ * @brief Default helper for quotes decorator.
  */
 template <typename T, typename = hana::when<true>>
 struct quotes_decorator_helper
@@ -45,7 +45,7 @@ struct quotes_decorator_helper
 };
 
 /**
- * @brief Helper for quotes decorator when argument is a concrete_phrase
+ * @brief Helper for quotes decorator when argument is a concrete_phrase.
  */
 template <typename T>
 struct quotes_decorator_helper<T,
@@ -60,7 +60,7 @@ struct quotes_decorator_helper<T,
 };
 
 /**
- * @brief Helper for quotes decorator when argument can be used to construct std::string but is not a concrete_phrase
+ * @brief Helper for quotes decorator when argument can be used to construct std::string but is not a concrete_phrase.
  */
 template <typename T>
 struct quotes_decorator_helper<T,
@@ -79,7 +79,7 @@ struct quotes_decorator_helper<T,
 }
 
 /**
- * @brief Quotes decorator adds quotes around initial string
+ * @brief Quotes decorator that adds quotes around original string.
  */
 struct quotes_decorator_t
 {

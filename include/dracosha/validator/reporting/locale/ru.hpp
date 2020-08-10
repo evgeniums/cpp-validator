@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/locale/ru.hpp
 *
-*   Defines strings for localization for Russian language
+*   Defines strings for localization for Russian language.
 *
 */
 
@@ -39,6 +39,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Grammatical categories used in Russian language.
+ */
 enum grammar_ru : uint8_t
 {
     muzhskoy_rod,
@@ -59,7 +62,7 @@ enum grammar_ru : uint8_t
 
 /**
  * @brief Construct translator of validator strings for Russian locale.
- * @return Translator of system phrases for Russian locale
+ * @return Translator of system phrases for Russian locale.
  *
  */
 inline const phrase_translator& validator_translator_ru()

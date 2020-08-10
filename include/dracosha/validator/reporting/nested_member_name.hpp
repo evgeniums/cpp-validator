@@ -31,7 +31,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief String to use for joining nested member names in member's path
+ * @brief String to use for joining nested member names in member's path.
  */
 struct string_member_name_conjunction_t : public enable_to_string<string_member_name_conjunction_t>
 {
@@ -45,7 +45,7 @@ namespace detail
 {
 
 /**
- * @brief Check if traits do not implement method nested(id,traits)
+ * @brief Check if traits do not implement method nested(id,traits).
  */
 template <typename T, typename TraitsT,
           typename =void>
@@ -55,7 +55,7 @@ struct has_nested
 };
 
 /**
- * @brief Check if traits implement method nested(id,traits,translator)
+ * @brief Check if traits implement method nested(id,traits,translator).
  */
 template <typename T, typename TraitsT>
 struct has_nested<T,TraitsT,
@@ -70,9 +70,9 @@ struct has_nested<T,TraitsT,
 };
 
 /**
- * @brief Construct member path for member name formating in case of direct order of levels in the path
- * @param path Original member path
- * @return Original member path
+ * @brief Construct member path for member name formating in case of direct order of levels in the path.
+ * @param path Original member path.
+ * @return Original member path.
  */
 template <typename T, typename TraitsT>
 constexpr auto member_names_path(T&& path, const TraitsT&,
@@ -82,9 +82,9 @@ constexpr auto member_names_path(T&& path, const TraitsT&,
 }
 
 /**
- * @brief Construct member path for member name formating in case of reverse order of levels in the path
- * @param path Original member path
- * @return Member path with reversed order
+ * @brief Construct member path for member name formating in case of reverse order of levels in the path.
+ * @param path Original member path.
+ * @return Member path with reversed order.
  */
 template <typename T, typename TraitsT>
 constexpr auto member_names_path(T&& path, const TraitsT&,
@@ -94,7 +94,7 @@ constexpr auto member_names_path(T&& path, const TraitsT&,
 }
 
 /**
- * @brief Default helper to format a single key of member path with separator
+ * @brief Default helper to format a single key of member path with separator.
  */
 template <typename T, typename TraitsT, typename =void>
 struct member_name_with_separator_t
@@ -108,7 +108,7 @@ struct member_name_with_separator_t
 };
 
 /**
- * @brief Helper to format a single key of member path with separator when traits implement method member_name_with_separator(id,grammar_cats)
+ * @brief Helper to format a single key of member path with separator when traits implement method member_name_with_separator(id,grammar_cats).
  */
 template <typename T, typename TraitsT>
 struct member_name_with_separator_t<T,TraitsT,
@@ -126,11 +126,11 @@ template <typename T, typename TraitsT>
 constexpr member_name_with_separator_t<T,TraitsT> member_name_with_separator_inst{};
 
 /**
- * @brief Format a single key of member path with separator
- * @param id Single key of member path
- * @param traits Formatter traits
- * @param grammar_cats Grammatical categories of preceding phrase
- * @return Formatted phrase
+ * @brief Format a single key of member path with separator.
+ * @param id Single key of member path.
+ * @param traits Formatter traits.
+ * @param grammar_cats Grammatical categories of preceding phrase.
+ * @return Formatted phrase.
  */
 template <typename T, typename TraitsT>
 auto member_name_with_separator(T&& id, const TraitsT& traits, const grammar_categories& grammar_cats=0)
@@ -139,11 +139,11 @@ auto member_name_with_separator(T&& id, const TraitsT& traits, const grammar_cat
 }
 
 /**
- * @brief Format names of intermediate keys of member path without the last key
- * @param id Member
- * @param traits Formatter traits
- * @param grammar_cats Grammatical categories of preceding phrase
- * @return Tuple of formatted names of intermediate keys
+ * @brief Format names of intermediate keys of member path without the last key.
+ * @param id Member.
+ * @param traits Formatter traits.
+ * @param grammar_cats Grammatical categories of preceding phrase.
+ * @return Tuple of formatted names of intermediate keys.
  */
 template <typename T, typename TraitsT>
 auto intermediate_member_names(const T& id, const TraitsT& traits, grammar_categories grammar_cats)
@@ -163,11 +163,11 @@ auto intermediate_member_names(const T& id, const TraitsT& traits, grammar_categ
 }
 
 /**
- * @brief Concat list of intermediate keys names with last key in case when the list is empty
- * @param id Member
- * @param traits Formatter traits
- * @param grammar_cats Grammatical categories of preceding phrase
- * @return Tuple with formatted last key of member path
+ * @brief Concat list of intermediate keys names with last key in case when the list is empty.
+ * @param id Member.
+ * @param traits Formatter traits.
+ * @param grammar_cats Grammatical categories of preceding phrase.
+ * @return Tuple with formatted last key of member path.
  */
 template <typename T, typename TraitsT, typename Ts>
 auto member_names_with_last_key(const T& id, const TraitsT& traits, Ts&&,
@@ -181,12 +181,12 @@ auto member_names_with_last_key(const T& id, const TraitsT& traits, Ts&&,
 }
 
 /**
- * @brief Concat list of intermediate keys names with last key
- * @param id Member
- * @param traits Formatter traits
- * @param ts Tuple of formatted names of intermediate keys
- * @param grammar_cats Grammatical categories of preceding phrase
- * @return Cpncatenation of formatted last key of member path and formatted names of intermediate keys
+ * @brief Concat list of intermediate keys names with last key.
+ * @param id Member.
+ * @param traits Formatter traits.
+ * @param ts Tuple of formatted names of intermediate keys.
+ * @param grammar_cats Grammatical categories of preceding phrase.
+ * @return Cpncatenation of formatted last key of member path and formatted names of intermediate keys.
  */
 template <typename T, typename TraitsT, typename Ts>
 auto member_names_with_last_key(const T& id, const TraitsT& traits, Ts&& ts,
@@ -203,11 +203,11 @@ auto member_names_with_last_key(const T& id, const TraitsT& traits, Ts&& ts,
 }
 
 /**
- * @param Construct list of formatted names of keys of member path in reverse order
- * @param id Member
- * @param traits Formatter traits
- * @param grammar_cats Grammatical categories of preceding phrase
- * @return Tuple of formatted names of keys of member path
+ * @param Construct list of formatted names of keys of member path in reverse order.
+ * @param id Member.
+ * @param traits Formatter traits.
+ * @param grammar_cats Grammatical categories of preceding phrase.
+ * @return Tuple of formatted names of keys of member path.
  */
 template <typename T, typename TraitsT>
 auto list_member_names(const T& id, const TraitsT& traits, grammar_categories grammar_cats,
@@ -216,7 +216,7 @@ auto list_member_names(const T& id, const TraitsT& traits, grammar_categories gr
                        ,void*> =nullptr)
 {
     // separator
-    //! @todo Use grammar categories from formatted id to format separator instead of grammar_cats because the formatted id will be preceding to the separator
+    //! @todo Use grammar categories from formatted id to format separator instead of grammar_cats because the formatted id will be preceding to the separator.
     auto sep=translate(traits,detail::to_string(traits.member_names_conjunction()),grammar_cats);
 
     // construct intermediate list using first grammar categories from the separator and drop last separator
@@ -227,11 +227,11 @@ auto list_member_names(const T& id, const TraitsT& traits, grammar_categories gr
 }
 
 /**
- * @param Construct list of formatted names of keys of member path in direct order
- * @param id Member
- * @param traits Formatter traits
- * @param grammar_cats Grammatical categories of preceding phrase
- * @return Tuple of formatted names of keys of member path
+ * @param Construct list of formatted names of keys of member path in direct order.
+ * @param id Member.
+ * @param traits Formatter traits.
+ * @param grammar_cats Grammatical categories of preceding phrase.
+ * @return Tuple of formatted names of keys of member path.
  */
 template <typename T, typename TraitsT>
 auto list_member_names(const T& id, const TraitsT& traits, grammar_categories grammar_cats,
@@ -251,11 +251,11 @@ auto list_member_names(const T& id, const TraitsT& traits, grammar_categories gr
 }
 
 /**
- * @brief Join list of formatted names of keys of member path to formatted string
- * @param id Member
- * @param traits Formatter traits
- * @param grammar_cats Grammatical categories of preceding phrase
- * @return Formatted full member name
+ * @brief Join list of formatted names of keys of member path to formatted string.
+ * @param id Member.
+ * @param traits Formatter traits.
+ * @param grammar_cats Grammatical categories of preceding phrase.
+ * @return Formatted full member name.
  */
 template <typename T, typename TraitsT>
 auto join_member_names(const T& id, const TraitsT& traits, grammar_categories grammar_cats)
@@ -277,7 +277,7 @@ auto join_member_names(const T& id, const TraitsT& traits, grammar_categories gr
 }
 
 /**
- * @brief Default formatter of a member name to be used when member doesn't have explicit name and traits do not implement method nested(id,traits)
+ * @brief Default formatter of a member name to be used when member doesn't have explicit name and traits do not implement method nested(id,traits).
  */
 template <typename T, typename TraitsT, typename =hana::when<true>>
 struct nested_member_name_t
@@ -289,7 +289,7 @@ struct nested_member_name_t
 };
 
 /**
- * @brief Formatter of a member name to be used when the member has explicit name and it is not a concrete_phrase
+ * @brief Formatter of a member name to be used when the member has explicit name and it is not a concrete_phrase.
  */
 template <typename T, typename TraitsT>
 struct nested_member_name_t<T,TraitsT,
@@ -306,7 +306,7 @@ struct nested_member_name_t<T,TraitsT,
 };
 
 /**
- * @brief Formatter of a member name to be used when the member has explicit name and it is a concrete_phrase
+ * @brief Formatter of a member name to be used when the member has explicit name and it is a concrete_phrase.
  */
 template <typename T, typename TraitsT>
 struct nested_member_name_t<T,TraitsT,
@@ -323,7 +323,7 @@ struct nested_member_name_t<T,TraitsT,
 };
 
 /**
- * @brief Formatter of a member name that uses method nested(id,traits) of traits object
+ * @brief Formatter of a member name that uses method nested(id,traits) of traits object.
  */
 template <typename T, typename TraitsT>
 struct nested_member_name_t<T,TraitsT,
@@ -336,14 +336,17 @@ struct nested_member_name_t<T,TraitsT,
     }
 };
 
+/**
+ * @brief Template instance of member name formatter.
+ */
 template <typename T, typename TraitsT>
 constexpr nested_member_name_t<T,TraitsT> nested_member_name_inst{};
 
 /**
- * @brief Process nested member name
- * @param id Member
- * @param traits Traits of member names formatter
- * @return Processed member name
+ * @brief Process nested member name.
+ * @param id Member.
+ * @param traits Traits of member names formatter.
+ * @return Processed member name.
  */
 template <typename T, typename TraitsT>
 constexpr auto nested_member_name(const T& id, const TraitsT& traits, grammar_categories grammar_cats=0) -> decltype(auto)

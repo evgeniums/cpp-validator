@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/locale/sample_locale.hpp
 *
-*   Defines sample file to use for translations of strings used in validator library to different languages
+*   Defines sample file to use for translations of strings used in validator library to different languages.
 *
 */
 

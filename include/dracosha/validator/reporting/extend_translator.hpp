@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/extend_translator.hpp
 *
-*   Defines exiended translator
+*   Defines extended translator.
 *
 */
 
@@ -35,9 +35,9 @@ template <typename BaseTranslatorT, typename ExtentionTranslatorT>
 struct extend_translator_t : public translator
 {
     /**
-     * @brief Constructor
-     * @param base Base translator
-     * @param extension Extension translator
+     * @brief Constructor.
+     * @param base Base translator.
+     * @param extension Translator to extend with.
      */
     extend_translator_t(
             BaseTranslatorT&& base,
@@ -47,10 +47,10 @@ struct extend_translator_t : public translator
     {}
 
     /**
-     * @brief Translate a string
-     * @param id String id
-     * @param cats Grammar categories to look for
-     * @return Translated string or id if such string not found
+     * @brief Translate a string.
+     * @param id String id.
+     * @param cats Grammar categories to look for.
+     * @return Translated string or id if such string not found.
      */
     virtual translation_result translate(const std::string& id, grammar_categories cats=0) const override
     {
@@ -68,9 +68,9 @@ struct extend_translator_t : public translator
 
 /**
  * @brief Create extended translator.
- * @param base Base translator
- * @param extension Extension translator
- * @return Translator with extension
+ * @param base Base translator.
+ * @param extension Translator to extend with.
+ * @return Translator with extension.
  *
  * Translator with extentions first tries to translate using extension. If no translation found then base translator is used.
  */

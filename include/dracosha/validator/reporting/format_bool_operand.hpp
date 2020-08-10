@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/reporting/format_bool_operand.hpp
 *
-* Defines helper for formatting of boolean operands.
+* Defines helper for formatting boolean operands.
 *
 */
 
@@ -27,25 +27,36 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief String presentation of boolean true
+ * @brief String description helper for presentation of boolean true.
  */
 struct string_true_t : public enable_to_string<string_true_t>
 {
     constexpr static const char* description="true";
 };
+
+/**
+ * @brief Instance of string description helper for presentation of boolean true.
+ */
 constexpr string_true_t string_true{};
 
 /**
- * @brief String presentation of boolean false
+ * @brief String description helper for presentation of boolean false.
  */
 struct string_false_t : public enable_to_string<string_false_t>
 {
     constexpr static const char* description="false";
 };
+
+/**
+ * @brief Instance of string description helper for presentation of boolean false.
+ */
 constexpr string_false_t string_false{};
 
 /**
- * @brief  Formatter of boolean operands
+ * @brief Formatter of boolean operands.
+ *
+ * Formatter uses corresponding string description for presentation of boolean and then translates and decorates it
+ * if "postprocess" argument is not false.
  */
 template <typename T>
 struct format_operand_t<T,hana::when<std::is_same<bool,std::decay_t<T>>::value>>
