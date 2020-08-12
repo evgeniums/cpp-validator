@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/make_validator.hpp
 *
-*  Defines creator of validator instances
+*  Defines creator of validator instances.
 *
 */
 
@@ -27,8 +27,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
-  @brief Create validator instance
-  @param fn Validation handler that will be held in validator instance
+  @brief Create validator instance.
+  @param fn Validation handler that will be embedded into validator instance.
 */
 BOOST_HANA_CONSTEXPR_LAMBDA auto make_validator = [](auto fn)
 {

@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/can_get.hpp
 *
-*  Defines helpers to check if member can be obtained from the object.
+*  Defines helpers for checking if a member can be obtained from the object.
 *
 */
 
@@ -29,9 +29,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- *  @brief Helper to check if member can be got from object by key.
+ *  @brief Default helper for checking if a member can be got from object by key.
  *
- *  Member is assumed to be gettable if key is wrapped iterator.
+ *  Member is not gettable.
  */
 template <typename T1, typename T2, typename =hana::when<true>>
 struct can_get_t
@@ -39,9 +39,9 @@ struct can_get_t
 };
 
 /**
- *  @brief Helper to check if member can be got from object by key.
+ *  @brief Helper for checking if a member can be got from object by key.
  *
- *  Member is assumed to be gettable if key is wrapped iterator.
+ *  Member gettable if key is a wrapped iterator.
  */
 template <typename T1, typename T2>
 struct can_get_t<T1,T2,hana::when<hana::is_a<wrap_iterator_tag,T2>>>
@@ -75,7 +75,7 @@ struct can_get_t<T1,T2,hana::when<hana::is_a<wrap_iterator_tag,T2>>>
 /**
  *  @brief Helper to check if member can be got from object by key.
  *
- *  Member is assumed to be gettable if object has either at(key) method or brackets [key] operator
+ *  Member is gettable if object has either at(key) method or brackets [key] operator
  *  and type of the key satisfies signature of the corresponding method/operator.
  */
 template <typename T1, typename T2>
@@ -116,7 +116,7 @@ struct can_get_t<T1,T2,hana::when<
 /**
  *  @brief Helper to check if member can be got from object by key.
  *
- *  Member is assumed to be gettable if object has the property.
+ *  Member is gettable if object has the property.
  */
 template <typename T1, typename T2>
 struct can_get_t<T1,T2,hana::when<hana::is_a<property_tag,T2>>>
@@ -148,7 +148,7 @@ struct can_get_t<T1,T2,hana::when<hana::is_a<property_tag,T2>>>
 };
 
 /**  
- * @brief Helper to check if member can be got from object of type T1 using key of type T2.
+ * @brief Helper for checking if a member can be got from object of type T1 using key of type T2.
  */
 template <typename T1, typename T2>
 constexpr can_get_t<T1,T2> can_get{};

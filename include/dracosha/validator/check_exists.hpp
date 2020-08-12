@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/check_exists.hpp
 *
-*  Defines helpers for checking existance of member in an object
+*  Defines helpers for checking existance of member in an object.
 *
 */
 
@@ -36,14 +36,15 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 #endif
 
 /**
-  @brief Extract member from object
-  @param obj Object under test
-  @param key Key for member lookup
+  @brief Extract member from object.
+  @param obj Object under test.
+  @param key Key for member lookup.
   @return Operation result, see comments below.
-
+  <pre>
     If member is found and is of lvalue reference type then address of that member will be returned.
     If member is found and is not of lvalue reference type then address of stub object will be returned to avoid taking addresses of temporary objects.
     If member is not found then nullptr will be returned.
+  </pre>
 */
 BOOST_HANA_CONSTEXPR_LAMBDA auto get_member_ptr =[](auto&& obj,auto&& key)
 {
@@ -67,12 +68,12 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto get_member_ptr =[](auto&& obj,auto&& key)
 #endif
 
 /**
-  @brief Check if member at a given path exist in the object
-  @param obj Object under validation
-  @param path Member path as a tuple
-  @return Validation status
+  @brief Check if member at a given path exist in the object.
+  @param obj Object under validation.
+  @param path Member path as a tuple.
+  @return Validation status.
 
-  This operation is performed at runtime
+  This operation is performed at runtime.
 */
 BOOST_HANA_CONSTEXPR_LAMBDA auto check_exists =[](auto&& obj,auto&& path)
 {

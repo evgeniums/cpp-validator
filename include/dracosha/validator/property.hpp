@@ -35,10 +35,10 @@ template <typename T,typename PropT>
 constexpr detail::has_property_t<T,PropT> has_property{};
 
 /**
-  @brief Check at compile time if object has a property
-  @param a Object under test
-  @param b Property which must be pre-declared with DRACOSHA_VALIDATOR_PROPERTY()
-  @return Validation status
+  @brief Check at compile time if object has a property.
+  @param a Object under test.
+  @param b Property which must be pre-declared with DRACOSHA_VALIDATOR_PROPERTY().
+  @return Validation status.
 */
 BOOST_HANA_CONSTEXPR_LAMBDA auto has_property_fn=[](auto&& a, auto&& b)
 {
@@ -46,10 +46,10 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto has_property_fn=[](auto&& a, auto&& b)
 };
 
 /**
-  @brief Extract object's property
-  @param val Object
-  @param prop Property which must be pre-declared with DRACOSHA_VALIDATOR_PROPERTY()
-  @return Value of the property or object itself if no such property exists
+  @brief Extract object's property.
+  @param val Object.
+  @param prop Property which must be pre-declared with DRACOSHA_VALIDATOR_PROPERTY().
+  @return Value of the property or object itself if no such property exists.
 */
 BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> decltype(auto)
 {
@@ -62,10 +62,10 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> declt
 #define DRACOSHA_VALIDATOR_HAS_PROPERTY(val,prop) hana::is_valid([](auto&& v) -> decltype((void)v.prop){})(val)
 
 /**
-  @brief Define property that can be used with validator
-  @param prop Property name
-  @param flag_dscr Description of positive flag
-  @param flag_dscr Description of negative flag
+  @brief Define property that can be used with validator.
+  @param prop Property name.
+  @param flag_dscr Description of positive flag.
+  @param flag_dscr Description of negative flag.
  */
 #define DRACOSHA_VALIDATOR_PROPERTY_FLAG(prop,flag_dscr,n_flag_dscr) \
     auto try_get_##prop =[](auto&& v) -> decltype(auto) \

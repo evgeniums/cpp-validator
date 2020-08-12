@@ -30,12 +30,12 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Modes of processing of not found members
+ * @brief Modes of processing of not found members.
  */
 enum class if_member_not_found : int
 {
-    ignore, //!< Ignore not found members
-    abort //!< Abort validating with false report if member is not found
+    ignore, //!< Ignore not found members.
+    abort //!< Abort validating with false report if member is not found.
 };
 
 /**
@@ -55,8 +55,8 @@ struct with_check_member_exists
     {}
 
     /**
-     * @brief Enable/disable checking if a member exists before validating the member
-     * @param enabled Flag
+     * @brief Enable/disable checking if a member exists before validating the member.
+     * @param enabled Flag.
      *
      * Disabling checking of member existance improves validation performance but can sometimes cause
      * exceptions or other undefined errors.
@@ -68,8 +68,8 @@ struct with_check_member_exists
         _check_member_exists=enable;
     }
     /**
-     * @brief Get flag of checking if member exists befor validation
-     * @return Flag
+     * @brief Get flag of checking if member exists befor validation.
+     * @return Flag.
      */
     bool is_check_member_exists_before_validation() const noexcept
     {
@@ -77,16 +77,16 @@ struct with_check_member_exists
     }
 
     /**
-     * @brief Set mode to use if member is not found
-     * @param mode Mode
+     * @brief Set mode to use if member is not found.
+     * @param mode Mode.
      */
     void set_unknown_member_mode(if_member_not_found mode) noexcept
     {
         _unknown_member_mode=mode;
     }
     /**
-     * @brief Get mode used if a member is not found
-     * @return Mode to use if a member not found
+     * @brief Get mode used if a member is not found.
+     * @return Mode to use if a member not found.
      */
     if_member_not_found unknown_member_mode() const noexcept
     {
@@ -94,9 +94,9 @@ struct with_check_member_exists
     }
 
     /**
-     * @brief Check if member exists
-     * @param member Member to check
-     * @return Status of checking
+     * @brief Check if member exists.
+     * @param member Member to check.
+     * @return Status of checking.
      */
     template <typename MemberT>
     bool check_member_exists(MemberT&& member) const
@@ -113,8 +113,8 @@ struct with_check_member_exists
     }
 
     /**
-     * @brief Get status to return if member is not found
-     * @return Resulting status
+     * @brief Get status to return if member is not found.
+     * @return Resulting status.
      */
     status not_found_status() const
     {

@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/extract.hpp
 *
-*  Defines method to extract value from operand
+*  Defines method to extract value from operand.
 *
 */
 
@@ -28,9 +28,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
-  @brief Extract value from input
-  @param v Input
-  @return Either input argument or result of handler evaluation if input is a lazy handler
+  @brief Extract value from argument.
+  @param v Argument can be plain value or lazy handler.
+  @return Either input argument or result of handler evaluation if input is a lazy handler.
   */
 BOOST_HANA_CONSTEXPR_LAMBDA auto extract = [](auto&& v) ->decltype(auto)
 {

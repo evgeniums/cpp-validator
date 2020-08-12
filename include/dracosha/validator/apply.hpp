@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operators/operator.hpp
 *
-*  Defines helpers to apply validating
+*  Defines helpers to apply validating.
 *
 */
 
@@ -27,10 +27,10 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct validator_tag;
 
 /**
-  @brief Apply validating to object
-  @param a Object to validate
-  @param v Either validation operator or compound validator
-  @return Validation result
+  @brief Apply validating to object.
+  @param a Object to validate.
+  @param v Either validation operator or compound validator.
+  @return Validation result.
   */
 BOOST_HANA_CONSTEXPR_LAMBDA auto apply = [](auto&& a,auto&& v) -> decltype(auto)
 {
@@ -41,11 +41,11 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto apply = [](auto&& a,auto&& v) -> decltype(auto)
 };
 
 /**
-  @brief Apply validating to object's member
-  @param a Object to validate
-  @param v Either validation operator or compound validator
-  @param member Object's member to validate
-  @return Validation result
+  @brief Apply validating to object's member.
+  @param a Object to validate.
+  @param v Either validation operator or compound validator.
+  @param member Object's member to validate.
+  @return Validation result.
   */
 BOOST_HANA_CONSTEXPR_LAMBDA auto apply_member = [](auto&& a,auto&& v,auto&& member) -> decltype(auto)
 {

@@ -49,9 +49,9 @@ struct range_t
     using is_sorted=SortedT;
 
     /**
-     * @brief Constructor
-     * @param container Container to be wrapped into range
-     * @param max_report_elements Max number of range elements to be listed in report
+     * @brief Constructor.
+     * @param container Container to be wrapped into range.
+     * @param max_report_elements Max number of range elements to be listed in report.
      */
     template <typename T1>
     range_t(
@@ -72,8 +72,8 @@ struct range_helper
 {
     /**
      * @brief Make range from container.
-     * @param container Container to wrap in range object
-     * @return Range
+     * @param container Container to wrap in range object.
+     * @return Range.
      */
     template <typename T>
     auto operator() (T&& container) const
@@ -205,12 +205,16 @@ struct range_helper
 constexpr range_helper range{};
 
 /**
- * @brief String representation of range to be used in reporting
+ * @brief String representation of range to be used in reporting.
  */
 struct range_str_t : public enable_to_string<range_str_t>
 {
     constexpr static const char* description="range";
 };
+
+/**
+ * @brief Instance of string representation of range to be used in reporting.
+ */
 constexpr range_str_t range_str{};
 
 /**
@@ -226,17 +230,17 @@ constexpr range_str_t range_str{};
  * // vector is formatted as "range [1, 2, 3, 4, 5, ... ]" if max_report_elements number is set to 5
  * @endcode
  *
- * If decorator is used then only the part within braces including the brases is decorated.
+ * If decorator is used then only the part within braces including the braces is decorated.
  */
 template <typename T>
 struct format_operand_t<T,hana::when<hana::is_a<range_tag,T>>>
 {
     /**
-     * @brief Format range operand
-     * @param traits Formatter traits
-     * @param val Operand value
-     * @param cats Grammatical categories of preceding phrase
-     * @return Formatted range
+     * @brief Format range operand.
+     * @param traits Formatter traits.
+     * @param val Operand value.
+     * @param cats Grammatical categories of preceding phrase.
+     * @return Formatted range.
      */
     template <typename TraitsT, typename T1>
     auto operator () (const TraitsT& traits, T1&& val, grammar_categories cats) const

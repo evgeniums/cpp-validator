@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/check_contains.hpp
 *
-*  Defines helper to check if object contains a member.
+*  Defines helper for checking if object contains a member.
 *
 */
 
@@ -32,12 +32,12 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Helper for checking if object contains a member
+ * @brief Helper for checking if object contains a member.
  */
 struct check_contains_t
 {
     /**
-     * @brief Check if T2 is iterator
+     * @brief Check if T2 is iterator.
      *
      * Check is performed at compile time.
      */
@@ -53,7 +53,7 @@ struct check_contains_t
     }
 
     /**
-     * @brief Check if object contains property
+     * @brief Check if object contains property.
      *
      * Check is performed at compile time using types of object and property.
      */
@@ -69,10 +69,10 @@ struct check_contains_t
     }
 
     /**
-     *  @brief Check if object contains member by key
-     *  @param a Object under validation
-     *  @param b Key
-     *  @return Operation status - true if found, false if not found
+     *  @brief Check if object contains member by key.
+     *  @param a Object under validation.
+     *  @param b Key.
+     *  @return Operation status - true if found, false if not found.
      */
     template <typename T1, typename T2>
     constexpr bool operator () (
@@ -116,7 +116,7 @@ struct check_contains_t
     }
 };
 /**
-  Instance to be used as check_contains() callable
+  Instance to be used as check_contains() callable.
 */
 constexpr check_contains_t check_contains{};
 

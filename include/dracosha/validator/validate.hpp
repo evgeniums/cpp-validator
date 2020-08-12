@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/validate.hpp
 *
-*  Defines class that performs actual validating
+*  Defines "validate" alias.
 *
 */
 
@@ -23,6 +23,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
+/**
+  Alias to call validation dispatcher.
+*/
 constexpr dispatcher_t validate{};
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

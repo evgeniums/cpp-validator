@@ -28,7 +28,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Proxy class for adapters using traits that inherits with_check_member_exists
+ * @brief Proxy class for adapters using traits that inherits with_check_member_exists.
  */
 template <typename AdapterT>
 class check_member_exists_traits_proxy
@@ -38,8 +38,8 @@ class check_member_exists_traits_proxy
         using adapter_type=AdapterT;
 
         /**
-         * @brief Constructor
-         * @param adapter Adapter object
+         * @brief Constructor.
+         * @param adapter Adapter object.
          */
         check_member_exists_traits_proxy(
             AdapterT& adapter
@@ -47,8 +47,8 @@ class check_member_exists_traits_proxy
         {}
 
         /**
-         * @brief Enable/disable checking if a member exists before validating the member
-         * @param enabled Flag
+         * @brief Enable/disable checking if a member exists before validating the member.
+         * @param enabled Flag.
          *
          * Disabling checking of member existance improves validation performance but can sometimes cause
          * exceptions or other undefined errors.
@@ -60,8 +60,8 @@ class check_member_exists_traits_proxy
             _adapter.traits().set_check_member_exists_before_validation(enable);
         }
         /**
-         * @brief Get flag of checking if member exists befor validation
-         * @return Flag
+         * @brief Get flag of checking if member exists befor validation.
+         * @return Flag.
          */
         bool is_check_member_exists_before_validation() const noexcept
         {
@@ -69,8 +69,8 @@ class check_member_exists_traits_proxy
         }
 
         /**
-         * @brief Set mode to use if member is not found
-         * @param mode Mode
+         * @brief Set mode to use if member is not found.
+         * @param mode Mode.
          */
         void set_unknown_member_mode(if_member_not_found mode) noexcept
         {
@@ -78,8 +78,8 @@ class check_member_exists_traits_proxy
         }
 
         /**
-         * @brief Get mode used if a member is not found
-         * @return Mode to use if a member not found
+         * @brief Get mode used if a member is not found.
+         * @return Mode to use if a member not found.
          */
         if_member_not_found unknown_member_mode() const noexcept
         {
@@ -87,9 +87,9 @@ class check_member_exists_traits_proxy
         }
 
         /**
-         * @brief Check if member exists
-         * @param member Member to check
-         * @return Status of checking
+         * @brief Check if member exists.
+         * @param member Member to check.
+         * @return Status of checking.
          */
         template <typename MemberT>
         bool check_member_exists(MemberT&& member) const
@@ -98,8 +98,8 @@ class check_member_exists_traits_proxy
         }
 
         /**
-         * @brief Get status to return if member is not found
-         * @return Resulting status
+         * @brief Get status to return if member is not found.
+         * @return Resulting status.
          */
         status not_found_status() const
         {

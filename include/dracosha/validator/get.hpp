@@ -25,9 +25,9 @@ Distributed under the Boost Software License, Version 1.0.
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 /**
-  @brief Get member/element from object
-  @param v Object
-  @param k Key of the member/element
+  @brief Get member/element from object.
+  @param v Object.
+  @param k Key of the member/element.
   @return Either reference to member's value or rvalue that was returned by property. It depends on the object and member implementation.
 
   If member can not be found by the key then behaviour depends on the object and member implementation,

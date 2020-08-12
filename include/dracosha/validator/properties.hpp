@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/properties.hpp
 *
-*  Includes all headers with properties
+*  Includes all headers with properties.
 *
 */
 

@@ -10,9 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/master_sampler.hpp
 *
-*  Defines wrapper of master sample object that can be used in validation operator
-*  as argument substitution. If such master sample is used as argument then
-*  the same member from master sample object will be forwarded to validation operator.
+*  Defines wrapper of master sample object.
 *
 */
 
@@ -33,6 +31,10 @@ struct master_sample_tag;
 
 /**
  * @brief Wrapper of master sample object
+ *
+ *  Wrapped master sample object can be used in validation operator
+ *  as argument substitution. If such master sample is used as argument then
+ *  the same member from master sample object will be forwarded to validation operator.
  */
 template <typename T>
 struct master_sample
@@ -103,10 +105,17 @@ struct is_master_sample<
 
 //-------------------------------------------------------------
 
+/**
+ * @brief String description for operator maste sample.
+ */
 struct string_master_sample_t : public enable_to_string<string_master_sample_t>
 {
     constexpr static const char* description="sample";
 };
+
+/**
+ * @brief Instance of string description for operator maste sample.
+ */
 constexpr string_master_sample_t string_master_sample{};
 
 //-------------------------------------------------------------

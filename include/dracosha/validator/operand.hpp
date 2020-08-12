@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/operand.hpp
 *
-*  Defines operand wrapper
+*  Defines operand wrapper.
 *
 */
 
@@ -33,7 +33,7 @@ struct master_sample_tag;
 struct operand_tag;
 
 /**
- * @brief Operand wrapper
+ * @brief Operand wrapper.
  *
  * Operand wrapper can be used to customize formatting of operand value.
  */
@@ -46,9 +46,9 @@ class operand : public object_wrapper<T>
         constexpr static const bool is_master_sample=hana::is_a<master_sample_tag,T>;
 
         /**
-         * @brief Constructor
-         * @param val Operand's value
-         * @param description String to use in report formatting to represent the operand
+         * @brief Constructor.
+         * @param val Operand's value.
+         * @param description String to use in report formatting to represent the operand.
          */
         operand(
                 T&& val,
@@ -58,7 +58,7 @@ class operand : public object_wrapper<T>
         {}
 
         /**
-         * @brief Operator of conversion to std::string
+         * @brief Operator of conversion to std::string.
          */
         operator std::string() const
         {
@@ -71,9 +71,9 @@ class operand : public object_wrapper<T>
 };
 
 /**
-  @brief Extract value from operand
-  @param v Input
-  @return Either v as is or v.get() if input is of operand_tag
+  @brief Extract value from operand.
+  @param v Input.
+  @return Either v as is or v.get() if input is of operand_tag.
   */
 BOOST_HANA_CONSTEXPR_LAMBDA auto extract_operand = [](auto&& v) ->decltype(auto)
 {

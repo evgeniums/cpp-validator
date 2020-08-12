@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/dispatcher.hpp
 *
-*  Defines validation dispatcher
+*  Defines validation dispatcher.
 *
 */
 
@@ -31,15 +31,15 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Dispatcher that dispatches validating requests to corresponding methods of supplied adapter
+ * @brief Dispatcher that dispatches validating requests to corresponding methods of supplied adapter.
  */
 struct dispatcher_t
 {
     /**
-     *  @brief Perform validation of object at one level without member nesting
-     *  @param a Object to validate
-     *  @param args Validation arguments
-     *  @return Validation status
+     *  @brief Perform validation of object.
+     *  @param a Object to validate or adapter.
+     *  @param args Validation arguments.
+     *  @return Validation status.
      */
     template <typename T1, typename ...Args>
     status operator() (T1&& a, Args&&... args) const
@@ -48,12 +48,12 @@ struct dispatcher_t
     }
 
     /**
-     *  @brief Perform validation of object's property at one level without member nesting
-     *  @param prop Property to validate
-     *  @param a Adapter with object to validate
-     *  @param op Operator for validation
-     *  @param b Sample argument for validation
-     *  @return Validation status
+     *  @brief Perform validation of object's property at one level.
+     *  @param prop Property to validate.
+     *  @param a Object to validate or adapter.
+     *  @param op Operator for validation.
+     *  @param b Sample argument for validation.
+     *  @return Validation status.
      */
     template <typename T1, typename T2, typename OpT, typename PropT>
     status operator() (PropT&& prop, T1&& a, OpT&& op, T2&& b) const
@@ -62,10 +62,10 @@ struct dispatcher_t
     }
 
     /**
-     *  @brief Perform validation of object's property at one level without member nesting
-     *  @param a Object to validate
-     *  @param args Validation arguments
-     *  @return Validation status
+     *  @brief Perform validation of object's property at one level without member nesting.
+     *  @param a Object to validate or adapter.
+     *  @param args Validation arguments.
+     *  @return Validation status.
      */
     template <typename T1, typename ...Args>
     static status invoke(T1&& a, Args&&... args)
@@ -74,10 +74,10 @@ struct dispatcher_t
     }
 
     /**
-     * @brief Execute validators on object and aggregate their results using logical AND
-     * @param a Object to validate
-     * @param args Validation arguments
-     * @return Logical AND of results of intermediate validators
+     * @brief Execute validators on object and aggregate their results using logical AND.
+     * @param a Object to validate or adapter.
+     * @param args Validation arguments.
+     * @return Logical AND of results of intermediate validators.
      */
     template <typename T1, typename ...Args>
     static status validate_and(T1&& a, Args&&... args)
@@ -86,10 +86,10 @@ struct dispatcher_t
     }
 
     /**
-     * @brief Execute validators on object and aggregate their results using logical OR
-     * @param a Object to validate
-     * @param args Validation arguments
-     * @return Logical OR of results of intermediate validators
+     * @brief Execute validators on object and aggregate their results using logical OR.
+     * @param a Object to validate or adapter.
+     * @param args Validation arguments.
+     * @return Logical OR of results of intermediate validators.
      */
     template <typename T1, typename ...Args>
     static status validate_or(T1&& a, Args&&... args)
@@ -98,10 +98,10 @@ struct dispatcher_t
     }
 
     /**
-     * @brief Execute validator on object and negate its result using logical NOT
-     * @param a Object to validate
-     * @param args Validation arguments
-     * @return Logical NOT of result of intermediate validator
+     * @brief Execute validator on object and negate its result using logical NOT.
+     * @param a Object to validate or adapter.
+     * @param args Validation arguments.
+     * @return Logical NOT of result of intermediate validator.
      */
     template <typename T1, typename ...Args>
     static status validate_not(T1&& a, Args&&... args)
@@ -110,10 +110,10 @@ struct dispatcher_t
     }
 
     /**
-     * @brief Execute validator to check if any element of a container satisfies the condition
-     * @param a Object to validate
-     * @param args Validation arguments
-     * @return Success if any element of a container satisfies the condition
+     * @brief Execute validator to check if any element of a container satisfies the condition.
+     * @param a Object to validate or adapter.
+     * @param args Validation arguments.
+     * @return Success if any element of a container satisfies the condition.
      */
     template <typename T1, typename ...Args>
     static status validate_any(T1&& a, Args&&... args)
@@ -122,10 +122,10 @@ struct dispatcher_t
     }
 
     /**
-     * @brief Execute validator to check if all elements of a container satisfy the condition
-     * @param a Object to validate
-     * @param args Validation arguments
-     * @return Success if all elements of a container satisfy the condition
+     * @brief Execute validator to check if all elements of a container satisfy the condition.
+     * @param a Object to validate or adapter.
+     * @param args Validation arguments.
+     * @return Success if all elements of a container satisfy the condition.
      */
     template <typename T1, typename ...Args>
     static status validate_all(T1&& a, Args&&... args)
@@ -133,6 +133,10 @@ struct dispatcher_t
         return detail::dispatcher_impl<T1>.validate_all(std::forward<T1>(a),std::forward<Args>(args)...);
     }
 };
+
+/**
+  @brief Instance of validation dispatcher.
+  */
 constexpr dispatcher_t dispatcher{};
 
 /**

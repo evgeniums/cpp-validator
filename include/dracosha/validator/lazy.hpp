@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/lazy.hpp
 *
-*  Defines wrapper for deferred invokation of a handler
+*  Defines wrapper for deferred invokation of a handler.
 *
 */
 
@@ -29,7 +29,7 @@ struct lazy_tag;
 template <typename T>
 
 /**
- * @brief Lazy invokation handler
+ * @brief Lazy invokation handler.
  */
 struct lazy_t
 {
@@ -43,8 +43,8 @@ struct lazy_t
 };
 
 /**
-  @brief Construct handler for deferred invokation
-  @param fn Handler that will be invoked later on demand
+  @brief Construct handler for deferred invokation.
+  @param fn Handler that will be invoked later on demand.
 */
 BOOST_HANA_CONSTEXPR_LAMBDA auto lazy = [](auto&& fn)
 {

@@ -27,7 +27,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct member_property_tag;
 
 /**
- * @brief Pair of a member and the member's property
+ * @brief Pair of a member and the member's property.
  */
 template <typename MemberT, typename PropT>
 struct member_property
@@ -42,9 +42,9 @@ struct member_property
 };
 
 /**
-  @brief Make member property pair
-  @param b ID to wrap into member operand
-  @return Member property pair
+  @brief Make pair of a member and the member's property.
+  @param b ID to wrap into member operand.
+  @return Pair of a member and the member's property.
   */
 template <typename MemberT, typename PropT>
 auto make_member_property(MemberT&& member, PropT&& prop)

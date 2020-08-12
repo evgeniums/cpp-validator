@@ -38,11 +38,17 @@ struct member_tag;
 namespace detail
 {
 
+/**
+ * @brief Helper for member's callable operator with 1 argument.
+ */
 template <typename T1, typename = hana::when<true>>
 struct member_helper_1arg_t
 {
 };
 
+/**
+ * @brief Helper for member's callable operator with 1 argument when the argument is operator.
+ */
 template <typename T1>
 struct member_helper_1arg_t<T1,
             hana::when<
@@ -55,10 +61,10 @@ struct member_helper_1arg_t<T1,
         >
 {
     /**
-     * @brief Bind compound validator to current member
-     * @param member Current member
-     * @param v Prepared partial validator
-     * @return Prepared partial validator bound to current member
+     * @brief Bind compound validator to current member.
+     * @param member Current member.
+     * @param v Prepared partial validator.
+     * @return Prepared partial validator bound to current member.
      */
     template <typename MemberT>
     auto operator() (MemberT&& member, T1&& v) const
@@ -67,6 +73,9 @@ struct member_helper_1arg_t<T1,
     }
 };
 
+/**
+ * @brief Helper for member's callable operator with 1 argument when the argument is a concrete_phrase.
+ */
 template <typename T1>
 struct member_helper_1arg_t<T1,
             hana::when<
@@ -79,20 +88,26 @@ struct member_helper_1arg_t<T1,
         >
 {
     /**
-     * @brief Construct a member from the current member with explicit name
-     * @param member Current member
-     * @param name Explicit name
-     * @return Member with explicit name
+     * @brief Construct a member from the current member with explicit name.
+     * @param member Current member.
+     * @param name Explicit name.
+     * @return Member with explicit name.
      */
     template <typename MemberT>
     auto operator() (MemberT&& member, T1&& name) const;
 };
 
+/**
+ * @brief Helper for member's callable operator with 2 arguments.
+ */
 template <typename T1, typename T2, typename = hana::when<true>>
 struct member_helper_2args_t
 {
 };
 
+/**
+ * @brief Helper for member's callable operator with 2 arguments when the second argument is enum of grammatical categories.
+ */
 template <typename T1, typename T2>
 struct member_helper_2args_t<T1,T2,
             hana::when<
@@ -101,16 +116,19 @@ struct member_helper_2args_t<T1,T2,
         >
 {
     /**
-     * @brief Construct a member from the current member with explicit name and grammatical category
-     * @param member Current member
-     * @param name Name and grammatical catrgories
-     * @param grammar_category Grammatical categoty of the name
-     * @return Member with explicit name
+     * @brief Construct a member from the current member with explicit name and grammatical category.
+     * @param member Current member.
+     * @param name Name and grammatical catrgories.
+     * @param grammar_category Grammatical categoty of the name.
+     * @return Member with explicit name.
      */
     template <typename MemberT>
     auto operator() (MemberT&& member, T1&& name, T2&& grammar_category) const;
 };
 
+/**
+ * @brief Helper for member's callable operator with 2 arguments when the first argument is operator.
+ */
 template <typename OpT, typename T1>
 struct member_helper_2args_t<OpT,T1,
             hana::when<
@@ -123,11 +141,11 @@ struct member_helper_2args_t<OpT,T1,
         >
 {
     /**
-     * @brief Bind plain operator to current member
-     * @param member Current member
-     * @param op Operator
-     * @param b Argument to forward to operator
-     * @return Prepared partial validator of "value" property bound to current member
+     * @brief Bind plain operator to current member.
+     * @param member Current member.
+     * @param op Operator.
+     * @param b Argument to forward to operator.
+     * @return Prepared partial validator of "value" property bound to current member.
      */
     template <typename MemberT>
     auto operator() (MemberT&& member, OpT&& op, T1&& b) const
@@ -136,6 +154,9 @@ struct member_helper_2args_t<OpT,T1,
     }
 };
 
+/**
+ * @brief Helper for member's callable operator with 2 arguments when the first argument is a flag.
+ */
 template <typename OpT, typename T1>
 struct member_helper_2args_t<OpT,T1,
             hana::when<
@@ -144,11 +165,11 @@ struct member_helper_2args_t<OpT,T1,
         >
 {
     /**
-     * @brief Rebind plain operator to the property validator if the last key in the path is a property and operator is a flag
-     * @param member Current member
-     * @param op Operator of flag type
-     * @param b Argument to forward to operator
-     * @return Prepared partial validator of the property corresponding to the last property key in the path
+     * @brief Rebind plain operator to the property validator if the last key in the path is a property and operator is a flag.
+     * @param member Current member.
+     * @param op Operator of flag type.
+     * @param b Argument to forward to operator.
+     * @return Prepared partial validator of the property corresponding to the last property key in the path.
      */
     template <typename MemberT>
     auto operator() (MemberT&& member, OpT&& op, T1&& b,
@@ -159,11 +180,11 @@ struct member_helper_2args_t<OpT,T1,
     }
 
     /**
-     * @brief Rebind plain operator to the property validator of parent member if the last key in the path is a property and operator is a flag
-     * @param member Current member
-     * @param op Operator of flag type
-     * @param b Argument to forward to operator
-     * @return Prepared partial validator of the property of parent member corresponding to the last property key in the path
+     * @brief Rebind plain operator to the property validator of parent member if the last key in the path is a property and operator is a flag.
+     * @param member Current member.
+     * @param op Operator of flag type.
+     * @param b Argument to forward to operator.
+     * @return Prepared partial validator of the property of parent member corresponding to the last property key in the path.
      */
     template <typename MemberT>
     auto operator () (MemberT&& member, OpT&& op, T1&& b,
@@ -180,29 +201,41 @@ struct member_helper_2args_t<OpT,T1,
     }
 };
 
+/**
+ * @brief Helper for member's callable operator.
+ */
 template <typename ... Args>
 struct member_helper_t
 {
     /**
      * @brief Construct a member from the current member with explicit name and grammatical categories.
-     * @param member Current member
-     * @param args Name and grammatical catrgories
-     * @return Member with explicit name
+     * @param member Current member.
+     * @param args Name and grammatical catrgories.
+     * @return Member with explicit name.
      */
     template <typename MemberT>
     auto operator() (MemberT&& member, Args&&... args) const;
 };
 
+/**
+ * @brief Helper for member's callable operator with 1 argument.
+ */
 template <typename T1>
 struct member_helper_t<T1> : public member_helper_1arg_t<T1>
 {
 };
 
+/**
+ * @brief Helper for member's callable operator with 2 arguments.
+ */
 template <typename T1, typename T2>
 struct member_helper_t<T1,T2> : public member_helper_2args_t<T1,T2>
 {
 };
 
+/**
+ * @brief Calable instance of helper for member's callable operator.
+ */
 template <typename ... Args>
 constexpr member_helper_t<Args...> member_helper{};
 

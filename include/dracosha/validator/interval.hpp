@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/interval.hpp
 *
-*  Defines interval
+*  Defines interval.
 *
 */
 
@@ -31,18 +31,18 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct interval_tag;
 
 /**
- * @brief Mode of interval
+ * @brief Mode of interval.
  */
 enum class interval_mode : int
 {
-    closed, //!< Interval includes both endpoints
-    open, //!< Interval does not include both endpoints
-    open_from, //!< Interval includes only "to" endpoint and doesn't include "from" endpoint
-    open_to //!< Interval includes only "from" endpoint and doesn't include "to" endpoint
+    closed, //!< Interval includes both endpoints.
+    open, //!< Interval does not include both endpoints.
+    open_from, //!< Interval includes only "to" endpoint and doesn't include "from" endpoint.
+    open_to //!< Interval includes only "from" endpoint and doesn't include "to" endpoint.
 };
 
 /**
- * @brief Interval to be used in operators of "in" type
+ * @brief Interval to be used in operators of "in" type.
  */
 template <typename T>
 struct interval_t
@@ -51,10 +51,10 @@ struct interval_t
     using type=T;
 
     /**
-     * @brief Constructor
-     * @param from From endpoint
-     * @param to To endpoint
-     * @param mode Mode of endpoints
+     * @brief Constructor.
+     * @param from From endpoint.
+     * @param to To endpoint.
+     * @param mode Mode of endpoints.
      */
     template <typename T1, typename T2>
     interval_t(
@@ -72,16 +72,16 @@ struct interval_t
 };
 
 /**
- * @brief Helper to build intervals
+ * @brief Helper to build intervals.
  */
 struct interval_helper
 {
     /**
-     * @brief Create interval from endpoints and mode
-     * @param from From endpoint
-     * @param to To endpoint
-     * @param mode Mode of endpoints
-     * @return Interval
+     * @brief Create interval from endpoints and mode.
+     * @param from From endpoint.
+     * @param to To endpoint.
+     * @param mode Mode of endpoints.
+     * @return Interval.
      */
     template <typename T1, typename T2>
     auto operator() (T1&& from, T2&& to, interval_mode mode=interval_mode::closed) const
@@ -90,8 +90,8 @@ struct interval_helper
     }
 
     /**
-     * @brief Get mode for closed interval
-     * @return Mode for closed interval
+     * @brief Get mode for closed interval.
+     * @return Mode for closed interval.
      */
     constexpr static interval_mode closed()
     {
@@ -99,8 +99,8 @@ struct interval_helper
     }
 
     /**
-     * @brief Get mode for open interval
-     * @return Mode for open interval
+     * @brief Get mode for open interval.
+     * @return Mode for open interval.
      */
     constexpr static interval_mode open()
     {
@@ -108,8 +108,8 @@ struct interval_helper
     }
 
     /**
-     * @brief Get mode for left open interval
-     * @return Mode for left open interval
+     * @brief Get mode for left open interval.
+     * @return Mode for left open interval.
      */
     constexpr static interval_mode open_from()
     {
@@ -117,8 +117,8 @@ struct interval_helper
     }
 
     /**
-     * @brief Get mode for right open interval
-     * @return Mode for right open interval
+     * @brief Get mode for right open interval.
+     * @return Mode for right open interval.
      */
     constexpr static interval_mode open_to()
     {
@@ -126,15 +126,23 @@ struct interval_helper
     }
 
 };
+
+/**
+  Interval instance to be used in validators.
+  */
 constexpr interval_helper interval{};
 
 /**
- * @brief String representation of interval to be used in reporting
+ * @brief String representation of interval to be used in reporting.
  */
 struct interval_str_t : public enable_to_string<interval_str_t>
 {
     constexpr static const char* description="interval";
 };
+
+/**
+ * @brief Instance of string representation of interval to be used in reporting.
+ */
 constexpr interval_str_t interval_str{};
 
 /**
@@ -152,11 +160,11 @@ template <typename T>
 struct format_operand_t<T,hana::when<hana::is_a<interval_tag,T>>>
 {
     /**
-     * @brief Format interval operand
-     * @param traits Formatter traits
-     * @param val Operand value
-     * @param cats Grammatical categories of preceding phrase
-     * @return Formatted interval
+     * @brief Format interval operand.
+     * @param traits Formatter traits.
+     * @param val Operand value.
+     * @param cats Grammatical categories of preceding phrase.
+     * @return Formatted interval.
      */
     template <typename TraitsT, typename T1>
     auto operator () (const TraitsT& traits, T1&& val, grammar_categories cats) const

@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/property_validator.hpp
 *
-*  Defines helpers functor for property validation
+*  Defines functor for property validation.
 *
 */
 
@@ -29,7 +29,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct property_validator_tag;
 
 /**
- * @brief Property validator functor
+ * @brief Property validator functor.
  */
 template <typename Handler, typename PropT>
 struct property_validator
@@ -47,9 +47,9 @@ struct property_validator
 };
 
 /**
- * @brief Make property validator functor
- * @param prop Property
- * @param args Arguments to forward to validator
+ * @brief Make property validator functor.
+ * @param prop Property.
+ * @param args Arguments to forward to validator.
  */
 template <typename PropT, typename ... Args>
 constexpr auto make_property_validator(PropT&& prop, Args&&... args)

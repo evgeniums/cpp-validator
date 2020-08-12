@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/status.hpp
 *
-*  Defines status of validation operations
+*  Defines status of validation operations.
 *
 */
 
@@ -39,30 +39,28 @@ class status
             ignore
         };
 
+        /**
+         * @brief Default constructor.
+         */
         status() noexcept : _code(code::success)
         {}
-        ~status()=default;
-        status(const status&)=default;
-        status(status&&)=default;
-        status& operator= (const status&)=default;
-        status& operator= (status&&)=default;
 
         /**
-         * @brief Constructor from code
-         * @param c Status code
+         * @brief Constructor from code.
+         * @param c Status code.
          */
         status(code c) noexcept : _code(c)
         {}
 
         /**
-         * @brief Constructor from boolean
-         * @param ok Boolean status
+         * @brief Constructor from boolean.
+         * @param ok Boolean status.
          */
         status(bool ok) noexcept : _code(ok?code::success:code::fail)
         {}
 
         /**
-         * @brief Convert to boolean
+         * @brief Convert to boolean.
          */
         operator bool () const noexcept
         {
@@ -70,8 +68,8 @@ class status
         }
 
         /**
-         * @brief Get value
-         * @return Status code
+         * @brief Get code value.
+         * @return Status code.
          */
         code value() const noexcept
         {

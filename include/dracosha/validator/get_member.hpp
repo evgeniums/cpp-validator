@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/get_member.hpp
 *
-*  Defines extractor of object's member
+*  Defines extractor of object's member.
 *
 */
 
@@ -27,10 +27,10 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
-  @brief Extract nested member from object
-  @param Top level object
-  @param Path to the member to extract
-  @return Extracted member
+  @brief Extract nested member from object.
+  @param Top level object.
+  @param Path to the member to extract.
+  @return Extracted member.
 
   In most cases a reference will be returned except for the cases of properties that return rvalues, e.g. size() or empty().
 */

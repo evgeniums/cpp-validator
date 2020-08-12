@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/validator.hpp
 *
-*  Top level header of validator library
+*  Top level header of validator library.
 *
 */
 
@@ -55,14 +55,14 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
- * @brief Helper for generating members and master sample wrappers
+ * @brief Helper for generating members and validation wrappers.
  */
 struct _t
 {
     /**
-     * @brief Create member
-     * @param key Key of the member
-     * @return Member
+     * @brief Create member.
+     * @param key Key of the member.
+     * @return Member.
      */
     template <typename T>
     constexpr auto operator [] (T&& key) const
@@ -71,9 +71,9 @@ struct _t
     }
 
     /**
-     * @brief Create master sample wrapper
-     * @param masterRefObj Object to use as a master sample
-     * @return Wrapper of master sample object
+     * @brief Wrap master sample object.
+     * @param masterRefObj Object to use as a master sample.
+     * @return Wrapped master sample object.
      */
     template <typename T>
     constexpr auto operator () (const T& masterRefObj) const -> decltype(auto)
@@ -82,10 +82,10 @@ struct _t
     }
 
     /**
-     * @brief Wrap operand appending explicit description to the operand
-     * @param val Operand
-     * @param description Explicit description to be used in reporting
-     * @return Wrapped operand
+     * @brief Wrap operand appending explicit description to the operand.
+     * @param val Operand.
+     * @param description Explicit description to be used in reporting.
+     * @return Wrapped operand.
      */
     template <typename T1, typename T2>
     constexpr auto operator () (
@@ -98,10 +98,10 @@ struct _t
     }
 
     /**
-     * @brief Wrap operator appending explicit description to the operator
-     * @param op Operator
-     * @param description Explicit description to be used in reporting
-     * @return Wrapped operator
+     * @brief Wrap operator appending explicit description to the operator.
+     * @param op Operator.
+     * @param description Explicit description to be used in reporting.
+     * @return Wrapped operator.
      */
     template <typename T1, typename T2>
     constexpr auto operator () (
@@ -121,10 +121,10 @@ struct _t
     }
 
     /**
-     * @brief Wrap flag operator appending explicit description
-     * @param op Flag operator
-     * @param description Explicit description to be used in reporting
-     * @return Flag operator with description
+     * @brief Wrap flag operator appending explicit description.
+     * @param op Flag operator.
+     * @param description Explicit description to be used in reporting.
+     * @return Flag operator with description.
      */
     template <typename T1, typename T2>
     constexpr auto operator () (
@@ -139,10 +139,10 @@ struct _t
     }
 
     /**
-     * @brief Wrap exists operator appending explicit description
-     * @param op Exists operator
-     * @param description Explicit description to be used in reporting
-     * @return Exists operator with description
+     * @brief Wrap exists operator appending explicit description.
+     * @param op Exists operator.
+     * @param description Explicit description to be used in reporting.
+     * @return Exists operator with description.
      */
     template <typename T1, typename T2>
     constexpr auto operator () (
@@ -154,19 +154,23 @@ struct _t
         return exists_op_with_string_t{std::forward<T2>(description)};
     }
 };
+
+/**
+ * @brief Instance of helper for generating members and validation wrappers.
+ */
 constexpr _t _{};
 
 //-------------------------------------------------------------
 
 /**
- * @brief Helper class to wrap validators
+ * @brief Helper for wrapping validators.
  */
 struct wrap_validator
 {
     /**
-     * @brief Wrap list of validators or validation operators into logical AND
-     * @param args Arguments to forward to AND
-     * @return Validator
+     * @brief Wrap list of validators or validation operators into logical AND.
+     * @param args Arguments to forward to AND.
+     * @return Validator.
      */
     template <typename ... Args>
     constexpr auto operator () (Args&& ...args) const -> decltype(auto)
@@ -175,9 +179,9 @@ struct wrap_validator
     }
 
     /**
-     * @brief Make validator from a property validator
-     * @param v Property validator
-     * @return Validator
+     * @brief Make validator from a property validator.
+     * @param v Property validator.
+     * @return Validator.
      */
     template <typename T>
     constexpr auto operator () (T&& v,
@@ -188,9 +192,9 @@ struct wrap_validator
     }
 
     /**
-     * @brief Just syntax sugar, return validator or validation operator as is
-     * @param v Validator or validation operator
-     * @return Input validator as is
+     * @brief Just syntax sugar, return validator or validation operator as is.
+     * @param v Validator or validation operator.
+     * @return Input validator as is.
      */
     template <typename T>
     constexpr auto operator () (T&& v,
@@ -201,10 +205,10 @@ struct wrap_validator
     }
 
     /**
-     * @brief Create validator form operator and operand
-     * @param op Operator
-     * @param b Operand
-     * @return Validator
+     * @brief Create validator form operator and operand.
+     * @param op Operator.
+     * @param b Operand.
+     * @return Validator.
      */
     template <typename OpT, typename T>
     constexpr auto operator () (OpT&& op,
@@ -215,6 +219,10 @@ struct wrap_validator
         return make_validator(value(std::forward<OpT>(op),std::forward<T>(b)));
     }
 };
+
+/**
+  @brief Callable object for creating or wrapping validators.
+*/
 constexpr wrap_validator validator{};
 
 //-------------------------------------------------------------

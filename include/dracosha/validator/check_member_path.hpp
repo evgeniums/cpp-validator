@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/check_member_path.hpp
 *
-*  Defines helpers for checking existance of member path in type of an object
+*  Defines helpers for checking existance of member path in type of an object.
 *
 */
 
@@ -27,12 +27,12 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
-  @brief Check if path of types in member descriptor can exist in the object
-  @param obj Object under validation
-  @param path Member path as a tuple
-  @return Validation status
+  @brief Check if path of types in member descriptor can exist in the object.
+  @param obj Object under validation.
+  @param path Member path as a tuple.
+  @return Validation status.
 
-  This operation is expected to be static and must be performed at compile time.
+  This operation is expected to be static and assumed to be performed at compile time.
 */
 BOOST_HANA_CONSTEXPR_LAMBDA auto check_member_path =[](auto&& obj,auto&& path)
 {
@@ -44,9 +44,9 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto check_member_path =[](auto&& obj,auto&& path)
 
 /**
   * @brief Check if members have paths of the same types.
-  * @param member1 First member
-  * @param Second member
-  * @return Result of check operation
+  * @param member1 First member.
+  * @param Second member.
+  * @return Result of check operation.
   */
 BOOST_HANA_CONSTEXPR_LAMBDA auto check_member_path_types =[](const auto& member1,const auto& member2)
 {

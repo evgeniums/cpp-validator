@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/detail/validator_impl.hpp
 *
-*  Defines implementation of validator
+*  Defines implementation of validator.
 *
 */
 
@@ -31,7 +31,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct validator_tag;
 
 /**
- * @brief Validator with hint
+ * @brief Validator with hint.
  *
  * Validator holds the validating executer and invokes apply() method to perform validation
  * using embedded executor.
@@ -46,8 +46,8 @@ class validator_with_hint_t
         using hint_type=typename adjust_storable_type<HintT>::type;
 
         /**
-         * @brief Ctor
-         * @param fn Validation handler that will be called to perform validating
+         * @brief Constructor.
+         * @param fn Validation handler that will be called to perform validating.
          */
         template <typename HintT1>
         validator_with_hint_t(
@@ -60,9 +60,9 @@ class validator_with_hint_t
 
         /**
          * @brief Invoke validating with supplied args and override reporting description with ecplicit description.
-         * @param adpt Reporting adapter
-         * @param args Arguments to forward to embedded executor
-         * @return Validation status
+         * @param adpt Reporting adapter.
+         * @param args Arguments to forward to embedded executor.
+         * @return Validation status.
          */
         template <typename AdapterT, typename ... Args>
         auto apply(AdapterT&& adpt, Args&&... args) const
@@ -83,7 +83,7 @@ class validator_with_hint_t
 };
 
 /**
- * @brief Validator
+ * @brief Validator.
  *
  * Validator holds the validating executer and invokes apply() method to perform validation
  * using embedded executor.
@@ -96,17 +96,17 @@ class validator_t
         using hana_tag=validator_tag;
 
         /**
-         * @brief Ctor
-         * @param fn Validation handler that will be called to perform validating
+         * @brief Construtor
+         * @param fn Validation handler that will be called to perform validating.
          */
         validator_t(Handler fn):_fn(std::move(fn))
         {
         }
 
         /**
-         * @brief Invoke validating with supplied args
-         * @param args Arguments to forward to embedded executor
-         * @return Validation status
+         * @brief Invoke validating with supplied args.
+         * @param args Arguments to forward to embedded executor.
+         * @return Validation status.
          */
         template <typename ... Args>
         auto apply(Args&&... args) const
@@ -115,9 +115,9 @@ class validator_t
         }
 
         /**
-         * @brief Create validator with hint
-         * @param h Hint
-         * @return Validator with hint
+         * @brief Create validator with hint.
+         * @param h Hint.
+         * @return Validator with hint.
          */
         template <typename T>
         auto hint(T&& h)
@@ -126,9 +126,9 @@ class validator_t
         }
 
         /**
-         * @brief Create validator with hint
-         * @param h Hint
-         * @return Validator with hint
+         * @brief Create validator with hint.
+         * @param h Hint.
+         * @return Validator with hint.
          */
         template <typename T>
         auto operator () (T&& h)
