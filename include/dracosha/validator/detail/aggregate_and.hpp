@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/detail/aggregate_and.hpp
 *
-*  Defines aggregation of intermediate validators or validation operators using logical AND
+*  Defines aggregation of intermediate validators or validation operators using logical AND.
 *
 */
 
@@ -32,15 +32,15 @@ namespace detail
 {
 
 /**
- * @brief Aggregation of intermediate validators using logical AND
+ * @brief Aggregation of intermediate validators using logical AND.
  */
 struct aggregate_and_t
 {
     /**
-     * @brief Execute validators on object and aggregate their results using logical AND
-     * @param a Object to validate
-     * @param ops List of intermediate validators or validation operators
-     * @return Logical AND of results of intermediate validators
+     * @brief Execute validators on object and aggregate their results using logical AND.
+     * @param a Object to validate or adapter.
+     * @param ops List of intermediate validators or validation operators.
+     * @return Logical AND of results of intermediate validators.
      */
     template <typename T, typename OpsT>
     constexpr bool operator ()(T&& a,OpsT&& ops) const
@@ -49,11 +49,11 @@ struct aggregate_and_t
     }
 
     /**
-     * @brief Execute validators on object's member and aggregate their results using logical AND
-     * @param a Object to validate
-     * @param member Member to process with validators
-     * @param ops List of intermediate validators or validation operators
-     * @return Logical AND of results of intermediate validators
+     * @brief Execute validators on object's member and aggregate their results using logical AND.
+     * @param a Object to validate or adapter.
+     * @param member Member to process with validators.
+     * @param ops List of intermediate validators or validation operators.
+     * @return Logical AND of results of intermediate validators.
      */
     template <typename T, typename OpsT, typename MemberT>
     constexpr bool operator () (T&& a,MemberT&& member,OpsT&& ops) const
@@ -61,6 +61,9 @@ struct aggregate_and_t
         return dispatcher.validate_and(std::forward<decltype(a)>(a),std::forward<decltype(member)>(member),std::forward<decltype(ops)>(ops));
     }
 };
+/**
+  @brief Instance of aggregation of intermediate validators using logical AND.
+  */
 constexpr aggregate_and_t aggregate_and{};
 }
 

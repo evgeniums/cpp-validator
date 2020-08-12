@@ -29,19 +29,27 @@ namespace detail
 {
 
 /**
- * @brief Stub to use for address extracting
+ * @brief Stub to use for address extracting.
  */
 struct take_address_of_stub_t
 {
 };
+
+/**
+ * @brief Instance of stub to use for address extracting.
+ */
 constexpr take_address_of_stub_t take_address_of_stub{};
 
+/**
+ * @brief Default helper for taking address of stub variable.
+ */
 template <typename T, typename=hana::when<true>>
 struct take_address_of_t
 {
 };
+
 /**
- * @brief Take address of stub variable if supplied variable is not of lvalue reference type
+ * @brief Helper for taking address of stub variable if supplied variable is not of lvalue reference type.
  */
 template <typename T>
 struct take_address_of_t<T,hana::when<!std::is_lvalue_reference<T>::value>>
@@ -53,7 +61,7 @@ struct take_address_of_t<T,hana::when<!std::is_lvalue_reference<T>::value>>
 };
 
 /**
- * @brief Take address of supplied variable it is of lvalue reference type
+ * @brief Helper for taking address of supplied variable if it is of lvalue reference type.
  */
 template <typename T>
 struct take_address_of_t<T,hana::when<std::is_lvalue_reference<T>::value>>
@@ -64,6 +72,9 @@ struct take_address_of_t<T,hana::when<std::is_lvalue_reference<T>::value>>
     }
 };
 
+/**
+ * @brief Callable for taking address of variable.
+ */
 template <typename T>
 constexpr take_address_of_t<T> take_address_of{};
 

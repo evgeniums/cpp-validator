@@ -65,7 +65,7 @@ void format_join(DstT& dst, FormatterTs&& formatters, Args&&... args)
 //-------------------------------------------------------------
 
 /**
- * @brief Apply presentation and order of validation report for 1 argument, which must be an aggregation operator
+ * @brief Apply presentation and order of validation report for 1 argument, which must be an aggregation operator.
  */
 template <typename AggregationItemT>
 struct apply_reorder_present_1arg_t
@@ -109,7 +109,7 @@ struct apply_reorder_present_1arg_t
 //-------------------------------------------------------------
 
 /**
- * @brief Apply presentation and order of validation report for 2 arguments without property and without member
+ * @brief Apply presentation and order of validation report for 2 arguments without property and without member.
  */
 template <typename OpT, typename T2, typename = hana::when<true>>
 struct apply_reorder_present_2args_t
@@ -156,7 +156,7 @@ struct apply_reorder_present_2args_t<
 //-------------------------------------------------------------
 
 /**
- * @brief Apply presentation and order of validation report for 3 arguments with property but without member
+ * @brief Apply presentation and order of validation report for 3 arguments with property but without member.
  */
 template <typename PropT, typename OpT, typename T2, typename = hana::when<true>>
 struct apply_reorder_present_3args_t
@@ -196,7 +196,7 @@ struct apply_reorder_present_3args_t
 };
 
 /**
- * @brief Apply presentation and order of validation report for 3 arguments when operator is a flag
+ * @brief Apply presentation and order of validation report for 3 arguments when operator is a flag.
  */
 template <typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_3args_t<
@@ -237,7 +237,7 @@ struct apply_reorder_present_3args_t<
 };
 
 /**
- * @brief Apply presentation and order of validation report for 3 arguments when operand is a member operand
+ * @brief Apply presentation and order of validation report for 3 arguments when operand is a member operand.
  */
 template <typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_3args_t<
@@ -286,7 +286,7 @@ struct apply_reorder_present_3args_t<
 //-------------------------------------------------------------
 
 /**
- * @brief Apply presentation and order of validation report for 4 arguments with member
+ * @brief Apply presentation and order of validation report for 4 arguments with member.
  */
 template <typename MemberT, typename PropT, typename OpT, typename T2, typename = hana::when<true>>
 struct apply_reorder_present_4args_t
@@ -332,7 +332,7 @@ struct apply_reorder_present_4args_t
 };
 
 /**
- * @brief Apply presentation and order of validation report for 4 arguments with a member is compared to other member
+ * @brief Apply presentation and order of validation report for 4 arguments with a member is compared to other member.
  */
 template <typename MemberT, typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_4args_t<
@@ -380,7 +380,7 @@ struct apply_reorder_present_4args_t<
 };
 
 /**
- * @brief Apply presentation and order of validation report for flag operator
+ * @brief Apply presentation and order of validation report for flag operator.
  */
 template <typename MemberT, typename PropT, typename OpT, typename T2>
 struct apply_reorder_present_4args_t<
@@ -427,7 +427,7 @@ struct apply_reorder_present_4args_t<
 //-------------------------------------------------------------
 
 /**
- * @brief Apply presentation and order of validation report for 4 arguments with a member is compared to the same member of sample object
+ * @brief Apply presentation and order of validation report for 4 arguments with a member is compared to the same member of sample object.
  */
 template <typename MemberT, typename PropT, typename OpT, typename MemberSampleT, typename T2>
 struct apply_reorder_present_5args_t
@@ -483,7 +483,7 @@ struct apply_reorder_present_5args_t
 //-------------------------------------------------------------
 
 /**
- * @brief Apply presentation and order of validation report for arbitrary number of arguments
+ * @brief Apply presentation and order of validation report for arbitrary number of arguments.
  */
 template <typename ...Args>
 struct apply_reorder_present_t
@@ -499,7 +499,7 @@ struct apply_reorder_present_t
 };
 
 /**
- * @brief Apply presentation and order of validation report for 5 arguments with member and sample member
+ * @brief Apply presentation and order of validation report for 5 arguments with member and sample member.
  */
 template <typename T1, typename T2, typename T3, typename T4, typename T5>
 struct apply_reorder_present_t<T1,T2,T3,T4,T5> : public apply_reorder_present_5args_t<T1,T2,T3,T4,T5>
@@ -507,7 +507,7 @@ struct apply_reorder_present_t<T1,T2,T3,T4,T5> : public apply_reorder_present_5a
 };
 
 /**
- * @brief Apply presentation and order of validation report for 4 arguments with member
+ * @brief Apply presentation and order of validation report for 4 arguments with member.
  */
 template <typename T1, typename T2, typename T3, typename T4>
 struct apply_reorder_present_t<T1,T2,T3,T4> : public apply_reorder_present_4args_t<T1,T2,T3,T4>
@@ -515,7 +515,7 @@ struct apply_reorder_present_t<T1,T2,T3,T4> : public apply_reorder_present_4args
 };
 
 /**
- * @brief Apply presentation and order of validation report for 3 arguments with property but without member
+ * @brief Apply presentation and order of validation report for 3 arguments with property but without member.
  */
 template <typename T1, typename T2, typename T3>
 struct apply_reorder_present_t<T1,T2,T3> : public apply_reorder_present_3args_t<T1,T2,T3>
@@ -523,7 +523,7 @@ struct apply_reorder_present_t<T1,T2,T3> : public apply_reorder_present_3args_t<
 };
 
 /**
- * @brief Apply presentation and order of validation report for 2 arguments without property and without member
+ * @brief Apply presentation and order of validation report for 2 arguments without property and without member.
  */
 template <typename T1, typename T2>
 struct apply_reorder_present_t<T1,T2> : public apply_reorder_present_2args_t<T1,T2>
@@ -531,20 +531,23 @@ struct apply_reorder_present_t<T1,T2> : public apply_reorder_present_2args_t<T1,
 };
 
 /**
- * @brief Apply presentation and order of validation report for 1 argument
+ * @brief Apply presentation and order of validation report for 1 argument.
  */
 template <typename T1>
 struct apply_reorder_present_t<T1> : public apply_reorder_present_1arg_t<T1>
 {
 };
 
+/**
+ * @brief Apply presentation and order.
+ */
 template <typename ... Args>
 constexpr apply_reorder_present_t<Args...> apply_reorder_present{};
 
 //-------------------------------------------------------------
 
 /**
- * @brief Apply presentation and order of validation report
+ * @brief Helper for applying presentation and order of validation report.
  */
 struct reorder_and_present_t
 {
@@ -554,6 +557,10 @@ struct reorder_and_present_t
         apply_reorder_present<Args...>(dst,std::forward<FormatterTs>(formatters),std::forward<Args>(args)...);
     }
 };
+
+/**
+ * @brief Apply presentation and order of validation report.
+ */
 constexpr reorder_and_present_t reorder_and_present{};
 
 //-------------------------------------------------------------

@@ -37,7 +37,7 @@ namespace detail
 {
 
 /**
- * @brief Helper for ANY/ALL aggregation of non-container types
+ * @brief Helper for ANY/ALL aggregation of non-container types.
  */
 template <typename T, typename=hana::when<true>>
 struct aggregate_impl
@@ -68,7 +68,7 @@ struct aggregate_impl
 };
 
 /**
- * @brief Helper for ANY/ALL aggregation of container types
+ * @brief Helper for ANY/ALL aggregation of container types.
  */
 template <typename T>
 struct aggregate_impl<T,
@@ -89,12 +89,12 @@ struct aggregate_impl<T,
 
 //-------------------------------------------------------------
 /**
- * @brief Implementation of default adapter
+ * @brief Implementation of default adapter.
  */
 struct default_adapter_impl
 {
     /**
-     *  Call validation operator on object extracted from adapter
+     *  @brief Call validation operator on object extracted from adapter.
      */
     template <typename AdapterT, typename T2, typename OpT>
     static status validate_operator(AdapterT&& adpt, OpT&& op, T2&& b)
@@ -107,7 +107,7 @@ struct default_adapter_impl
     }
 
     /**
-     *  Call validation operator on property of the object extracted from adapter
+     *  @brief Call validation operator on property of the object extracted from adapter.
      */
     template <typename AdapterT, typename T2, typename OpT, typename PropT>
     static status validate_property(AdapterT&& adpt, PropT&& prop, OpT&& op, T2&& b)
@@ -120,7 +120,7 @@ struct default_adapter_impl
     }
 
     /**
-     * Check if member exists.
+     * @brief Check if member exists.
      */
     template <typename AdapterT, typename T2, typename OpT, typename MemberT>
     static status validate_exists(AdapterT&& adpt, MemberT&& member, OpT&&, T2&& b, bool from_check_member)
@@ -140,7 +140,8 @@ struct default_adapter_impl
     }
 
     /**
-     * Validate a member.
+     * @brief Validate a member.
+     *
      * If configured, the existance of the member can be checked before validation.
      */
     template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
@@ -168,7 +169,8 @@ struct default_adapter_impl
     }
 
     /**
-     * Validate a member using other member as sample.
+     * @brief Validate a member using other member as sample.
+     *
      * If configured, the existance of the member can be checked before validation.
      */
     template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
@@ -196,7 +198,8 @@ struct default_adapter_impl
     }
 
     /**
-     * Validate a member using member with the same path of sample object.
+     * @brief Validate a member using member with the same path of sample object.
+     *
      * If configured, the existance of the member can be checked before validation.
      */
     template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
@@ -224,7 +227,7 @@ struct default_adapter_impl
     }
 
     /**
-     * Validate AND aggregation.
+     * @brief Validate AND aggregation.
      */
     template <typename AdapterT, typename OpsT>
     static status validate_and(AdapterT&& adpt, OpsT&& ops)
@@ -242,7 +245,7 @@ struct default_adapter_impl
     }
 
     /**
-     * Validate a member using AND aggregation.
+     * @brief Validate a member using AND aggregation.
      */
     template <typename AdapterT, typename MemberT, typename OpsT>
     static status validate_and(AdapterT&& adpt, MemberT&& member, OpsT&& ops)
@@ -275,7 +278,7 @@ struct default_adapter_impl
     }
 
     /**
-     * Validate OR aggregation.
+     * @brief Validate OR aggregation.
      */
     template <typename AdapterT, typename OpsT>
     static status validate_or(AdapterT&& adpt, OpsT&& ops)
@@ -296,7 +299,7 @@ struct default_adapter_impl
     }
 
     /**
-     * Validate a member using OR aggregation.
+     * @brief Validate a member using OR aggregation.
      */
     template <typename AdapterT, typename MemberT, typename OpsT>
     static status validate_or(AdapterT&& adpt, MemberT&& member, OpsT&& ops)
@@ -326,7 +329,7 @@ struct default_adapter_impl
     }
 
     /**
-     * Validate ANY aggregation.
+     * @brief Validate ANY aggregation.
      */
     template <typename AdapterT, typename OpT>
     static status validate_any(AdapterT&& adpt, OpT&& op)
@@ -336,7 +339,7 @@ struct default_adapter_impl
     }
 
     /**
-     * Validate a member using ANY aggregation.
+     * @brief Validate a member using ANY aggregation.
      */
     template <typename AdapterT, typename MemberT, typename OpT>
     static status validate_any(AdapterT&& adpt, MemberT&& member, OpT&& op)
@@ -356,7 +359,7 @@ struct default_adapter_impl
     }
 
     /**
-     * Validate a member ALL aggregation.
+     * @brief Validate ALL aggregation.
      */
     template <typename AdapterT, typename OpT>
     static status validate_all(AdapterT&& adpt, OpT&& op)
@@ -366,7 +369,7 @@ struct default_adapter_impl
     }
 
     /**
-     * Validate a member using ALL aggregation.
+     * @brief Validate a member using ALL aggregation.
      */
     template <typename AdapterT, typename MemberT, typename OpT>
     static status validate_all(AdapterT&& adpt, MemberT&& member, OpT&& op)
@@ -386,7 +389,7 @@ struct default_adapter_impl
     }
 
     /**
-     * Validate NOT aggregation.
+     * @brief Validate NOT aggregation.
      */
     template <typename AdapterT, typename OpT>
     static status validate_not(AdapterT&& adpt, OpT&& op)
@@ -395,7 +398,7 @@ struct default_adapter_impl
     }
 
     /**
-     * Validate a member NOT aggregation.
+     * @brief Validate a member NOT aggregation.
      */
     template <typename AdapterT, typename MemberT, typename OpT>
     static status validate_not(AdapterT&& adpt, MemberT&& member, OpT&& op)

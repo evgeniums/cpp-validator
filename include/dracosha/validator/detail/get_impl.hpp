@@ -69,7 +69,7 @@ struct get_t
 };
 
 /**
- * @brief Get with iterator
+ * @brief Get with iterator.
  */
 template <typename T1, typename T2>
 struct get_t<T1,T2,
@@ -82,7 +82,7 @@ struct get_t<T1,T2,
 };
 
 /**
- * @brief Get as property
+ * @brief Get as property.
  */
 template <typename T1, typename T2>
 struct get_t<T1,T2,
@@ -95,7 +95,7 @@ struct get_t<T1,T2,
 };
 
 /**
- * @brief Get using at(key) method
+ * @brief Get using at(key) method.
  */
 template <typename T1, typename T2>
 struct get_t<T1,T2,
@@ -108,7 +108,7 @@ struct get_t<T1,T2,
 };
 
 /**
- * @brief Get using [key] operator
+ * @brief Get using [key] operator.
  */
 template <typename T1, typename T2>
 struct get_t<T1,T2,
@@ -121,7 +121,7 @@ struct get_t<T1,T2,
 };
 
 /**
- * @brief Traits for getting member from object of type T1 using key of type T2
+ * @brief Helper for getting member from object of type T1 using key of type T2.
  */
 template <typename T1, typename T2>
 constexpr get_t<T1,T2> get_impl{};

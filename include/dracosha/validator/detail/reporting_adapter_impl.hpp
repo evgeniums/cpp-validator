@@ -32,7 +32,7 @@ namespace detail
 {
 
 /**
- * @brief Implementation of reporting adapter
+ * @brief Implementation of reporting adapter.
  */
 template <typename ReporterT, typename NextAdapterImplT>
 class reporting_adapter_impl

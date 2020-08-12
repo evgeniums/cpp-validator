@@ -30,6 +30,10 @@ using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 namespace fmt
 {
+
+/**
+ * @brief Define fmt formatter of concrete_phrase.
+ */
 template <>
 struct formatter<concrete_phrase>
 {
@@ -48,10 +52,10 @@ namespace detail
 {
 
 /**
- * @brief Join vector of parts and append to destination object
- * @param dst Destination object
- * @param sep Separator for joining
- * @param parts Vector of parts to join and append
+ * @brief Join vector of parts and append to destination object.
+ * @param dst Destination object.
+ * @param sep Separator for joining.
+ * @param parts Vector of parts to join and append.
  */
 template <typename DstT, typename SepT, typename PartsT>
 void fmt_append_join(DstT& dst, SepT&& sep, PartsT&& parts,
@@ -61,10 +65,10 @@ void fmt_append_join(DstT& dst, SepT&& sep, PartsT&& parts,
 }
 
 /**
- * @brief Join hana::tuple of parts and append to destination object
- * @param dst Destination object
- * @param sep Separator for joining
- * @param parts hana::tuple of parts to join and append
+ * @brief Join hana::tuple of parts and append to destination object.
+ * @param dst Destination object.
+ * @param sep Separator for joining.
+ * @param parts hana::tuple of parts to join and append.
  */
 template <typename DstT, typename SepT, typename PartsT>
 void fmt_append_join(DstT& dst, SepT&& sep, PartsT&& parts,
@@ -74,7 +78,7 @@ void fmt_append_join(DstT& dst, SepT&& sep, PartsT&& parts,
 }
 
 /**
- * @brief Append arguments to destination object
+ * @brief Append arguments to destination object.
  */
 template <typename DstT, typename SepT, typename ...Args>
 void fmt_append_join_args(DstT& dst, SepT&& sep, Args&&... args)
@@ -83,7 +87,7 @@ void fmt_append_join_args(DstT& dst, SepT&& sep, Args&&... args)
 }
 
 /**
- * @brief Append arguments to destination object
+ * @brief Append arguments to destination object.
  */
 template <typename DstT, typename ...Args>
 void fmt_append_args(DstT& dst, Args&&... args)
@@ -94,7 +98,7 @@ void fmt_append_args(DstT& dst, Args&&... args)
 struct backend_formatter_tag;
 
 /**
- * @brief Backend formatter that uses libfmt fot formatting
+ * @brief Backend formatter that uses libfmt fot formatting.
  *
  * Destination object is normally a std::string.
  * Also it can be a container of chars that can deal with inserter iterators,

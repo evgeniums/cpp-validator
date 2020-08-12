@@ -30,7 +30,7 @@ namespace detail
 //-------------------------------------------------------------
 
 /**
- * @brief Helper to invoke hint_before() method
+ * @brief Default helper to invoke hint_before() method.
  */
 template <typename T, typename HintT, typename=void>
 struct hint_before_t
@@ -41,6 +41,10 @@ struct hint_before_t
         return status();
     }
 };
+
+/**
+ * @brief Helper to invoke hint_before() method.
+ */
 template <typename T, typename HintT>
 struct hint_before_t<T,HintT,
         decltype( (void)std::declval<std::decay_t<T>>().hint_before(std::declval<std::decay_t<HintT>>()))
@@ -52,11 +56,15 @@ struct hint_before_t<T,HintT,
         return v.hint_before(std::forward<T2>(x));
     }
 };
+
+/**
+ * @brief Instance of helper to invoke hint_before() method.
+ */
 template <typename T, typename HintT>
 constexpr hint_before_t<T,HintT> hint_before{};
 
 /**
- * @brief Helper to invoke hint_after() method
+ * @brief Default helper to invoke hint_after() method.
  */
 template <typename T, typename HintT, typename=void>
 struct hint_after_t
@@ -67,6 +75,10 @@ struct hint_after_t
         return validation_status;
     }
 };
+
+/**
+ * @brief Helper to invoke hint_after() method.
+ */
 template <typename T, typename HintT>
 struct hint_after_t<T,HintT,
         decltype( (void)std::declval<std::decay_t<T>>().hint_after(std::declval<status>(),std::declval<std::decay_t<HintT>>()))
@@ -78,6 +90,10 @@ struct hint_after_t<T,HintT,
         return v.hint_after(validation_status,std::forward<T2>(x));
     }
 };
+
+/**
+ * @brief Instance of helper to invoke hint_after() method.
+ */
 template <typename T, typename HintT>
 constexpr hint_after_t<T,HintT> hint_after{};
 

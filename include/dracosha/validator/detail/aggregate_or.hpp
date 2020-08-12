@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/detail/aggregate_or.hpp
 *
-*  Defines aggregation of intermediate validators or validation operators using logical AND
+*  Defines aggregation of intermediate validators or validation operators using logical AND.
 *
 */
 
@@ -31,15 +31,15 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 namespace detail
 {
 /**
- * @brief Aggregation of intermediate validators using logical AND
+ * @brief Aggregation of intermediate validators using logical OR.
  */
 struct aggregate_or_t
 {
     /**
-     * @brief Execute validators on object and aggregate their results using logical OR
-     * @param a Object to validate
-     * @param ops List of intermediate validators or validation operators
-     * @return Logical OR of results of intermediate validators
+     * @brief Execute validators on object and aggregate their results using logical OR.
+     * @param a Object to validate or adapter.
+     * @param ops List of intermediate validators or validation operators.
+     * @return Logical OR of results of intermediate validators.
      */
     template <typename T, typename OpsT>
     constexpr bool operator ()(T&& a,OpsT&& ops) const
@@ -48,11 +48,11 @@ struct aggregate_or_t
     }
 
     /**
-     * @brief Execute validators on object's member and aggregate their results using logical OR
-     * @param a Object to validate
-     * @param member Member to process with validators
-     * @param ops List of intermediate validators or validation operators
-     * @return Logical OR of results of intermediate validators
+     * @brief Execute validators on object's member and aggregate their results using logical OR.
+     * @param a Object to validate or adapter.
+     * @param member Member to process with validators.
+     * @param ops List of intermediate validators or validation operators.
+     * @return Logical OR of results of intermediate validators.
      */
     template <typename T, typename OpsT, typename MemberT>
     constexpr bool operator () (T&& a,MemberT&& member,OpsT&& ops) const
@@ -60,8 +60,11 @@ struct aggregate_or_t
         return dispatcher.validate_or(std::forward<decltype(a)>(a),std::forward<decltype(member)>(member),std::forward<decltype(ops)>(ops));
     }
 };
-constexpr aggregate_or_t aggregate_or{};
 
+/**
+ * @brief Instance of aggregation of intermediate validators using logical OR.
+ */
+constexpr aggregate_or_t aggregate_or{};
 }
 
 //-------------------------------------------------------------

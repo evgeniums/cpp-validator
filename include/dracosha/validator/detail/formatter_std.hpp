@@ -33,10 +33,10 @@ namespace detail
 {
 
 /**
- * @brief Append arguments to destination string
- * @param dst Destination string
- * @param sep Separator for joining arguments
- * @param parts Vector to join and append to string
+ * @brief Append arguments to destination string.
+ * @param dst Destination string.
+ * @param sep Separator for joining arguments.
+ * @param parts Vector to join and append to string.
  */
 template <typename PartsT, typename SepT>
 void std_append_join(std::string& dst, SepT&& sep, PartsT&& parts,
@@ -57,10 +57,10 @@ void std_append_join(std::string& dst, SepT&& sep, PartsT&& parts,
 }
 
 /**
- * @brief Append arguments to destination string
- * @param dst Destination string
- * @param sep Separator for joining arguments
- * @param parts Hana tuple to join and append to string
+ * @brief Append arguments to destination string.
+ * @param dst Destination string.
+ * @param sep Separator for joining arguments.
+ * @param parts Hana tuple to join and append to string.
  */
 template <typename PartsT, typename SepT>
 void std_append_join(std::string& dst, SepT&& sep, PartsT&& parts,
@@ -85,10 +85,10 @@ void std_append_join(std::string& dst, SepT&& sep, PartsT&& parts,
 }
 
 /**
- * @brief Append arguments to destination string
- * @param dst Destination string
- * @param sep Separator for joining arguments
- * @param args Arguments to join and append to string
+ * @brief Append arguments to destination string.
+ * @param dst Destination string.
+ * @param sep Separator for joining arguments.
+ * @param args Arguments to join and append to string.
  */
 template <typename SepT, typename ...Args>
 void std_append(std::string& dst, SepT&& sep, Args&&... args)
@@ -99,7 +99,7 @@ void std_append(std::string& dst, SepT&& sep, Args&&... args)
 struct backend_formatter_tag;
 
 /**
- * @brief Backend formatter that uses std::stringstream fot formatting
+ * @brief Backend formatter that uses std::stringstream fot formatting.
  */
 struct std_backend_formatter
 {

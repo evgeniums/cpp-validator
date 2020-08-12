@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** \file validator/detail/dispatcher_impl.hpp
 *
-*  Defines validation dispatcher
+*  Defines implementation of validation dispatcher.
 *
 */
 
@@ -42,84 +42,87 @@ struct member_tag;
 namespace detail
 {
 
+/**
+ * @brief Default dispatcher implementation.
+ */
 template <typename T1, typename =hana::when<true>>
 struct dispatcher_impl_t
 {
 };
 
 /**
- * @brief Dispatcher that first wraps object into default adapter and then forwards it to actual dispatcher
+ * @brief Implementation of dispatcher that first wraps object into default adapter and then forwards it to actual dispatcher.
  */
 template <typename T1>
 struct dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>
 {
     /**
-     *  @brief Perform validation of object at one level without member nesting
-     *  @param a Object to validate
-     *  @param args Validation arguments
-     *  @return Validation status
+     *  @brief Perform validation of object.
+     *  @param a Object to validate.
+     *  @param args Validation arguments.
+     *  @return Validation status.
      */
     template <typename ...Args>
     status operator() (T1&& obj, Args&&... args) const;
 
     /**
-     *  @brief Perform validation of object's property at one level without member nesting
-     *  @param prop Property to validate
-     *  @param a Object to validate
-     *  @param args Validation arguments
-     *  @return Validation status
+     *  @brief Perform validation of object's property at one level without member nesting.
+     *  @param prop Property to validate.
+     *  @param a Object to validate.
+     *  @param args Validation arguments.
+     *  @return Validation status.
      */
     template <typename ...Args>
     static status invoke(T1&& obj, Args&&... args);
 
     /**
-     * @brief Execute validators on object and aggregate their results using logical AND
-     * @return Logical AND of results of intermediate validators
+     * @brief Execute validators on object and aggregate their results using logical AND.
+     * @return Logical AND of results of intermediate validators.
      */
     template <typename ... Args>
     static status validate_and(T1&& obj, Args&&... args);
 
     /**
-     * @brief Execute validators on object and aggregate their results using logical OR
-     * @return Logical OR of results of intermediate validators
+     * @brief Execute validators on object and aggregate their results using logical OR.
+     * @return Logical OR of results of intermediate validators.
      */
     template <typename ... Args>
     static status validate_or(T1&& obj, Args&&... args);
 
     /**
-     * @brief Execute validator on object and negate its result using logical NOT
-     * @return Logical NOT of result of intermediate validators
+     * @brief Execute validator on object and negate its result using logical NOT.
+     * @return Logical NOT of result of intermediate validators.
      */
     template <typename ... Args>
     static status validate_not(T1&& obj, Args&&... args);
 
     /**
-     * @brief Execute validator to check if any element of a container satisfies the condition
-     * @return Success if any element of a container satisfies the condition
+     * @brief Execute validator to check if any element of a container satisfies the condition.
+     * @return Success if any element of a container satisfies the condition.
      */
     template <typename ...Args>
     static status validate_any(T1&& obj, Args&&... args);
 
     /**
-     * @brief Execute validator to check if all elements of a container satisfy the condition
-     * @return Success if all elements of a container satisfy the condition
+     * @brief Execute validator to check if all elements of a container satisfy the condition.
+     * @return Success if all elements of a container satisfy the condition.
      */
     template <typename ...Args>
     static status validate_all(T1&& obj, Args&&... args);
 };
 
 /**
- * @brief Dispatcher that dispatches validating requests to corresponding methods of supplied adapter
+ * @brief Implementation of dispatcher that dispatches validating requests to corresponding methods of supplied adapter.
  */
 template <typename T1>
 struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
 {
     /**
-     *  @brief Perform validation of object at one level without member nesting
-     *  @param a Adapter with object to validate
-     *  @param op Operator for validation
-     *  @param b Sample argument for validation
-     *  @return Validation status
+     *  @brief Perform validation of object.
+     *  @param a Adapter with object to validate.
+     *  @param op Operator for validation.
+     *  @param b Sample argument for validation.
+     *  @return Validation status.
      */
     template <typename T2, typename OpT>
     status operator() (T1&& a, OpT&& op, T2&& b) const
@@ -128,12 +131,12 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     }
 
     /**
-     *  @brief Perform validation of object's property at one level without member nesting
-     *  @param prop Property to validate
-     *  @param a Adapter with object to validate
-     *  @param op Operator for validation
-     *  @param b Sample argument for validation
-     *  @return Validation status
+     *  @brief Perform validation of object's property at one level without member nesting.
+     *  @param prop Property to validate.
+     *  @param a Adapter with object to validate.
+     *  @param op Operator for validation.
+     *  @param b Sample argument for validation.
+     *  @return Validation status.
      */
     template <typename T2, typename OpT, typename PropT>
     status operator() (PropT&& prop, T1&& a, OpT&& op, T2&& b) const
@@ -142,12 +145,12 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     }
 
     /**
-     *  @brief Perform validation of object's property at one level without member nesting
-     *  @param prop Property to validate
-     *  @param a Adapter with object to validate
-     *  @param op Operator for validation
-     *  @param b Sample argument for validation
-     *  @return Validation status
+     *  @brief Perform validation of object's property at one level without member nesting.
+     *  @param prop Property to validate.
+     *  @param a Adapter with object to validate.
+     *  @param op Operator for validation.
+     *  @param b Sample argument for validation.
+     *  @return Validation status.
      */
     template <typename T2, typename OpT, typename PropT>
     static status invoke(T1&& a, PropT&& prop, OpT&& op, T2&& b,
@@ -161,12 +164,12 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     }
 
     /**
-     *  @brief Validate existance of a member
-     *  @param a Adapter with object to validate
-     *  @param member Member descriptor
-     *  @param op Operator for validation
-     *  @param b Boolean flag, when true check if member exists, when false check if member does not exist
-     *  @return Validation status
+     *  @brief Validate existance of a member.
+     *  @param a Adapter with object to validate.
+     *  @param member Member descriptor.
+     *  @param op Operator for validation.
+     *  @param b Boolean flag, when true check if member exists, when false check if member does not exist.
+     *  @return Validation status.
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
     static status invoke(T1&& a, MemberT&& member, PropT&&, OpT&& op, T2&& b,
@@ -183,13 +186,13 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     }
 
     /**
-     *  @brief Normal validation of a member
-     *  @param a Adapter with object to validate
-     *  @param member Member descriptor
-     *  @param prop Property to validate
-     *  @param op Operator for validation
-     *  @param b Sample argument for validation
-     *  @return Validation status
+     *  @brief Normal validation of a member.
+     *  @param a Adapter with object to validate.
+     *  @param member Member descriptor.
+     *  @param prop Property to validate.
+     *  @param op Operator for validation.
+     *  @param b Sample argument for validation.
+     *  @return Validation status.
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
     static status invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
@@ -207,13 +210,13 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     }
 
     /**
-     *  @brief Validate using other member of the same object as a reference argument for validation
-     *  @param a Object to validate
-     *  @param member Member descriptor
-     *  @param prop Property to validate
-     *  @param op Operator for validation
-     *  @param b Descriptor of sample member of the same object
-     *  @return Validation status
+     *  @brief Validate using other member of the same object as a reference argument for validation.
+     *  @param a Object to validate.
+     *  @param member Member descriptor.
+     *  @param prop Property to validate.
+     *  @param op Operator for validation.
+     *  @param b Descriptor of sample member of the same object.
+     *  @return Validation status.
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
     static status invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
@@ -227,13 +230,13 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     }
 
     /**
-     *  @brief Validate using the same member of a Sample object
-     *  @param a Object to validate
-     *  @param member Member descriptor
-     *  @param prop Property to validate
-     *  @param op Operator for validation
-     *  @param b Sample object whose member must be used as argument passed to validation operator
-     *  @return Validation status
+     *  @brief Validate using the same member of a Sample object.
+     *  @param a Object to validate.
+     *  @param member Member descriptor.
+     *  @param prop Property to validate.
+     *  @param op Operator for validation.
+     *  @param b Sample object whose member must be used as argument passed to validation operator.
+     *  @return Validation status.
      */
     template <typename T2, typename OpT, typename PropT, typename MemberT>
     static status invoke(T1&& a, MemberT&& member, PropT&& prop, OpT&& op, T2&& b,
@@ -247,8 +250,8 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     }
 
     /**
-     * @brief Execute validators on object and aggregate their results using logical AND
-     * @return Logical AND of results of intermediate validators
+     * @brief Execute validators on object and aggregate their results using logical AND.
+     * @return Logical AND of results of intermediate validators.
      */
     template <typename ... Args>
     static status validate_and(T1&& a, Args&&... args)
@@ -257,8 +260,8 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     }
 
     /**
-     * @brief Execute validators on object and aggregate their results using logical OR
-     * @return Logical OR of results of intermediate validators
+     * @brief Execute validators on object and aggregate their results using logical OR.
+     * @return Logical OR of results of intermediate validators.
      */
     template <typename ... Args>
     static status validate_or(T1&& a, Args&&... args)
@@ -267,8 +270,8 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     }
 
     /**
-     * @brief Execute validator on object and negate its result using logical NOT
-     * @return Logical NOT of result of intermediate validators
+     * @brief Execute validator on object and negate its result using logical NOT.
+     * @return Logical NOT of result of intermediate validators.
      */
     template <typename ... Args>
     static status validate_not(T1&& a, Args&&... args)
@@ -277,8 +280,8 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     }
 
     /**
-     * @brief Execute validator to check if any element of a container satisfies the condition
-     * @return Success if any element of a container satisfies the condition
+     * @brief Execute validator to check if any element of a container satisfies the condition.
+     * @return Success if any element of a container satisfies the condition.
      */
     template <typename ...Args>
     static status validate_any(T1&& a, Args&&... args)
@@ -287,8 +290,8 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     }
 
     /**
-     * @brief Execute validator to check if all elements of a container satisfy the condition
-     * @return Success if all elements of a container satisfy the condition
+     * @brief Execute validator to check if all elements of a container satisfy the condition.
+     * @return Success if all elements of a container satisfy the condition.
      */
     template <typename ...Args>
     static status validate_all(T1&& a, Args&&... args)
@@ -297,6 +300,9 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     }
 };
 
+/**
+ * Instance of dispatcher implementation object.
+ */
 template <typename T1>
 constexpr dispatcher_impl_t<T1> dispatcher_impl{};
 

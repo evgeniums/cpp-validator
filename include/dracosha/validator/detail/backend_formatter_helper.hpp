@@ -32,9 +32,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 #ifdef DRACOSHA_VALIDATOR_FMT
 
 /**
- * @brief Wrap destination object into fmt formatter
- * @param dst Destination object
- * @return fmt backend formatter
+ * @brief Wrap destination object into fmt formatter.
+ * @param dst Destination object.
+ * @return fmt backend formatter.
  */
 template <typename DstT>
 auto default_backend_formatter(DstT& dst)
@@ -45,9 +45,9 @@ auto default_backend_formatter(DstT& dst)
 #else
 
 /**
- * @brief Wrap destination object into std::stringstream formatter
- * @param dst Destination object
- * @return std::stringstream backend formatter
+ * @brief Wrap destination object into std::stringstream formatter.
+ * @param dst Destination object.
+ * @return std::stringstream backend formatter.
  */
 inline auto default_backend_formatter(std::string& dst)
 {
@@ -60,7 +60,7 @@ namespace detail
 {
 
 /**
- * @brief Helper used when destination object is not a backend formatter.
+ * @brief Backend formatter helper used when destination object is not a backend formatter.
  *
  * The helper first wraps the destination object into backend formatter and then calls corresponding method.
  */
@@ -92,7 +92,7 @@ struct backend_formatter_helper
 };
 
 /**
- * @brief Helper used when destination object is a backend formatter.
+ * @brief Backend formatter helper used when destination object is a backend formatter.
  *
  * The helper forwards calls to corresponding methods of backend formatter.
  */
@@ -125,12 +125,23 @@ struct backend_formatter_helper<DstT,
     }
 };
 
+/**
+ * @brief Extract destination object for fomratting from argument.
+ * @param v Backend formatter.
+ * @return Destination object for formatting.
+ */
 template <typename T>
 auto to_dst(T&& v,
             std::enable_if_t<hana::is_a<backend_formatter_tag,T>,void*> =nullptr) -> decltype(auto)
 {
     return v.get();
 }
+
+/**
+ * @brief Extract destination object for fomratting from argument.
+ * @param v Destination object for formatting.
+ * @return Input destination object as is.
+ */
 template <typename T>
 auto to_dst(T&& v,
             std::enable_if_t<!hana::is_a<backend_formatter_tag,T>,void*> =nullptr) -> decltype(auto)

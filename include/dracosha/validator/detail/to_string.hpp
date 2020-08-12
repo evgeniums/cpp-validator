@@ -33,7 +33,7 @@ namespace detail
 {
 
 /**
- *  @brief Convert to <?????> token if no other conversion is possible
+ *  @brief Convert to <?????> token if no other conversion is possible.
  */
 template <typename T, typename =hana::when<true>>
 struct to_string_t
@@ -46,7 +46,7 @@ struct to_string_t
 };
 
 /**
- *  @brief Convert to string if string can be constructible of argument
+ *  @brief Convert to string if string is constructible of argument.
  */
 template <typename T>
 struct to_string_t<T,hana::when<std::is_constructible<std::string,T>::value>>
@@ -59,7 +59,7 @@ struct to_string_t<T,hana::when<std::is_constructible<std::string,T>::value>>
 };
 
 /**
- *  @brief Convert to string if argument is a property
+ *  @brief Convert to string if argument is a property.
  */
 template <typename T>
 struct to_string_t<T,hana::when<hana::is_a<property_tag,T>>>
@@ -71,7 +71,7 @@ struct to_string_t<T,hana::when<hana::is_a<property_tag,T>>>
 };
 
 /**
- *  @brief Convert to string if argument is a iterator
+ *  @brief Convert to string if argument is an iterator.
  */
 template <typename T>
 struct to_string_t<T,hana::when<hana::is_a<wrap_iterator_tag,T>>>
@@ -83,7 +83,7 @@ struct to_string_t<T,hana::when<hana::is_a<wrap_iterator_tag,T>>>
 };
 
 /**
- *  @brief Check if sdt::to_string() can be callable with the given type
+ *  @brief Check if sdt::to_string() can be callable with the given type.
  */
 template <typename T, typename=void>
 struct can_to_string
@@ -91,7 +91,7 @@ struct can_to_string
     constexpr static const bool value=false;
 };
 /**
- *  @brief Check if sdt::to_string() can be callable with the given type
+ *  @brief Check if sdt::to_string() can be callable with the given type.
  */
 template <typename T>
 struct can_to_string<T,
@@ -101,7 +101,7 @@ struct can_to_string<T,
 };
 
 /**
- *  @brief Convert to string if string can be constructible using sdt::to_string()
+ *  @brief Convert to string if string can be constructible using sdt::to_string().
  */
 template <typename T>
 struct to_string_t<T,hana::when<can_to_string<T>::value>>
@@ -112,9 +112,17 @@ struct to_string_t<T,hana::when<can_to_string<T>::value>>
     }
 };
 
+/**
+ * @brief Template instance for converting variable to string.
+ */
 template <typename T>
 constexpr to_string_t<T> to_string_inst{};
 
+/**
+ * @brief Convert argument to string.
+ * @param v Argument
+ * @return String
+ */
 template <typename T>
 std::string to_string(const T& v)
 {
