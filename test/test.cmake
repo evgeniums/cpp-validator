@@ -13,6 +13,7 @@ SET(SOURCES
     ${VALIDATOR_TEST_SRC}/testtranslator_ru.cpp
     ${VALIDATOR_TEST_SRC}/testlexicographical.cpp
     ${VALIDATOR_TEST_SRC}/testoperatorin.cpp
+    ${VALIDATOR_TEST_SRC}/testregex.cpp
 )
 
 SET (HEADERS

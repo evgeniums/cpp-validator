@@ -2,7 +2,7 @@ PROJECT(dracoshavalidator-test)
 
 SET (Boost_USE_STATIC_LIBS OFF CACHE BOOL "Boost static libs")
 
-FIND_PACKAGE(Boost 1.65 COMPONENTS unit_test_framework REQUIRED)
+FIND_PACKAGE(Boost 1.65 COMPONENTS regex unit_test_framework REQUIRED)
 
 SET(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
