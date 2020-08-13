@@ -27,6 +27,10 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/operators.hpp>
 #include <dracosha/validator/operators/lexicographical.hpp>
 #include <dracosha/validator/operators/in.hpp>
+#include <dracosha/validator/operators/regex.hpp>
+#include <dracosha/validator/operators/string_patterns.hpp>
+#include <dracosha/validator/operators/number_patterns.hpp>
+
 #include <dracosha/validator/range.hpp>
 #include <dracosha/validator/interval.hpp>
 
@@ -169,6 +173,18 @@ inline const phrase_translator& validator_translator_sample()
         m[interval_str]="interval"; // "interval"
         m[in]="must be in"; // "must be in"
         m[nin]="must be not in"; // "must be not in"
+
+        // regex and strings
+        m[regex_match.str()]="must match expression"; // "must match expression"
+        m[regex_match.n_str()]="must not match expression"; // "must not match expression"
+        m[str_alpha.str()]="must contain only letters and digits"; // "must contain only letters and digits"
+        m[str_alpha.n_str()]="must contain not only letters and digits"; // "must contain not only letters and digits"
+        m[str_hex.str()]="must be a hexadecimal number"; // "must be a hexadecimal number"
+        m[str_hex.n_str()]="must be not a hexadecimal number"; // "must be not a hexadecimal number"
+        m[str_int.str()]="must be integer"; // "must be integer"
+        m[str_int.n_str()]="must not be integer"; // "must not be integer"
+        m[str_float.str()]="must be a floating point number"; // "must be a floating point number"
+        m[str_float.n_str()]="must be not a floating point number"; // "must be not a floating point number"
     }
 
     return m;

@@ -346,6 +346,18 @@ BOOST_AUTO_TEST_CASE(CheckSampleLocale)
     BOOST_CHECK_EQUAL(m(interval_str).text(),std::string(interval_str));
     BOOST_CHECK_EQUAL(m(in).text(),std::string(in));
     BOOST_CHECK_EQUAL(m(nin).text(),std::string(nin));
+
+    // regex and strings
+    BOOST_CHECK_EQUAL(m(regex_match.str()).text(),regex_match.str());
+    BOOST_CHECK_EQUAL(m(regex_match.n_str()).text(),regex_match.n_str());
+    BOOST_CHECK_EQUAL(m(str_alpha.str()).text(),str_alpha.str());
+    BOOST_CHECK_EQUAL(m(str_alpha.n_str()).text(),str_alpha.n_str());
+    BOOST_CHECK_EQUAL(m(str_hex.str()).text(),str_hex.str());
+    BOOST_CHECK_EQUAL(m(str_hex.n_str()).text(),str_hex.n_str());
+    BOOST_CHECK_EQUAL(m(str_int.str()).text(),str_int.str());
+    BOOST_CHECK_EQUAL(m(str_int.n_str()).text(),str_int.n_str());
+    BOOST_CHECK_EQUAL(m(str_float.str()).text(),str_float.str());
+    BOOST_CHECK_EQUAL(m(str_float.n_str()).text(),str_float.n_str());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
