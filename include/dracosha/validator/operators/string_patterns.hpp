@@ -51,6 +51,27 @@ struct str_alpha_t : public op_report_without_operand<str_alpha_t>
 */
 constexpr str_alpha_t str_alpha{};
 
+/**
+ * @brief Definition of operator "must be hexadecimal number".
+ */
+struct str_hex_t : public op_report_without_operand<str_hex_t>
+{
+    constexpr static const char* description="must be a hexadecimal number";
+    constexpr static const char* n_description="must be not a hexadecimal number";
+
+    template <typename T1, typename T2>
+    bool operator() (const T1& a, const T2& b) const
+    {
+        static const boost::regex e("[0-9a-fA-F]+");
+        return regex_match(a,e)==b;
+    }
+};
+
+/**
+    @brief Operator "must be hexadecimal number".
+*/
+constexpr str_hex_t str_hex{};
+
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

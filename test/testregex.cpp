@@ -90,4 +90,58 @@ BOOST_AUTO_TEST_CASE(CheckAlpha)
     rep.clear();
 }
 
+BOOST_AUTO_TEST_CASE(CheckHex)
+{
+    std::string rep;
+
+    std::string str1="abcdef01234567890ABCDEF";
+    auto ra1=make_reporting_adapter(str1,rep);
+    std::string str2="Hello world!";
+    auto ra2=make_reporting_adapter(str2,rep);
+
+    auto v1=validator(
+        str_hex,true
+    );
+    BOOST_CHECK(v1.apply(ra1));
+    BOOST_CHECK(!v1.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"must be a hexadecimal number");
+    rep.clear();
+
+    auto v2=validator(
+        str_hex,false
+    );
+    BOOST_CHECK(!v2.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"must be not a hexadecimal number");
+    rep.clear();
+    BOOST_CHECK(v2.apply(ra2));
+
+    std::map<std::string,std::string> m3={
+        {"field1",str1},
+        {"field2",str2}
+    };
+    auto ra3=make_reporting_adapter(m3,rep);
+
+    auto v3=validator(
+        _["field1"](str_hex,true),
+        _["field2"](str_hex,false)
+    );
+    BOOST_CHECK(v3.apply(ra3));
+
+    auto v4=validator(
+        _["field1"](str_hex,false),
+        _["field2"](str_hex,false)
+    );
+    BOOST_CHECK(!v4.apply(ra3));
+    BOOST_CHECK_EQUAL(rep,"field1 must be not a hexadecimal number");
+    rep.clear();
+
+    auto v5=validator(
+        _["field1"](str_hex,true),
+        _["field2"](str_hex,true)
+    );
+    BOOST_CHECK(!v5.apply(ra3));
+    BOOST_CHECK_EQUAL(rep,"field2 must be a hexadecimal number");
+    rep.clear();
+}
+
 BOOST_AUTO_TEST_SUITE_END()
