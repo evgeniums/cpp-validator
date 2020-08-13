@@ -81,18 +81,20 @@ class invert_op : public object_wrapper<T>
          * @brief Get operator description for reporting.
          * @return Negative description of embedded operator.
          */
-        constexpr auto str() const
+        template <typename ... Args>
+        constexpr auto str(Args&&... args) const
         {
-            return this->get().n_str();
+            return this->get().n_str(std::forward<Args>(args)...);
         }
 
         /**
          * @brief Get negative operator description for reporting.
          * @return Description of embedded operator.
          */
-        constexpr auto n_str() const
+        template <typename ... Args>
+        constexpr auto n_str(Args&&... args) const
         {
-            return this->get().str();
+            return this->get().str(std::forward<Args>(args)...);
         }
 
         /**
@@ -139,7 +141,8 @@ class invert_op_with_string : public invert_op<T>
         /**
          * @brief Get explicit operator description.
          */
-        constexpr auto str() const
+        template <typename ... Args>
+        constexpr auto str(Args&&...) const
         {
             return _description;
         }
@@ -147,7 +150,8 @@ class invert_op_with_string : public invert_op<T>
         /**
          * @brief Get explicit operator description.
          */
-        constexpr auto n_str() const
+        template <typename ... Args>
+        constexpr auto n_str(Args&&...) const
         {
             return _description;
         }

@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/reference_wrapper.hpp>
 #include <dracosha/validator/operators/flag.hpp>
+#include <dracosha/validator/operators/op_report_without_operand.hpp>
 #include <dracosha/validator/properties.hpp>
 #include <dracosha/validator/reporting/strings.hpp>
 #include <dracosha/validator/reporting/member_operand.hpp>
@@ -134,6 +135,29 @@ template <typename OpT, typename T2>
 struct apply_reorder_present_2args_t<
                         OpT,T2,
                         hana::when<
+                            std::is_base_of<op_report_without_operand_t,std::decay_t<OpT>>::value
+                        >
+                    >
+{
+    template <typename DstT, typename FormatterTs>
+    void operator () (
+                        DstT& dst, FormatterTs&& formatters,
+                        const OpT& op, const T2& b
+                    ) const
+    {
+        format_join(dst,
+            hana::make_tuple(
+                hana::at(formatters,hana::size_c<0>)
+            ),
+            op.str(b)
+        );
+    }
+};
+
+template <typename OpT, typename T2>
+struct apply_reorder_present_2args_t<
+                        OpT,T2,
+                        hana::when<
                             std::is_base_of<flag_t,std::decay_t<OpT>>::value
                         >
                     >
@@ -189,6 +213,49 @@ struct apply_reorder_present_3args_t
                     prop,
                     op,
                     b
+                );
+            }
+        );
+    }
+};
+
+/**
+ * @brief Apply presentation and order of validation report for 3 arguments when operand's description must not be used in report.
+ */
+template <typename PropT, typename OpT, typename T2>
+struct apply_reorder_present_3args_t<
+                        PropT,OpT,T2,
+                        hana::when<std::is_base_of<op_report_without_operand_t,std::decay_t<OpT>>::value>
+                    >
+{
+    template <typename DstT, typename FormatterTs>
+    void operator () (
+                        DstT& dst, FormatterTs&& formatters,
+                        const PropT& prop, const OpT& op, const T2& b
+                    ) const
+    {
+        hana::eval_if(
+            std::is_same<std::decay_t<PropT>,type_p_value>::value,
+            [&](auto)
+            {
+                // op b
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<1>)
+                    ),
+                    op.str(b)
+                );
+            },
+            [&](auto)
+            {
+                // prop of member op b
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<1>)
+                    ),
+                    prop,
+                    op.str(b)
                 );
             }
         );
@@ -373,6 +440,53 @@ struct apply_reorder_present_4args_t<
                     make_member_property(member,prop),
                     op,
                     make_member_property(b.get(),prop)
+                );
+            }
+        );
+    }
+};
+
+/**
+ * @brief Apply presentation and order of validation report when operand's description must not be used in report.
+ */
+template <typename MemberT, typename PropT, typename OpT, typename T2>
+struct apply_reorder_present_4args_t<
+                        MemberT,PropT,OpT,T2,
+                        hana::when<
+                            std::is_base_of<op_report_without_operand_t,std::decay_t<OpT>>::value
+                        >
+                    >
+{
+    template <typename DstT, typename FormatterTs>
+    void operator () (
+                        DstT& dst, FormatterTs&& formatters,
+                        const MemberT& member, const PropT& prop, const OpT& op, const T2& b
+                    ) const
+    {
+        hana::eval_if(
+            std::is_same<std::decay_t<PropT>,type_p_value>::value,
+            [&](auto)
+            {
+                // member op b
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<2>)
+                    ),
+                    member,
+                    op.str(b)
+                );
+            },
+            [&](auto)
+            {
+                // prop of member op b
+                format_join(dst,
+                    hana::make_tuple(
+                        hana::at(formatters,hana::size_c<0>),
+                        hana::at(formatters,hana::size_c<2>)
+                    ),
+                    make_member_property(member,prop),
+                    op.str(b)
                 );
             }
         );
