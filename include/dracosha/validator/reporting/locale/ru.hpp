@@ -27,6 +27,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/operators.hpp>
 #include <dracosha/validator/operators/lexicographical.hpp>
 #include <dracosha/validator/operators/in.hpp>
+#include <dracosha/validator/operators/regex.hpp>
+#include <dracosha/validator/operators/string_patterns.hpp>
+#include <dracosha/validator/operators/number_patterns.hpp>
 #include <dracosha/validator/range.hpp>
 #include <dracosha/validator/interval.hpp>
 #include <dracosha/validator/reporting/member_names.hpp>
@@ -309,6 +312,68 @@ inline const phrase_translator& validator_translator_ru()
                 {"интервале",grammar_ru::predlozhny_padezh},
                 {"интервала",grammar_ru::roditelny_padezh}
               }; // interval
+
+        // regex and strings
+        m[regex_match.str()]={
+                {"должен соответствовать выражению"},
+                {"должна соответствовать выражению",grammar_ru::zhensky_rod},
+                {"должно соответствовать выражению",grammar_ru::sredny_rod},
+                {"должны соответствовать выражению",grammar_ru::mn_chislo}
+            }; // "must match expression"
+        m[regex_match.n_str()]={
+                {"не должен соответствовать выражению"},
+                {"не должна соответствовать выражению",grammar_ru::zhensky_rod},
+                {"не должно соответствовать выражению",grammar_ru::sredny_rod},
+                {"не должны соответствовать выражению",grammar_ru::mn_chislo}
+            }; // "must not match expression"
+        m[str_alpha.str()]={
+                {"должен содержать только буквы и цифры"},
+                {"должна содержать только буквы и цифры",grammar_ru::zhensky_rod},
+                {"должно содержать только буквы и цифры",grammar_ru::sredny_rod},
+                {"должны содержать только буквы и цифры",grammar_ru::mn_chislo}
+            }; // "must contain only letters and digits"
+        m[str_alpha.n_str()]={
+                {"должен содержать не только буквы и цифры"},
+                {"должна содержать не только буквы и цифры",grammar_ru::zhensky_rod},
+                {"должно содержать не только буквы и цифры",grammar_ru::sredny_rod},
+                {"должны содержать не только буквы и цифры",grammar_ru::mn_chislo}
+            }; // "must contain not only letters and digits"
+        m[str_hex.str()]={
+                {"должен быть шестнадцатеричным числом"},
+                {"должна быть шестнадцатеричным числом",grammar_ru::zhensky_rod},
+                {"должно быть шестнадцатеричным числом",grammar_ru::sredny_rod},
+                {"должны быть шестнадцатеричным числом",grammar_ru::mn_chislo}
+            }; // "must be a hexadecimal number"
+        m[str_hex.n_str()]={
+                {"не должен быть шестнадцатеричным числом"},
+                {"не должна быть шестнадцатеричным числом",grammar_ru::zhensky_rod},
+                {"не должно быть шестнадцатеричным числом",grammar_ru::sredny_rod},
+                {"не должны быть шестнадцатеричным числом",grammar_ru::mn_chislo}
+            }; // "must be not a hexadecimal number"
+        m[str_int.str()]={
+                {"должен быть целочисленным"},
+                {"должна быть целочисленной",grammar_ru::zhensky_rod},
+                {"должно быть целочисленным",grammar_ru::sredny_rod},
+                {"должны быть целочисленными",grammar_ru::mn_chislo}
+            }; // "must be integer"
+        m[str_int.n_str()]={
+                {"не должен целочисленным"},
+                {"не должна целочисленной",grammar_ru::zhensky_rod},
+                {"не должно целочисленным",grammar_ru::sredny_rod},
+                {"не должны целочисленными",grammar_ru::mn_chislo}
+            }; // "must not be integer"
+        m[str_float.str()]={
+                {"должен быть вещественным числом"},
+                {"должна быть вещественным числом",grammar_ru::zhensky_rod},
+                {"должно быть вещественным числом",grammar_ru::sredny_rod},
+                {"должны быть вещественным числом",grammar_ru::mn_chislo}
+            }; // "must be a floating point number"
+        m[str_float.n_str()]={
+                {"не должен вещественным числом"},
+                {"не должна вещественным числом",grammar_ru::zhensky_rod},
+                {"не должно вещественным числом",grammar_ru::sredny_rod},
+                {"не должны вещественным числом",grammar_ru::mn_chislo}
+            }; // "must be not a floating point number"
     }
 
     return m;
