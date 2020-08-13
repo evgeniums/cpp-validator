@@ -3,6 +3,7 @@
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
 #include <dracosha/validator/operators/regex.hpp>
+#include <dracosha/validator/operators/string_patterns.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -32,6 +33,60 @@ BOOST_AUTO_TEST_CASE(CheckRegex)
 
     BOOST_CHECK(!v2.apply(ra2));
     BOOST_CHECK_EQUAL(rep,"must match expression [0-9a-zA-Z_]+");
+    rep.clear();
+}
+
+BOOST_AUTO_TEST_CASE(CheckAlpha)
+{
+    std::string rep;
+
+    std::string str1="abcAnz120";
+    auto ra1=make_reporting_adapter(str1,rep);
+    std::string str2="Hello world!";
+    auto ra2=make_reporting_adapter(str2,rep);
+
+    auto v1=validator(
+        str_alpha,true
+    );
+    BOOST_CHECK(v1.apply(ra1));
+    BOOST_CHECK(!v1.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"must contain only letters and digits");
+    rep.clear();
+
+    auto v2=validator(
+        str_alpha,false
+    );
+    BOOST_CHECK(!v2.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"must contain not only letters and digits");
+    rep.clear();
+    BOOST_CHECK(v2.apply(ra2));
+
+    std::map<std::string,std::string> m3={
+        {"field1","AbZ90_O"},
+        {"field2","How are you?"}
+    };
+    auto ra3=make_reporting_adapter(m3,rep);
+
+    auto v3=validator(
+        _["field1"](str_alpha,true),
+        _["field2"](str_alpha,false)
+    );
+    BOOST_CHECK(v3.apply(ra3));
+
+    auto v4=validator(
+        _["field1"](str_alpha,false),
+        _["field2"](str_alpha,false)
+    );
+    BOOST_CHECK(!v4.apply(ra3));
+    BOOST_CHECK_EQUAL(rep,"field1 must contain not only letters and digits");
+    rep.clear();
+
+    auto v5=validator(
+        _["field1"](str_alpha,true),
+        _["field2"](str_alpha,true)
+    );
+    BOOST_CHECK(!v5.apply(ra3));
+    BOOST_CHECK_EQUAL(rep,"field2 must contain only letters and digits");
     rep.clear();
 }
 
