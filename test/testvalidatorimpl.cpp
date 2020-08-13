@@ -22,8 +22,11 @@ struct TestRefStruct
     }
 
     TestRefStruct(const TestRefStruct&)=delete;
+    TestRefStruct(const TestRefStruct&&)=delete;
+    TestRefStruct& operator = (const TestRefStruct&)=delete;
+    TestRefStruct& operator = (TestRefStruct&&)=delete;
 
-    TestRefStruct(TestRefStruct&&)
+    TestRefStruct(TestRefStruct&&) noexcept
     {
         BOOST_TEST_MESSAGE("Move TestRefStruct ctor");
     }

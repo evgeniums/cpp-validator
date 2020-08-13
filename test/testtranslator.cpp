@@ -283,7 +283,7 @@ BOOST_AUTO_TEST_CASE(CheckPhraseTranslator)
 
 BOOST_AUTO_TEST_CASE(CheckSampleLocale)
 {
-    auto m=validator_translator_sample();
+    const auto& m=validator_translator_sample();
 
     // specials
     BOOST_CHECK_EQUAL(m(string_true).text(),std::string(string_true));

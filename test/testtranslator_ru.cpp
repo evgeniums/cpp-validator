@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_SUITE(TestTranslatorRu)
 
 BOOST_AUTO_TEST_CASE(CheckTranslatorRu)
 {
-    auto sys_tr=validator_translator_ru();
+    const auto& sys_tr=validator_translator_ru();
 
     BOOST_CHECK_EQUAL(sys_tr(string_true).text(),"истина");
     BOOST_CHECK_EQUAL(sys_tr(string_false).text(),"ложь");
