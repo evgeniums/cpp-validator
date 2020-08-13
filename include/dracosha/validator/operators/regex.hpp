@@ -37,21 +37,13 @@ struct regex_match_t : public op<regex_match_t>
     constexpr static const char* n_description="must not match expression";
 
     template <typename T1, typename T2>
-    constexpr bool operator() (const T1& a, const T2& b,
-                               std::enable_if_t<
-                                !std::is_same<T2,boost::regex>::value,
-                                void*
-                               > =nullptr) const
+    constexpr bool operator() (const T1& a, const T2& b) const
     {
         return boost::regex_match(a,boost::regex(b));
     }
 
     template <typename T1, typename T2>
-    constexpr bool operator() (const T1& a, const T2& b,
-                               std::enable_if_t<
-                                std::is_same<T2,boost::regex>::value,
-                                void*
-                               > =nullptr) const
+    constexpr bool operator() (const T1& a, const boost::regex& b) const
     {
         return boost::regex_match(a,b);
     }
@@ -81,6 +73,52 @@ struct regex_nmatch_t : public op<regex_nmatch_t>
     @brief Operator "not match regular expression".
 */
 constexpr regex_nmatch_t regex_nmatch{};
+
+/**
+ * @brief Definition of operator "contains regular expression".
+ */
+struct regex_contains_t : public op<regex_contains_t>
+{
+    constexpr static const char* description="must contain expression";
+    constexpr static const char* n_description="must not contain expression";
+
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b) const
+    {
+        return boost::regex_search(a,boost::regex(b));
+    }
+
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const boost::regex& b) const
+    {
+        return boost::regex_search(a,b);
+    }
+};
+
+/**
+    @brief Operator "contains regular expression".
+*/
+constexpr regex_contains_t regex_contains{};
+
+/**
+ * @brief Definition of operator "not contain regular expression".
+ */
+struct regex_ncontains_t : public op<regex_ncontains_t>
+{
+    constexpr static const char* description=regex_contains_t::n_description;
+    constexpr static const char* n_description=regex_contains_t::description;
+
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b) const
+    {
+        return !regex_contains(a,b);
+    }
+};
+
+/**
+    @brief Operator "not contain regular expression".
+*/
+constexpr regex_ncontains_t regex_ncontains{};
 
 /**
  * @brief Format boost::regex operand.

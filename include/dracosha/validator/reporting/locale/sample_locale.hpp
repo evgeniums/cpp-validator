@@ -177,6 +177,8 @@ inline const phrase_translator& validator_translator_sample()
         // regex and strings
         m[regex_match.str()]="must match expression"; // "must match expression"
         m[regex_match.n_str()]="must not match expression"; // "must not match expression"
+        m[regex_contains.str()]="must contain expression"; // "must contain expression"
+        m[regex_contains.n_str()]="must not contain expression"; // "must not contain expression"
         m[str_alpha.str()]="must contain only letters and digits"; // "must contain only letters and digits"
         m[str_alpha.n_str()]="must contain not only letters and digits"; // "must contain not only letters and digits"
         m[str_hex.str()]="must be a hexadecimal number"; // "must be a hexadecimal number"

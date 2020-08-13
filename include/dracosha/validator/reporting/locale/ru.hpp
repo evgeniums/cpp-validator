@@ -326,6 +326,18 @@ inline const phrase_translator& validator_translator_ru()
                 {"не должно соответствовать выражению",grammar_ru::sredny_rod},
                 {"не должны соответствовать выражению",grammar_ru::mn_chislo}
             }; // "must not match expression"
+        m[regex_contains.str()]={
+                {"должен содержать выражению"},
+                {"должна содержать выражению",grammar_ru::zhensky_rod},
+                {"должно содержать выражению",grammar_ru::sredny_rod},
+                {"должны содержать выражению",grammar_ru::mn_chislo}
+            }; // "must contain expression"
+        m[regex_contains.n_str()]={
+                {"не должен содержать выражению"},
+                {"не должна содержать выражению",grammar_ru::zhensky_rod},
+                {"не должно содержать выражению",grammar_ru::sredny_rod},
+                {"не должны содержать выражению",grammar_ru::mn_chislo}
+            }; // "must not contain expression"
         m[str_alpha.str()]={
                 {"должен содержать только буквы и цифры"},
                 {"должна содержать только буквы и цифры",grammar_ru::zhensky_rod},

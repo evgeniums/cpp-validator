@@ -350,6 +350,8 @@ BOOST_AUTO_TEST_CASE(CheckSampleLocale)
     // regex and strings
     BOOST_CHECK_EQUAL(m(regex_match.str()).text(),regex_match.str());
     BOOST_CHECK_EQUAL(m(regex_match.n_str()).text(),regex_match.n_str());
+    BOOST_CHECK_EQUAL(m(regex_contains.str()).text(),regex_contains.str());
+    BOOST_CHECK_EQUAL(m(regex_contains.n_str()).text(),regex_contains.n_str());
     BOOST_CHECK_EQUAL(m(str_alpha.str()).text(),str_alpha.str());
     BOOST_CHECK_EQUAL(m(str_alpha.n_str()).text(),str_alpha.n_str());
     BOOST_CHECK_EQUAL(m(str_hex.str()).text(),str_hex.str());

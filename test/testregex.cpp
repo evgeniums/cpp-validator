@@ -9,7 +9,7 @@ using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestRegex)
 
-BOOST_AUTO_TEST_CASE(CheckRegex)
+BOOST_AUTO_TEST_CASE(CheckRegexMatch)
 {
     std::string rep;
 
@@ -34,6 +34,49 @@ BOOST_AUTO_TEST_CASE(CheckRegex)
     BOOST_CHECK(!v2.apply(ra2));
     BOOST_CHECK_EQUAL(rep,"must match expression [0-9a-zA-Z_]+");
     rep.clear();
+
+    auto v3=validator(
+        regex_nmatch,boost::regex("[0-9a-zA-Z_]+")
+    );
+    BOOST_CHECK(!v3.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"must not match expression [0-9a-zA-Z_]+");
+    rep.clear();
+    BOOST_CHECK(v3.apply(ra2));
+}
+
+BOOST_AUTO_TEST_CASE(CheckRegexContains)
+{
+    std::string rep;
+
+    auto v1=validator(
+        regex_contains,"[0-9][0-9][0-9]"
+    );
+    std::string str1="abcAnz120";
+    auto ra1=make_reporting_adapter(str1,rep);
+    BOOST_CHECK(v1.apply(ra1));
+
+    auto v2=validator(
+        regex_contains,boost::regex("[0-9][0-9][0-9]")
+    );
+    BOOST_CHECK(v2.apply(ra1));
+
+    std::string str2="Hello world 12 34";
+    auto ra2=make_reporting_adapter(str2,rep);
+    BOOST_CHECK(!v1.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"must contain expression [0-9][0-9][0-9]");
+    rep.clear();
+
+    BOOST_CHECK(!v2.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"must contain expression [0-9][0-9][0-9]");
+    rep.clear();
+
+    auto v3=validator(
+        regex_ncontains,"[0-9][0-9][0-9]"
+    );
+    BOOST_CHECK(!v3.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"must not contain expression [0-9][0-9][0-9]");
+    rep.clear();
+    BOOST_CHECK(v3.apply(ra2));
 }
 
 BOOST_AUTO_TEST_CASE(CheckAlpha)
