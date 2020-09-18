@@ -19,9 +19,11 @@ There are a lot of options for validator extension and customization. During val
 
 The library was tested with clang, gcc and msvc compilers that support C++14 and/or C++17 standards. Tested operating systems include Linux, Windows, macOS, iOS and Android platforms.
 
+For more details see [Documentation](docs/mainpage.md).
+
 _The README and reference documentation are under construction yet._
 
-Currently only doxygen-style comments in sources are available. Tests in test folder can be used as a kind of examples. Scripts for tests budiling are in sample-build folder.
+Currently only doxygen-style comments in sources are available. Tests in test folder can be used as a kind of examples. Scripts for tests budiling are in a *sample-build* folder.
 
 ## Some examples of basic usage
 
