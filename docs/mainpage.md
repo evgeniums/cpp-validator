@@ -19,10 +19,11 @@
 	* [Reporting](#reporting)
 * [Building and installation](#building-and-installation)
 * [License](#license)
-* [Contribution](#contribution)
+* [Contributing](#contributing)
 * [Appendix A. Built-in validation operators](#appendix-a.built-in-validation-operators)
 
 [//]: # (TOC End)
+
 
 
 # Introduction
