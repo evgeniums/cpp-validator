@@ -94,7 +94,7 @@ To construct a validator one should describe validation conditions using five gr
     * plain validation without any aggregation when only single [operator](#operator) is used;
     * compound validation with [aggregation(s)](#aggregation).
 
-### Basic validators
+### Basic validator
 
 #### Whole object
 
@@ -120,7 +120,7 @@ auto v=validator(
 ```
 The example above defines validation condition "field1 of variable must be greater than 100" where *"field1"* is object's [member](#member), *gt* is an [operator](#operator) and *100* is an [operand](#operand).
 
-### Validators with properties
+### Validator with properties
 
 #### Whole object
 
@@ -139,7 +139,7 @@ auto v2=validator(
         _[size](gt,100)
     );
 ```
-Validators *v1* and *v2* in the example above both define validation condition "size of variable must be greater than 100" where *"field1"* is object's [member](#member), *size* is a [property](#property), *gt* is an [operator](#operator) and *100* is an [operand](#operand). The first is described in property notation and the second is described in member notation.
+Validators *v1* and *v2* in the example above both define validation condition "size of variable must be greater than 100" where *size* is a [property](#property), *gt* is an [operator](#operator) and *100* is an [operand](#operand). The first validator is described using property notation and the second validator is described using member notation.
 
 #### Object's member
 
@@ -158,10 +158,10 @@ auto v2=validator(
         _["field1"][size](gt,100)
     );
 ```
-Validators *v1* and *v2* in the example above both define validation condition "size of field1 of variable must be greater than 100" where *field1* is a member of variable, *size* is a [property](#property) of *field1*, *gt* is an [operator](#operator) and *100* is an [operand](#operand). The first is described in property notation and the second is described in member notation.
+Validators *v1* and *v2* in the example above both define validation condition "size of field1 of variable must be greater than 100" where *field1* is a member of variable, *size* is a [property](#property) of *field1*, *gt* is an [operator](#operator) and *100* is an [operand](#operand). The first validator is described using property notation and the second validator is described using member notation.
 
 
-### Validators with aggregations
+### Validator with aggregations
 
 #### Whole object
 
@@ -242,6 +242,56 @@ The examples above define validation condition "size of variable is not equal to
 
 ## Using validator for data validation
 
+Data validation is performed by [adapters](#adapter). When a [validator](#validator) is applied to an [adapter](#adapter) the [adapter](#adapter) *reads* validation conditions from the [validator](#validator) and processes them depending on [adapter](#adapter) implementation. See more about adapters in [Adapters](#adapters) section.
+```cpp
+#include <dracosha/validator/validator.hpp>
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// define validator
+auto v=validator(gt,100);
+
+// validate variable that satisfies validator
+int value1=200;
+auto a1=make_default_adapter(value1);
+if (v.apply(a1))
+{
+  // validation succeeded
+}
+
+// validate variable that doesn't satisfy validator
+int value2=90;
+auto a2=make_default_adapter(value2);
+if (!v.apply(a2))
+{
+  // validation failed
+}
+```
+
+A [validator](#validator) can be applied directly to a variable that must be validated. In this case a [default adapter](#default-adapter) will be used implicitly.
+```cpp
+#include <dracosha/validator/validator.hpp>
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// define validator
+auto v=validator(gt,100);
+
+// validate variable that satisfies validator
+int value1=200;
+if (v.apply(value1))
+{
+  // validation succeeded
+}
+
+// validate variable that doesn't satisfy validator
+int value2=90;
+if (!v.apply(value2))
+{
+  // validation failed
+}
+```
+
 ## Members
 
 ## Properties
@@ -253,6 +303,8 @@ The examples above define validation condition "size of variable is not equal to
 ## Aggregations
 
 ## Adapters
+
+### Default adapter
 
 ## Reporting
 
