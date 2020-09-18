@@ -1,3 +1,29 @@
+# Table of Contents
+[//]: # (TOC Begin)
+* [Introduction](#introduction)
+* [Definitions](#definitions)
+* [Usage](#usage)
+	* [Validator construction](#validator-construction)
+		* [Components of validator](#components-of-validator)
+		* [Basic validator](#basic-validator)
+		* [Validator with properties](#validator-with-properties)
+		* [Validator with aggregations](#validator-with-aggregations)
+	* [Using validator for data validation](#using-validator-for-data-validation)
+	* [Members](#members)
+	* [Properties](#properties)
+	* [Operators](#operators)
+	* [Operands](#operands)
+	* [Aggregations](#aggregations)
+	* [Adapters](#adapters)
+		* [Default adapter](#default-adapter)
+	* [Reporting](#reporting)
+* [Building and installation](#building-and-installation)
+* [License](#license)
+* [Contribution](#contribution)
+* [Appendix A. Built-in validating operators](#appendix-a.built-in-validating-operators)
+
+[//]: # (TOC End)
+
 # Introduction
 
 Modern C++ header-only library for validation of variables, objects and containers. 
@@ -196,7 +222,7 @@ auto v=validator(
             )
     );
 ```
-The example above defines validation condition "field1 of variable must be greater than 100 AND less than 200" where *field1* is a member of variable, *value* is a pseudo [property](#property) standing for value of member *field1*, *gt* and *lt* are [operators](#operator), *100* and *200* are [operands](#operand), and *\^AND\^* is [aggregation](#aggregation).
+The example above defines validation condition "field1 of variable must be greater than 100 AND less than 200" where *field1* is a member of variable, *value* is a pseudo [property](#property) standing for member *field1* of variable, *gt* and *lt* are [operators](#operator), *100* and *200* are [operands](#operand), and *\^AND\^* is [aggregation](#aggregation).
 
 #### Property of object's member
 
@@ -211,7 +237,7 @@ auto v=validator(
             )
     );
 ```
-The example above defines validation condition "field1 of variable must be equal to "value1" OR size of field1 of variable is less than 3" where *field1* is a member of variable, *value* is a pseudo [property](#property) standing for value of member *field1*, *size* is a [property](#property) of member *field1*, *eq* and *lt* are [operators](#operator), *"value1"* and *3* are [operands](#operand), and *\^OR\^* is [aggregation](#aggregation).
+The example above defines validation condition "field1 of variable must be equal to "value1" OR size of field1 of variable is less than 3" where *field1* is a member of variable, *value* is a pseudo [property](#property) standing for member *field1* of variable, *size* is a [property](#property) of member *field1*, *eq* and *lt* are [operators](#operator), *"value1"* and *3* are [operands](#operand), and *\^OR\^* is [aggregation](#aggregation).
 
 #### Mixed
 
@@ -238,7 +264,7 @@ auto v2=validator(
     );
     
 ```
-The examples above define validation condition "size of variable is not equal to 3 AND field1 of variable must be equal to "value1" OR size of field1 of variable is less than 3" where *field1* is a member of variable, *value* is a pseudo [property](#property) standing for value of member *field1*, *size* is a [property](#property), *ne*, *eq* and *lt* are [operators](#operator), *3*, *10*, *"value1"* are [operands](#operand), *\^OR\^* and *\^AND\^* are [aggregations](#aggregation).
+The examples above define validation condition "size of variable is not equal to 3 AND field1 of variable must be equal to "value1" OR size of field1 of variable is less than 3" where *field1* is a member of variable, *value* is a pseudo [property](#property) standing for member *field1* of variable, *size* is a [property](#property), *ne*, *eq* and *lt* are [operators](#operator), *3*, *10*, *"value1"* are [operands](#operand), *\^OR\^* and *\^AND\^* are [aggregations](#aggregation).
 
 ## Using validator for data validation
 
