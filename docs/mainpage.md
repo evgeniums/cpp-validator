@@ -77,6 +77,8 @@
 
 [//]: # (TOC End)
 
+----
+
 # Introduction
 
 Modern C++ header-only library for validation of variables, objects and containers. 
