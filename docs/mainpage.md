@@ -20,9 +20,10 @@
 * [Building and installation](#building-and-installation)
 * [License](#license)
 * [Contribution](#contribution)
-* [Appendix A. Built-in validating operators](#appendix-a.built-in-validating-operators)
+* [Appendix A. Built-in validation operators](#appendix-a.built-in-validation-operators)
 
 [//]: # (TOC End)
+
 
 # Introduction
 
@@ -338,6 +339,11 @@ if (!v.apply(value2))
 
 # License
 
-# Contribution
+&copy; Evgeny Sidorov 2020
 
-# Appendix A. Built-in validating operators
+Distributed under the Boost Software License, Version 1.0.
+See accompanying file [LICENSE.md](../LICENSE.md) or copy at http://boost.org/LICENSE_1_0.txt.
+
+# Contributing
+
+# Appendix A. Built-in validation operators
