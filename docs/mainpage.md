@@ -6,25 +6,74 @@
 	* [Validator construction](#validator-construction)
 		* [Components of validator](#components-of-validator)
 		* [Basic validator](#basic-validator)
+			* [Whole object](#whole-object)
+			* [Object's member](#objects-member)
 		* [Validator with properties](#validator-with-properties)
+			* [Whole object](#whole-object)
+			* [Object's member](#objects-member)
 		* [Validator with aggregations](#validator-with-aggregations)
+			* [Whole object](#whole-object)
+			* [Object's member](#objects-member)
+			* [Property of object's member](#property-of-objects-member)
+			* [Mixed](#mixed)
 	* [Using validator for data validation](#using-validator-for-data-validation)
 	* [Members](#members)
+		* [Member notation](#member-notation)
+		* [Member levels](#member-levels)
+		* [Member existence](#member-existence)
 	* [Properties](#properties)
+		* [Property notations](#property-notations)
+		* [Built-in properties](#built-in-properties)
+			* [*value*](#value)
+			* [*size*](#size)
+			* [*length*](#length)
+			* [*empty*](#empty)
+		* [Adding new property](#adding-new-property)
 	* [Operators](#operators)
+		* [Special operators](#special-operators)
+			* [*exists*](#exists)
+			* [*_n* (negation)](#n-negation)
+			* [*flag*](#flag)
+			* [*in*](#in)
+		* [Built-in operators](#built-in-operators)
+		* [Adding new operator](#adding-new-operator)
 	* [Operands](#operands)
+		* [Variables](#variables)
+		* [Lazy operands](#lazy-operands)
+		* [Other members](#other-members)
+		* [Sample objects](#sample-objects)
+		* [Intervals](#intervals)
+		* [Ranges](#ranges)
 	* [Aggregations](#aggregations)
+		* [Logical aggregations](#logical-aggregations)
+			* [AND](#and)
+			* [OR](#or)
+			* [NOT](#not)
+		* [Element aggregations](#element-aggregations)
+			* [ANY](#any)
+			* [ALL](#all)
 	* [Adapters](#adapters)
 		* [Default adapter](#default-adapter)
+		* [Single member adapter](#single-member-adapter)
+		* [Adding new adapter](#adding-new-adapter)
 	* [Reporting](#reporting)
+		* [Reporting adapter](#reporting-adapter)
+		* [Reports customization](#reports-customization)
+		* [Reporting hints](#reporting-hints)
+		* [Localization](#localization)
+			* [Concrete phrases and grammatical categories](#concrete-phrases-and-grammatical-categories)
+			* [Translator](#translator)
+			* [Translator repository](#translator-repository)
+			* [Adding new locale](#adding-new-locale)
 * [Building and installation](#building-and-installation)
+	* [Supported platforms and compilers](#supported-platforms-and-compilers)
+	* [Dependencies](#dependencies)
+	* [CMake configuration](#cmake-configuration)
+	* [Building and running tests](#building-and-running-tests)
 * [License](#license)
 * [Contributing](#contributing)
-* [Appendix A. Built-in validation operators](#appendix-a.built-in-validation-operators)
 
 [//]: # (TOC End)
-
-
 
 # Introduction
 
@@ -319,24 +368,113 @@ if (!v.apply(value2))
   // validation failed
 }
 ```
-
 ## Members
+
+### Member notation
+
+### Member levels
+
+### Member existence
 
 ## Properties
 
+### Property notations
+
+### Built-in properties
+
+#### *value*
+
+#### *size*
+
+#### *length*
+
+#### *empty*
+
+### Adding new property
+
 ## Operators
+
+### Special operators
+
+#### *exists*
+
+#### *_n* (negation)
+
+#### *flag*
+
+#### *in*
+
+### Built-in operators
+
+See [Built-in validation operators](builtin_operators.md).
+
+### Adding new operator
 
 ## Operands
 
+### Variables
+
+### Lazy operands
+
+### Other members
+
+### Sample objects
+
+### Intervals
+
+### Ranges
+
 ## Aggregations
+
+### Logical aggregations
+
+#### AND
+
+#### OR
+
+#### NOT
+
+### Element aggregations
+
+#### ANY
+
+#### ALL
 
 ## Adapters
 
 ### Default adapter
 
+### Single member adapter
+
+### Adding new adapter
+
 ## Reporting
 
+### Reporting adapter
+
+### Reports customization
+
+### Reporting hints
+
+### Localization
+
+#### Concrete phrases and grammatical categories
+
+#### Translator
+
+#### Translator repository
+
+#### Adding new locale
+
 # Building and installation
+
+## Supported platforms and compilers
+
+## Dependencies
+
+## CMake configuration
+
+## Building and running tests
 
 # License
 
@@ -348,5 +486,3 @@ See accompanying file [LICENSE.md](../LICENSE.md) or copy at http://boost.org/LI
 # Contributing
 
 See accompanying file [CONTRIBUTING.md](../CONTRIBUTING.md).
-
-# Appendix A. Built-in validation operators
