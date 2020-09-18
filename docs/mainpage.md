@@ -346,4 +346,6 @@ See accompanying file [LICENSE.md](../LICENSE.md) or copy at http://boost.org/LI
 
 # Contributing
 
+See accompanying file [CONTRIBUTING.md](../CONTRIBUTING.md).
+
 # Appendix A. Built-in validation operators
