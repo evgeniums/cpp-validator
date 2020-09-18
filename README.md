@@ -17,13 +17,11 @@ Basic usage of the library includes two steps:
 
 There are a lot of options for validator extension and customization. During validation a text report describing an error can be constructed. Reports can be widely customised and translated to supported languages.
 
-The library was tested with clang, gcc and msvc compilers that support C++14 and/or C++17 standards. Tested operating systems include Linux, Windows, macOS, iOS and Android platforms.
+The library was tested with *Clang*, *GCC* and *MSVC* compilers that support *C\++14* or *C\++17* standards. Tested operating systems include *Linux*, *Windows*, *macOS*, *iOS* and *Android* platforms.
 
 For more details see [Documentation](docs/mainpage.md).
 
-_The README and reference documentation are under construction yet._
-
-Currently only doxygen-style comments in sources are available. Tests in test folder can be used as a kind of examples. Scripts for tests budiling are in a *sample-build* folder.
+Doxygen-style comments in sources are also available. Tests in a *test* folder can be used as a kind of examples. Scripts for tests building are in a *sample-build* folder.
 
 ## Some examples of basic usage
 
