@@ -1,10 +1,10 @@
-# C++ validator
+# *cpp-validator* (C++ Data Validation Library)
 
 ## Introduction
 
 Modern C++ header-only library for validation of variables, objects and containers. 
 
-Cpp-validator can be used to validate:
+*cpp-validator* library can be used to validate:
 - plain variables;
 - properties of objects, where a property can be accessed either as object's variable or object's method;
 - contents and properties of containers;
