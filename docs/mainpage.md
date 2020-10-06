@@ -385,6 +385,8 @@ Members are used to define what parts of [objects](#object) must be validated. A
 Member notation is used to define validation conditions for a certain [member](#member). With member notation a temporary callable object is constructed which will define the validation conditions for that member when invoked with validation operators and operands.
 
 ```cpp
+#include <dracosha/validator/validator.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 // define member with member notation
 auto member_callable=_[member_id];
@@ -402,10 +404,12 @@ auto member_validator2=_[member_id](gte,100);
 
 #### Single level members
 
-A [member](#member) name must be placed within square brackets that follow an underscore symbol `_`.
+A [member](#member) name must be placed within square brackets that follow an underscore symbol `_` which is defined in cpp-validator library namespace.
 If a member name is a literal key of an element in container then it must be surrounded with quotes. See examples below.
 
 ```cpp
+#include <dracosha/validator/validator.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 // member is a property
 auto member_property=_[size];
@@ -419,10 +423,12 @@ auto member_string_key=_["some_member"];
 ```
 #### Nested members
 
-To validate members of nested objects or containers compound member notation must be used.
+To validate members of nested objects or containers a compound member notation must be used.
 where name of member at each level is placed within square brackets and appended to the upper member. See examples below.
 
 ```cpp
+#include <dracosha/validator/validator.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 // 3 levels
 auto member_3_levels=_[level1][level2][level3];
@@ -449,40 +455,42 @@ Method `set_unknown_member_mode` instructs adapter what to do if a member is not
 See examples below.
 
 ```cpp
+#include <dracosha/validator/validator.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
-    std::map<std::string,int> m1={
-            {"field1",10},
-            {"field3",100}
-        };
+std::map<std::string,int> m1={
+        {"field1",10},
+        {"field3",100}
+    };
 
-    // adapter 1 aborts validation if some member is not found        
-    auto a1=make_default_adapter(m1);
-    a1.set_check_member_exists_before_validation(true);
-    a1.set_unknown_member_mode(if_member_not_found::abort);
+// adapter 1 aborts validation if some member is not found        
+auto a1=make_default_adapter(m1);
+a1.set_check_member_exists_before_validation(true);
+a1.set_unknown_member_mode(if_member_not_found::abort);
 
-    // adapter 2 ignores not found members
-    auto a2=make_default_adapter(m1);
-    a2.set_check_member_exists_before_validation(true);
-    a2.set_unknown_member_mode(if_member_not_found::ignore);
+// adapter 2 ignores not found members
+auto a2=make_default_adapter(m1);
+a2.set_check_member_exists_before_validation(true);
+a2.set_unknown_member_mode(if_member_not_found::ignore);
 
-    // both members exist in the map
-    auto v1=validator(
-                _["field1"](gte,9),
-                _["field3"](eq,100)
-            );
-    // validation succeeded with both adapters
-    assert(v1.apply(a1));
-    assert(v1.apply(a2));
+// both members exist in the map
+auto v1=validator(
+            _["field1"](gte,9),
+            _["field3"](eq,100)
+        );
+// validation succeeded with both adapters
+assert(v1.apply(a1));
+assert(v1.apply(a2));
 
-    // member "field2" doesn't exist in the map
-    auto v2=validator(
-                _["field1"](eq,10),
-                _["field2"](lt,1000)
-            );
-    // validation failed with adapter 1
-    assert(!v2.apply(a1));
-    // validation succeeded with adapter 2
-    assert(v2.apply(a2));
+// member "field2" doesn't exist in the map
+auto v2=validator(
+            _["field1"](eq,10),
+            _["field2"](lt,1000)
+        );
+// validation failed with adapter 1
+assert(!v2.apply(a1));
+// validation succeeded with adapter 2
+assert(v2.apply(a2));
 
 ```
 
@@ -511,6 +519,8 @@ See examples below.
 The operator `exists` is used to check explicitly if an [object](#object) contains some [member](#member). Se example below.
 
 ```cpp
+#include <dracosha/validator/validator.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 // define validator
 auto v1=validator(
