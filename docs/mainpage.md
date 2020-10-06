@@ -21,7 +21,8 @@
 	* [Using validator for data validation](#using-validator-for-data-validation)
 	* [Members](#members)
 		* [Member notation](#member-notation)
-		* [Member levels](#member-levels)
+			* [Single level members](#single-level-members)
+			* [Nested members](#nested-members)
 		* [Member existence](#member-existence)
 	* [Properties](#properties)
 		* [Property notations](#property-notations)
@@ -374,11 +375,116 @@ if (!v.apply(value2))
 ```
 ## Members
 
+Members are used to define what parts of [objects](#object) must be validated. A member can point to one of the following:
+- member variable of C++ object;
+- member method of C++ object, where the method must be of getter type, i.e. it must return some value and have no arguments;
+- element of container.
+
 ### Member notation
 
-### Member levels
+Member notation is used to define validation conditions for a certain [member](#member). With member notation a temporary callable object is constructed which will define the validation conditions for that member when invoked with validation operators and operands.
+
+```cpp
+
+// define member with member notation
+auto member_callable=_[member_id];
+
+/* 
+   define validator of the member by invoking the member callable 
+   with validation operators and operands
+*/
+auto member_validator1=member_callable(gte,100);
+
+// the same as above but in one line
+auto member_validator2=_[member_id](gte,100);
+
+```
+
+#### Single level members
+
+A [member](#member) name must be placed within square brackets that follow an underscore symbol `_`.
+If a member name is a literal key of an element in container then it must be surrounded with quotes. See examples below.
+
+```cpp
+
+// member is a property
+auto member_property=_[size];
+
+// member is an integer key of container element
+auto member_integer_key=_[100];
+
+// member is a literal key of container element
+auto member_string_key=_["some_member"];
+
+```
+#### Nested members
+
+To validate members of nested objects or containers compound member notation must be used.
+where name of member at each level is placed within square brackets and appended to the upper member. See examples below.
+
+```cpp
+
+// 3 levels
+auto member_3_levels=_[level1][level2][level3];
+
+// nested container elements
+auto member_nested_container=_["element1"]["element1_1"]["element1_1_1"];
+
+```
 
 ### Member existence
+
+Special operator [exists](#exists) can be used to check explicitly if an [object](#object) contains some [member](#member). 
+
+There is also a built-in [contains](builtin_operators.md#contains) operator for convenience when validating container members.
+
+A [member](#member) existence can also be checked implicitly before applying validation conditions to the [member](#member). Such checking is performed by an [adapter](#adapter) if the [adapter](#adapter) supports that. [Default adapter](#default-adapter) and [reporting adapter](#reporting-adapter) provide such feature that can be configured with  `set_check_member_exists_before_validation` and `set_unknown_member_mode` adapter methods. 
+
+Method `set_check_member_exists_before_validation` enables/disables implicit checking of member existence. By default this option is disabled which improves validation performance but can sometimes cause exceptions or other undefined errors. Besides, some basic checking if a member can be found for given object type is performed statically at compile time regardless of this flag.
+
+Method `set_unknown_member_mode` instructs adapter what to do if a member is not found. There are two options:
+- ignore not found members and continue validation process;
+- abort validation process with error.
+
+See examples below.
+
+```cpp
+
+    std::map<std::string,int> m1={
+            {"field1",10},
+            {"field3",100}
+        };
+
+    // adapter 1 aborts validation if some member is not found        
+    auto a1=make_default_adapter(m1);
+    a1.set_check_member_exists_before_validation(true);
+    a1.set_unknown_member_mode(if_member_not_found::abort);
+
+    // adapter 2 ignores not found members
+    auto a2=make_default_adapter(m1);
+    a2.set_check_member_exists_before_validation(true);
+    a2.set_unknown_member_mode(if_member_not_found::ignore);
+
+    // both members exist in the map
+    auto v1=validator(
+                _["field1"](gte,9),
+                _["field3"](eq,100)
+            );
+    // validation succeeded with both adapters
+    assert(v1.apply(a1));
+    assert(v1.apply(a2));
+
+    // member "field2" doesn't exist in the map
+    auto v2=validator(
+                _["field1"](eq,10),
+                _["field2"](lt,1000)
+            );
+    // validation failed with adapter 1
+    assert(!v2.apply(a1));
+    // validation succeeded with adapter 2
+    assert(v2.apply(a2));
+
+```
 
 ## Properties
 
@@ -401,6 +507,28 @@ if (!v.apply(value2))
 ### Special operators
 
 #### *exists*
+
+The operator `exists` is used to check explicitly if an [object](#object) contains some [member](#member). Se example below.
+
+```cpp
+
+// define validator
+auto v1=validator(
+    _["key1"](exists,true),
+    _["key2"](exists,false)
+);
+
+// m1 satisfies validation conditions
+std::map<std::string,std::string> 
+    m1={{"key1","value1"}};
+assert(v1.apply(m1));
+
+// m2 does not satisfy validation conditions
+std::map<std::string,std::string> 
+    m2={{"key2","value2"}};
+assert(!v1.apply(m2));
+
+```
 
 #### *_n* (negation)
 
