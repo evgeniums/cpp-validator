@@ -496,19 +496,126 @@ assert(v2.apply(a2));
 
 ## Properties
 
+[Properties](#property) are used to validate either contents or characteristics of [objects](#object) and [members](#member). A [property](#property) can correspond either to a member variable or to a getter method of C++ `class` or `struct`.
+
 ### Property notations
+
+A [property](#property) can be used in a [validator](#validator) in one of the following forms:
+* `property notation` when property's name is used as part of a validation condition;
+* [member notation](#member-notation) when property's name is used in [member](#member) section of a [validator](#validator).
+
+See examples of different property notations in section [Validator with properties](#validator-with-properties).
 
 ### Built-in properties
 
 #### *value*
 
+`value` property stands for the variable itself. This is a special pseudo property which means that validation must be applied to the variable "as is". See examples how the `value` property can be used in section [validator with aggregations](#validator-with-aggregations).
+
 #### *size*
+
+`size` property is used to validate result of `size()` method or `size` member variable of an [object](#object).
 
 #### *length*
 
+`length` property is used to validate result of `length()` method or `length` member variable of an [object](#object).
+
 #### *empty*
 
+`empty` property is used to validate result of `empty()` method or `empty` member variable of an [object](#object).
+
 ### Adding new property
+
+A new [property](#property) can be added using special macros defined in `cpp-validator` library. 
+
+If a [property](#property) is boolean that can be used with [flag](#flag) operator then `DRACOSHA_VALIDATOR_PROPERTY_FLAG` macro must be used which has three arguments:
+1. name of the [property](#property);
+2. description of positive [flag](#flag);
+3. description of negative [flag](#flag).
+
+```cpp
+#include <dracosha/validator/property.hpp>
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/adapter/reporting_adapter.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// structure with red_color() getter method
+struct Foo
+{
+    // boolean getter method
+    bool red_color() const
+    {
+        return true;
+    }
+};
+
+// define flaggable red_color property
+DRACOSHA_VALIDATOR_PROPERTY_FLAG(red_color,"Must be red","Must be not red");
+
+// validator with red_color property
+auto v=validator(
+    _[red_color](flag,false)
+);
+
+// create reporting adapter
+std::string report;
+Foo foo_instance;
+auto ra=make_reporting_adapter(foo_instance,report);
+
+// apply validator and print report
+if (!v.apply(ra))
+{
+    std::cerr << report << std::endl;
+    /* prints:
+    
+    "Must be not red"
+    
+    */
+}
+
+```
+
+All the rest [properties](#property) must be defined using `DRACOSHA_VALIDATOR_PROPERTY` macro which has only one argument for name of the [property](#property).
+
+```cpp
+#include <dracosha/validator/property.hpp>
+#include <dracosha/validator/validator.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// structure with two properties
+struct Foo
+{
+    // member variable
+    std::string var1;
+    
+    // getter method
+    uint32_t get_var2() const
+    {
+        return _var2;
+    }
+    
+    private:
+    
+        uint32_t _var2=1000;
+};
+
+// define property corresponding to member variable
+DRACOSHA_VALIDATOR_PROPERTY(var1);
+
+// define property corresponding to getter method
+DRACOSHA_VALIDATOR_PROPERTY(get_var2);
+
+// validator with custom properties
+auto v=validator(
+    var1(ne,"unknown"),
+    get_var2(gte,100)
+);
+
+// valiate object
+Foo foo_instance;
+assert(v.apply(foo_instance));
+
+```
 
 ## Operators
 
@@ -516,7 +623,7 @@ assert(v2.apply(a2));
 
 #### *exists*
 
-The operator `exists` is used to check explicitly if an [object](#object) contains some [member](#member). Se example below.
+The operator `exists` is used to check explicitly if an [object](#object) contains some [member](#member). See example below.
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
