@@ -35,9 +35,10 @@
 	* [Operators](#operators)
 		* [Special operators](#special-operators)
 			* [*exists*](#exists)
-			* [*_n* (negation)](#n-negation)
+			* [*contains*](#contains)
 			* [*flag*](#flag)
 			* [*in*](#in)
+			* [*_n* (negation)](#n-negation)
 		* [Built-in operators](#built-in-operators)
 		* [Adding new operator](#adding-new-operator)
 	* [Operands](#operands)
@@ -442,7 +443,7 @@ auto member_nested_container=_["element1"]["element1_1"]["element1_1_1"];
 
 Special operator [exists](#exists) can be used to check explicitly if an [object](#object) contains some [member](#member). 
 
-There is also a built-in [contains](builtin_operators.md#contains) operator for convenience when validating container members.
+There is also a [contains](#contains) operator added for convenience to validate container members.
 
 A [member](#member) existence can also be checked implicitly before applying validation conditions to the [member](#member). Such checking is performed by an [adapter](#adapter) if the [adapter](#adapter) supports that. [Default adapter](#default-adapter) and [reporting adapter](#reporting-adapter) provide such feature that can be configured with  `set_check_member_exists_before_validation` and `set_unknown_member_mode` adapter methods. 
 
@@ -534,6 +535,7 @@ If a [property](#property) is boolean that can be used with [flag](#flag) operat
 3. description of negative [flag](#flag).
 
 ```cpp
+#include <iostream>
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapter/reporting_adapter.hpp>
@@ -619,11 +621,17 @@ assert(v.apply(foo_instance));
 
 ## Operators
 
+[Operators](#operator) define atomic validation conditions in [validators](validator). 
+
+[Operator](#operator) is a callable object that returns `true` if validation condition is satisfied, `false` otherwise. In default [adapter](#adapter) implementations [operator](#operator) is called with two arguments when [validator](#validator) is applied to the [adapter](#adapter):
+* the first argument is a corresponding [property](#property) of the [object](#object) or object's [member](#member) that must be validated;
+* the second argument is an [operand](#operand) that must be used as a sample for validation.
+
 ### Special operators
 
 #### *exists*
 
-The operator `exists` is used to check explicitly if an [object](#object) contains some [member](#member). See example below.
+Operator `exists` is used to check explicitly if an [object](#object) contains some [member](#member). See example below.
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -647,17 +655,173 @@ assert(!v1.apply(m2));
 
 ```
 
-#### *_n* (negation)
+#### *contains*
+
+Operator `contains` is used to check corresponding argument that is under validation contains value of corresponding [operand](#operand). See example below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/operator/contains.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// define validator
+auto v1=validator(contains,"field1");
+
+// m1 satisfies validation condition
+std::map<std::string,size_t> m1={{"field1",1}};
+assert(v1.apply(m1));
+
+// m2 does not satisfy validation condition
+std::map<std::string,size_t> m2={{"field2",2}};
+assert(!v1.apply(m2));
+
+```
 
 #### *flag*
 
+Operator `flag` is a special case of equality operator for boolean arguments. The main purpose of defining separate operator `flag` in addition to operator [eq](builtin_operators.md#eq) is more flexible [reports](#report) construction. With operator `eq` report would always use "must be equal to" string. With operator `flag` report strings can be customized depending on the [property](#property) or explicitly preset strings, e.g. in some places "must be checked", in other places "must be set" and so on can be used.
+
+There are three ways of string customization for `flag` operator.
+
+1. Define [custom property](#adding-new-property) using `DRACOSHA_VALIDATOR_PROPERTY_FLAG` macro where the second argument is a reporting string for `<custom property>(flag,true)` condition and the third argument is a reporting string for `<custom property>(flag,false)` condition. See [example](#adding-new-property).
+
+2. Use `flag` operator with one of string presets, e.g. `value(flag(flag_on_off),true)` will result in reporting string "must be on" and `value(flag(flag_on_off),false)` will result in reporting string "must be off". See below list of presets for `flag` operator.
+*Preset flag strings are defined in `validator/reporting/flag_presets.hpp` header file. The following presets are defined:
+
+    * `flag_true_false` (default flag string): "must be true" | "must be false";
+    * `flag_on_off`: "must be on" | "must be off";
+    * `flag_checked_unchecked`: "must be checked" | "must be unchecked";
+    * `flag_set_unset`: "must be set" | "must be unset";
+    * `flag_enable_disable`: "must be enabled" | "must be disabled".
+
+3. Use `flag` operator with explicit string description, e.g. `value(flag("custom description"),true)` will result in reporting string "custom description".
+
+```cpp
+#include <vector>
+#include <iostream>
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/operator/flag.hpp>
+#include <dracosha/validator/reporting/flag_presets.hpp>
+#include <dracosha/validator/adapters/reporting_adapter.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// prepare object and reporting adapter
+std::vector<size_t> m1;
+std::string report;
+auto ra1=make_reporting_adapter(m1,report);
+
+// validator with preset flag string
+auto v1=validator(
+    empty(flag(flag_true_false),false)
+);
+assert(!v1.apply(ra1));
+std::cerr << report << std::endl;
+/* prints:
+"empty must be false"
+*/
+report.clear();
+
+// validator with explicit flag string
+auto v2=validator(
+    empty(flag("why?"),false)
+);
+assert(!v2.apply(ra1));
+std::cerr << report << std::endl;
+/* prints:
+"empty why?"
+*/
+report.clear();
+
+```
+
 #### *in*
+
+Operator `in` is used to check if corresponding argument fits into [range](#range) or [interval](#interval). See examples below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/operators.hpp>
+#include <dracosha/validator/range.hpp>
+#include <dracosha/validator/interval.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// define value for validation
+size_t val=90;
+
+// check if the value is in range
+auto v1=validator(in,range({70,80,90,100}));
+assert(v1.apply(val));
+
+// check if the value is in interval
+auto v2=validator(in,interval(80,100));
+assert(v2.apply(val));
+    
+```
+
+#### *_n* (negation)
+
+`_n` is an [operator](#operator) wrapper that negates wrapped [operator](#operator). See example below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/operators.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// container to validate
+std::map<std::string,uint32_t> m1={{"key1",100}};
+
+// validator with original operator
+auto v1=validator(
+    ["key1"](eq,100)
+);
+assert(v1.apply(m1));
+
+// validator with negated operator
+auto v2=validator(
+    ["key1"](_n(eq),100)
+);
+assert(!v2.apply(m1));
+
+```
 
 ### Built-in operators
 
 See [Built-in validation operators](builtin_operators.md).
 
 ### Adding new operator
+
+Adding a new [operator](#operator) consists of the following steps.
+
+1. Define `struct` that inherits from template `op` with the name of the defined struct as template argument.
+2. Define callable `operator ()` in the struct with two templated arguments.
+3. Define `description` and `n_description` as `constexpr static const char*` variables of the the struct that will be used as human readable error descriptions in [report](#report) if this operator returns `false` during validation: `description` is used for the operator itself and `n_description` is used for negation of this operator.
+4. Define `constexpr` callable object with type of the new struct. This object will be used in [validators](#validator).
+
+See example below.
+
+```cpp
+#include <dracosha/validator/operators/operator.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// new operator implementation
+struct simple_eq_t : public op<simple_eq_t>
+{
+    // comparison operator with two templated arguments
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b) const
+    {
+        return a==b;
+    }
+
+    // direct error description
+    constexpr static const char* description="must be simply equal to";
+    // negated error description
+    constexpr static const char* n_description="must be not simply equal to";
+};
+// callable object to be used in validators
+constexpr simple_eq_t simple_eq{};
+
+```
 
 ## Operands
 
