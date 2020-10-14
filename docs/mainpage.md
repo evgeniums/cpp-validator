@@ -84,9 +84,9 @@
 
 # Introduction
 
-Modern C++ header-only library for validation of variables, objects and containers. 
+`cpp-validator` is a modern **C++** header-only library for validation of variables, objects and containers.
 
-Cpp-validator can be used to validate:
+`cpp-validator` can be used to validate:
 - plain variables;
 - properties of objects, where a property can be accessed either as object's variable or object's method;
 - contents and properties of containers;
@@ -184,7 +184,6 @@ To construct a validator one should describe validation conditions using five gr
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
-
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 auto v=validator(gt,100);
@@ -195,7 +194,6 @@ The example above defines validation condition "variable must be greater than 10
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
-
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 auto v=validator(
@@ -210,7 +208,6 @@ The example above defines validation condition "field1 of variable must be great
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
-
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 // property notation
@@ -229,7 +226,6 @@ Validators *v1* and *v2* in the example above both define validation condition "
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
-
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 // property notation
@@ -251,7 +247,6 @@ Validators *v1* and *v2* in the example above both define validation condition "
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
-
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 // implicit AND
@@ -271,7 +266,6 @@ The example above defines validation condition "variable must be greater than 10
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
-
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 auto v=validator(
@@ -286,7 +280,6 @@ The example above defines validation condition "field1 of variable must be great
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
-
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 auto v=validator(
@@ -301,7 +294,6 @@ The example above defines validation condition "field1 of variable must be equal
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
-
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 // implicit AND
@@ -320,7 +312,6 @@ auto v2=validator(
                 value(eq,"value1") ^OR^ size(lt,3)
             )
     );
-    
 ```
 The examples above define validation condition "size of variable is not equal to 3 AND field1 of variable must be equal to "value1" OR size of field1 of variable is less than 3" where *field1* is a member of variable, *value* is a pseudo [property](#property) standing for member *field1* of variable, *size* is a [property](#property), *ne*, *eq* and *lt* are [operators](#operator), *3*, *10*, *"value1"* are [operands](#operand), *\^OR\^* and *\^AND\^* are [aggregations](#aggregation).
 
@@ -329,8 +320,10 @@ The examples above define validation condition "size of variable is not equal to
 Data validation is performed by [adapters](#adapter). When a [validator](#validator) is applied to an [adapter](#adapter) the [adapter](#adapter) *reads* validation conditions from the [validator](#validator) and processes them depending on [adapter](#adapter) implementation. See more about adapters in [Adapters](#adapters) section.
 ```cpp
 #include <dracosha/validator/validator.hpp>
-
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
 
 // define validator
 auto v=validator(gt,100);
@@ -350,13 +343,18 @@ if (!v.apply(a2))
 {
   // validation failed
 }
+
+return 0;
+}
 ```
 
 A [validator](#validator) can be applied directly to a variable that must be validated. In this case a [default adapter](#default-adapter) will be used implicitly.
 ```cpp
 #include <dracosha/validator/validator.hpp>
-
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
 
 // define validator
 auto v=validator(gt,100);
@@ -374,10 +372,13 @@ if (!v.apply(value2))
 {
   // validation failed
 }
+
+return 0;
+}
 ```
 ## Members
 
-Members are used to define what parts of [objects](#object) must be validated. A member can point to one of the following:
+Members are used to define what parts of [objects](#object) must be validated. A [member](#member) can point to one of the following:
 - member variable of C++ object;
 - member method of C++ object, where the method must be of getter type, i.e. it must return some value and have no arguments;
 - element of container.
@@ -401,12 +402,11 @@ auto member_validator1=member_callable(gte,100);
 
 // the same as above but in one line
 auto member_validator2=_[member_id](gte,100);
-
 ```
 
 #### Single level members
 
-A [member](#member) name must be placed within square brackets that follow an underscore symbol `_` which is defined in cpp-validator library namespace.
+A [member](#member) name must be placed within square brackets that follow an underscore symbol `_` which is defined in `cpp-validator` library `namespace`.
 If a member name is a literal key of an element in container then it must be surrounded with quotes. See examples below.
 
 ```cpp
@@ -421,7 +421,6 @@ auto member_integer_key=_[100];
 
 // member is a literal key of container element
 auto member_string_key=_["some_member"];
-
 ```
 #### Nested members
 
@@ -436,16 +435,15 @@ auto member_path_3_levels=_[level1][level2][level3];
 
 // nested container elements
 auto member_path_nested_container=_["element1"]["element1_1"]["element1_1_1"];
-
 ```
 
 ### Member existence
 
 Special operator [exists](#exists) can be used to check explicitly if an [object](#object) contains some [member](#member). 
 
-There is also a [contains](#contains) operator added for convenience to validate container members.
+There is also a [contains](#contains) operator added to the library for convenience to validate members of container types.
 
-A [member](#member) existence can also be checked implicitly before applying validation conditions to the [member](#member). Such checking is performed by an [adapter](#adapter) if the [adapter](#adapter) supports that. [Default adapter](#default-adapter) and [reporting adapter](#reporting-adapter) provide such feature that can be configured with  `set_check_member_exists_before_validation` and `set_unknown_member_mode` adapter methods. 
+A [member](#member) existence can also be checked implicitly before applying validation conditions to the [member](#member). Such check is performed by an [adapter](#adapter) if the [adapter](#adapter) supports that. [Default adapter](#default-adapter) and [reporting adapter](#reporting-adapter) provide such feature that can be configured with  `set_check_member_exists_before_validation` and `set_unknown_member_mode` adapter methods. 
 
 Method `set_check_member_exists_before_validation` enables/disables implicit checking of member existence. By default this option is disabled which improves validation performance but can sometimes cause exceptions or other undefined errors. Besides, some basic checking if a member can be found for given object type is performed statically at compile time regardless of this flag.
 
@@ -458,6 +456,9 @@ See examples below.
 ```cpp
 #include <dracosha/validator/validator.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
 
 std::map<std::string,int> m1={
         {"field1",10},
@@ -493,6 +494,8 @@ assert(!v2.apply(a1));
 // validation succeeded with adapter 2
 assert(v2.apply(a2));
 
+return 0;
+}
 ```
 
 ## Properties
@@ -529,55 +532,7 @@ See examples of different property notations in section [Validator with properti
 
 A new [property](#property) can be added using special macros defined in `cpp-validator` library. 
 
-If a [property](#property) is boolean that can be used with [flag](#flag) operator then `DRACOSHA_VALIDATOR_PROPERTY_FLAG` macro must be used which has three arguments:
-1. name of the [property](#property);
-2. description of positive [flag](#flag);
-3. description of negative [flag](#flag).
-
-```cpp
-#include <iostream>
-#include <dracosha/validator/property.hpp>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapter/reporting_adapter.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
-
-// structure with red_color() getter method
-struct Foo
-{
-    // boolean getter method
-    bool red_color() const
-    {
-        return true;
-    }
-};
-
-// define flaggable red_color property
-DRACOSHA_VALIDATOR_PROPERTY_FLAG(red_color,"Must be red","Must be not red");
-
-// validator with red_color property
-auto v=validator(
-    _[red_color](flag,false)
-);
-
-// create reporting adapter
-std::string report;
-Foo foo_instance;
-auto ra=make_reporting_adapter(foo_instance,report);
-
-// apply validator and print report
-if (!v.apply(ra))
-{
-    std::cerr << report << std::endl;
-    /* prints:
-    
-    "Must be not red"
-    
-    */
-}
-
-```
-
-All the rest [properties](#property) must be defined using `DRACOSHA_VALIDATOR_PROPERTY` macro which has only one argument for name of the [property](#property).
+A [property](#property) of non-boolean type must be defined using `DRACOSHA_VALIDATOR_PROPERTY` macro which has only one argument for name of the [property](#property).
 
 ```cpp
 #include <dracosha/validator/property.hpp>
@@ -607,6 +562,9 @@ DRACOSHA_VALIDATOR_PROPERTY(var1);
 // define property corresponding to getter method
 DRACOSHA_VALIDATOR_PROPERTY(get_var2);
 
+int main()
+{
+
 // validator with custom properties
 auto v=validator(
     var1(ne,"unknown"),
@@ -617,6 +575,61 @@ auto v=validator(
 Foo foo_instance;
 assert(v.apply(foo_instance));
 
+return 0;
+}
+```
+
+If a [property](#property) is boolean that can be used with [flag](#flag) operator then `DRACOSHA_VALIDATOR_PROPERTY_FLAG` macro must be used which has three arguments:
+1. name of the [property](#property);
+2. description of positive [flag](#flag);
+3. description of negative [flag](#flag).
+
+```cpp
+#include <iostream>
+#include <dracosha/validator/property.hpp>
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/adapter/reporting_adapter.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// structure with red_color() getter method
+struct Foo
+{
+    // boolean getter method
+    bool red_color() const
+    {
+        return true;
+    }
+};
+
+int main()
+{
+
+// define flaggable red_color property
+DRACOSHA_VALIDATOR_PROPERTY_FLAG(red_color,"Must be red","Must be not red");
+
+// validator with red_color property
+auto v=validator(
+    _[red_color](flag,false)
+);
+
+// create reporting adapter
+std::string report;
+Foo foo_instance;
+auto ra=make_reporting_adapter(foo_instance,report);
+
+// apply validator and print report
+if (!v.apply(ra))
+{
+    std::cerr << report << std::endl;
+    /* prints:
+    
+    "Must be not red"
+    
+    */
+}
+
+return 0;
+}
 ```
 
 ## Operators
@@ -637,6 +650,9 @@ Operator `exists` is used to check explicitly if an [object](#object) contains s
 #include <dracosha/validator/validator.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
+int main()
+{
+
 // define validator
 auto v1=validator(
     _["key1"](exists,true),
@@ -653,16 +669,21 @@ std::map<std::string,std::string>
     m2={{"key2","value2"}};
 assert(!v1.apply(m2));
 
+return 0;
+}
 ```
 
 #### *contains*
 
-Operator `contains` is used to check corresponding argument that is under validation contains value of corresponding [operand](#operand). See example below.
+Operator `contains` is used to check if the variable that is under validation contains an element that matches the value of corresponding [operand](#operand). See example below.
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/operator/contains.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
 
 // define validator
 auto v1=validator(contains,"field1");
@@ -675,11 +696,13 @@ assert(v1.apply(m1));
 std::map<std::string,size_t> m2={{"field2",2}};
 assert(!v1.apply(m2));
 
+return 0;
+}
 ```
 
 #### *flag*
 
-Operator `flag` is a special case of equality operator for boolean arguments. The main purpose of defining separate operator `flag` in addition to operator [eq](builtin_operators.md#eq) is more flexible [reports](#report) construction. With operator `eq` report would always use "must be equal to" string. With operator `flag` report strings can be customized depending on the [property](#property) or explicitly preset strings, e.g. in some places "must be checked", in other places "must be set" and so on can be used.
+Operator `flag` is a special case of equality operator for boolean arguments. The main purpose of defining separate operator `flag` in addition to operator [eq](builtin_operators.md#eq) is more flexible [reports](#report) construction. With operator [eq](builtin_operators.md#eq) a [report](#report) would always use "must be equal to" string. With operator `flag` report strings can be customized depending on the [property](#property) or explicitly preset strings, e.g. in some places "must be checked", in other places "must be set" and so on can be used.
 
 There are three ways of string customization for `flag` operator.
 
@@ -704,6 +727,9 @@ There are three ways of string customization for `flag` operator.
 #include <dracosha/validator/reporting/flag_presets.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
 
 // prepare object and reporting adapter
 std::vector<size_t> m1;
@@ -732,11 +758,13 @@ std::cerr << report << std::endl;
 */
 report.clear();
 
+return 0;
+}
 ```
 
 #### *in*
 
-Operator `in` is used to check if corresponding argument fits into [range](#range) or [interval](#interval). Operator `nin` is a negation of the `in` operator. See examples below.
+Operator `in` is used to check if corresponding argument fits into [range](#range) or [interval](#interval). Operator `nin` is a [negation](#_n-negation) of the `in` operator. See examples below.
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -744,6 +772,9 @@ Operator `in` is used to check if corresponding argument fits into [range](#rang
 #include <dracosha/validator/range.hpp>
 #include <dracosha/validator/interval.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
 
 // define value for validation
 size_t val=90;
@@ -755,7 +786,9 @@ assert(v1.apply(val));
 // check if the value is in interval
 auto v2=validator(in,interval(80,100));
 assert(v2.apply(val));
-    
+
+return 0;
+}
 ```
 
 #### *nin*
@@ -770,6 +803,9 @@ See [in](#in) operator.
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/operators.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
 
 // container to validate
 std::map<std::string,uint32_t> m1={{"key1",100}};
@@ -786,6 +822,8 @@ auto v2=validator(
 );
 assert(!v2.apply(m1));
 
+return 0;
+}
 ```
 
 ### Built-in operators
@@ -824,7 +862,6 @@ struct simple_eq_t : public op<simple_eq_t>
 };
 // callable object to be used in validators
 constexpr simple_eq_t simple_eq{};
-
 ```
 
 ## Operands
@@ -852,7 +889,6 @@ auto v2=validator(gt,lval_operand);
 // operand is rvalue
 int rval_operand=100;
 auto v3=validator(gt,std::move(rval_operand));
-
 ```
 
 ### Lazy operands
@@ -963,7 +999,7 @@ return 0;
 An interval can be specified with two endpoints: `from` and `to`. Interval can be one of the following:
 - `open` when its endpoints do not belong to the interval;
 - `closed` when its endpoints belong to the interval;
-- partially `open` or `closed` when one of its endpoints belong to the interval while the other do not.
+- partially `open` or `closed` when one of its endpoints belongs to the interval while the other does not.
 
 Interval [operand](#operand) can be used only with [in](#in) and [nin](#nin) operators. With [in](#in) operator it is used to check if a variable is greater than or equal to `from` endpoint and less than or equal to `to` endpoint. If an endpoint is `open` then condition "is greater than" or "is less than" will be checked respectively.
 
@@ -1021,9 +1057,9 @@ If [decorator](#decorator) is used then only part within braces including the br
 
 ### Ranges
 
-`Range` [operand](#operand) is a searchable set of elements. `Range` [operand](#operand) can be used only with [in](#in) and [nin](#nin) operators. With [in](#in) operator it is used to check if a variable match one of the elements in the `range`.
+Range [operand](#operand) is a searchable set of elements. Range [operand](#operand) can be used only with [in](#in) and [nin](#nin) operators. With [in](#in) operator it is used to check if a variable matches one of the elements in the `range`.
 
-`Range` can be specified using one of the following ways:
+Range can be specified using one of the following ways:
 
 - wrap some existing container, e.g. 
     ```cpp
@@ -1043,9 +1079,9 @@ If [decorator](#decorator) is used then only part within braces including the br
     ```cpp
     auto v1=validator(in,range({1,2,3,4,5},sorted));
     ```
-Sorted and unsorted `ranges` differ in processing: for sorted `ranges` `std::binary_search` is used while for unsorted `ranges` `std::find_if` is used which is slower than `std::binary_search`.
+Sorted and unsorted ranges differ in processing: for sorted ranges `std::binary_search` is used while for unsorted ranges `std::find_if` is used which is slower than `std::binary_search`.
 
-In [reporting](#report) a `range` is formatted as "range [x[0], x[1], ... , x[N]]", where x[i] denotes i-th element of the container. To limit a number of elements in [report](#report) use `range` with additional integer argument that stands for `max_report_elements`. If  `max_report_elements` is set then at most `max_report_elements` will be used in [report](#report) formatting and ", ... " will be appended to the end of the list. See examples below.
+In [reporting](#report) a `range` is formatted as "range [x[0], x[1], ... , x[N]]", where x[i] denotes i-th element of the container. To limit a number of elements in a [report](#report) one should use `range` with additional integer argument that stands for `max_report_elements`. If  `max_report_elements` is set then at most `max_report_elements` will be used in [report](#report) formatting and ", ... " will be appended to the end of the list. See examples below.
 
 ```cpp
 std::vector<size_t> vec{1,2,3,4,5,6,7,8,9,10};
@@ -1099,6 +1135,8 @@ If [decorator](#decorator) is used then only the part within braces including th
 ### Reports customization
 
 ### Reporting hints
+
+### Decorator
 
 ### Localization
 
