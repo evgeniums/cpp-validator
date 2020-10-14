@@ -38,6 +38,7 @@
 			* [*contains*](#contains)
 			* [*flag*](#flag)
 			* [*in*](#in)
+			* [*nin*](#nin)
 			* [*_n* (negation)](#n-negation)
 		* [Built-in operators](#built-in-operators)
 		* [Adding new operator](#adding-new-operator)
@@ -424,18 +425,17 @@ auto member_string_key=_["some_member"];
 ```
 #### Nested members
 
-To validate members of nested objects or containers a compound member notation must be used.
-where name of member at each level is placed within square brackets and appended to the upper member. See examples below.
+To validate members of nested objects or containers a compound member notation must be used, where name of the member at each level is placed within square brackets and appended to the upper member resulting in a `member path`. See examples below.
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 // 3 levels
-auto member_3_levels=_[level1][level2][level3];
+auto member_path_3_levels=_[level1][level2][level3];
 
 // nested container elements
-auto member_nested_container=_["element1"]["element1_1"]["element1_1_1"];
+auto member_path_nested_container=_["element1"]["element1_1"]["element1_1_1"];
 
 ```
 
@@ -736,7 +736,7 @@ report.clear();
 
 #### *in*
 
-Operator `in` is used to check if corresponding argument fits into [range](#range) or [interval](#interval). See examples below.
+Operator `in` is used to check if corresponding argument fits into [range](#range) or [interval](#interval). Operator `nin` is a negation of the `in` operator. See examples below.
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -757,6 +757,10 @@ auto v2=validator(in,interval(80,100));
 assert(v2.apply(val));
     
 ```
+
+#### *nin*
+
+See [in](#in) operator.
 
 #### *_n* (negation)
 
@@ -825,17 +829,244 @@ constexpr simple_eq_t simple_eq{};
 
 ## Operands
 
+Value of an [operand](#operand) is given as the second argument to an [operator](#operator) and is meant to be used as a validation sample. An [operand](#operand) can be one of:
+- constant or `lvalue` or `rvalue` [variable](#variables);
+- [lazy](#lazy-operands) operand;
+- [other-member](#other-members) of the [object](#object) under validation;
+- [the same member of sample object](#sample-objects);
+- [interval](#intervals);
+- [range](#ranges).
+
 ### Variables
+
+The most common case is when an [operand](#operand) is either constant or `lvalue` or `rvalue` variable. See examples below.
+
+```cpp
+// operand is constant
+auto v1=validator(gt,100);
+
+// operand is lvalue
+int lval_operand=100;
+auto v2=validator(gt,lval_operand);
+
+// operand is rvalue
+int rval_operand=100;
+auto v3=validator(gt,std::move(rval_operand));
+
+```
 
 ### Lazy operands
 
+If value of an [operand](#operand) must be evaluated at the moment of [validator](#validator) applying then `lazy` wrapper must be used. `lazy` wraps a callable object (e.g. lambda) that will be invoked later when the [validator](#validator) is applied. See example below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/lazy.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+
+// define sample getter
+int sample=100;
+auto get_sample=[&sample]()
+{
+    return sample;
+};
+
+// define validator with lazy operand
+auto v1=validator(
+            eq,lazy(get_sample)
+        );
+
+// define variable
+int val=100;
+
+// validate variable with original sample
+assert(v1.apply(val));
+
+// update sample and validate variable again
+sample=200;
+assert(!v1.apply(val));
+
+return 0;
+}
+```
+
 ### Other members
+
+Other [member](#member) of the same [object](#object) can be used as an [operand](#operand). For example, one can check if two [members](#members) of the same object match. See example below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+
+// validator to check if "password" is equal to "check_password"
+auto v1=validator(
+    _["password"](eq,_["check_password"])
+);
+
+// map to validate, just for example - NEVER use such passwords!
+std::map<std::string,std::string> m1={
+        {"password","12345678"},
+        {"check_password","12345678"}
+    };
+
+// validate map
+assert(v1.apply(m1));
+
+return 0;
+}
+
+```
 
 ### Sample objects
 
+[Members](#member) of other object can be used as [operands](#operand) for validation. A [member](#member) with the same [member path](#nested-members) of sample object is used as [operand](#operand) in validation conditions for a given [member](#member). To construct such [operand](#operand) a sample object must be placed within round brackets following underscore symbol, e.g. `_(sample_object)`. See example below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+
+// sample container
+std::map<std::string,std::string> sample={
+        {"token","12345678"}
+    };
+
+// validator to check if "token" element of object under validation 
+// is equal to "token" element of the sample
+auto v1=validator(
+    _["token"](eq,_(sample))
+);
+
+// map to validate
+std::map<std::string,std::string> m1={
+        {"token","12345678"}
+    };
+
+// validate map
+assert(v1.apply(m1));
+
+return 0;
+}
+
+```
+
 ### Intervals
 
+An interval can be specified with two endpoints: `from` and `to`. Interval can be one of the following:
+- `open` when its endpoints do not belong to the interval;
+- `closed` when its endpoints belong to the interval;
+- partially `open` or `closed` when one of its endpoints belong to the interval while the other do not.
+
+Interval [operand](#operand) can be used only with [in](#in) and [nin](#nin) operators. With [in](#in) operator it is used to check if a variable is greater than or equal to `from` endpoint and less than or equal to `to` endpoint. If an endpoint is `open` then condition "is greater than" or "is less than" will be checked respectively.
+
+Notation of interval operand consists of keyword `interval` followed by `from` endpoint and `to` endpoint separated with comma and surrounded with round braces, e.g. `interval(1,100)`. By default an interval is `closed`. An interval modifier can be used as the third argument of `interval(from,to,modifier)` to change the type of interval's endpoint. There are four modifiers defined:
+- `interval.closed()` (default modifier) corresponds to `[from,to]`;
+- `interval.open()` corresponds to `(from,to)`;
+- `interval.open_from()` corresponds to `(from,to]`;
+- `interval.open_to()` corresponds to `[from,to)`.
+
+See examples below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/interval.hpp>
+#include <dracosha/validator/operators/in.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main
+{
+
+size_t val=90;
+
+auto v1=validator(in,interval(1,100));
+assert(v1.apply(val));
+
+auto v2=validator(in,interval(95,100));
+assert(!v2.apply(val));
+
+auto v3=validator(in,interval(90,100));
+assert(v3.apply(val));
+
+auto v4=validator(in,interval(90,100,interval.open()));
+assert(!v4.apply(val));
+
+auto v5=validator(in,interval(90,100,interval.open_from()));
+assert(!v5.apply(val));
+
+auto v6=validator(in,interval(90,100,interval.open_to()));
+assert(v6.apply(val));
+
+auto v7=validator(in,interval(80,90,interval.open_to()));
+assert(!v7.apply(val));
+
+return 0;
+}
+```
+
+In [report](#report) construction an interval is formatted as "interval [from,two]" where forms of the braces depend on the interval's mode as follows:
+- "interval [from,two]" for closed intervals;
+- "interval (from,two)" for open intervals;
+- "interval (from,two]" for left open intervals;
+- "interval [from,two)" for right open intervals.
+
+If [decorator](#decorator) is used then only part within braces including the braces is decorated.
+
 ### Ranges
+
+`Range` [operand](#operand) is a searchable set of elements. `Range` [operand](#operand) can be used only with [in](#in) and [nin](#nin) operators. With [in](#in) operator it is used to check if a variable match one of the elements in the `range`.
+
+`Range` can be specified using one of the following ways:
+
+- wrap some existing container, e.g. 
+    ```cpp
+    std::vector<int> vec={10,5,9,100};
+    auto v1=validator(in,range(vec));
+    ```
+- wrap some existing sorted container, e.g. 
+    ```cpp
+    std::vector<int> vec={1,2,3,4,5};
+    auto v1=validator(in,range(vec,sorted));
+    ```
+- construct range in-line, e.g. 
+    ```cpp
+    auto v1=validator(in,range({10,5,9,100}));
+    ```
+- construct sorted range in-line, e.g. 
+    ```cpp
+    auto v1=validator(in,range({1,2,3,4,5},sorted));
+    ```
+Sorted and unsorted `ranges` differ in processing: for sorted `ranges` `std::binary_search` is used while for unsorted `ranges` `std::find_if` is used which is slower than `std::binary_search`.
+
+In [reporting](#report) a `range` is formatted as "range [x[0], x[1], ... , x[N]]", where x[i] denotes i-th element of the container. To limit a number of elements in [report](#report) use `range` with additional integer argument that stands for `max_report_elements`. If  `max_report_elements` is set then at most `max_report_elements` will be used in [report](#report) formatting and ", ... " will be appended to the end of the list. See examples below.
+
+```cpp
+std::vector<size_t> vec{1,2,3,4,5,6,7,8,9,10};
+
+// report will use string "range [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"  
+auto v1=validator(in,range(vec,5));
+
+// report will use string "range [1, 2, 3, 4, 5, ... ]"  
+auto v2=validator(in,range(vec,5));
+
+// report will use string "range [1, 2, 3, 4, 5, ... ]"  
+auto v3=validator(in,range(vec,sorted,5));
+
+// report will use string "range [1, 2, 3, 4, 5, ... ]"  
+auto v4=validator(in,range({1,2,3,4,5},5));
+
+// report will use string "range [1, 2, 3, 4, 5, ... ]"  
+auto v5=validator(in,range({1,2,3,4,5},sorted,5));
+```
+
+If [decorator](#decorator) is used then only the part within braces including the braces is decorated.
 
 ## Aggregations
 
