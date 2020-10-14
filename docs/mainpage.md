@@ -1239,11 +1239,106 @@ auto v2=validator(
 
 ## Adapters
 
+[Adapters](#adapter) perform actual processing of validation conditions specified in [validators](#validator). To invoke validation with a specific adapter a [validator](#validator) must be applied to the adapter. Adapters implemented in the `cpp-validator` library use [operators](#operator) as callable objects to check validation conditions. However, adapters of other types can also be implemented, e.g. adapters that construct SQL queries equivalent to validation conditions specified in [validators](#validator).
+
+There are three built-in adapter types implemented in `cpp-validator` library:
+- [default adapter](#default-adapter) that applies validation to an [object](#object) by invoking [operators](#operator) one by one as specified in a [validator](#validator);
+- [reporting adapter](#reporting-adapter) that does the same as [default adapter](#default-adapter) with addition of constructing a [report](#report) describing an error if validation fails;
+- [single member adapter](single-member-adapter) that validates only one [member](#member) and constructs a [report](#report) if validation fails.
+
 ### Default adapter
+
+`Default adapter` wraps reference to an [object](#object) to be validated and invokes [operators](#operator) one by one as specified in a [validator](#validator). To make a `default adapter` call `make_default_adapter(object_to_validate)` with an [object](#object) as an argument. If a [validator](#validator) is applied directly to an [object](#object) then `default adapter` is constructed implicitly. See examples in [Using validator for data validation](#using-validator-for-data-validation) section.
+
+`Default adapter` supports implicit check of [member existence](#member-existence).
 
 ### Single member adapter
 
+`Single member adapter` validates only a single member. This adapter is best suitable to validate data before updating an object in the object's setters. `Single member adapter` is made with `make_single_member_adapter()` that can have two signatures:
+- `make_single_member_adapter(member_path,val,reporter)` where
+    - `member_path` is a [member](#member) specified in [member notation](#member-notation);
+    - `val` is a variable to validate;
+    - `reporter` is a custom [reporter](#reporter) used for [report](#report) constructing if validation fails;
+- `make_single_member_adapter(member_path,val,dst)` where
+    - `member_path` is a [member](#member) specified in [member notation](#member-notation);
+    - `val` is a variable to validate;
+    - `dst` destination object (e.g. string) where to put validation [report](#report) constructed with default [reporter](#reporter) if validation fails.
+
+If the [member](#member) used in a `single member adapter` is not found in a [validator](#validator) then the validation will be considered as successful.
+
+See example of object setter with validation below.
+
+```cpp
+#include <iostream>
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/adapters/single_member_adapter.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// define Foo type
+struct Foo
+{
+    std::string bar_value;
+    uint32_t other_value=0;
+
+    void set_bar_value(std::string val)
+    {
+        bar_value=std::move(val);
+    }
+};
+
+// define bar_value property
+DRACOSHA_VALIDATOR_PROPERTY(bar_value);
+
+// define other_value property
+DRACOSHA_VALIDATOR_PROPERTY(other_value);
+
+int main
+{
+
+// define validator
+auto v=validator(
+    _[bar_value](ilex_ne,"UNKNOWN"), // case insensitive lexicographical not equal
+    _[other_value](gte,1000)
+);
+
+// define object and setter
+Foo foo_instance;
+auto bar_value_setter = [&v,&foo_instance] (std::string val)
+{
+    std::string report;
+    auto sa=make_single_member_adapter(_[bar_value],val,report);
+    if (!v.apply(sa))
+    {
+        std::cerr << report << std::endl;
+        return false;
+    }
+
+    foo_instance.set_bar_value(std::move(val));
+    return true;
+};
+
+// validate and set value
+auto ok=bar_value_setter("Hello world");
+// ok == true
+
+// validate and print error report
+ok=bar_value_setter("unknown");
+// ok == false
+/* prints:
+ "bar_value must be not equal to UNKNOWN"
+ */
+
+return 0;
+}
+```
+
 ### Adding new adapter
+
+Template of adapter is defined in `validator/adapters/adapter.hpp` header file. To implement a custom adapter the custom adapter traits must be implemented that will be used as template argument in the `adapter` template. In addition, if custom adapter supports implicit check of [member existence](#member-existence) then it also must inherit from `check_member_exists_traits_proxy` template and the custom adapter traits must inherit from `with_check_member_exists` template. 
+
+Examples of adapter traits implementation can be found in `validator/detail/default_adapter_impl.hpp`, `validator/detail/reporting_adapter_impl.hpp` and `validator/detail/single_member_adapter_impl.hpp`.
+
+Examples of adapter implementation can be found in `validator/adapters/default_adapter.hpp`, `validator/adapters/reporting_adapter.hpp` and `validator/adapters/single_member_adapter.hpp`. 
 
 ## Reporting
 
@@ -1251,7 +1346,11 @@ auto v2=validator(
 
 ### Reports customization
 
-### Reporting hints
+#### Reporter
+
+#### Formatters
+
+### Reporting hint
 
 ### Decorator
 
