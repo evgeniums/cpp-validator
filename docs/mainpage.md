@@ -65,6 +65,7 @@
 		* [Reporting adapter](#reporting-adapter)
 		* [Reports customization](#reports-customization)
 		* [Reporting hints](#reporting-hints)
+		* [Decorator](#decorator)
 		* [Localization](#localization)
 			* [Concrete phrases and grammatical categories](#concrete-phrases-and-grammatical-categories)
 			* [Translator](#translator)
@@ -1106,19 +1107,135 @@ If [decorator](#decorator) is used then only the part within braces including th
 
 ## Aggregations
 
+[Aggregations](#aggregation) can be used in one of the following notations:
+- `functional notation` where validation conditions are given as list of arguments in aggregation callable object, e.g. `AND(op1,op2,op3)`;
+- `inline notation` where validation conditions are joined using aggregation conjunction made up of aggregation keyword surrounded with `^`, e.g. `op1 ^AND^ op2 ^AND^ op3`.
+
 ### Logical aggregations
+
+Logical aggregation is a combination of validating [operators](#operator) or other [validators](#validator) that make up a compound [validator](#validator). Logical aggregations can be used to combine validation conditions for both [objects](#object) and [members](#member). See examples of logical aggregations in [Validator with aggregations](#validator-with-aggregations) section.
 
 #### AND
 
+`AND` aggregation is used when all validation conditions must be satisfied. In addition to `functional notation` and `inline notation` the `AND` aggregation can be implicitly invoked when validation conditions in a [validator](#validator) for the whole object are listed separated with commas. See examples below.
+
+```cpp
+// validator is satisfied when variable is greater than 1 and less than 100
+
+// functional notation in validation condition of whole object
+auto v1=validator(
+        AND(value(gt,1),value(lt,100))
+    );
+
+// inline notation in validation condition of whole object
+auto v2=validator(
+        value(gt,1) ^AND^ value(lt,100)
+    );
+
+// implicit AND in validation condition of whole object
+auto v3=validator(
+        value(gt,1),
+        value(lt,100)
+    );
+
+// validator is satisfied when "key1" element of variable is greater than 1 and less than 100
+
+// functional notation in validation condition of a member
+auto v4=validator(
+        _["key1"](AND(value(gt,1),value(lt,100)))
+    );
+
+// inline notation in validation condition of a member
+auto v5=validator(
+        _["key1"](value(gt,1) ^AND^ value(lt,100))
+    );
+```
+
 #### OR
+
+`OR` aggregation is used when at least one validation condition must be satisfied. See examples below.
+
+```cpp
+// validator is satisfied when variable is equal to 1 or is equal to 100
+
+// functional notation in validation condition of whole object
+auto v1=validator(
+        OR(value(eq,1),value(eq,100))
+    );
+
+// inline notation in validation condition of whole object
+auto v2=validator(
+        value(eq,1) ^OR^ value(eq,100)
+    );
+
+// validator is satisfied when "key1" element of variable is equal to 1 or is equal to 100
+
+// functional notation in validation condition of a member
+auto v3=validator(
+        _["key1"](OR(value(eq,1),value(eq,100)))
+    );
+
+// inline notation in validation condition of a member
+auto v4=validator(
+        _["key1"](value(eq,1) ^OR^ value(eq,100))
+    );
+```
 
 #### NOT
 
+`NOT` aggregation is used to negate the whole expression. `NOT` aggregation can use only `functional notation` with single argument. See examples below.
+
+```cpp
+// validator is satisfied when variable is not equal to 1 and not equal to 100
+auto v1=validator(
+        NOT(value(eq,1) ^OR^ value(eq,100))
+    );
+
+// validator is satisfied when "key1" element of variable is not equal to 1 and is not equal to 100
+auto v4=validator(
+        _["key1"](NOT(value(eq,1) ^OR^ value(eq,100)))
+    );
+```
+
 ### Element aggregations
+
+Element aggregations are used when the same validation conditions must be applied to multiple elements of container. Element aggregations can use only `functional notation` with single argument.
 
 #### ANY
 
+`ANY` aggregation is used when at least one element of container must satisfy a condition. See examples below.
+
+```cpp
+// at least one element of container must be equal to "unknown" 
+// or must have size greater or equal to 5
+auto v1=validator(
+        ANY(value(eq,"unknown") ^OR^ size(gte,5))
+    );
+
+// at least one element of cntainer at "key1" element must be equal to "unknown" 
+// or must have size greater or equal to 5
+auto v2=validator(
+        _["key1"](ANY(value(eq,"unknown") ^OR^ size(gte,5)))
+    );
+```
+
 #### ALL
+
+`ALL` aggregation is used when each element of container must satisfy a condition. See examples below.
+
+```cpp
+// each element of container must be equal to "unknown" 
+// or must have size greater or equal to 5
+auto v1=validator(
+        ALL(value(eq,"unknown") ^OR^ size(gte,5))
+    );
+
+// each element of container at "key1" element must be equal to "unknown" 
+// or must have size greater or equal to 5
+auto v2=validator(
+        _["key1"](ALL(value(eq,"unknown") ^OR^ size(gte,5)))
+    );
+```
 
 ## Adapters
 
