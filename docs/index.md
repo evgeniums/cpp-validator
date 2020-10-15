@@ -540,7 +540,7 @@ return 0;
 
 ## Properties
 
-[Properties](#property) are used to validate either contents or characteristics of [objects](#object) and [members](#member). A [property](#property) can correspond either to a member variable or to a getter method of C++ `class` or `struct`.
+[Properties](#property) are used to validate contents or characteristics of [objects](#object) and [members](#member). A [property](#property) can correspond either to a member variable or to a getter method of C++ `class` or `struct`.
 
 ### Property notations
 
@@ -619,7 +619,7 @@ return 0;
 }
 ```
 
-If a [property](#property) is boolean that can be used with [flag](#flag) operator then `DRACOSHA_VALIDATOR_PROPERTY_FLAG` macro must be used which has three arguments:
+If a [property](#property) is of boolean type and must be capable of being used with [flag](#flag) operator then the property must be defined with `DRACOSHA_VALIDATOR_PROPERTY_FLAG` macro which has three arguments:
 1. name of the [property](#property);
 2. description of positive [flag](#flag);
 3. description of negative [flag](#flag).
@@ -676,7 +676,7 @@ return 0;
 
 [Operators](#operator) define atomic validation conditions in [validators](validator). 
 
-[Operator](#operator) is a callable object that returns `true` if validation condition is satisfied, `false` otherwise. In default [adapter](#adapter) implementations [operator](#operator) is called with two arguments when [validator](#validator) is applied to the [adapter](#adapter):
+[Operator](#operator) is a callable object that returns `true` if validation condition is satisfied, `false` otherwise. In default [adapter](#adapter) implementations an [operator](#operator) is called with two arguments when [validator](#validator) is applied to the [adapter](#adapter):
 * the first argument is a corresponding [property](#property) of the [object](#object) or object's [member](#member) that must be validated;
 * the second argument is an [operand](#operand) that must be used as a sample for validation.
 
@@ -715,7 +715,7 @@ return 0;
 
 #### *contains*
 
-Operator `contains` is used to check if the variable that is under validation contains an element that matches the value of corresponding [operand](#operand). See example below.
+Operator `contains` is used to check if the variable that is under validation contains an element that matches the [operand](#operand). See example below.
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -742,7 +742,7 @@ return 0;
 
 #### *flag*
 
-Operator `flag` is a special case of equality operator for boolean arguments. The main purpose of defining separate operator `flag` in addition to operator [eq](builtin_operators.md#eq) is more flexible [reports](#report) construction. With operator [eq](builtin_operators.md#eq) a [report](#report) would always use "must be equal to" string. With operator `flag` report strings can be customized depending on the [property](#property) or explicitly preset strings, e.g. in some places "must be checked", in other places "must be set" and so on can be used.
+Operator `flag` is a special case of equality operator for boolean arguments. The main purpose of defining separate operator `flag` in addition to operator [eq](builtin_operators.md#eq) is more flexible [reports](#report) construction. With operator [eq](builtin_operators.md#eq) a [report](#report) would always use "must be equal to" string. With operator `flag` report strings can be customized depending on the [property](#property) or explicitly preset strings, e.g. "must be checked" or "must be set" and so on can be used in different places.
 
 There are three ways of string customization for `flag` operator.
 
