@@ -543,7 +543,7 @@ return 0;
 ### Property notations
 
 A [property](#property) can be used in a [validator](#validator) in one of the following forms:
-* `property notation` when property's name is used as part of a validation condition;
+* `property notation` when property's name is used as part of a validation condition in the form of `property_name(operator_name,operand)`;
 * [member notation](#member-notation) when property's name is used in [member](#member) section of a [validator](#validator).
 
 See examples of different property notations in section [Validator with properties](#validator-with-properties).
