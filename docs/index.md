@@ -64,11 +64,13 @@
 	* [Reporting](#reporting)
 		* [Reporting adapter](#reporting-adapter)
 		* [Reports customization](#reports-customization)
+			* [Report construction](#report-construction)
+			* [Formatters](#formatters)
+			* [Decorator](#decorator)
 		* [Reporting hints](#reporting-hints)
-		* [Decorator](#decorator)
 		* [Localization](#localization)
 			* [Concrete phrases and grammatical categories](#concrete-phrases-and-grammatical-categories)
-			* [Translator](#translator)
+			* [Translators](#translators)
 			* [Translator repository](#translator-repository)
 			* [Adding new locale](#adding-new-locale)
 * [Building and installation](#building-and-installation)
@@ -119,7 +121,7 @@ Immutable string that will be used in final [report](#report).
 A special type of [member](#member) that points to an element of container when the [object](#object) is a container.
 
 ##### *Formatter*
-Customizable implementer of [reports](#report) formatting.
+Customizable implementer of [reports](#report) formatting. See [formatters](#formatters) section.
 
 ##### *Grammatical category*
 A grammatical category is a property of items within the grammar of a language (see https://en.wikipedia.org/wiki/Grammatical_category). In some languages different grammatical categories of some words can affect the forms of the successive words in a phrase. In this library grammatical categories are used for more natural [reports](#report) construction.
@@ -146,7 +148,7 @@ Method or member variable of C++ class or structure that must be validated, see 
 String description of validation error.
 
 ##### *Reporter*
-Customizable [report](#report) constructor.
+Customizable [constructor](#report-construction) of [reports](#report).
 
 ##### *Translator*
 Translates strings of a [report](#report) to certain language.
@@ -1291,15 +1293,15 @@ There are three built-in adapter types implemented in `cpp-validator` library:
 
 ### Single member adapter
 
-`Single member adapter` validates only a single member. This adapter is best suitable to validate data before updating an object in the object's setters. `Single member adapter` is constructed by calling `make_single_member_adapter()` that can have two signatures:
+`Single member adapter` validates only a single member. This adapter is best suitable to validate data before updating an object in the object's setters. `Single member adapter` is constructed by calling `make_single_member_adapter()` that can have one of the following signatures:
 - `make_single_member_adapter(member_path,val,reporter)` where
     - `member_path` is a [member](#member) specified in [member notation](#member-notation);
     - `val` is a variable to validate;
-    - `reporter` is a custom [reporter](#reporter) used for [report](#report) constructing if validation fails;
+    - `reporter` is a custom [reporter](#reporter) used for [report](#report) construction if validation fails;
 - `make_single_member_adapter(member_path,val,dst)` where
     - `member_path` is a [member](#member) specified in [member notation](#member-notation);
     - `val` is a variable to validate;
-    - `dst` destination object (e.g. string) where to put the validation [report](#report) to constructed with default [reporter](#reporter) if validation fails.
+    - `dst` destination object (e.g. string) where to put the validation [report](#report) to constructed with the default [reporter](#reporter) if validation fails.
 
 If the [member](#member) used in a `single member adapter` is not found in a [validator](#validator) then the validation will be considered as successful.
 
@@ -1379,23 +1381,98 @@ Examples of *custom adapter* implementation can be found in `validator/adapters/
 
 ## Reporting
 
+`cpp-library` can construct text [reports](#report) describing validation errors. To enable construction of error [reports](#report) either [reporting adapter](#reporing-adapter) or [single member adapter](#single-member-adapter) should be used. [Reports](#report) can be customized with help of custom [reporters](#reporter) given to the corresponding adapters.
+
 ### Reporting adapter
+
+`Reporting adapter` does the same validation as [default adapter](#default-adapter) with addition of constructing a text [report](#report) describing the validation error. `Reporting adapter` is constructed by calling `make_reporting_adapter()` that can have one of the following signatures:
+- `make_reporting_adapter(object,reporter)` where
+    - `object` is an [object](#object) to validate;
+    - `reporter` is a custom [reporter](#reporter) used for [report](#report) constructing if validation fails;
+- `make_reporting_adapter(object,dst)` where
+    - `object` is an [object](#object) to validate;
+    - `dst` destination object (e.g. string) where to put the validation [report](#report) to constructed with the default [reporter](#reporter) if validation fails.
+
+`Reporting adapter` supports implicit check of [member existence](#member-existence).
 
 ### Reports customization
 
-#### Reporter
+[Reports](#report) can be customized with help of custom [reporters](#reporter) that are given to adapters supporting [reports](#reports) construction.
+
+#### Report construction
+
+A [report](#report) is constructed by a [reporter](#reporter) given to an adapter that supports [reports](#reports) construction. Default [reporter](#reporter) is implemented by `reporter` template class defined in `validator/reporting/reporter.hpp` header file. There are two ways to customize report construction:
+- implement a custom reporter *from scratch* and give it to the corresponding adapter;
+- use default `reporter` template class with custom [formatter](#formatter) - a helper function `make_reporter(report_destination,custom_formatter)` can be used for convenience, e.g.:
+    ```cpp
+    
+    // object_for_validation must be defined elsewhere
+    // custom_formatter must be defined elsewhere
+    
+    std::string report;
+    
+    // create reporting adapter with custom report formatter
+    auto reporting_adapter1=make_reporting_adapter(
+            object_for_validation,
+            make_reporter(report,custom_formatter)
+        );
+    ```
 
 #### Formatters
 
-### Reporting hint
+##### Members formatter
 
-### Decorator
+##### Operands formatter
+
+##### Miscellaneous strings formatter
+
+##### Strings order and presentation
+
+#### Decorator
+
+Decorators can be used to decorate [members](#members-formatter) and [operands](#operands-formatter). For example, if one wants to mark [operands](#operands-formatter) with bold text using HTML tags to highlight them in user interface then a `decorator` that wraps operands with `<b>...</b>` might be implemented and used in [operands formatter](#operands-formatter). See examples of `decorator` use in [members formatter](#members-formatter) and [operands formatter](#operands-formatter) sections.
+
+There are two built-in decorators in `cpp-validator` library:
+- `brackets_decorator` defined in `validator/reporting/decorator.hpp` header file that decorates string with square brackets, e.g. `text` will be decorated as `[text]`;
+- `quotes_decorator` defined in `validator/reporting/quotes_decorator.hpp` header file that decorates string with quotes, e.g. `text` will be decorated as `"text"`.
+
+Adding a new `decorator` consists of the following steps.
+
+1. Define `struct` that will implement *custom decorator*.
+2. Add `using hana_tag=decorator_tag;` in the struct.
+3. Define in the struct a callable `operator ()` with value to be decorated as an argument. The operator must return decorated input argument.
+4. Define `constexpr` callable object with type of the new struct. This object will be used in [members formatters](#members-formatter) and [operands formatters](#operands-formatter).
+
+See example below.
+
+```cpp
+#include <dracosha/validator/reporting/decorator.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// define decorator for marking text bold with <b>...</b> tag
+struct bold_decorator_t
+{
+    using hana_tag=decorator_tag;
+
+    template <typename T>
+    auto operator () (T&& id) const
+    {
+        std::string dst;
+        backend_formatter.append(dst,"<b>",detail::to_string(std::forward<T>(id)),"</b>");
+        return dst;
+    }
+};
+constexpr bold_decorator_t bold_decorator{};
+```
+
+
+### Reporting hints
 
 ### Localization
 
 #### Concrete phrases and grammatical categories
 
-#### Translator
+#### Translators
 
 #### Translator repository
 
