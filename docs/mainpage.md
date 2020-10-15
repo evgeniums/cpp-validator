@@ -1366,13 +1366,79 @@ Examples of adapter implementation can be found in `validator/adapters/default_a
 
 # Building and installation
 
+`cpp-validator` is a header-only library, so no special library building is required. Still, some extra configuration may be required when using the library.
+
+For `CMake` build system there is `CMakeLists.txt` project file in the library's root folder. Add `cpp-library` folder as a subdirectory to your `CMake` project and configure build parameters, see [CMake configuration](#cmake-configuration).
+
+For the rest build systems ensure that `include` subfolder of `cpp-library` is available for your compiler in the list of include paths. [Boost](http://boost.org) libraries must also be in the paths. To use [fmt](https://github.com/fmtlib/fmt) library as a [backend formatter](#backend-formatter) add definition of macro `DRACOSHA_VALIDATOR_FMT` to compiler command line and ensure that [fmt](https://github.com/fmtlib/fmt) library is available in compiler's paths. To compile with `MSVC` don't forget to add `/Zc:ternary` compiler flag.
+
 ## Supported platforms and compilers
+
+`cpp-validator` library was tested with the following platforms and compilers:
+
+- Windows:
+    - MSVC 14.2;
+    - MinGW GCC 9.2.0;
+- Linux:
+    - Clang 10.0.0;
+    - GCC 9.3.0;
+- macOS:
+    - Apple Clang 10.0.1;
+- iOS:
+    - Apple Clang 10.0.1;
+- Android:
+    - Android Clang 8.0.7.
 
 ## Dependencies
 
+`cpp-validator` library strictly depends only on the [Boost](http://boost.org) libraries, version 1.65 and above, in particular on the following libraries:
+- `Boost.Hana`;
+- `Boost.Regex` only if [lexicographical operators](builtin_operators.md#lexicographical-operators) are used;
+- `Boost.Test` only for testing.
+
+Also `cpp-validator` library can depend on [fmt](https://github.com/fmtlib/fmt) library, version 7.0.0 and above, if it is used as a [backend formatter](#backend-formatter) which is recommended.
+
 ## CMake configuration
 
+To use `cpp-validator` library with `CMake` build system do the following:
+
+- add `cpp-library` folder as a subdirectory to your `CMake` project:
+    ```
+    ADD_SUBDIRECTORY(cpp-validator)
+    ```
+- add `dracoshavalidator` library dependency to your project:
+    ```
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME} dracoshavalidator ${Boost_LIBRARIES})
+    ```
+- ensure that [Boost](http://boost.org) libraries can be found by `CMake`;
+- configure the following optional `CMake` parameters if needed:
+    - `VALIDATOR_WITH_FMT` - *On*|*Off* - enable [fmt](https://github.com/fmtlib/fmt) library for [report](#report) [formatting](#backend-formatter) - default is **On**;
+    - `FMT_ROOT` - path to folder where [fmt](https://github.com/fmtlib/fmt) library is installed;
+    - `FMT_INCLUDE_DIRECTORY` - path to headers of [fmt](https://github.com/fmtlib/fmt) library if `FMT_ROOT` is not set;
+    - `FMT_HEADER_ONLY` - *Off*|*On* - mode of [fmt](https://github.com/fmtlib/fmt) library - default **Off**;
+    - `FMT_LIB_DIR` - path to folder with built [fmt](https://github.com/fmtlib/fmt) library if `FMT_ROOT` is not set and `FMT_HEADER_ONLY` is off;
+    - `VALIDATOR_WITH_TESTS` - *Off*|*On* - enable tests building - default is **Off**;
+
 ## Building and running tests
+
+Sample scripts for tests building and running are located in `sample-build` folder:
+- `win-msvc.bat` to build and run tests on Windows with MSVC compiler;
+- `linux-clang.sh` to build and run tests on Linux with Clang compiler.
+
+Ensure that variables in a script fit your environment and edit the following parameters if required:
+
+- `BOOST_ROOT` - root folder where  [Boost](http://boost.org) is installed;
+- `FMT_ROOT` - root folder where [fmt](https://github.com/fmtlib/fmt) is installed;
+- `BUILD_TYPE` - build type which can be one of *Release*|*Debug*;
+
+- `CXX` (Linux only) - name of C++ compiler (e.g. *clang++*);
+
+- `CMAKE_PATH` (Windows only) - path where CMake is installed on Windows (e.g. *C:\Program Files\CMake\bin*);
+- `MSVC_ROOT` (Windows only) - path where Microsoft Visual C++ is installed (e.g. *C:\Program Files (x86)\Microsoft Visual Studio\2019\Community*);
+- `MSVC_COMPILER` (Windows only) - string representing version of MSVC compiler (e.g. *v142*);
+- `COMPILER_VERSION` (Windows only) - version of MSVC compiler (e.g. *14.2*).
+
+Run a script corresponding to your platform from a folder where source folder `cpp-validator` resides (i.e. go to folder `cpp-validator/../`).
 
 # License
 
