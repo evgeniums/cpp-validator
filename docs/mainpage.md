@@ -438,6 +438,43 @@ auto member_path_3_levels=_[level1][level2][level3];
 auto member_path_nested_container=_["element1"]["element1_1"]["element1_1_1"];
 ```
 
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/adapters/reporting_adapter.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+
+auto v=validator(
+                _["field1"][1](in,range({10,20,30,40,50})),
+                _["field1"][2](lt,100),
+                _["field2"](exists,false),
+                _["field3"](empty(flag,true))
+            );
+                
+std::string report;
+
+std::map<std::string,std::map<size_t,size_t>> nested_map={
+            {"field1",{{1,5},{2,50}}},
+            {"field3",{}}
+        };
+auto ra=make_reporting_adapter(nested_map,report);
+
+if (!v.apply(ra))
+{
+    std::cerr << report << std::endl;
+    /* prints:
+    
+    "element #1 of field1 must be in range [10, 20, 30, 40, 50]"
+    
+    */
+}
+
+return 0;
+}
+```
+
 ### Member existence
 
 Special operator [exists](#exists) can be used to check explicitly if an [object](#object) contains some [member](#member). 
@@ -1370,24 +1407,24 @@ Examples of adapter implementation can be found in `validator/adapters/default_a
 
 For `CMake` build system there is `CMakeLists.txt` project file in the library's root folder. Add `cpp-library` folder as a subdirectory to your `CMake` project and configure build parameters, see [CMake configuration](#cmake-configuration).
 
-For the rest build systems ensure that `include` subfolder of `cpp-library` is available for your compiler in the list of include paths. [Boost](http://boost.org) libraries must also be in the paths. To use [fmt](https://github.com/fmtlib/fmt) library as a [backend formatter](#backend-formatter) add definition of macro `DRACOSHA_VALIDATOR_FMT` to compiler command line and ensure that [fmt](https://github.com/fmtlib/fmt) library is available in compiler's paths. To compile with `MSVC` don't forget to add `/Zc:ternary` compiler flag.
+For the rest build systems ensure that `include` subfolder of `cpp-library` is available for your compiler in the list of include paths. [Boost](http://boost.org) libraries must also be in the paths. To use [fmt](https://github.com/fmtlib/fmt) library as a [backend formatter](#backend-formatter) add definition of macro `DRACOSHA_VALIDATOR_FMT` to compiler command line and ensure that [fmt](https://github.com/fmtlib/fmt) library is available in compiler's paths. When compiling with `MSVC` don't forget to add `/Zc:ternary` compiler flag.
 
 ## Supported platforms and compilers
 
 `cpp-validator` library was tested with the following platforms and compilers:
 
-- Windows:
-    - MSVC 14.2;
-    - MinGW GCC 9.2.0;
-- Linux:
-    - Clang 10.0.0;
-    - GCC 9.3.0;
-- macOS:
-    - Apple Clang 10.0.1;
-- iOS:
-    - Apple Clang 10.0.1;
-- Android:
-    - Android Clang 8.0.7.
+- `Windows`:
+    - `MSVC` 14.2;
+    - `MinGW` 9.2.0;
+- `Linux`:
+    - `Clang` 10.0.0;
+    - `GCC` 9.3.0;
+- `macOS`:
+    - `Apple Clang` 10.0.1;
+- `iOS`:
+    - `Apple Clang` 10.0.1;
+- `Android`:
+    - `Android Clang` 8.0.7.
 
 ## Dependencies
 
