@@ -746,8 +746,7 @@ There are three ways of string customization for `flag` operator.
 
 1. Define [custom property](#adding-new-property) using `DRACOSHA_VALIDATOR_PROPERTY_FLAG` macro where the second argument is a reporting string for `<custom property>(flag,true)` condition and the third argument is a reporting string for `<custom property>(flag,false)` condition. See [example](#adding-new-property).
 
-2. Use `flag` operator with one of string presets, e.g. `value(flag(flag_on_off),true)` will result in reporting string "must be on" and `value(flag(flag_on_off),false)` will result in reporting string "must be off". See below list of presets for `flag` operator.
-*Preset flag strings are defined in `validator/reporting/flag_presets.hpp` header file. The following presets are defined:
+2. Use `flag` operator with one of string presets, e.g. `value(flag(flag_on_off),true)` will result in reporting string "must be on" and `value(flag(flag_on_off),false)` will result in reporting string "must be off". The following preset flag strings are defined in `validator/reporting/flag_presets.hpp` header file:
 
     * `flag_true_false` (default flag string): "must be true" | "must be false";
     * `flag_on_off`: "must be on" | "must be off";
@@ -757,6 +756,7 @@ There are three ways of string customization for `flag` operator.
 
 3. Use `flag` operator with explicit string description, e.g. `value(flag("custom description"),true)` will result in reporting string "custom description".
 
+Examples of `flag` operator.
 ```cpp
 #include <vector>
 #include <iostream>
@@ -872,8 +872,8 @@ See [Built-in validation operators](builtin_operators.md).
 
 Adding a new [operator](#operator) consists of the following steps.
 
-1. Define `struct` that inherits from template `op` with the name of the defined struct as template argument.
-2. Define callable `operator ()` in the struct with two templated arguments.
+1. Define `struct` that inherits from template class `op` with the name of the defined struct as a template argument.
+2. Define callable `operator ()` in the struct with two template arguments.
 3. Define `description` and `n_description` as `constexpr static const char*` variables of the the struct that will be used as human readable error descriptions in [report](#report) if this operator returns `false` during validation: `description` is used for the operator itself and `n_description` is used for negation of this operator.
 4. Define `constexpr` callable object with type of the new struct. This object will be used in [validators](#validator).
 
@@ -907,7 +907,7 @@ constexpr simple_eq_t simple_eq{};
 Value of an [operand](#operand) is given as the second argument to an [operator](#operator) and is meant to be used as a validation sample. An [operand](#operand) can be one of:
 - constant or `lvalue` or `rvalue` [variable](#variables);
 - [lazy](#lazy-operands) operand;
-- [other-member](#other-members) of the [object](#object) under validation;
+- [other member](#other-members) of the [object](#object) under validation;
 - [the same member of sample object](#sample-objects);
 - [interval](#intervals);
 - [range](#ranges).
@@ -1285,13 +1285,13 @@ There are three built-in adapter types implemented in `cpp-validator` library:
 
 ### Default adapter
 
-`Default adapter` wraps reference to an [object](#object) to be validated and invokes [operators](#operator) one by one as specified in a [validator](#validator). To make a `default adapter` call `make_default_adapter(object_to_validate)` with an [object](#object) as an argument. If a [validator](#validator) is applied directly to an [object](#object) then `default adapter` is constructed implicitly. See examples in [Using validator for data validation](#using-validator-for-data-validation) section.
+`Default adapter` wraps *lvalue* reference to the [object](#object) to be validated and invokes [operators](#operator) one by one as specified in a [validator](#validator). To make a `default adapter` call `make_default_adapter(object_to_validate)` with the [object](#object) as an argument. If a [validator](#validator) is applied directly to the [object](#object) then `default adapter` is constructed implicitly. See examples in [Using validator for data validation](#using-validator-for-data-validation) section.
 
 `Default adapter` supports implicit check of [member existence](#member-existence).
 
 ### Single member adapter
 
-`Single member adapter` validates only a single member. This adapter is best suitable to validate data before updating an object in the object's setters. `Single member adapter` is made with `make_single_member_adapter()` that can have two signatures:
+`Single member adapter` validates only a single member. This adapter is best suitable to validate data before updating an object in the object's setters. `Single member adapter` is constructed by calling `make_single_member_adapter()` that can have two signatures:
 - `make_single_member_adapter(member_path,val,reporter)` where
     - `member_path` is a [member](#member) specified in [member notation](#member-notation);
     - `val` is a variable to validate;
@@ -1299,7 +1299,7 @@ There are three built-in adapter types implemented in `cpp-validator` library:
 - `make_single_member_adapter(member_path,val,dst)` where
     - `member_path` is a [member](#member) specified in [member notation](#member-notation);
     - `val` is a variable to validate;
-    - `dst` destination object (e.g. string) where to put validation [report](#report) constructed with default [reporter](#reporter) if validation fails.
+    - `dst` destination object (e.g. string) where to put the validation [report](#report) to constructed with default [reporter](#reporter) if validation fails.
 
 If the [member](#member) used in a `single member adapter` is not found in a [validator](#validator) then the validation will be considered as successful.
 
@@ -1371,11 +1371,11 @@ return 0;
 
 ### Adding new adapter
 
-Template of adapter is defined in `validator/adapters/adapter.hpp` header file. To implement a custom adapter the custom adapter traits must be implemented that will be used as template argument in the `adapter` template. In addition, if custom adapter supports implicit check of [member existence](#member-existence) then it also must inherit from `check_member_exists_traits_proxy` template and the custom adapter traits must inherit from `with_check_member_exists` template. 
+Base `adapter` template class is defined in `validator/adapters/adapter.hpp` header file. To implement a *custom adapter* the *custom adapter traits* must be implemented that will be used as a template argument in the base `adapter` template class. In addition, if the *custom adapter* supports implicit check of [member existence](#member-existence) then it also must inherit from `check_member_exists_traits_proxy` template class and the *custom adapter traits* must inherit from `with_check_member_exists` template class.
 
-Examples of adapter traits implementation can be found in `validator/detail/default_adapter_impl.hpp`, `validator/detail/reporting_adapter_impl.hpp` and `validator/detail/single_member_adapter_impl.hpp`.
+Examples of *custom adapter traits* implementation can be found in `validator/detail/default_adapter_impl.hpp`, `validator/detail/reporting_adapter_impl.hpp` and `validator/detail/single_member_adapter_impl.hpp`.
 
-Examples of adapter implementation can be found in `validator/adapters/default_adapter.hpp`, `validator/adapters/reporting_adapter.hpp` and `validator/adapters/single_member_adapter.hpp`. 
+Examples of *custom adapter* implementation can be found in `validator/adapters/default_adapter.hpp`, `validator/adapters/reporting_adapter.hpp` and `validator/adapters/single_member_adapter.hpp`. 
 
 ## Reporting
 
@@ -1411,7 +1411,7 @@ For the rest build systems ensure that `include` subfolder of `cpp-library` is a
 
 ## Supported platforms and compilers
 
-`cpp-validator` library was tested with the following platforms and compilers:
+A compiler must support at least C\+\+14 or C\+\+17 standards to build `cpp-validator` library. The library was tested with the following platforms and compilers:
 
 - `Windows`:
     - `MSVC` 14.2;
@@ -1433,12 +1433,13 @@ For the rest build systems ensure that `include` subfolder of `cpp-library` is a
 - `Boost.Regex` only if [lexicographical operators](builtin_operators.md#lexicographical-operators) are used;
 - `Boost.Test` only for testing.
 
-Also `cpp-validator` library can depend on [fmt](https://github.com/fmtlib/fmt) library, version 7.0.0 and above, if it is used as a [backend formatter](#backend-formatter) which is recommended.
+Also `cpp-validator` library can depend on [fmt](https://github.com/fmtlib/fmt) library, version 7.0.0 and above, if [fmt](https://github.com/fmtlib/fmt) is used as a [backend formatter](#backend-formatter) which is recommended.
 
 ## CMake configuration
 
 To use `cpp-validator` library with `CMake` build system do the following:
 
+- ensure that [Boost](http://boost.org) libraries can be found by `CMake`;
 - add `cpp-library` folder as a subdirectory to your `CMake` project:
     ```
     ADD_SUBDIRECTORY(cpp-validator)
@@ -1447,7 +1448,6 @@ To use `cpp-validator` library with `CMake` build system do the following:
     ```
     TARGET_LINK_LIBRARIES(${PROJECT_NAME} dracoshavalidator ${Boost_LIBRARIES})
     ```
-- ensure that [Boost](http://boost.org) libraries can be found by `CMake`;
 - configure the following optional `CMake` parameters if needed:
     - `VALIDATOR_WITH_FMT` - *On*|*Off* - enable [fmt](https://github.com/fmtlib/fmt) library for [report](#report) [formatting](#backend-formatter) - default is **On**;
     - `FMT_ROOT` - path to folder where [fmt](https://github.com/fmtlib/fmt) library is installed;
