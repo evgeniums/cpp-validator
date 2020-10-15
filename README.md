@@ -19,7 +19,7 @@ There are a lot of options for validator extension and customization. During val
 
 The library was tested with *Clang*, *GCC* and *MSVC* compilers that support *C\++14* or *C\++17* standards. Tested operating systems include *Linux*, *Windows*, *macOS*, *iOS* and *Android* platforms.
 
-For more details see [Documentation](docs/mainpage.md).
+For more details see [Documentation](docs/index.md).
 
 Doxygen-style comments in sources are also available. Tests in a *test* folder can be used as a kind of examples. Scripts for tests building are in a *sample-build* folder.
 
