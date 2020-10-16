@@ -101,6 +101,8 @@ Basic usage of the library includes a few steps:
 - then, apply the [validator](#validator) to [object](#object) that must be validated;
 - finally, check the results and print [report](#report) if applicable.
 
+The library is suitable for both *post-validation* and *pre-validation*. *Post-validation* stands for validating the object that is already populated with the data. [*Pre-validation*](#single-member-adapter) stands for validating the data before writing it to the object. The same validator declaration can be used in both cases.
+
 # Definitions
 
 ##### *Adapter*
@@ -1293,7 +1295,7 @@ There are three built-in adapter types implemented in `cpp-validator` library:
 
 ### Single member adapter
 
-`Single member adapter` validates only a single member. This adapter is best suitable to validate data before updating an object in the object's setters. `Single member adapter` is constructed by calling `make_single_member_adapter()` that can have one of the following signatures:
+`Single member adapter` validates only a single member. This adapter is best suitable for *pre-validation*, i.e. validating the data before updating an object in the object's setters. `Single member adapter` is constructed by calling `make_single_member_adapter()` that can have one of the following signatures:
 - `make_single_member_adapter(member_path,val,reporter)` where
     - `member_path` is a [member](#member) specified in [member notation](#member-notation);
     - `val` is a variable to validate;
