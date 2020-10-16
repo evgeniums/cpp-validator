@@ -63,11 +63,16 @@
 		* [Adding new adapter](#adding-new-adapter)
 	* [Reporting](#reporting)
 		* [Reporting adapter](#reporting-adapter)
-		* [Reports customization](#reports-customization)
+		* [Customization of reports](#customization-of-reports)
 			* [Report construction](#report-construction)
 			* [Formatters](#formatters)
 			* [Decorator](#decorator)
 		* [Reporting hints](#reporting-hints)
+			* [Override the whole report](#override-the-whole-report)
+			* [Override description of a member validation condition](#override-description-of-a-member-validation-condition)
+			* [Override member name](#override-member-name)
+			* [Override operator description](#override-operator-description)
+			* [Override operand formatting](#override-operand-formatting)
 		* [Localization](#localization)
 			* [Concrete phrases and grammatical categories](#concrete-phrases-and-grammatical-categories)
 			* [Translators](#translators)
@@ -82,6 +87,7 @@
 * [Contributing](#contributing)
 
 [//]: # (TOC End)
+
 
 ----
 
@@ -1395,9 +1401,37 @@ Examples of *custom adapter* implementation can be found in `validator/adapters/
     - `object` is an [object](#object) to validate;
     - `dst` destination object (e.g. string) where to put the validation [report](#report) to constructed with the default [reporter](#reporter) if validation fails.
 
+See example below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/adapters/reporting_adapter.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+
+auto v=validator(gt,100);
+                
+std::string report;
+size_t val=90;
+auto ra=make_reporting_adapter(val,report);
+
+if (!v.apply(ra))
+{
+    std::cerr << report << std::endl;
+    /* prints:
+    "must be greater than 100"
+    */
+}
+
+return 0;
+}
+```
+
 `Reporting adapter` supports implicit check of [member existence](#member-existence).
 
-### Reports customization
+### Customization of reports
 
 [Reports](#report) can be customized with help of custom [reporters](#reporter) that are given to adapters supporting [reports](#reports) construction.
 
@@ -1467,8 +1501,234 @@ struct bold_decorator_t
 constexpr bold_decorator_t bold_decorator{};
 ```
 
-
 ### Reporting hints
+
+To override strings constructed by [reporter](#reporter) one can use *hints*. *Hint* is an explicit string that must be used in a [report](#report) for certain part of the report instead of automatically generated string.
+
+#### Override the whole report
+
+To override the whole error message a reporting *hint* must be attached to the validator using one of the following: 
+- call `hint(override_message)` method of validator with the desired error message as an argument;
+- invoke validator as a callable object with the desired error message as an argument.
+
+See examples below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/adapters/reporting_adapter.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+
+// define reporting adapter
+std::map<std::string,size_t> m1={{"field1",1}};
+std::string report;
+auto ra=make_reporting_adapter(m1,report);
+
+// override error message by invoking hint method of validator
+auto v1=validator(
+            _["field1"](gte,10)
+        ).hint("Invoking hint method of validator object");
+if (!v1.apply(ra))
+{
+    std::cerr << report << std::endl;
+    /* prints:
+    "Invoking hint method of validator object"
+    */
+}
+report.clear();
+
+// override error message by invoking validator as a callable
+auto v2=validator(
+            _["field1"](gte,10)
+        )("Invoking callable validator object");
+if (!v2.apply(ra))
+{
+    std::cerr << report << std::endl;
+    /* prints:
+    "Invoking callable validator object"
+    */
+}
+report.clear();
+
+return 0;
+}
+```
+
+#### Override description of a member validation condition
+
+To override description of a member validation condition a temporary member validator object must be called with string *hint* as an argument, e.g. `_["key1"](gt,100)("reporting hint")`. See examples below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/adapters/reporting_adapter.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+
+// define reporting adapter
+std::map<std::string,size_t> m1={{"field1",1}};
+std::string report;
+auto ra=make_reporting_adapter(m1,report);
+
+// define validator overriding description of member validation condition
+auto v1=validator(
+            _["field1"](gte,10)("Explicit description")
+        );
+if (!v1.apply(ra))
+{
+    std::cerr << report << std::endl;
+    /* prints:
+    "Explicit description"
+    */
+}
+report.clear();
+
+/* define aggregate validator 
+overriding description of one of the member validation conditions
+*/
+auto v2=validator(
+            _["field1"](gte,10)
+            ^OR^
+            _["field1"](eq,100)("Explicit description")
+        );
+if (!v2.apply(ra))
+{
+    std::cerr << report << std::endl;
+    /* prints:
+    '"field1" must be greater or equal to 10 OR Explicit description'
+    */
+}
+report.clear();
+
+return 0;
+}
+```
+
+#### Override member name
+
+To override [member name](#members-formatter) a temporary [member notation](#member-notation) object must be called with string *hint* as an argument, e.g. `_["key1"]("reporting hint")(gt,100)`. See example below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/adapters/reporting_adapter.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+
+// reporting adapter
+std::string report;
+std::vector<size_t> vec={10,20,30,40,50};
+auto ra=make_reporting_adapter(vec,report);
+
+// define validator with member name hint
+auto v1=validator(
+            _[1]("first element")(gt,100)
+        );
+if (!v1.apply(ra))
+{
+    std::cerr << report << std::endl;
+    /* prints:
+    "first element must be greater than 100"
+    */
+}
+report.clear();
+
+return 0;
+}
+```
+
+#### Override operator description
+
+To override description of an [operator](#operator) the operator must be wrapped as `_(operator,custom_description)`. To override description of [negated](#_n-negation) operator the `_n(operator,custom_description)` must be used with two arguments. See examples below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/adapters/reporting_adapter.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+
+// reporting adapter
+std::string report;
+std::vector<size_t> vec={10,20,30,40,50};
+auto ra=make_reporting_adapter(vec,report);
+
+// define validator with custom descriptions of operators
+auto v1=validator(
+            _[1](
+                value(_(gte,"must be not less than"),100)
+                ^OR^
+                value(_(eq,"must be the same as"),1)
+            )
+        );
+if (!v1.apply(ra))
+{
+    std::cerr << report << std::endl;
+    /* prints:
+    "element #1 must be not less than 100 OR element #1 must be the same as 1"
+    */
+}
+report.clear();
+
+// define validator with custom descriptions of negated operators
+auto v2=validator(
+            _[1](
+                value(_n(gte,"must be less than"),5)
+                ^OR^
+                value(_n(eq,"must not be the same as"),20)
+            )
+        );
+if (!v2.apply(ra))
+{
+    std::cerr << report << std::endl;
+    /* prints:
+    "element #1 must be less than 5 OR element #1 must not be the same as 1"
+    */
+}
+report.clear();
+
+return 0;
+}
+```
+
+#### Override operand formatting
+
+To override [operand formatting](#operands-formatting) the operand must be wrapped as `_(operand,custom_description)`. See example below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/adapters/reporting_adapter.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+
+// reporting adapter
+std::string report;
+std::vector<size_t> vec={10,20,30,40,50};
+auto ra=make_reporting_adapter(vec,report);
+
+// define validator with custom operand string
+auto v1=validator(
+            _[1](gte,_(100,"one hundred"))
+        );
+if (!v1.apply(ra))
+{
+    std::cerr << report << std::endl;
+    /* prints:
+    "element #1 must be greater or equal to one hundred"
+    */
+}
+report.clear();
+
+return 0;
+}
+```
 
 ### Localization
 
