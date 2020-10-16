@@ -39,7 +39,7 @@ For more details see [Documentation](docs/index.md).
 // define validator
 auto v=validator(gt,100);
 
-// apply vaidator to variables
+// apply validator to variables
 
 int value1=90;
 if (!v.apply(value1))
@@ -64,7 +64,7 @@ auto v=validator(
   size(lt,15)
 );
 
-// apply vaidator to variables
+// apply validator to variables
 
 std::string str1="sample";
 if (!v.apply(str1))
@@ -91,7 +91,7 @@ if (!v.apply(str3))
 // define validator
 auto v=validator(in,interval(95,100));
 
-// apply vaidator to variable and construct validation error message
+// apply validator to variable and construct validation error message
 
 std::string report;
 size_t val=90;
@@ -117,7 +117,7 @@ auto v=validator(
                 _["field1"](size(gte,100) ^OR^ value(gte,"zzzzzzzzzzzz"))
             );
 
-// apply vaidator to container and construct validation error message
+// apply validator to container and construct validation error message
 
 std::string report;
 std::map<std::string,std::string> test_map={{"field1","value1"}};
@@ -148,7 +148,7 @@ auto v=validator(
                 
 std::string report;
 
-// apply vaidator to container and construct validation error message
+// apply validator to container and construct validation error message
 
 std::map<std::string,std::map<size_t,size_t>> nested_map={
             {"field1",{{1,5},{2,50}}},
@@ -188,7 +188,7 @@ auto v=validator(
     _[red_color](flag,false)
 );
 
-// apply vaidator to object with custom property and construct validation error message
+// apply validator to object with custom property and construct validation error message
 
 std::string report;
 Foo foo_instance;
