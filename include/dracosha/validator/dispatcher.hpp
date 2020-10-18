@@ -138,6 +138,7 @@ struct dispatcher_t
   @brief Instance of validation dispatcher.
   */
 constexpr dispatcher_t dispatcher{};
+constexpr dispatcher_t validate_inline{};
 
 /**
   @brief Dispatch validation.

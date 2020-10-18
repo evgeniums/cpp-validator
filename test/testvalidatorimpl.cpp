@@ -54,13 +54,13 @@ BOOST_AUTO_TEST_CASE(CheckGteOperator)
     BOOST_CHECK(gte(10,10));
     BOOST_CHECK(!gte(5,10));
 
-    BOOST_CHECK(validate(10,gte,5));
-    BOOST_CHECK(validate(10,gte,10));
-    BOOST_CHECK(!validate(5,gte,10));
+    BOOST_CHECK(validate_inline(10,gte,5));
+    BOOST_CHECK(validate_inline(10,gte,10));
+    BOOST_CHECK(!validate_inline(5,gte,10));
 
-    BOOST_CHECK(validate(lazy([](){return 10;}),gte,lazy([](){return 5;})));
-    BOOST_CHECK(validate(lazy([](){return 10;}),gte,lazy([](){return 10;})));
-    BOOST_CHECK(!validate(lazy([](){return 5;}),gte,lazy([](){return 10;})));
+    BOOST_CHECK(validate_inline(lazy([](){return 10;}),gte,lazy([](){return 5;})));
+    BOOST_CHECK(validate_inline(lazy([](){return 10;}),gte,lazy([](){return 10;})));
+    BOOST_CHECK(!validate_inline(lazy([](){return 5;}),gte,lazy([](){return 10;})));
 }
 
 struct Aaa
@@ -77,11 +77,11 @@ BOOST_AUTO_TEST_CASE(CheckProperty)
     std::vector<char> v(5);
     BOOST_CHECK_EQUAL(property(v,size),v.size());
     BOOST_CHECK(!property(v,empty));
-    BOOST_CHECK(validate(size,v,gte,3));
+    BOOST_CHECK(validate_inline(size,v,gte,3));
 
     Aaa a;
     BOOST_CHECK_EQUAL(property(a,size),10);
-    BOOST_CHECK(!validate(size,a,gte,100));
+    BOOST_CHECK(!validate_inline(size,a,gte,100));
 
     auto check=make_property_validator(size,gte,9);
     BOOST_CHECK(check(a));
