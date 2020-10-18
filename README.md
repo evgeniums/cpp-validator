@@ -35,6 +35,55 @@ For more details see [Documentation](docs/index.md).
 
 ### Check if value is greater than constant
 
+Error as argument.
+
+```cpp
+// define validator
+auto v=validator(gt,100);
+
+// validate variables
+error err;
+
+validate(90,v,err);
+if (err)
+{
+  // validation failed
+}
+
+validate(200,v,err))
+if (!err)
+{
+  // validation succeeded
+}
+```
+
+Error as exception.
+
+```cpp
+// define validator
+auto v=validator(gt,100);
+
+// validate variables
+
+try
+{
+    validate(200,v); // succeed
+    validate(90,v); // throw
+}
+catch (const validation_error& err)
+{
+    std::cerr << err.what() << std::endl;
+    /* prints:
+    
+    "must be greater than 100"
+    
+    */
+}
+
+```
+
+Explicit applying of a validator.
+
 ```cpp
 // define validator
 auto v=validator(gt,100);
@@ -52,7 +101,6 @@ if (v.apply(value2))
 {
   // validation succeeded
 }
-
 ```
 
 ### Check if string is greater than or equal to other string and size of the string is less than constant
@@ -93,12 +141,13 @@ auto v=validator(in,interval(95,100));
 
 // apply validator to variable and construct validation error message
 
-std::string report;
+error_report err;
+
 size_t val=90;
-auto ra=make_reporting_adapter(val,report);
-if (!v.apply(ra))
+validate(val,v,err);
+if (err)
 {
-    std::cerr << report << std::endl; 
+    std::cerr << err.mesage() << std::endl; 
     /* prints:
     
     "must be in interval [95,100]"
@@ -119,20 +168,18 @@ auto v=validator(
 
 // apply validator to container and construct validation error message
 
-std::string report;
+error_report err;
 std::map<std::string,std::string> test_map={{"field1","value1"}};
-auto ra=make_reporting_adapter(test_map,report);
-
-if (!v.apply(ra))
+validate(test_map,v,err);
+if (err)
 {
-    std::cerr << report << std::endl;
+    std::cerr << err.message() << std::endl;
     /* prints:
     
     "field1 must be greater than or equal to xxxxxx OR size of field1 must be greater than or equal to 100 OR field1 must be greater than or equal to zzzzzzzzzzzz"
     
-    */    
+    */
 }
-    
 ```
 
 ### Check nested container elements and print report
@@ -146,7 +193,7 @@ auto v=validator(
                 _["field3"](empty(flag,true))
             );
                 
-std::string report;
+error_report err;
 
 // apply validator to container and construct validation error message
 
@@ -154,11 +201,10 @@ std::map<std::string,std::map<size_t,size_t>> nested_map={
             {"field1",{{1,5},{2,50}}},
             {"field3",{}}
         };
-auto ra=make_reporting_adapter(nested_map,report);
-
-if (!v.apply(ra))
+validate(neted_map,v,err);
+if (err)
 {
-    std::cerr << report << std::endl;
+    std::cerr << err.message() << std::endl;
     /* prints:
     
     "element #1 of field1 must be in range [10, 20, 30, 40, 50]"
@@ -190,13 +236,12 @@ auto v=validator(
 
 // apply validator to object with custom property and construct validation error message
 
-std::string report;
+error_report err;
 Foo foo_instance;
-auto ra=make_reporting_adapter(foo_instance,report);
-
-if (!v.apply(ra))
+validate(foo_instance,v,err);
+if (err)
 {
-    std::cerr << report << std::endl;
+    std::cerr << err.message() << std::endl;
     /* prints:
     
     "Must be not red"
@@ -231,17 +276,17 @@ DRACOSHA_VALIDATOR_PROPERTY(other_value);
 auto v=validator(
     _[bar_value](ilex_ne,"UNKNOWN"), // case insensitive lexicographical not equal
     _[other_value](gte,1000)
-); // define validator
+);
 
 // object setter that performs data pre-validation and prints validation error
 Foo foo_instance;
 auto bar_value_setter = [&v,&foo_instance] (std::string val)
 {
-    std::string report;
-    auto sa=make_single_member_adapter(_[bar_value],val,report);
-    if (!v.apply(sa))
+    error_report err;
+    validate(_[bar_value],val,v,err);
+    if (err)
     {
-        std::cerr << report << std::endl;
+        std::cerr << err.message() << std::endl;
         return false;
     }
 
