@@ -39,7 +39,6 @@
 
 [//]: # (TOC End)
 
-
 ## Comparison operators
 
 Comparison operators are defined in `validator/operators/comparison.hpp` header file.
