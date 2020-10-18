@@ -201,7 +201,7 @@ std::map<std::string,std::map<size_t,size_t>> nested_map={
             {"field1",{{1,5},{2,50}}},
             {"field3",{}}
         };
-validate(neted_map,v,err);
+validate(nested_map,v,err);
 if (err)
 {
     std::cerr << err.message() << std::endl;
@@ -272,38 +272,54 @@ struct Foo
 DRACOSHA_VALIDATOR_PROPERTY(bar_value);
 DRACOSHA_VALIDATOR_PROPERTY(other_value);
 
+// template specialization for setting bar_value member of Foo type
+DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+
+template <>
+struct set_member_t<Foo,DRACOSHA_VALIDATOR_PROPERTY_TYPE(bar_value)>
+{
+    template <typename ObjectT, typename MemberT, typename ValueT>
+    void operator() (
+            ObjectT& obj,
+            MemberT&&,
+            ValueT&& val
+        ) const
+    {
+        obj.set_bar_value(std::forward<ValueT>(val));
+    }
+};
+
+DRACOSHA_VALIDATOR_NAMESPACE_END
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
 // define validator of custom properties
 auto v=validator(
     _[bar_value](ilex_ne,"UNKNOWN"), // case insensitive lexicographical not equal
     _[other_value](gte,1000)
 );
 
-// object setter that performs data pre-validation and prints validation error
 Foo foo_instance;
-auto bar_value_setter = [&v,&foo_instance] (std::string val)
+
+error_report err;
+
+// call setter with valid data
+set_validated(foo_instance,bar_value,"Hello world",v,err);
+if (!err)
 {
-    error_report err;
-    validate(_[bar_value],val,v,err);
-    if (err)
-    {
-        std::cerr << err.message() << std::endl;
-        return false;
-    }
+    // object's member is set
+}
 
-    foo_instance.set_bar_value(std::move(val));
-    return true;
-};
-
-// call object setter with valid data
-auto ok=bar_value_setter("Hello world");
-// ok == true
-
-// call object setter with invalid data
-ok=bar_value_setter("unknown");
-// ok == false
-/* prints:
- 
- "bar_value must be not equal to UNKNOWN"
- 
- */
+// call setter with invalid data
+set_validated(foo_instance,bar_value,"unknown",v,err);
+if (err)
+{
+    // object's member is not set
+    std::cerr << err.message() << std::endl;
+    /* prints:
+     
+     "bar_value must be not equal to UNKNOWN"
+     
+     */
+}
 ```
