@@ -228,7 +228,7 @@ struct flag_op : public flag_t
   empty(flag,false) -> must be not empty
   empty(flag(flag_on_off),true) -> must be on
   empty(flag(flag_on_off),false) -> must be off
-  empty(flag("custom description"),true) -> explicit custom description
+  empty(flag("custom description"),true) -> custom description
   </pre>
 *
 */
