@@ -26,7 +26,17 @@ Distributed under the Boost Software License, Version 1.0.
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
-struct property_tag;
+struct property_tag
+{
+    bool operator ==(const property_tag&) const
+    {
+        return true;
+    }
+    bool operator !=(const property_tag&) const
+    {
+        return false;
+    }
+};
 
 //-------------------------------------------------------------
 

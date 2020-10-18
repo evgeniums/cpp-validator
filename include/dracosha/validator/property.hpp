@@ -126,6 +126,17 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> declt
         { \
             return flag_dscr!=nullptr && n_flag_dscr!=nullptr; \
         } \
+        \
+        constexpr bool operator == (const type_p_##prop&) const \
+        { \
+            return true; \
+        } \
+        \
+        constexpr bool operator != (const type_p_##prop&) const \
+        { \
+            return false; \
+        } \
+        \
     }; \
     constexpr type_p_##prop prop{}; \
     template <typename ...Args> \
@@ -135,6 +146,8 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> declt
     }
 
 #define DRACOSHA_VALIDATOR_PROPERTY(prop) DRACOSHA_VALIDATOR_PROPERTY_FLAG(prop,nullptr,nullptr)
+
+#define DRACOSHA_VALIDATOR_PROPERTY_TYPE(prop) type_p_##prop
 
 //-------------------------------------------------------------
 
