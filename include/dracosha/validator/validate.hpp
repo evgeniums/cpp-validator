@@ -77,6 +77,8 @@ struct validate_t
      * @brief Validate object with validator and throw validation_error if operation fails.
      * @brief obj Object to validate.
      * @brief validator Validator.
+     *
+     * @throws validation_error if validation fails.
      */
     template <typename ObjectT, typename ValidatorT>
     void operator() (
@@ -121,6 +123,8 @@ struct validate_t
      * @brief member Path of the member to validate.
      * @brief obj Object to validate.
      * @brief validator Validator.
+     *
+     * @throws validation_error if validation fails.
      */
     template <typename MemberT, typename ValueT, typename ValidatorT>
     void operator() (
