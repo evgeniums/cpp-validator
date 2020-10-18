@@ -36,7 +36,7 @@ cmake -A %MSVC_BUILD_ARCH% -T %MSVC_TOOLSET% ^
     -DVALIDATOR_WITH_TESTS=On ^
     %SRC_DIR%
 
-cmake --build . --target install --config Release -- /m:1 /p:UseMultiToolTask=true /p:MultiProcMaxCount=8 /fileLogger
+cmake --build . --config Release -- /m:1 /p:UseMultiToolTask=true /p:MultiProcMaxCount=8 /fileLogger
 
 cd %BASE_DIR%
 

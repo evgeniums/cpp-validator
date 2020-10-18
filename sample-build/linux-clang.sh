@@ -27,7 +27,7 @@ cmake -G "CodeBlocks - Unix Makefiles" \
     -DVALIDATOR_WITH_TESTS=On \
     -DVALIDATOR_WITH_FMT=On \
     $SRC_DIR
-make -j8 install
+make -j8
 cd -
 
 $BUILD_DIR/test/dracoshavalidator-test --log_level=test_suite
