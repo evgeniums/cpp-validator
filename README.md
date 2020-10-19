@@ -25,7 +25,7 @@ Basic usage of the library includes two steps:
 
 The library is suitable for both *post-validation* and *pre-validation*. *Post-validation* stands for validating the object that is already populated with the data. *Pre-validation* stands for validating the data before writing it to the object. The same validator declaration can be used in both cases.
 
-There are a lot of options for validator extension and customization. During validation a text report describing an error can be constructed. Reports can be widely customised and translated to supported languages.
+There are a lot of options for `cpp-validator` extension and customization. During validation a text report describing an error can be constructed. Reports can be widely customised and translated to supported languages.
 
 The library was tested with *Clang*, *GCC* and *MSVC* compilers that support *C\++14* or *C\++17* standards. Tested operating systems include *Linux*, *Windows*, *macOS*, *iOS* and *Android* platforms.
 
@@ -35,7 +35,7 @@ For more details see [Documentation](docs/index.md).
 
 ### Check if value is greater than constant
 
-Error as argument.
+Error as an argument.
 
 ```cpp
 // define validator
@@ -57,7 +57,7 @@ if (!err)
 }
 ```
 
-Error as exception.
+Error as an exception.
 
 ```cpp
 // define validator
@@ -272,7 +272,7 @@ struct Foo
 DRACOSHA_VALIDATOR_PROPERTY(bar_value);
 DRACOSHA_VALIDATOR_PROPERTY(other_value);
 
-// template specialization for setting bar_value member of Foo type
+// template specialization for setting bar_value member of Foo
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 template <>
