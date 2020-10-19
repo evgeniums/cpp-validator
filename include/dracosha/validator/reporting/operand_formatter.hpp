@@ -37,7 +37,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct operand_formatter_tag;
 
 /**
- * @brief Traits for operands formatting.
+ * @brief Operands formatter.
  *
  * Sometimes operands require special formatting.
  * The obvious example is a boolean value which can be displayed
