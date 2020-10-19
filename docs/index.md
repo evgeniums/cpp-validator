@@ -19,6 +19,13 @@
 			* [Property of object's member](#property-of-objects-member)
 			* [Mixed](#mixed)
 	* [Using validator for data validation](#using-validator-for-data-validation)
+		* [Post-validation](#post-validation)
+			* [validate() without report and without exception](#validate-without-report-and-without-exception)
+			* [validate() with report but without exception](#validate-with-report-but-without-exception)
+			* [validate() with exception](#validate-with-exception)
+			* [Apply validator to adapter](#apply-validator-to-adapter)
+			* [Apply validator to object](#apply-validator-to-object)
+		* [Pre-validation](#pre-validation)
 	* [Members](#members)
 		* [Member notation](#member-notation)
 			* [Single level members](#single-level-members)
@@ -245,7 +252,6 @@ auto v2=validator(
 ```
 Validators *v1* and *v2* in the example above both define validation condition "size of field1 of variable must be greater than 100" where *field1* is a member of variable, *size* is a [property](#property) of *field1*, *gt* is an [operator](#operator) and *100* is an [operand](#operand). The first validator is described using property notation and the second validator is described using member notation.
 
-
 ### Validator with aggregations
 
 #### Whole object
@@ -322,6 +328,116 @@ The examples above define validation condition "size of variable is not equal to
 
 ## Using validator for data validation
 
+### Post-validation
+
+*Post-validation* here stands for validating the object that is already populated with the data. The simplest way to validate an [object](#object) is to use `validate()` helper. There are forms `validate` with *exceptions* and without *exceptions*, with [report](#report) and without [report](#report).
+
+Also validation can be performed by calling `apply()` method of [validator](#validator), see the next sections.
+
+#### validate() without report and without exception
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/validate.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+
+// define validator
+auto v=validator(gt,100);
+
+// validate variables
+error err;
+
+validate(90,v,err);
+if (err)
+{
+  // validation failed
+}
+
+validate(200,v,err))
+if (!err)
+{
+  // validation succeeded
+}
+
+return 0;
+}
+```
+
+#### validate() with report but without exception
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/validate.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+
+// define validator
+auto v=validator(gt,100);
+
+// validate variables
+error_report err;
+
+validate(90,v,err);
+if (err)
+{
+  // validation failed
+    std::cerr << err.message() << std::endl;
+    /* prints:
+    "must be greater than 100"
+    */
+}
+
+validate(200,v,err))
+if (!err)
+{
+  // validation succeeded
+}
+
+return 0;
+}
+```
+
+#### validate() with exception
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/validate.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+
+// define validator
+auto v=validator(gt,100);
+
+// validate variables
+
+try
+{
+    validate(200,v); // succeed
+    validate(90,v); // throw
+}
+catch (const validation_error& err)
+{
+    std::cerr << err.what() << std::endl;
+    /* prints:
+    
+    "must be greater than 100"
+    
+    */
+}
+
+return 0;
+}
+```
+
+#### Apply validator to adapter
+
 Data validation is performed by [adapters](#adapter). When a [validator](#validator) is applied to an [adapter](#adapter) the [adapter](#adapter) *reads* validation conditions from the [validator](#validator) and processes them depending on [adapter](#adapter) implementation. See more about adapters in [Adapters](#adapters) section.
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -353,6 +469,8 @@ return 0;
 }
 ```
 
+#### Apply validator to object
+
 A [validator](#validator) can be applied directly to a variable that must be validated. In this case a [default adapter](#default-adapter) will be used implicitly.
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -381,6 +499,95 @@ if (!v.apply(value2))
 return 0;
 }
 ```
+
+### Pre-validation
+
+*Pre-validation* here stands for validating the data before writing it to the object. The simplest way to validate data before writing it to the object is to use `set_validated`. To customize data *pre-validation* use [single member adapter](#single-member-adapter).
+
+To use `set_validated` with custom [properties](#property) a template specialization of property setter `set_member_t` in `DRACOSHA_VALIDATOR_NAMESPACE` must be defined first. `set_validated` can be used both with and without exceptions.
+
+See examples below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/validate.hpp>
+
+// define structure with member variables and member setter method
+struct Foo
+{
+    std::string bar_value;
+    
+    uint32_t other_value;
+    size_t some_size;
+    
+    void set_bar_value(std::string val)
+    {
+        bar_value=std::move(val);
+    }
+};
+
+// define custom properties
+DRACOSHA_VALIDATOR_PROPERTY(bar_value);
+DRACOSHA_VALIDATOR_PROPERTY(other_value);
+
+// template specialization for setting bar_value member of Foo
+DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+
+template <>
+struct set_member_t<Foo,DRACOSHA_VALIDATOR_PROPERTY_TYPE(bar_value)>
+{
+    template <typename ObjectT, typename MemberT, typename ValueT>
+    void operator() (
+            ObjectT& obj,
+            MemberT&&,
+            ValueT&& val
+        ) const
+    {
+        obj.set_bar_value(std::forward<ValueT>(val));
+    }
+};
+
+DRACOSHA_VALIDATOR_NAMESPACE_END
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+
+// define validator of custom properties
+auto v=validator(
+    _[bar_value](ilex_ne,"UNKNOWN"), // case insensitive lexicographical not equal
+    _[other_value](gte,1000)
+);
+
+Foo foo_instance;
+
+error_report err;
+
+// call setter with valid data
+set_validated(foo_instance,bar_value,"Hello world",v,err);
+if (!err)
+{
+    // object's member is set
+}
+
+// call setter with invalid data
+set_validated(foo_instance,bar_value,"unknown",v,err);
+if (err)
+{
+    // object's member is not set
+    std::cerr << err.message() << std::endl;
+    /* prints:
+     
+     "bar_value must be not equal to UNKNOWN"
+     
+     */
+}
+
+return 0;
+} 
+```
+
 ## Members
 
 Members are used to define what parts of [objects](#object) must be validated. A [member](#member) can point to one of the following:
@@ -469,9 +676,7 @@ if (!v.apply(ra))
 {
     std::cerr << report << std::endl;
     /* prints:
-    
     "element #1 of field1 must be in range [10, 20, 30, 40, 50]"
-    
     */
 }
 
