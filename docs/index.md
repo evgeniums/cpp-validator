@@ -81,9 +81,9 @@
 			* [Override operator description](#override-operator-description)
 			* [Override operand formatting](#override-operand-formatting)
 		* [Localization](#localization)
-			* [Concrete phrases and grammatical categories](#concrete-phrases-and-grammatical-categories)
+			* [Grammatical categories and concrete phrases](#grammatical-categories-and-concrete-phrases)
 			* [Translators](#translators)
-			* [Translator repository](#translator-repository)
+			* [Repository of translators](#repository-of-translators)
 			* [Adding new locale](#adding-new-locale)
 * [Building and installation](#building-and-installation)
 	* [Supported platforms and compilers](#supported-platforms-and-compilers)
@@ -123,17 +123,11 @@ Customizable validation implementer. Adapter performs actual validation when the
 ##### *Aggregation*
 Combination of validating [operators](#operator) or other [validators](#validator) that make up a compound [validator](#validator). There are logical aggregations such as _AND_, _OR_, _NOT_ and [element](#element) aggregations such as _ANY_, _ALL_.
 
-##### *Concrete phrase*
-Immutable string that will be used in final [report](#report).
-
 ##### *Element*
 A special type of [member](#member) that points to an element of container when the [object](#object) is a container.
 
 ##### *Formatter*
 Customizable implementer of [reports](#report) formatting. See [formatters](#formatters) section.
-
-##### *Grammatical category*
-A grammatical category is a property of items within the grammar of a language (see https://en.wikipedia.org/wiki/Grammatical_category). In some languages different grammatical categories of some words can affect the forms of the successive words in a phrase. In this library grammatical categories are used for more natural [reports](#report) construction.
 
 ##### *Member*
 An [element](#element) or a [property](#property) of [object](#object) the validation must be applied to. Members can be either direct (single level depth) or nested (multi level depth).
@@ -2070,13 +2064,125 @@ return 0;
 
 ### Localization
 
-#### Concrete phrases and grammatical categories
+[Reports](#report) can be translated either with the external translation tools or with the localization tools of `cpp-validator` library.
+
+External translation tools can be used only for translation of the whole final [report](#report). In order to translate the whole [report](#report) with the external translation tools one must give desired translation of the [report](#report) as a [hint to validator](#Override-the-whole-report).
+
+In `cpp-validator` a [report](#report) is usually constructed by a [formatter](#formatter) dynamically *on-the-fly* from the parts prepared with [partial formatters](#formatters). Thus, with `cpp-validator` library the final [report](#report) can not be translated in advance. Instead, only parts from [partial formatters](#formatters) can be translated in advance that will be dynamically [joined](#strings-order-and-presentation) into the final [report](#report) later.
+
+#### Grammatical categories and concrete phrases
+
+A *grammatical category* is a property of items within the grammar of a language (see https://en.wikipedia.org/wiki/Grammatical_category). In some languages different *grammatical categories* of some words can affect the forms of the successive words in a phrase. For example the forms of *go* word are different in phrases *I go*, *they go*, *she **goes***.
+
+In `cpp-validator` library *grammatical categories* are used for more natural [reports](#report) construction. When results from the [partial formatters](#formatters) are being [joined](#strings-order-and-presentation) the results of the successive [partial formatters](#formatters) can depend on *grammatical categories* of the previous results. 
+
+`concrete_phrase` class is used to combine the string result of a [partial formatter](#formatters) and *grammatical categories* of that string actual for the current locale.
+
+*Grammatical categories* are used by [translators](#translator) to select which translations must be used in certain cases. Result of a single translation is returned as `concrete_phrase`. String value of the `concrete_phrase` will be used in the final [report](#report). *Grammatical categories* of the `concrete_phrase` will be used by [translator](#translator) of the next [partial formatter](#formatters) to select corresponding translation.
 
 #### Translators
 
-#### Translator repository
+Translators are used by [partial formatters](#formatters) to translate partial string results. Base `translator` class is defined in `validator/reporting/translator.hpp` header file. 
+
+To construct a [formatter](#formatter) in which all [partial formatters](#formatters) use the same translator use `make_formatter(translator_instance)` or `make_formatter(translator_instance,std::true_type())` helpers. Besides, different translators can be used in different [partial formatters](#formatters). See corresponding `make_translated_member_names()`, `make_translated_strings()` and `make_translated_operand_formatter()` helpers.
+
+##### Translator with grammatical categories
+
+`phrase_translator` defined in `validator/reporting/phrase_translator.hpp` can be used as a base class for *grammatical categories* aware translators. Each string in `phrase_translator` can be bound to two types of grammatical categories:
+- *grammatical categories* of *preceding phrase* that should be use to select *current phrase*;
+- *grammatical categories* of *current phrase* that should be used for translation of the *successive phrase*.
+ 
+*Grammatical categories* of the latter type are stored within current `concrete_phrase`. *Grammatical categories* of the former type are used as selectors of the most suitable phrase translation of given string in the `phrase_translator`. Translator will select the phrase with the maximum number of matching grammatical categories of the former type.
+
+#### Repository of translators
+
+*Translator repository* is a repository of [translators](#translator) mapped to names of locales. `translator_repository` is defined in `validator/reporting/translator_repository.hpp` header file.
+
+To construct a [formatter](#formatter) in which all [partial formatters](#formatters) select translator for locale from the same *translator repository* use `make_formatter(translator_repository_instance,current_locale)` or `make_formatter(translator_repository_instance,current_locale,std::true_type())` helpers. Besides, different *translator repositories* and locales can be used in different [partial formatters](#formatters). See corresponding `make_translated_member_names()`, `make_translated_strings()` and `make_translated_operand_formatter()` helpers.
+
+A name of locale can be either in more generic form like "en" or in more specific form like "en_US.UTF-8". When looking for a [translator](#translator) the *repository* will first try to use the most specific name of locale, and if that is not found then the *repository* will try to use further less specific names down to the name of language only. If still no [translator](#translator) is found then the default translator will be used. A [translator](#translator) should be added to the repository with the full list of all forms of locale names this [translator](#translator) is suitable for. See example below.
+
+```cpp
+const auto& translator_en_us=validator_translator_sample();
+phrase_translator translator_en_gb;
+
+translator_repository rep;
+
+// translator_en_us will be used for all "en_US" locales as well as for generic "en" language
+rep.add_translator(translator_en_us,{"en","en_US","en_US.UTF-8"});
+// translator_en_gb will be used for all "en_GB" locales but for the generic "en" language the translator_en_us will be used
+rep.add_translator(translator_en_gb,{"en_GB","en_GB.UTF-8"});
+
+auto locale1="en_US";
+auto formatter_for_locale1=make_formatter(rep,locale1); 
+// formatter_for_locale1 will use translator_en_us
+
+auto locale2="en_GB";
+auto formatter_for_locale2=make_formatter(rep,locale2); 
+// formatter_for_locale2 will use translator_en_gb
+
+auto locale3="en";
+auto formatter_for_locale3=make_formatter(rep,locale3); 
+// formatter_for_locale3 will use translator_en_us
+```
 
 #### Adding new locale
+
+To add a new locale the `phrase_translator` for that locale must be filled. 
+
+As a sample of translator of phrases defined in `cpp-validator` library the `validator_translator_sample()` helper can be used which is defined in `validator/reporting/locale/sample_locale.hpp`. To add new language or locale copy that file, rename `validator_translator_sample()` to something like `translator_of_<locale_name>` (e.g. `translator_of_de`) and replace its phrases with the translation of the phrases for target locale.
+
+If translation of a phrase depends on *grammatical categories* of the previous phrase then add translation with taking into account that dependency as follows:
+```cpp
+m[original]={
+               {"default translation"},
+               {"translation for grammatical category 1", grammatical_category1},
+               {"translation for combination of grammatical category 1 and grammatical category 2", grammatical_category1, grammatical_category2}
+          };
+```
+See example for value and plural values:
+```cpp
+m[value.name()]={
+                    {"value"},
+                    {"values",grammar::plural} // use "values" translation if preceding grammatical category is grammar::plural
+                };
+```
+
+If translation of successive phrase can depend on *grammatical categories* of the current translated phrase then translation must be added as follows:
+```cpp
+m[original]={
+               {{"default translation",grammatical_category_to_use_for_next_phrase}},
+               {{"translation for grammatical_category_to_select_current_translation", grammatical_category_to_use_for_next_phrase}, grammatical_category_to_select_current_translation},
+               {
+                   {
+                       "translation for combination of grammatical_category_to_select_current_translation1 and grammatical_category_to_select_current_translation2",
+                       grammatical_category_to_use_for_next_phrase3, grammatical_category_to_use_for_next_phrase4
+                   },
+                   grammatical_category_to_select_current_translation1,
+                   grammatical_category_to_select_current_translation2
+               }
+          };
+```
+
+See example for plural values:
+```cpp
+m["values"]={
+               {{"values",grammar::plural}} // use this grammatical category grammar::plural for next phrase
+            };
+```
+
+See example for value and plural values:
+```cpp
+m["value"]={
+               {"value"}
+               {
+                   {"values",grammar::plural}, // use grammatical category grammar::plural for next phrase
+                   grammar::plural // use "values" translation if preceding grammatical category is grammar::plural
+               }
+            };
+```
+
+Another example of custom locale can be found in `validator/reporting/locale/ru.hpp` that implements translations for Russian locale.
 
 # Building and installation
 
