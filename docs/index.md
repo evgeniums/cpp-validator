@@ -1471,7 +1471,7 @@ auto ra=make_reporting_adapter(
 - [formatter of member names](#members-formatter);
 - [formatter of miscellaneous strings](#miscellaneous-strings-formatter) such as descriptions of [special](#special-operators) and [built-in](#built-in-operators) operators as well as keywords used in the library;
 - [formatter of operands](#operands-formatter);
-- traits that perform [final ordering and presentation](strings-order-and-presentation) of strings prepared with the partial formatters listed above.
+- implementation of [final ordering and presentation](strings-order-and-presentation) of strings prepared with the partial formatters listed above.
 
 Actual strings formatting is performed by a [backend formatter](backend-formatter).
 
@@ -1479,7 +1479,7 @@ Base `formatter` template class is defined in `validator/reporting/formatter.hpp
 
 Use `make_formatter()` helper to construct *formatters* with custom components and [translators](#translator). There is a number of `make_formatter()` signatures defined in `validator/reporting/formatter.hpp` header file, choose the most suitable for certain cases.
 
-Reporting strings prepared with either top-level *formatter* or partial formatters can be overwritten with [reporting hints](#reporting-hints).
+Strings prepared with either top-level *formatter* or partial formatters can be overwritten with [reporting hints](#reporting-hints).
 
 ##### Backend formatter
 
