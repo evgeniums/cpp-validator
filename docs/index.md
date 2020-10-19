@@ -116,11 +116,6 @@ Customizable validation implementer. Adapter performs actual validation when the
 ##### *Aggregation*
 Combination of validating [operators](#operator) or other [validators](#validator) that make up a compound [validator](#validator). There are logical aggregations such as _AND_, _OR_, _NOT_ and [element](#element) aggregations such as _ANY_, _ALL_.
 
-##### *Backend formatter*
-String formatter used for [reports](#report) building. One of the following backend formatters can be used:
-* *(preferred)* [fmt](https://github.com/fmtlib/fmt) based backend formatter;
-* std::stringstream based backend formatter.
-
 ##### *Concrete phrase*
 Immutable string that will be used in final [report](#report).
 
@@ -1294,13 +1289,13 @@ There are three built-in adapter types implemented in `cpp-validator` library:
 
 ### Default adapter
 
-`Default adapter` wraps *lvalue* reference to the [object](#object) to be validated and invokes [operators](#operator) one by one as specified in a [validator](#validator). To make a `default adapter` call `make_default_adapter(object_to_validate)` with the [object](#object) as an argument. If a [validator](#validator) is applied directly to the [object](#object) then `default adapter` is constructed implicitly. See examples in [Using validator for data validation](#using-validator-for-data-validation) section.
+*Default adapter* wraps *lvalue* reference to the [object](#object) to be validated and invokes [operators](#operator) one by one as specified in a [validator](#validator). To make a *default adapter* call `make_default_adapter(object_to_validate)` with the [object](#object) as an argument. If a [validator](#validator) is applied directly to the [object](#object) then *default adapter* is constructed implicitly. See examples in [Using validator for data validation](#using-validator-for-data-validation) section.
 
-`Default adapter` supports implicit check of [member existence](#member-existence).
+*Default adapter* supports implicit check of [member existence](#member-existence).
 
 ### Single member adapter
 
-`Single member adapter` validates only a single member. This adapter is best suitable for *pre-validation*, i.e. validating the data before updating an object in the object's setters. `Single member adapter` is constructed by calling `make_single_member_adapter()` that can have one of the following signatures:
+*Single member adapter* validates only a single member. This adapter is best suitable for *pre-validation*, i.e. validating the data before updating an object in the object's setters. *Single member adapter* is constructed by calling `make_single_member_adapter()` helper that can have one of the following signatures:
 - `make_single_member_adapter(member_path,val,reporter)` where
     - `member_path` is a [member](#member) specified in [member notation](#member-notation);
     - `val` is a variable to validate;
@@ -1310,7 +1305,7 @@ There are three built-in adapter types implemented in `cpp-validator` library:
     - `val` is a variable to validate;
     - `dst` destination object (e.g. string) where to put the validation [report](#report) to constructed with the default [reporter](#reporter) if validation fails.
 
-If the [member](#member) used in a `single member adapter` is not found in a [validator](#validator) then the validation will be considered as successful.
+If the [member](#member) used in a *single member adapter* is not found in a [validator](#validator) then the validation will be considered as successful.
 
 See example of object setter with validation below.
 
@@ -1392,7 +1387,7 @@ Examples of *custom adapter* implementation can be found in `validator/adapters/
 
 ### Reporting adapter
 
-`Reporting adapter` does the same validation as [default adapter](#default-adapter) with addition of constructing a text [report](#report) describing the validation error. `Reporting adapter` is constructed by calling `make_reporting_adapter()` that can have one of the following signatures:
+*Reporting adapter* does the same validation as [default adapter](#default-adapter) with addition of constructing a text [report](#report) describing the validation error. *Reporting adapter* is constructed by calling `make_reporting_adapter()` that can have one of the following signatures:
 - `make_reporting_adapter(object,reporter)` where
     - `object` is an [object](#object) to validate;
     - `reporter` is a custom [reporter](#reporter) used for [report](#report) constructing if validation fails;
@@ -1428,7 +1423,7 @@ return 0;
 }
 ```
 
-`Reporting adapter` supports implicit check of [member existence](#member-existence).
+*Reporting adapter* supports implicit check of [member existence](#member-existence).
 
 ### Customization of reports
 
@@ -1436,9 +1431,11 @@ return 0;
 
 #### Report construction
 
-A [report](#report) is constructed by a [reporter](#reporter) given to an adapter that supports [reports](#reports) construction. Default [reporter](#reporter) is implemented by `reporter` template class defined in `validator/reporting/reporter.hpp` header file. There are two ways to customize report construction:
+##### Default reporter
+
+A [report](#report) is constructed by a [reporter](#reporter) given to an adapter that supports [reports](#reports) construction. *Default [reporter](#reporter)* is implemented by `reporter` template class defined in `validator/reporting/reporter.hpp` header file. There are two ways to customize report construction:
 - implement a custom reporter *from scratch* and give it to the corresponding adapter;
-- use default `reporter` template class with custom [formatter](#formatter) - a helper function `make_reporter(report_destination,custom_formatter)` can be used for convenience, e.g.:
+- use default `reporter` template class with custom [formatter](#formatter), a helper function `make_reporter(report_destination,custom_formatter)` can be used for convenience, e.g.:
     ```cpp
     
     // object_for_validation must be defined elsewhere
@@ -1447,21 +1444,150 @@ A [report](#report) is constructed by a [reporter](#reporter) given to an adapte
     std::string report;
     
     // create reporting adapter with custom report formatter
-    auto reporting_adapter1=make_reporting_adapter(
+    auto ra=make_reporting_adapter(
             object_for_validation,
             make_reporter(report,custom_formatter)
         );
     ```
+##### Report with object's name
+
+Typically, [report](#report) does not include a name of the object being validated. For example, `validator(gt,100)` will result in error message "must be greater than 100". If [report](#report) must include the object's name, e.g. "*the object under validation* must be greater than 100", then `reporter_with_object_name` must be used instead of [default reporter](#default-reporter). `reporter_with_object_name` template class is defined `validator/reporting/reporter_with_object_name.hpp` header file. A helper function `make_reporter_with_object_name()` can be used for convenience. See example below.
+
+```cpp
+// object_for_validation must be defined elsewhere
+
+std::string report;
+
+// create reporting adapter with custom report formatter
+auto ra=make_reporting_adapter(
+        object_for_validation,
+        make_reporter_with_object_name(report,get_default_formatter(),"the object under validation")
+    );
+```
 
 #### Formatters
 
+[Formatter](#formatter) of [reports](#report) uses four components that can be customized:
+- [formatter of member names](#members-formatter);
+- [formatter of miscellaneous strings](#miscellaneous-strings-formatter) such as descriptions of [special](#special-operators) and [built-in](#built-in-operators) operators as well as keywords used in the library;
+- [formatter of operands](#operands-formatter);
+- traits that perform [final ordering and presentation](strings-order-and-presentation) of strings prepared with the partial formatters listed above.
+
+Actual strings formatting is performed by a [backend formatter](backend-formatter).
+
+Base `formatter` template class is defined in `validator/reporting/formatter.hpp` header file. Default *formatter* implementation can be obtained with `get_default_formatter()`.
+
+Use `make_formatter()` helper to construct *formatters* with custom components and [translators](#translator). There is a number of `make_formatter()` signatures defined in `validator/reporting/formatter.hpp` header file, choose the most suitable for certain cases.
+
+Reporting strings prepared with either top-level *formatter* or partial formatters can be overwritten with [reporting hints](#reporting-hints).
+
+##### Backend formatter
+
+*Backend formatter* is a *variable-to-string* formatter. One of the following string formatters can be used:
+- *(preferred)* [fmt](https://github.com/fmtlib/fmt) based backend formatter;
+- `std::stringstream` based backend formatter.
+
+To use [fmt](https://github.com/fmtlib/fmt) for strings formatting define `DRACOSHA_VALIDATOR_FMT` macro, see [Building and installation](#building-and-installation) for details of formatter configuration.
+
 ##### Members formatter
+
+[Reports](#report) must display human readable names of [members](#members). Member names formatting is performed by a *member names formatter* with base template class `member_names` defined in `validator/reporting/member_names.hpp` header file. For custom *member names formatting* the custom traits must be implemented and used as a template argument of `member_names`. There is `make_member_names()` helper to construct *member names formatter* from the custom traits.
+
+Default implementation of *member names formatter* joins member names in reverse order using *of* conjunction, e.g. `["field1"]["subfield1_1"]["subfield1_1_1"]` will be formatted as "*subfield1_1_1 of subfield1_1 of field1*". Default member names formatter can be obtained with `get_default_member_names()`.
+
+There is also `dotted_member_names` formatter that displays member names similar to their declaration, e.g. `["field1"]["subfield1_1"]["subfield1_1_1"]`` will be formatted as "*[field1].[subfield1_1].[subfield1_1_1]*".
+
+If [localization](#localization) of member names must be supported then original *member names formatter* must be wrapped with *locale-aware member names formatter* using one of `make_translated_member_names()` helpers.
+
+To [decorate](#decorator) member names the original *member names formatter* must be wrapped with *decorating member names formatter* using  `make_decorated_member_names()` helper. See example below.
+
+```cpp
+// define validator
+auto v=validator(
+        ["field1"]["subfield1_1"]["subfield1_1_1"](gt,100)
+    );
+
+// wrap default member names formatter with quoted member names decorator
+auto decorated_mn=make_decorated_member_names(get_default_member_names(),quotes_decorator);
+
+// object_for_validation must be defined elsewhere
+
+std::string report;
+
+// create reporting adapter with quoted member names
+auto ra_decorated=make_reporting_adapter(
+        object_for_validation,
+        make_reporter(report,make_formatter(decorated_mn))
+    );
+
+if (!v.apply(ra))
+{
+    std::cerr << report << std::endl;
+    /* prints:
+    '"subfield1_1_1" of "subfield1_1" of "field1" must be greater than 100'
+    */
+}
+```
 
 ##### Operands formatter
 
+By default [operands](#operand) are formatted at the discretion of [backend formatter](#backend-formatter). Sometimes [operands](#operand) may require special formatting. The obvious example is a boolean value which can be displayed in different ways, e.g. as 1/0, true/false, yes/not, checked/unchecked, etc. Another example is when the [operands](#operand) must be decorated, e.g. with quotes or HTML tags.
+
+[Operands](#operand) formatting is performed by the *operands formatter* with base template class `operand_formatter` defined in `validator/reporting/operand_formatter.hpp` header file. For custom *operands formatting* the custom traits must be implemented and used as a template argument of `operand_formatter`. There is also `default_operand_formatter` which forwards operands to [backend formatter](#backend-formatter) "as is".
+
+If [localization](#localization) of operands must be supported then *locale-aware operands formatter* must be used that can be constructed with one of `make_translated_operand_formatter()` helpers.
+
+To [decorate](#decorator) operands the *decorating member names formatter* can be constructed with `make_operand_formatter()` or `make_translated_operand_formatter()` helpers. See example below.
+
+```cpp
+// define validator
+auto v=validator(
+        [size](gt,100)
+    );
+
+// operands formatter with quoted decorator
+auto decorated_operands=make_operand_formatter(quotes_decorator);
+
+// object_for_validation must be defined elsewhere
+
+std::string report;
+
+// create reporting adapter with quoted member names
+auto ra_decorated=make_reporting_adapter(
+        object_for_validation,
+        make_reporter(report,make_formatter(get_default_member_names(),decorated_operands))
+    );
+
+if (!v.apply(ra))
+{
+    std::cerr << report << std::endl;
+    /* prints:
+    'size must be greater than "100"'
+    */
+}
+```
+
 ##### Miscellaneous strings formatter
 
+This formatter is used to format [operators](#operator) and some other strings.
+
+Conversion of a generic *ID* to the string is performed as follows.
+- If string *ID* is a [property](#property) then `name()` of the [property](#property) is used.
+- If string *ID* is convertible to `std::string` then that conversion is used, e.g. all validation [operators](#operator) are formatted using the *to string conversion operator*.
+- If string *ID* is of some scalar type that can be forwarded to `std::to_string(id)` then `std::to_string()` is used.
+- In the rest cases "*\<?????\>*" string is used as a result.
+
+After *ID* is converted to the string the conversion result goes to [translator](#translator). Translator returns either translated or original string.
+
+Base template class `strings` for *miscellaneous strings formatting* is defined in `validator/reporting/strings.hpp` header file. Customization of *miscellaneous strings formatting* can be done with use of custom [translators](#translator) or *[aggregation](#aggregation) strings* which are used as template arguments in `strings` template class. Default *miscellaneous strings formatting* is implemented with `default_strings` formatter that uses default `aggregation_strings` formatter and no [translators](#translator).
+
+If [localization](#localization) of miscellaneous strings must be supported then *locale-aware miscellaneous strings formatter* must be used that can be constructed with one of `make_translated_strings()` helpers.
+
 ##### Strings order and presentation
+
+Resulting strings from the partial [formatters](#formatters) must be ordered and joined to construct the final [report](#report). By default that is performed by `default_order_and_presentation` helper defined in `validator/reporting/order_and_presentation.hpp` header file.
+
+For custom strings ordering and presentation a custom implementation of the *strings order and presentation* must be used in `formatter` that can be constructed with corresponding `make_formatter()` helper.
 
 #### Decorator
 
@@ -1502,7 +1628,7 @@ constexpr bold_decorator_t bold_decorator{};
 
 ### Reporting hints
 
-To override strings constructed by [reporter](#reporter) one can use *hints*. *Hint* is an explicit string that must be used in a [report](#report) for certain part of the report instead of automatically generated string.
+To override strings constructed by [formatters](#formatters) one can use *hints*. *Hint* is an explicit string that must be used in a [report](#report) for certain part of the report instead of automatically generated string.
 
 #### Override the whole report
 
