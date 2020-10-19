@@ -1658,7 +1658,7 @@ A [report](#report) is constructed by a [reporter](#reporter) given to an adapte
     ```
 ##### Report with object's name
 
-Typically, [report](#report) does not include a name of the object being validated. For example, `validator(gt,100)` will result in error message "must be greater than 100". If [report](#report) must include the object's name, e.g. "*the object under validation* must be greater than 100", then `reporter_with_object_name` must be used instead of [default reporter](#default-reporter). `reporter_with_object_name` template class is defined `validator/reporting/reporter_with_object_name.hpp` header file. A helper function `make_reporter_with_object_name()` can be used for convenience. See example below.
+Typically, [report](#report) does not include a name of the object being validated. For example, `validator(gt,100)` will result in error message "must be greater than 100". If [report](#report) must include the object's name, e.g. "*the object under validation* must be greater than 100", then `reporter_with_object_name` must be used instead of [default reporter](#default-reporter). `reporter_with_object_name` template class is defined in `validator/reporting/reporter_with_object_name.hpp` header file. A helper function `make_reporter_with_object_name()` can be used for convenience. See example below.
 
 ```cpp
 // object_for_validation must be defined elsewhere
@@ -2084,7 +2084,7 @@ In `cpp-validator` library *grammatical categories* are used for more natural [r
 
 Translators are used by [partial formatters](#formatters) to translate partial string results. Base `translator` class is defined in `validator/reporting/translator.hpp` header file. 
 
-To construct a [formatter](#formatter) in which all [partial formatters](#formatters) use the same translator use `make_formatter(translator_instance)` or `make_formatter(translator_instance,std::true_type())` helpers. Besides, different translators can be used in different [partial formatters](#formatters). See corresponding `make_translated_member_names()`, `make_translated_strings()` and `make_translated_operand_formatter()` helpers.
+To construct a [formatter](#formatter) with the same translator for all [partial formatters](#formatters) use `make_formatter(translator_instance)` or `make_formatter(translator_instance,std::true_type())` helpers. Besides, different translators can be used in different [partial formatters](#formatters). See corresponding `make_translated_member_names()`, `make_translated_strings()` and `make_translated_operand_formatter()` helpers.
 
 ##### Translator with grammatical categories
 
@@ -2092,7 +2092,7 @@ To construct a [formatter](#formatter) in which all [partial formatters](#format
 - *grammatical categories* of *preceding phrase* that should be use to select *current phrase*;
 - *grammatical categories* of *current phrase* that should be used for translation of the *successive phrase*.
  
-*Grammatical categories* of the latter type are stored within current `concrete_phrase`. *Grammatical categories* of the former type are used as selectors of the most suitable phrase translation of given string in the `phrase_translator`. Translator will select the phrase with the maximum number of matching grammatical categories of the former type.
+*Grammatical categories* of the latter type are stored within current `concrete_phrase`. *Grammatical categories* of the former type are used as selectors of the most suitable phrase translation of given string in the `phrase_translator`. Translator will select the phrase with the maximum number of matching grammatical categories of the former type. See examples in [Adding new locale](#adding-new-locale).
 
 #### Repository of translators
 
@@ -2128,7 +2128,7 @@ auto formatter_for_locale3=make_formatter(rep,locale3);
 
 #### Adding new locale
 
-To add a new locale the `phrase_translator` for that locale must be filled. 
+To add a new locale the `phrase_translator` for that locale must be populated.
 
 As a sample of translator of phrases defined in `cpp-validator` library the `validator_translator_sample()` helper can be used which is defined in `validator/reporting/locale/sample_locale.hpp`. To add new language or locale copy that file, rename `validator_translator_sample()` to something like `translator_of_<locale_name>` (e.g. `translator_of_de`) and replace its phrases with the translation of the phrases for target locale.
 
@@ -2211,12 +2211,12 @@ A compiler must support at least C\+\+14 or C\+\+17 standards to build `cpp-vali
 
 ## Dependencies
 
-`cpp-validator` library strictly depends only on the [Boost](http://boost.org) libraries, version 1.65 and above, in particular on the following libraries:
+`cpp-validator` library strictly depends only on the [Boost](http://boost.org) libraries, version 1.65 and newer, in particular on the following libraries:
 - `Boost.Hana`;
-- `Boost.Regex` only if [lexicographical operators](builtin_operators.md#lexicographical-operators) are used;
+- `Boost.Regex` only if [regular expression](builtin_operators.md#regular-expressions) or [string pattern](#string-patterns) operators are used;
 - `Boost.Test` only for testing.
 
-Also `cpp-validator` library can depend on [fmt](https://github.com/fmtlib/fmt) library, version 7.0.0 and above, if [fmt](https://github.com/fmtlib/fmt) is used as a [backend formatter](#backend-formatter) which is recommended.
+Also `cpp-validator` library can depend on [fmt](https://github.com/fmtlib/fmt) library, version 7.0.0 and newer, if [fmt](https://github.com/fmtlib/fmt) is used as a [backend formatter](#backend-formatter) which is recommended.
 
 ## CMake configuration
 
