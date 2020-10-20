@@ -2211,12 +2211,12 @@ A compiler must support at least C\+\+14 or C\+\+17 standards to build `cpp-vali
 
 ## Dependencies
 
-`cpp-validator` library strictly depends only on the [Boost](http://boost.org) libraries, version 1.65 and newer, in particular on the following libraries:
+`cpp-validator` library strictly depends only on the [Boost](http://boost.org) libraries, version 1.65 or above, in particular on the following libraries:
 - `Boost.Hana`;
 - `Boost.Regex` only if [regular expression](builtin_operators.md#regular-expressions) or [string pattern](#string-patterns) operators are used;
 - `Boost.Test` only for testing.
 
-Also `cpp-validator` library can depend on [fmt](https://github.com/fmtlib/fmt) library, version 7.0.0 and newer, if [fmt](https://github.com/fmtlib/fmt) is used as a [backend formatter](#backend-formatter) which is recommended.
+Also `cpp-validator` library can depend on [fmt](https://github.com/fmtlib/fmt) library, version 7.0.0 or above, if [fmt](https://github.com/fmtlib/fmt) is used as a [backend formatter](#backend-formatter) which is recommended.
 
 ## CMake configuration
 
