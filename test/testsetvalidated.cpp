@@ -3,6 +3,7 @@
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/set_validated.hpp>
 
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 DRACOSHA_VALIDATOR_PROPERTY(field1)
 
 namespace {
@@ -29,8 +30,6 @@ struct set_member_t<TestSetValidatorStruct,DRACOSHA_VALIDATOR_PROPERTY_TYPE(fiel
 };
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
-
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 namespace validator_ns {
 
