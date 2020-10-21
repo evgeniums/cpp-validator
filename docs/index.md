@@ -332,7 +332,7 @@ The examples above define validation condition "size of variable is not equal to
 
 ### Post-validation
 
-*Post-validation* here stands for validating the object that is already populated with the data. The simplest way to validate an [object](#object) is to use `validate()` helper. There are forms `validate` with *exceptions* and without *exceptions*, with [report](#report) and without [report](#report).
+*Post-validation* here stands for validating the object that is already populated with the data. The simplest way to validate an [object](#object) is to use `validate()` helper. There are forms of `validate()` with *exceptions* and without *exceptions*, with [report](#report) and without [report](#report).
 
 Also validation can be performed by calling `apply()` method of [validator](#validator), see the next sections.
 
