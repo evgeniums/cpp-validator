@@ -144,14 +144,6 @@ Variable or value used as a validation sample in [operator](#operator).
 ##### *Operator*
 Atomic validation condition.
 
-##### *Post-validation*
-
-Validating the object that is already populated with the data.
-
-##### *Pre-validation*
-
-Validating the data before writing it to the object.
-
 ##### *Property*
 Method or member variable of C++ class or structure that must be validated, see [Properties](#properties).
 
