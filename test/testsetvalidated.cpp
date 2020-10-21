@@ -32,6 +32,39 @@ DRACOSHA_VALIDATOR_NAMESPACE_END
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
+namespace validator_ns {
+
+DRACOSHA_VALIDATOR_PROPERTY(GetX);
+
+auto MyClassValidator=validator(
+   _[GetX](in,interval(0,500))
+);
+
+}
+using namespace validator_ns;
+
+namespace {
+class MyClass {
+  double x;  // Must be in [0;500].
+
+public:
+
+  MyClass(double _x) : x(_x) {
+      validate(*this,MyClassValidator);
+  }
+
+  double GetX() const
+  {
+     return x;
+  }
+
+  void SetX(double _x) {
+    validate(_[validator_ns::GetX],_x,MyClassValidator);
+    x = _x;
+  }
+};
+}
+
 BOOST_AUTO_TEST_SUITE(TestSetValidated)
 
 BOOST_AUTO_TEST_CASE(CheckSetValidatedContainer)
@@ -103,6 +136,17 @@ BOOST_AUTO_TEST_CASE(CheckSetValidatedProperty)
     }
 
     BOOST_CHECK_EQUAL(val.field1,300);
+}
+
+BOOST_AUTO_TEST_CASE(CheckSetValidatedObject)
+{
+    BOOST_CHECK_NO_THROW(MyClass obj1{100.0};);
+    BOOST_CHECK_THROW(MyClass obj2{1000.0};,validation_error);
+
+    MyClass obj3{100.0};
+    BOOST_CHECK_NO_THROW(obj3.SetX(200.0););
+
+    BOOST_CHECK_THROW(obj3.SetX(1000.0);,validation_error);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
