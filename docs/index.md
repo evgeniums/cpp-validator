@@ -1349,7 +1349,7 @@ If [decorator](#decorator) is used then only the part within braces including th
 
 [Aggregations](#aggregation) can be used in one of the following notations:
 - `functional notation` where validation conditions are given as list of arguments in aggregation callable object, e.g. `AND(op1,op2,op3)`;
-- `infix notation` where validation conditions are joined using aggregation conjunction made up of aggregation keyword surrounded with `^`, e.g. `op1 ^AND^ op2 ^AND^ op3`.
+- `infix notation` where validation conditions are joined using aggregation conjunctive made up of aggregation keyword surrounded with `^`, e.g. `op1 ^AND^ op2 ^AND^ op3`.
 
 ### Logical aggregations
 
@@ -1692,7 +1692,7 @@ To use [fmt](https://github.com/fmtlib/fmt) for strings formatting define `DRACO
 
 [Reports](#report) must display human readable names of [members](#members). Member names formatting is performed by a *member names formatter* with base template class `member_names` defined in `validator/reporting/member_names.hpp` header file. For custom *member names formatting* the custom traits must be implemented and used as a template argument of `member_names`. There is `make_member_names()` helper to construct *member names formatter* from the custom traits.
 
-Default implementation of *member names formatter* joins member names in reverse order using *of* conjunction, e.g. `["field1"]["subfield1_1"]["subfield1_1_1"]` will be formatted as "*subfield1_1_1 of subfield1_1 of field1*". Default member names formatter can be obtained with `get_default_member_names()`.
+Default implementation of *member names formatter* joins member names in reverse order using *of* conjunctive, e.g. `["field1"]["subfield1_1"]["subfield1_1_1"]` will be formatted as "*subfield1_1_1 of subfield1_1 of field1*". Default member names formatter can be obtained with `get_default_member_names()`.
 
 There is also `dotted_member_names` formatter that displays member names similar to their declaration, e.g. `["field1"]["subfield1_1"]["subfield1_1_1"]`` will be formatted as "*[field1].[subfield1_1].[subfield1_1_1]*".
 
