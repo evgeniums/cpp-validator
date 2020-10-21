@@ -1349,7 +1349,7 @@ If [decorator](#decorator) is used then only the part within braces including th
 
 [Aggregations](#aggregation) can be used in one of the following notations:
 - `functional notation` where validation conditions are given as list of arguments in aggregation callable object, e.g. `AND(op1,op2,op3)`;
-- `inline notation` where validation conditions are joined using aggregation conjunction made up of aggregation keyword surrounded with `^`, e.g. `op1 ^AND^ op2 ^AND^ op3`.
+- `infix notation` where validation conditions are joined using aggregation conjunction made up of aggregation keyword surrounded with `^`, e.g. `op1 ^AND^ op2 ^AND^ op3`.
 
 ### Logical aggregations
 
@@ -1357,7 +1357,7 @@ Logical aggregation is a combination of validating [operators](#operator) or oth
 
 #### AND
 
-`AND` aggregation is used when all validation conditions must be satisfied. In addition to `functional notation` and `inline notation` the `AND` aggregation can be implicitly invoked when validation conditions in a [validator](#validator) for the whole object are listed separated with commas. See examples below.
+`AND` aggregation is used when all validation conditions must be satisfied. In addition to `functional notation` and `infix notation` the `AND` aggregation can be implicitly invoked when validation conditions in a [validator](#validator) for the whole object are listed separated with commas. See examples below.
 
 ```cpp
 // validator is satisfied when variable is greater than 1 and less than 100
@@ -1385,7 +1385,7 @@ auto v4=validator(
         _["key1"](AND(value(gt,1),value(lt,100)))
     );
 
-// inline notation in validation condition of a member
+// infix notation in validation condition of a member
 auto v5=validator(
         _["key1"](value(gt,1) ^AND^ value(lt,100))
     );
@@ -1403,7 +1403,7 @@ auto v1=validator(
         OR(value(eq,1),value(eq,100))
     );
 
-// inline notation in validation condition of whole object
+// infix notation in validation condition of whole object
 auto v2=validator(
         value(eq,1) ^OR^ value(eq,100)
     );
@@ -1415,7 +1415,7 @@ auto v3=validator(
         _["key1"](OR(value(eq,1),value(eq,100)))
     );
 
-// inline notation in validation condition of a member
+// infix notation in validation condition of a member
 auto v4=validator(
         _["key1"](value(eq,1) ^OR^ value(eq,100))
     );
