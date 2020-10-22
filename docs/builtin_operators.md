@@ -26,6 +26,12 @@
 	* [lex_nin](#lex_nin)
 	* [ilex_in](#ilex_in)
 	* [ilex_nin](#ilex_nin)
+	* [lex_contains](#lex_contains)
+	* [ilex_contains](#ilex_contains)
+	* [lex_starts_with](#lex_starts_with)
+	* [ilex_starts_with](#ilex_starts_with)
+	* [lex_ends_with](#lex_ends_with)
+	* [ilex_ends_with](#ilex_ends_with)
 * [Regular expressions](#regular-expressions)
 	* [regex_match](#regex_match)
 	* [regex_nmatch](#regex_nmatch)
@@ -134,6 +140,30 @@ Lexicographical case insensitive [in](index.md#in) operator.
 ### ilex_nin
 
 Lexicographical case insensitive [nin](index.md#nin) operator.
+
+### lex_contains
+
+Lexicographically contains.
+
+### ilex_contains
+
+Lexicographically case insensitive contains.
+
+### lex_starts_with
+
+Lexicographically starts with.
+
+### ilex_starts_with
+
+Lexicographically case insensitive starts with.
+
+### lex_ends_with
+
+Lexicographically ends with.
+
+### ilex_ends_with
+
+Lexicographically case insensitive ends with.
 
 ## Regular expressions
 
