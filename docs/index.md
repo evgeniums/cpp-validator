@@ -75,7 +75,7 @@
 			* [Formatters](#formatters)
 			* [Decorator](#decorator)
 		* [Reporting hints](#reporting-hints)
-			* [Override the whole report](#override-the-whole-report)
+			* [Override entire report](#override-entire-report)
 			* [Override description of a member validation condition](#override-description-of-a-member-validation-condition)
 			* [Override member name](#override-member-name)
 			* [Override operator description](#override-operator-description)
@@ -133,7 +133,7 @@ Customizable implementer of [reports](#report) formatting. See [formatters](#for
 An [element](#element) or a [property](#property) of [object](#object) the validation must be applied to. Members can be either direct (single level depth) or nested (multi level depth).
 
 ##### *Object* 
-Variable that must be validated. It can be a scalar variable, C++ object or container.
+Variable that must be validated. It can be either scalar variable, C++ object or container.
 
 ##### *Sample object* 
 Sample variable whose [member](#member) must be used as [operand](#operand).
@@ -586,7 +586,7 @@ return 0;
 
 Members are used to define what parts of [objects](#object) must be validated. A [member](#member) can point to one of the following:
 - member variable of C++ object;
-- member method of C++ object, where the method must be of getter type, i.e. it must return some value and have no arguments;
+- member method of C++ object, where the method must be of getter type, i.e. it must be without arguments and must return a value;
 - element of container.
 
 ### Member notation
@@ -612,7 +612,7 @@ auto member_validator2=_[member_id](gte,100);
 
 #### Single level members
 
-A [member](#member) name must be placed within square brackets that follow an underscore symbol `_` which is defined in `cpp-validator` library `namespace`.
+A [member](#member) name must be placed within square brackets that follow an underscore symbol `_` defined in the namespace of `cpp-validator` library.
 If a member name is a literal key of an element in container then it must be surrounded with quotes. See examples below.
 
 ```cpp
@@ -684,12 +684,12 @@ Special operator [exists](#exists) can be used to check explicitly if an [object
 
 There is also a [contains](#contains) operator added to the library for convenience to validate members of container types.
 
-A [member](#member) existence can also be checked implicitly before applying validation conditions to the [member](#member). Such check is performed by an [adapter](#adapter) if the [adapter](#adapter) supports that. [Default adapter](#default-adapter) and [reporting adapter](#reporting-adapter) provide such feature that can be configured with  `set_check_member_exists_before_validation` and `set_unknown_member_mode` adapter methods. 
+A [member](#member) existence can also be checked implicitly before applying validation conditions to the [member](#member). This check is performed by an [adapter](#adapter) if the [adapter](#adapter) supports that. [Default adapter](#default-adapter) and [reporting adapter](#reporting-adapter) provide this feature which can be configured with  `set_check_member_exists_before_validation` and `set_unknown_member_mode` adapter methods.
 
-Method `set_check_member_exists_before_validation` enables/disables implicit checking of member existence. By default this option is disabled which improves validation performance but can sometimes cause exceptions or other undefined errors. Besides, some basic checking if a member can be found for given object type is performed statically at compile time regardless of this flag.
+Method `set_check_member_exists_before_validation` enables/disables implicit check of member existence. By default this option is disabled which improves validation performance but can sometimes cause exceptions or other undefined errors. Note that some basic check of property existence or type compatibility might be performed statically at compile time regardless of this flag.
 
 Method `set_unknown_member_mode` instructs adapter what to do if a member is not found. There are two options:
-- ignore not found members and continue validation process;
+- ignore missed members and continue validation process;
 - abort validation process with error.
 
 See examples below.
@@ -773,7 +773,7 @@ See examples of different property notations in section [Validator with properti
 
 A new [property](#property) can be added using special macros defined in `cpp-validator` library. 
 
-A [property](#property) of non-boolean type must be defined using `DRACOSHA_VALIDATOR_PROPERTY` macro which has only one argument for name of the [property](#property).
+A [property](#property) of non-boolean type must be defined using `DRACOSHA_VALIDATOR_PROPERTY` macro with one argument for name of the [property](#property).
 
 ```cpp
 #include <dracosha/validator/property.hpp>
@@ -820,7 +820,7 @@ return 0;
 }
 ```
 
-If a [property](#property) is of boolean type and must be capable of being used with [flag](#flag) operator then the property must be defined with `DRACOSHA_VALIDATOR_PROPERTY_FLAG` macro which has three arguments:
+If a [property](#property) is of boolean type and must be capable of being used with [flag](#flag) operator then the property must be defined with `DRACOSHA_VALIDATOR_PROPERTY_FLAG` macro that has three arguments:
 1. name of the [property](#property);
 2. description of positive [flag](#flag);
 3. description of negative [flag](#flag).
@@ -1107,7 +1107,7 @@ constexpr simple_eq_t simple_eq{};
 
 ## Operands
 
-Value of an [operand](#operand) is given as the second argument to an [operator](#operator) and is meant to be used as a validation sample. An [operand](#operand) can be one of:
+Value of an [operand](#operand) is given as the second argument to an [operator](#operator) and is meant to be used as a validation sample. An [operand](#operand) can be one of the following list:
 - constant or `lvalue` or `rvalue` [variable](#variables);
 - [lazy](#lazy-operands) operand;
 - [other member](#other-members) of the [object](#object) under validation;
@@ -1357,7 +1357,7 @@ Logical aggregation is a combination of validating [operators](#operator) or oth
 
 #### AND
 
-`AND` aggregation is used when all validation conditions must be satisfied. In addition to `functional notation` and `infix notation` the `AND` aggregation can be implicitly invoked when validation conditions in a [validator](#validator) for the whole object are listed separated with commas. See examples below.
+`AND` aggregation is used when all validation conditions must be satisfied. In addition to `functional notation` and `infix notation` the `AND` aggregation can be implicitly invoked when validation conditions in a [validator](#validator) for the whole object are separated with commas. See examples below.
 
 ```cpp
 // validator is satisfied when variable is greater than 1 and less than 100
@@ -1479,7 +1479,7 @@ auto v2=validator(
 
 ## Adapters
 
-[Adapters](#adapter) perform actual processing of validation conditions specified in [validators](#validator). To invoke validation with a specific adapter a [validator](#validator) must be applied to the adapter. Adapters implemented in the `cpp-validator` library use [operators](#operator) as callable objects to check validation conditions. However, adapters of other types can also be implemented, e.g. adapters that construct SQL queries equivalent to validation conditions specified in [validators](#validator).
+[Adapters](#adapter) perform actual processing of validation conditions specified in [validators](#validator). To invoke validation with a specific adapter a [validator](#validator) must be applied to the adapter. Adapters implemented in the `cpp-validator` library use [operators](#operator) as callable objects to check validation conditions. However, adapters of other types can also be implemented, e.g. one can implement an adapter that constructs SQL queries that are equivalent to validation conditions specified in [validators](#validator).
 
 There are three built-in adapter types implemented in `cpp-validator` library:
 - [default adapter](#default-adapter) that applies validation to an [object](#object) by invoking [operators](#operator) one by one as specified in a [validator](#validator);
@@ -1694,7 +1694,7 @@ To use [fmt](https://github.com/fmtlib/fmt) for strings formatting define `DRACO
 
 Default implementation of *member names formatter* joins member names in reverse order using *of* conjunctive, e.g. `["field1"]["subfield1_1"]["subfield1_1_1"]` will be formatted as "*subfield1_1_1 of subfield1_1 of field1*". Default member names formatter can be obtained with `get_default_member_names()`.
 
-There is also `dotted_member_names` formatter that displays member names similar to their declaration, e.g. `["field1"]["subfield1_1"]["subfield1_1_1"]`` will be formatted as "*[field1].[subfield1_1].[subfield1_1_1]*".
+There is also `dotted_member_names` formatter that displays member names similar to their declaration, e.g. `["field1"]["subfield1_1"]["subfield1_1_1"]` will be formatted as "*[field1].[subfield1_1].[subfield1_1_1]*".
 
 If [localization](#localization) of member names must be supported then original *member names formatter* must be wrapped with *locale-aware member names formatter* using one of `make_translated_member_names()` helpers.
 
@@ -1730,7 +1730,7 @@ if (!v.apply(ra))
 
 ##### Operands formatter
 
-By default [operands](#operand) are formatted at the discretion of [backend formatter](#backend-formatter). Sometimes [operands](#operand) may require special formatting. The obvious example is a boolean value which can be displayed in different ways, e.g. as 1/0, true/false, yes/not, checked/unchecked, etc. Another example is when the [operands](#operand) must be decorated, e.g. with quotes or HTML tags.
+By default [operands](#operand) are formatted at the discretion of [backend formatter](#backend-formatter). Sometimes [operands](#operand) may require special formatting. The straightforward example is a boolean value that can be displayed in different ways, e.g. as 1/0, true/false, yes/not, checked/unchecked, etc. Another possible example is when the [operands](#operand) must be decorated, e.g. with quotes or HTML tags.
 
 [Operands](#operand) formatting is performed by the *operands formatter* with base template class `operand_formatter` defined in `validator/reporting/operand_formatter.hpp` header file. For custom *operands formatting* the custom traits must be implemented and used as a template argument of `operand_formatter`. There is also `default_operand_formatter` which forwards operands to [backend formatter](#backend-formatter) "as is".
 
@@ -1829,9 +1829,9 @@ constexpr bold_decorator_t bold_decorator{};
 
 To override strings constructed by [formatters](#formatters) one can use *hints*. *Hint* is an explicit string that must be used in a [report](#report) for certain part of the report instead of automatically generated string.
 
-#### Override the whole report
+#### Override entire report
 
-To override the whole error message a reporting *hint* must be attached to the validator using one of the following: 
+To override entire error message a reporting *hint* must be attached to the validator using one of the following: 
 - call `hint(override_message)` method of validator with the desired error message as an argument;
 - invoke validator as a callable object with the desired error message as an argument.
 
