@@ -103,7 +103,7 @@ struct member_name_with_separator_t
     {
         auto name=single_member_name(std::forward<T>(id),traits,grammar_cats);
         auto name_grammar_cats=phrase_grammar_cats(name);
-        return hana::make_tuple(std::move(name),translate(traits,detail::to_string(traits.member_names_conjunction()),name_grammar_cats));
+        return hana::make_tuple(std::move(name),translate(traits,to_string(traits.member_names_conjunction()),name_grammar_cats));
     }
 };
 
@@ -217,7 +217,7 @@ auto list_member_names(const T& id, const TraitsT& traits, grammar_categories gr
 {
     // separator
     //! @todo Use grammar categories from formatted id to format separator instead of grammar_cats because the formatted id will be preceding to the separator.
-    auto sep=translate(traits,detail::to_string(traits.member_names_conjunction()),grammar_cats);
+    auto sep=translate(traits,to_string(traits.member_names_conjunction()),grammar_cats);
 
     // construct intermediate list using first grammar categories from the separator and drop last separator
     auto parts=hana::drop_back(intermediate_member_names(id,traits,phrase_grammar_cats(sep)));

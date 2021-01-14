@@ -78,7 +78,7 @@ struct property_member_name_t
     {
         auto prop=single_member_name(id.property,traits,grammar_cats);
         auto next_cats=phrase_grammar_cats(prop);
-        auto sep=translate(traits,detail::to_string(traits.member_property_conjunction()));
+        auto sep=translate(traits,to_string(traits.member_property_conjunction()));
         auto sep_cats=phrase_grammar_cats(sep);
 
         auto members=detail::list_member_names(id.member,traits,sep_cats);
@@ -112,7 +112,7 @@ struct property_member_name_t
         auto member_parts=detail::list_member_names(id.member,traits,grammar_cats);
         auto prop=single_member_name(id.property,traits,last_grammar_categories(member_parts,grammar_cats));
         auto next_cats=phrase_grammar_cats(prop);
-        auto sep=translate(traits,detail::to_string(traits.member_property_conjunction()));
+        auto sep=translate(traits,to_string(traits.member_property_conjunction()));
 
         std::string dst;
         backend_formatter.append_join(
@@ -168,7 +168,7 @@ struct property_member_name_t<T,TraitsT,
     {
         auto prop=single_member_name(id.property,traits,grammar_cats);
         auto next_cats=phrase_grammar_cats(prop);
-        auto sep=translate(traits,detail::to_string(traits.member_property_conjunction()));
+        auto sep=translate(traits,to_string(traits.member_property_conjunction()));
         auto sep_cats=phrase_grammar_cats(sep);
 
         auto parts=hana::make_tuple(std::move(prop),std::move(sep),member(id,traits,sep_cats));
@@ -197,7 +197,7 @@ struct property_member_name_t<T,TraitsT,
         auto mmbr=member(id,traits,grammar_cats);
         auto prop=single_member_name(id.property,traits,phrase_grammar_cats(mmbr,grammar_cats));
         auto next_cats=phrase_grammar_cats(prop);
-        auto sep=translate(traits,detail::to_string(traits.member_property_conjunction()));
+        auto sep=translate(traits,to_string(traits.member_property_conjunction()));
 
         std::string dst;
         backend_formatter.append_join(

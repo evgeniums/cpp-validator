@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <string>
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/detail/to_string.hpp>
+#include <dracosha/validator/utils/to_string.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -57,7 +57,7 @@ struct brackets_decorator_t
     auto operator () (T&& id) const
     {
         std::string dst;
-        backend_formatter.append(dst,"[",detail::to_string(std::forward<T>(id)),"]");
+        backend_formatter.append(dst,"[",to_string(std::forward<T>(id)),"]");
         return dst;
     }
 };

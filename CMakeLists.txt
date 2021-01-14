@@ -127,7 +127,7 @@ SET (HEADERS
     include/dracosha/validator/detail/logical_not.hpp
     include/dracosha/validator/detail/dispatcher_impl.hpp
     include/dracosha/validator/detail/take_address_of.hpp
-    include/dracosha/validator/detail/to_string.hpp
+    include/dracosha/validator/utils/to_string.hpp
     include/dracosha/validator/detail/format_operand.hpp
     include/dracosha/validator/detail/formatter_fmt.hpp
     include/dracosha/validator/detail/reorder_and_present.hpp

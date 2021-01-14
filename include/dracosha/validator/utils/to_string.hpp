@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/to_string.hpp
+/** \file validator/utils/to_string.hpp
 *
 * Defines helper for strings conversion.
 *
@@ -28,9 +28,6 @@ Distributed under the Boost Software License, Version 1.0.
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
-
-namespace detail
-{
 
 /**
  *  @brief Convert to <?????> token if no other conversion is possible.
@@ -127,8 +124,6 @@ template <typename T>
 std::string to_string(const T& v)
 {
     return to_string_inst<T>(v);
-}
-
 }
 
 //-------------------------------------------------------------

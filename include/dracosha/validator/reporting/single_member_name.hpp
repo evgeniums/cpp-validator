@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/translate.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
-#include <dracosha/validator/detail/to_string.hpp>
+#include <dracosha/validator/utils/to_string.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -73,7 +73,7 @@ struct single_member_name_t
 {
     auto operator() (const T& id, const TraitsT& traits, grammar_categories grammar_cats) const -> decltype(auto)
     {
-        return decorate(traits,translate(traits,detail::to_string(id),grammar_cats));
+        return decorate(traits,translate(traits,to_string(id),grammar_cats));
     }
 };
 

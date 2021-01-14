@@ -31,7 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/no_translator.hpp>
 #include <dracosha/validator/reporting/translator_repository.hpp>
 #include <dracosha/validator/reporting/aggregation_strings.hpp>
-#include <dracosha/validator/detail/to_string.hpp>
+#include <dracosha/validator/utils/to_string.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -117,7 +117,7 @@ struct strings
                                     ,void*> =nullptr
                                 ) const
     {
-        return _translator(detail::to_string(id),grammar_cats);
+        return _translator(to_string(id),grammar_cats);
     }
 
     /**
