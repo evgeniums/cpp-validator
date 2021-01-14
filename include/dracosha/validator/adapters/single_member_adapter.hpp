@@ -24,8 +24,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/object_wrapper.hpp>
 #include <dracosha/validator/adapters/adapter.hpp>
 #include <dracosha/validator/reporting/reporter.hpp>
-#include <dracosha/validator/detail/reporting_adapter_impl.hpp>
-#include <dracosha/validator/detail/single_member_adapter_impl.hpp>
+#include <dracosha/validator/adapters/impl/reporting_adapter_impl.hpp>
+#include <dracosha/validator/adapters/impl/single_member_adapter_impl.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -36,7 +36,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  */
 template <typename MemberT, typename T, typename ReporterT>
 class single_member_adapter_traits : public object_wrapper<T>,
-                                     public detail::reporting_adapter_impl<ReporterT,detail::single_member_adapter_impl<MemberT>>
+                                     public reporting_adapter_impl<ReporterT,single_member_adapter_impl<MemberT>>
 {
     public:
 
@@ -52,7 +52,7 @@ class single_member_adapter_traits : public object_wrapper<T>,
                     T&& val,
                     ReporterT&& reporter
                 ) : object_wrapper<T>(std::forward<T>(val)),
-                    detail::reporting_adapter_impl<ReporterT,detail::single_member_adapter_impl<MemberT>>(
+                    reporting_adapter_impl<ReporterT,single_member_adapter_impl<MemberT>>(
                         std::forward<ReporterT>(reporter),
                         std::forward<MemberT>(member)
                     )

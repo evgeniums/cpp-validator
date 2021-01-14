@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/single_member_adapter_impl.hpp
+/** \file validator/adapters/impl/single_member_adapter_impl.hpp
 *
 *  Defines implementation of adapter for single member validation.
 *
@@ -27,14 +27,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/apply.hpp>
 #include <dracosha/validator/operators/exists.hpp>
 #include <dracosha/validator/member.hpp>
-#include <dracosha/validator/detail/default_adapter_impl.hpp>
+#include <dracosha/validator/adapters/impl/default_adapter_impl.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
-
-namespace detail
-{
 
 /**
  * @brief Implementation of single member reporting adapter.
@@ -273,7 +270,6 @@ class single_member_adapter_impl
         CheckMemberT _member;
         mutable bool _skip_member_filter;
 };
-}
 
 //-------------------------------------------------------------
 

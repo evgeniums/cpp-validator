@@ -23,7 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/object_wrapper.hpp>
 #include <dracosha/validator/adapters/adapter.hpp>
 #include <dracosha/validator/reporting/reporter.hpp>
-#include <dracosha/validator/detail/reporting_adapter_impl.hpp>
+#include <dracosha/validator/adapters/impl/reporting_adapter_impl.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -35,7 +35,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename T, typename ReporterT>
 struct reporting_adapter_traits : public object_wrapper<T>,
                                   public with_check_member_exists<adapter<reporting_adapter_traits<T,ReporterT>>>,
-                                  public detail::reporting_adapter_impl<ReporterT,detail::default_adapter_impl>
+                                  public reporting_adapter_impl<ReporterT,default_adapter_impl>
 {
     public:
 
@@ -52,7 +52,7 @@ struct reporting_adapter_traits : public object_wrapper<T>,
                 )
             : object_wrapper<T>(std::forward<T>(obj)),
               with_check_member_exists<adapter<reporting_adapter_traits<T,ReporterT>>>(adpt),
-              detail::reporting_adapter_impl<ReporterT,detail::default_adapter_impl>(std::forward<ReporterT>(reporter))
+              reporting_adapter_impl<ReporterT,default_adapter_impl>(std::forward<ReporterT>(reporter))
         {}
 };
 

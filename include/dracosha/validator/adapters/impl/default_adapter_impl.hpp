@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/default_adapter_impl.hpp
+/** \file validator/adapters/impl/default_adapter_impl.hpp
 *
 *  Defines implementation of default adapter.
 *
@@ -32,9 +32,6 @@ Distributed under the Boost Software License, Version 1.0.
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
-
-namespace detail
-{
 
 /**
  * @brief Helper for ANY/ALL aggregation of non-container types.
@@ -425,7 +422,6 @@ struct default_adapter_impl
         )(member.path);
     }
 };
-}
 
 //-------------------------------------------------------------
 

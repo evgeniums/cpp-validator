@@ -83,6 +83,10 @@ SET (HEADERS
     include/dracosha/validator/adapters/default_adapter.hpp
     include/dracosha/validator/adapters/reporting_adapter.hpp
     include/dracosha/validator/adapters/single_member_adapter.hpp
+    include/dracosha/validator/adapters/impl/default_adapter_impl.hpp
+    include/dracosha/validator/adapters/impl/reporting_adapter_impl.hpp
+    include/dracosha/validator/adapters/impl/single_member_adapter_impl.hpp
+    include/dracosha/validator/adapters/impl/default_adapter_impl.ipp
 
     include/dracosha/validator/reporting/reporter.hpp
     include/dracosha/validator/reporting/formatter.hpp
@@ -133,12 +137,7 @@ SET (HEADERS
     include/dracosha/validator/detail/reorder_and_present.hpp
     include/dracosha/validator/detail/formatter_std.hpp
     include/dracosha/validator/detail/backend_formatter_helper.hpp
-    include/dracosha/validator/detail/default_adapter_impl.hpp
-    include/dracosha/validator/detail/reporting_adapter_impl.hpp
-    include/dracosha/validator/detail/single_member_adapter_impl.hpp
     include/dracosha/validator/detail/hint_helper.hpp
-
-    include/dracosha/validator/detail/default_adapter_impl.ipp
 )
 
 IF (DRACOSHA_VALIDATOR_SRC)

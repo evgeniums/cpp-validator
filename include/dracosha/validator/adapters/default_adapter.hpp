@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/with_check_member_exists.hpp>
 #include <dracosha/validator/check_member_exists_traits_proxy.hpp>
 #include <dracosha/validator/adapters/adapter.hpp>
-#include <dracosha/validator/detail/default_adapter_impl.hpp>
+#include <dracosha/validator/adapters/impl/default_adapter_impl.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -37,7 +37,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename T>
 class default_adapter_traits :  public object_wrapper<T>,
                                 public with_check_member_exists<adapter<default_adapter_traits<T>>>,
-                                public detail::default_adapter_impl
+                                public default_adapter_impl
 {
     public:
 

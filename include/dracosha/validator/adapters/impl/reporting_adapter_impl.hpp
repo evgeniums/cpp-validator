@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/details/reporting_adapter_impl.hpp
+/** \file validator/adapters/impl/reporting_adapter_impl.hpp
 *
 *  Defines implementation of reporting adapter.
 *
@@ -20,16 +20,13 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_REPORTING_ADAPTER_IMPL_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/detail/default_adapter_impl.hpp>
+#include <dracosha/validator/adapters/impl/default_adapter_impl.hpp>
 #include <dracosha/validator/operators/any.hpp>
 #include <dracosha/validator/operators/all.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
-
-namespace detail
-{
 
 /**
  * @brief Implementation of reporting adapter.
@@ -251,8 +248,6 @@ class reporting_adapter_impl
         ReporterT _reporter;
         NextAdapterImplT _next_adapter_impl;
 };
-
-}
 
 //-------------------------------------------------------------
 

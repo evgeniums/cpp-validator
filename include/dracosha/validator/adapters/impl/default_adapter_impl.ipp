@@ -21,16 +21,13 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/member.hpp>
-#include <dracosha/validator/detail/default_adapter_impl.hpp>
+#include <dracosha/validator/adapters/impl/default_adapter_impl.hpp>
 #include <dracosha/validator/operators/all.hpp>
 #include <dracosha/validator/operators/any.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
-
-namespace detail
-{
 
 template <typename T>
 template <typename ContainerT, typename AdapterT, typename OpT>
@@ -114,8 +111,6 @@ status aggregate_impl<T,
         return status::code::success;
     }
     return status::code::fail;
-}
-
 }
 
 //-------------------------------------------------------------
