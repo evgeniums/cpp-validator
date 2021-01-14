@@ -1576,7 +1576,7 @@ return 0;
 
 Base `adapter` template class is defined in `validator/adapters/adapter.hpp` header file. To implement a *custom adapter* the *custom adapter traits* must be implemented that will be used as a template argument in the base `adapter` template class. In addition, if the *custom adapter* supports implicit check of [member existence](#member-existence) then it also must inherit from `check_member_exists_traits_proxy` template class and the *custom adapter traits* must inherit from `with_check_member_exists` template class.
 
-Examples of *custom adapter traits* implementation can be found in `validator/detail/default_adapter_impl.hpp`, `validator/detail/reporting_adapter_impl.hpp` and `validator/detail/single_member_adapter_impl.hpp`.
+Examples of *custom adapter traits* implementation can be found in `validator/adapters/impl/default_adapter_impl.hpp`, `validator/adapters/impl/reporting_adapter_impl.hpp` and `validator/adapters/impl/single_member_adapter_impl.hpp`.
 
 Examples of *custom adapter* implementation can be found in `validator/adapters/default_adapter.hpp`, `validator/adapters/reporting_adapter.hpp` and `validator/adapters/single_member_adapter.hpp`. 
 
@@ -1818,7 +1818,7 @@ struct bold_decorator_t
     auto operator () (T&& id) const
     {
         std::string dst;
-        backend_formatter.append(dst,"<b>",detail::to_string(std::forward<T>(id)),"</b>");
+        backend_formatter.append(dst,"<b>",to_string(std::forward<T>(id)),"</b>");
         return dst;
     }
 };
