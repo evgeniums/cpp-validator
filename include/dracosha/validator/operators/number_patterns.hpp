@@ -73,7 +73,7 @@ struct str_float_t : public op_report_without_operand<str_float_t>
     template <typename T1, typename T2>
     bool operator() (const T1& a, const T2& b) const
     {
-        static const boost::regex e("[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?");
+        static const std::regex e("[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?");
         return regex_match(a,e)==b;
     }
 };

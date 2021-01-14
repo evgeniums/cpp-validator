@@ -19,6 +19,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_REGEX_HPP
 #define DRACOSHA_VALIDATOR_REGEX_HPP
 
+#include <regex>
 #include <boost/regex.hpp>
 
 #include <dracosha/validator/config.hpp>
@@ -39,10 +40,16 @@ struct regex_match_t : public op<regex_match_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return boost::regex_match(a,boost::regex(b));
+        return std::regex_match(a,std::regex(b));
     }
 
-    template <typename T1, typename T2>
+    template <typename T1>
+    constexpr bool operator() (const T1& a, const std::regex& b) const
+    {
+        return std::regex_match(a,b);
+    }
+
+    template <typename T1>
     constexpr bool operator() (const T1& a, const boost::regex& b) const
     {
         return boost::regex_match(a,b);
@@ -85,10 +92,16 @@ struct regex_contains_t : public op<regex_contains_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return boost::regex_search(a,boost::regex(b));
+        return std::regex_search(a,std::regex(b));
     }
 
-    template <typename T1, typename T2>
+    template <typename T1>
+    constexpr bool operator() (const T1& a, const std::regex& b) const
+    {
+        return std::regex_search(a,b);
+    }
+
+    template <typename T1>
     constexpr bool operator() (const T1& a, const boost::regex& b) const
     {
         return boost::regex_search(a,b);
@@ -136,6 +149,25 @@ struct format_operand_t<T,hana::when<std::is_same<std::decay_t<T>,boost::regex>:
     auto operator () (const TraitsT& traits, T1&& val, grammar_categories cats) const
     {
         return decorate(traits,translate(traits,val.str(),cats));
+    }
+};
+
+/**
+ * @brief Format std::regex operand.
+ */
+template <typename T>
+struct format_operand_t<T,hana::when<std::is_same<std::decay_t<T>,std::regex>::value>>
+{
+    /**
+     * @brief Format std::regex operand.
+     * @param traits Formatter traits.
+     * @param val Operand value.
+     * @return Formatted interval.
+     */
+    template <typename TraitsT, typename T1>
+    auto operator () (const TraitsT& traits, T1&&, grammar_categories cats) const
+    {
+        return decorate(traits,translate(traits,"",cats));
     }
 };
 

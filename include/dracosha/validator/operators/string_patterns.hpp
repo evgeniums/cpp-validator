@@ -41,7 +41,7 @@ struct str_alpha_t : public op_report_without_operand<str_alpha_t>
     template <typename T1, typename T2>
     bool operator() (const T1& a, const T2& b) const
     {
-        static const boost::regex e("[0-9a-zA-Z_]*");
+        static const std::regex e("[0-9a-zA-Z_]*");
         return regex_match(a,e)==b;
     }
 };
@@ -62,7 +62,7 @@ struct str_hex_t : public op_report_without_operand<str_hex_t>
     template <typename T1, typename T2>
     bool operator() (const T1& a, const T2& b) const
     {
-        static const boost::regex e("[0-9a-fA-F]+");
+        static const std::regex e("[0-9a-fA-F]+");
         return regex_match(a,e)==b;
     }
 };

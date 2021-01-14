@@ -25,6 +25,11 @@ BOOST_AUTO_TEST_CASE(CheckRegexMatch)
     );
     BOOST_CHECK(v2.apply(ra1));
 
+    auto v2_std=validator(
+        regex_match,std::regex("[0-9a-zA-Z_]+")
+    );
+    BOOST_CHECK(v2_std.apply(ra1));
+
     std::string str2="Hello world";
     auto ra2=make_reporting_adapter(str2,rep);
     BOOST_CHECK(!v1.apply(ra2));
@@ -35,6 +40,10 @@ BOOST_AUTO_TEST_CASE(CheckRegexMatch)
     BOOST_CHECK_EQUAL(rep,"must match expression [0-9a-zA-Z_]+");
     rep.clear();
 
+    BOOST_CHECK(!v2_std.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"must match expression");
+    rep.clear();
+
     auto v3=validator(
         regex_nmatch,boost::regex("[0-9a-zA-Z_]+")
     );
@@ -42,6 +51,15 @@ BOOST_AUTO_TEST_CASE(CheckRegexMatch)
     BOOST_CHECK_EQUAL(rep,"must not match expression [0-9a-zA-Z_]+");
     rep.clear();
     BOOST_CHECK(v3.apply(ra2));
+    rep.clear();
+
+    auto v3_std=validator(
+        regex_nmatch,std::regex("[0-9a-zA-Z_]+")
+    );
+    BOOST_CHECK(!v3_std.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,"must not match expression");
+    rep.clear();
+    BOOST_CHECK(v3_std.apply(ra2));
 }
 
 BOOST_AUTO_TEST_CASE(CheckRegexContains)
@@ -60,6 +78,11 @@ BOOST_AUTO_TEST_CASE(CheckRegexContains)
     );
     BOOST_CHECK(v2.apply(ra1));
 
+    auto v2_std=validator(
+        regex_contains,std::regex("[0-9][0-9][0-9]")
+    );
+    BOOST_CHECK(v2.apply(ra1));
+
     std::string str2="Hello world 12 34";
     auto ra2=make_reporting_adapter(str2,rep);
     BOOST_CHECK(!v1.apply(ra2));
@@ -68,6 +91,10 @@ BOOST_AUTO_TEST_CASE(CheckRegexContains)
 
     BOOST_CHECK(!v2.apply(ra2));
     BOOST_CHECK_EQUAL(rep,"must contain expression [0-9][0-9][0-9]");
+    rep.clear();
+
+    BOOST_CHECK(!v2_std.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,"must contain expression");
     rep.clear();
 
     auto v3=validator(
