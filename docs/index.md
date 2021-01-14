@@ -2189,7 +2189,7 @@ Below is an example of custom localization for Russian language. This example us
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
-// define custom trasnlator of container keys for Russian language taking into account some Russian grammatic categories
+// define custom trasnlator of container keys for Russian language taking into account some Russian grammatical categories
 phrase_translator custom_key_translator;
 custom_key_translator["password"]={
                     {"пароль"},
