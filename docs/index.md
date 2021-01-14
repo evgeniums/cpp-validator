@@ -85,6 +85,7 @@
 			* [Translators](#translators)
 			* [Repository of translators](#repository-of-translators)
 			* [Adding new locale](#adding-new-locale)
+			* [Localization example](#localization-example)
 * [Building and installation](#building-and-installation)
 	* [Supported platforms and compilers](#supported-platforms-and-compilers)
 	* [Dependencies](#dependencies)
@@ -2175,6 +2176,103 @@ m["value"]={
 ```
 
 Another example of custom locale can be found in `validator/reporting/locale/ru.hpp` that implements translations for Russian locale.
+
+#### Localization example
+
+Below is an example of custom localization for Russian language. This example uses some grammatical categories of Russian language listed in `grammar_ru` enumeration.
+
+```cpp
+#include <iostream>
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/reporting/extend_translator.hpp>
+#include <dracosha/validator/reporting/locale/ru.hpp>
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// define custom trasnlator of container keys for Russian language taking into account some Russian grammatic categories
+phrase_translator custom_key_translator;
+custom_key_translator["password"]={
+                    {"пароль"},
+                    {"пароля",grammar_ru::roditelny_padezh}
+               };
+custom_key_translator["hyperlink"]={
+                    {{"гиперссылка",grammar_ru::zhensky_rod}},
+                    {{"гиперссылки",grammar_ru::zhensky_rod},grammar_ru::roditelny_padezh}
+                };
+custom_key_translator["words"]={
+                {{"слова",grammar_ru::mn_chislo}}
+            };
+
+/*
+final translator merges predefined Russian translator
+validator_translator_ru() and custom translator for element names defined above
+*/
+auto final_key_translator=extend_translator(validator_translator_ru(),custom_key_translator);
+
+// container to validate
+std::map<std::string,std::string> m1={
+    {"password","123456"},
+    {"hyperlink","zzzzzzzzz"}
+};
+
+// define reporting adapter that will generate error messages in Russian language
+std::string rep;
+auto ra1=make_reporting_adapter(m1,make_reporter(rep,make_formatter(final_key_translator)));
+
+// examples of error generation in Russian language with the reporting adapter defined above
+
+auto v1=validator(
+    _["words"](exists,true)
+ );
+if (!v1.apply(ra1))
+{
+    std::cerr<<rep<<std::endl;
+    /*
+    prints:
+    "слова должны существовать"
+    */
+}
+rep.clear();
+
+auto v2=validator(
+    _["hyperlink"](eq,"https://www.boost.org")
+ );
+if (!v2.apply(ra1))
+{
+    std::cerr<<rep<<std::endl;
+    /*
+    prints:
+    "гиперссылка должна быть равна https://www.boost.org"
+    */
+}
+rep.clear();
+
+auto v3=validator(
+    _["password"](length(gt,7))
+ );
+if (!v3.apply(ra1))
+{
+    std::cerr<<rep<<std::endl;
+    /*
+    prints:
+    "длина пароля должна быть больше 7"
+    */
+}
+rep.clear();
+
+auto v4=validator(
+    _["hyperlink"](length(lte,7))
+ );
+if (!v4.apply(ra1))
+{
+    std::cerr<<rep<<std::endl;
+    /*
+    prints:
+    "длина гиперссылки должна быть меньше или равна 7"
+    */
+}
+rep.clear();
+```
 
 # Building and installation
 
