@@ -4,7 +4,7 @@
 
 It is quite a common task to check if data satisfies specific constraints. For example, server backend must check validity of commands that come from the clients. Another example is a requirement to validate input data in application user interface and show the messages describing validation errors.
 
-A typical approach for implementing complex data validation is writing nested *if-conditions* or chained invocations of partial validation methods. Declarations of the constraints can become intermixed with their implementations so that the constraints are spread over the code which makes it hard to watch and support them. Requirement to construct and show messages describing validation errors makes everything still more complicated.
+A typical approach for implementing complex data validation is writing nested *if-conditions* or chained invocations of partial validation methods. Declarations of the constraints can become intermixed with their implementations so that the constraints are spread over the code which makes it hard to watch and maintain them. Requirement to construct and show messages describing validation errors makes everything still more complicated.
 
 `cpp-validator` library allows one to declare data constraints with clean statements in certain points of code and apply them in other points of code on demand. If needed, the validation error messages are automatically constructed with taking into account the user's locale.
 
