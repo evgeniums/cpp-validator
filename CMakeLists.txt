@@ -68,7 +68,7 @@ SET (HEADERS
     include/dracosha/validator/operators/lexicographical.hpp
     include/dracosha/validator/operators/lex_in.hpp
     include/dracosha/validator/operators/regex.hpp
-    include/dracosha/validator/reporting/op_report_without_operand.hpp
+    include/dracosha/validator/operators/op_report_without_operand.hpp
     include/dracosha/validator/operators/string_patterns.hpp
     include/dracosha/validator/operators/number_patterns.hpp
     include/dracosha/validator/operators.hpp
@@ -117,6 +117,7 @@ SET (HEADERS
     include/dracosha/validator/reporting/phrase_grammar_cats.hpp
     include/dracosha/validator/reporting/prepare_operand_for_formatter.hpp
     include/dracosha/validator/reporting/format_bool_operand.hpp
+    include/dracosha/validator/reporting/format_operand.hpp
 
     include/dracosha/validator/reporting/locale/sample_locale.hpp
     include/dracosha/validator/reporting/locale/ru.hpp
@@ -132,13 +133,14 @@ SET (HEADERS
     include/dracosha/validator/detail/dispatcher_impl.hpp
     include/dracosha/validator/detail/take_address_of.hpp
     include/dracosha/validator/utils/to_string.hpp
-    include/dracosha/validator/detail/format_operand.hpp
     include/dracosha/validator/detail/formatter_fmt.hpp
     include/dracosha/validator/detail/reorder_and_present.hpp
     include/dracosha/validator/detail/formatter_std.hpp
     include/dracosha/validator/detail/backend_formatter_helper.hpp
     include/dracosha/validator/detail/hint_helper.hpp
 )
+
+ADD_CUSTOM_TARGET(headers SOURCES ${HEADERS})
 
 IF (DRACOSHA_VALIDATOR_SRC)
 
@@ -153,7 +155,7 @@ IF (DRACOSHA_VALIDATOR_SRC)
         INCLUDE(dracosha/Install)
     ENDIF (INSTALL_DEV)
 
-    ADD_DEFINITIONS(-DDRACOSHA_VALIDATOR_FMT)
+    TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} INTERFACE -DDRACOSHA_VALIDATOR_FMT)
 
 ELSE (DRACOSHA_VALIDATOR_SRC)
 
@@ -171,20 +173,20 @@ ELSE (DRACOSHA_VALIDATOR_SRC)
     
     IF(WIN32)
         IF(MSVC)
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:ternary")
+            TARGET_COMPILE_OPTIONS(${PROJECT_NAME} INTERFACE "/Zc:ternary")
         ELSE()
-            ADD_DEFINITIONS(-D_WIN32_WINNT=0x0600 -Dstrcasecmp=stricmp)            
+            TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} INTERFACE -D_WIN32_WINNT=0x0600 -Dstrcasecmp=stricmp)
         ENDIF(MSVC)
     ENDIF(WIN32)
     
     IF(NOT MSVC)
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstack-protector-all -fno-omit-frame-pointer")
+        TARGET_COMPILE_OPTIONS(${PROJECT_NAME} INTERFACE -fstack-protector-all -fno-omit-frame-pointer)
     ENDIF(NOT MSVC)
 
     IF (VALIDATOR_WITH_FMT)
 
         MESSAGE(STATUS "Use libfmt for formatting in cpp-validator library")
-        ADD_DEFINITIONS(-DDRACOSHA_VALIDATOR_FMT)
+        TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} INTERFACE -DDRACOSHA_VALIDATOR_FMT)
 
         IF (NOT FMT_ROOT)
             SET (FMT_ROOT $ENV{FMT_ROOT})
