@@ -164,7 +164,6 @@ ELSE (DRACOSHA_VALIDATOR_SRC)
     FIND_PACKAGE(Boost 1.65 REQUIRED)
 
     OPTION(VALIDATOR_WITH_TESTS "Build tests for cpp-validator library" OFF)
-    OPTION(VALIDATOR_WITH_EXAMPLES "Build examples for cpp-validator library" OFF)
 
     OPTION(VALIDATOR_WITH_FMT "Use libfmt backend for formatting" On)
 
