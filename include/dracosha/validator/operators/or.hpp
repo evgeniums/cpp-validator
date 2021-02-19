@@ -35,7 +35,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  *
  * Can be used both in functioin call notation OR(...) and in infix notation (... ^OR^ ...).
  */
-BOOST_HANA_CONSTEXPR_LAMBDA auto OR=hana::infix([](auto&& ...xs) -> decltype(auto)
+DRACOSHA_VALIDATOR_INLINE_LAMBDA auto OR=hana::infix([](auto&& ...xs) -> decltype(auto)
 {
     return make_validator(
                 hana::reverse_partial(

@@ -28,6 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
+
 /**
  *  Helper to check at compile time if object has a property.
  */
@@ -40,10 +41,11 @@ constexpr detail::has_property_t<T,PropT> has_property{};
   @param b Property which must be pre-declared with DRACOSHA_VALIDATOR_PROPERTY().
   @return Validation status.
 */
-BOOST_HANA_CONSTEXPR_LAMBDA auto has_property_fn=[](auto&& a, auto&& b)
+template <typename Ta, typename Tb>
+auto has_property_fn(Ta&& a, Tb&& b)
 {
     return has_property<decltype(a),decltype(b)>();
-};
+}
 
 /**
   @brief Extract object's property.
@@ -51,10 +53,11 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto has_property_fn=[](auto&& a, auto&& b)
   @param prop Property which must be pre-declared with DRACOSHA_VALIDATOR_PROPERTY().
   @return Value of the property or object itself if no such property exists.
 */
-BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> decltype(auto)
+template <typename Tv, typename Tp>
+auto property(Tv&& val, Tp&& prop) -> decltype(auto)
 {
     return std::decay_t<decltype(prop)>::get(std::forward<decltype(val)>(val));
-};
+}
 
 //-------------------------------------------------------------
 
@@ -68,7 +71,8 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> declt
   @param flag_dscr Description of negative flag.
  */
 #define DRACOSHA_VALIDATOR_PROPERTY_FLAG(prop,flag_dscr,n_flag_dscr) \
-    auto try_get_##prop =[](auto&& v) -> decltype(auto) \
+    template <typename Tv> \
+    auto try_get_##prop (Tv&& v) -> decltype(auto) \
     { \
       return hana::if_(DRACOSHA_VALIDATOR_HAS_PROPERTY_FN(v,prop), \
         [](auto&& x) -> decltype(auto) { return x.prop(); }, \
@@ -80,11 +84,11 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto property = [](auto&& val, auto&& prop) -> declt
             } \
       )(std::forward<decltype(v)>(v)); \
     }; \
-    BOOST_HANA_CONSTEXPR_LAMBDA auto has_fn_##prop = hana::is_valid([](auto v) -> decltype( \
+    DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_fn_##prop = hana::is_valid([](auto v) -> decltype( \
                                                                         (void)hana::traits::declval(v).prop() \
                                                                     ) \
                                                                 {}); \
-    BOOST_HANA_CONSTEXPR_LAMBDA auto has_##prop = hana::is_valid([](auto v) -> decltype( \
+    DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_##prop = hana::is_valid([](auto v) -> decltype( \
                                                                         (void)hana::traits::declval(v).prop \
                                                                     ) \
                                                                 {}); \

@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/property.hpp>
+#include <dracosha/validator/properties/size.hpp>
 #include <dracosha/validator/can_check_contains.hpp>
 #include <dracosha/validator/utils/safe_compare.hpp>
 #include <dracosha/validator/utils/wrap_it.hpp>

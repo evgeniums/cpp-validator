@@ -32,13 +32,21 @@ struct validator_tag;
   @param v Either validation operator or compound validator.
   @return Validation result.
   */
-BOOST_HANA_CONSTEXPR_LAMBDA auto apply = [](auto&& a,auto&& v) -> decltype(auto)
+struct apply_t
 {
-    return hana::if_(hana::is_a<validator_tag,decltype(v)>,
-      [&a](auto&& x) -> decltype(auto) { return x.apply(a); },
-      [&a](auto&& x) -> decltype(auto) { return x(a); }
-    )(std::forward<decltype(v)>(v));
+    template <typename Ta, typename Tv>
+    constexpr auto operator () (Ta&& a, Tv&& v) const -> decltype(auto)
+    {
+        return hana::if_(hana::is_a<validator_tag,decltype(v)>,
+          [&a](auto&& x) -> decltype(auto) { return x.apply(a); },
+          [&a](auto&& x) -> decltype(auto) { return x(a); }
+        )(std::forward<decltype(v)>(v));
+    }
 };
+/**
+  @brief Callable for applying validation to object.
+  */
+constexpr apply_t apply{};
 
 /**
   @brief Apply validating to object's member.
@@ -47,13 +55,21 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto apply = [](auto&& a,auto&& v) -> decltype(auto)
   @param member Object's member to validate.
   @return Validation result.
   */
-BOOST_HANA_CONSTEXPR_LAMBDA auto apply_member = [](auto&& a,auto&& v,auto&& member) -> decltype(auto)
+struct apply_member_t
 {
-    return hana::if_(hana::is_a<validator_tag,decltype(v)>,
-      [&a,&member](auto&& x) -> decltype(auto) { return x.apply(a,member); },
-      [&a,&member](auto&& x) -> decltype(auto) { return x(a,member); }
-    )(std::forward<decltype(v)>(v));
+    template <typename Ta, typename Tv, typename Tm>
+    constexpr auto operator () (Ta&& a, Tv&& v, Tm&& member) const -> decltype(auto)
+    {
+        return hana::if_(hana::is_a<validator_tag,decltype(v)>,
+          [&a,&member](auto&& x) -> decltype(auto) { return x.apply(a,member); },
+          [&a,&member](auto&& x) -> decltype(auto) { return x(a,member); }
+        )(std::forward<decltype(v)>(v));
+    }
 };
+/**
+  @brief Callable for applying validation to object's member.
+  */
+constexpr apply_member_t apply_member{};
 
 //-------------------------------------------------------------
 

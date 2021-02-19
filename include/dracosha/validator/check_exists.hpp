@@ -46,39 +46,48 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
     If member is not found then nullptr will be returned.
   </pre>
 */
-BOOST_HANA_CONSTEXPR_LAMBDA auto get_member_ptr =[](auto&& obj,auto&& key)
+struct get_member_ptr_t
 {
-    if (obj && check_contains(*obj,key))
+    template <typename Tobj, typename Tkey>
+    constexpr auto operator () (Tobj&& obj, Tkey&& key) const
     {
-        return detail::take_address_of<decltype(get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key)))>
-                (
-                        get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key))
-                    );
+        if (obj && check_contains(*obj,key))
+        {
+            return detail::take_address_of<decltype(get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key)))>
+                    (
+                            get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key))
+                        );
+        }
+        return decltype(
+                    detail::take_address_of<decltype(get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key)))>
+                                    (
+                                            get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key))
+                                        )
+                    )(nullptr);
     }
-    return decltype(
-                detail::take_address_of<decltype(get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key)))>
-                                (
-                                        get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key))
-                                    )
-                )(nullptr);
 };
+/**
+  @brief Callable for extracting member from object.
+  */
+constexpr get_member_ptr_t get_member_ptr{};
 
 #ifdef _MSC_VER
 #pragma warning(default:4172)
 #endif
 
 /**
-  @brief Check if member at a given path exist in the object.
+  @brief Check if member at a given path exists in the object.
   @param obj Object under validation.
   @param path Member path as a tuple.
   @return Validation status.
 
   This operation is performed at runtime.
 */
-BOOST_HANA_CONSTEXPR_LAMBDA auto check_exists =[](auto&& obj,auto&& path)
+template <typename Tobj, typename Tpath>
+auto check_exists(Tobj&& obj, Tpath&& path)
 {
     return hana::fold(std::forward<decltype(path)>(path),&obj,get_member_ptr)!=nullptr;
-};
+}
 
 //-------------------------------------------------------------
 

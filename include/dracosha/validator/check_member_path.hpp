@@ -34,13 +34,14 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
   This operation is expected to be static and assumed to be performed at compile time.
 */
-BOOST_HANA_CONSTEXPR_LAMBDA auto check_member_path =[](auto&& obj,auto&& path)
+template <typename Tobj, typename Tpath>
+auto check_member_path(Tobj&& obj, Tpath&& path)
 {
     auto path_c=hana::transform(path,hana::make_type);
     auto obj_c=hana::type_c<decltype(obj)>;
 
     return !hana::is_nothing(hana::monadic_fold_left<hana::optional_tag>(path_c,obj_c,hana::sfinae(check_member)));
-};
+}
 
 /**
   * @brief Check if members have paths of the same types.
@@ -48,13 +49,14 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto check_member_path =[](auto&& obj,auto&& path)
   * @param Second member.
   * @return Result of check operation.
   */
-BOOST_HANA_CONSTEXPR_LAMBDA auto check_member_path_types =[](const auto& member1,const auto& member2)
+template <typename Tm1, typename Tm2>
+auto check_member_path_types(const Tm1& member1,const Tm2& member2)
 {
     auto path1_c=hana::transform(member1.path,hana::make_type);
     auto path2_c=hana::transform(member2.path,hana::make_type);
 
     return hana::equal(path1_c,path2_c);
-};
+}
 
 //-------------------------------------------------------------
 

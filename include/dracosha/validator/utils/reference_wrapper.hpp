@@ -125,30 +125,45 @@ struct reference_wrapper
   @param v Object to wrap.
   @return Constant reference wrapper.
 */
-BOOST_HANA_CONSTEXPR_LAMBDA auto cref =[](const auto& v)
+struct cref_t
 {
-    return reference_wrapper<std::remove_reference_t<decltype(v)>>{v};
+    template <typename Tv>
+    constexpr auto operator () (const Tv& v) const -> decltype(auto)
+    {
+        return reference_wrapper<std::remove_reference_t<decltype(v)>>{v};
+    }
 };
+constexpr cref_t cref{};
 
 /**
   @brief Create a reference wrapper.
   @param v Object to wrap.
   @return Reference wrapper.
 */
-BOOST_HANA_CONSTEXPR_LAMBDA auto ref =[](auto& v)
+struct ref_t
 {
-    return reference_wrapper<std::remove_reference_t<decltype(v)>>{v};
+    template <typename Tv>
+    constexpr auto operator () (Tv& v) const -> decltype(auto)
+    {
+        return reference_wrapper<std::remove_reference_t<decltype(v)>>{v};
+    }
 };
+constexpr ref_t ref{};
 
 /**
   @brief Extract reference from argument.
   @param vr Value to extract a reference from.
   @return If vr is a reference wrapper than kept reference is returned, othervise the value itself is returned.
 */
-BOOST_HANA_CONSTEXPR_LAMBDA auto extract_ref =[](auto&& vr) -> decltype(auto)
+struct extract_ref_t
 {
-    return detail::extract_ref_impl<decltype(vr)>(std::forward<decltype(vr)>(vr));
+    template <typename Tvr>
+    constexpr auto operator () (Tvr&& vr) const -> decltype(auto)
+    {
+        return detail::extract_ref_impl<decltype(vr)>(std::forward<decltype(vr)>(vr));
+    }
 };
+constexpr extract_ref_t extract_ref{};
 
 /**
   @brief Invoke a function with an argument.
@@ -158,30 +173,45 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto extract_ref =[](auto&& vr) -> decltype(auto)
   @param vr Argument to fn or vref of argument to fn.
   @return Result of fn invokation.
 */
-BOOST_HANA_CONSTEXPR_LAMBDA auto apply_ref =[](auto&& fn,auto&& vr, auto&&... args) -> decltype(auto)
+struct apply_ref_t
 {
-    return extract_ref(fn)(extract_ref(std::forward<decltype(vr)>(vr)),std::forward<decltype(args)>(args)...);
+    template <typename Tfn, typename Tvr, typename ... Args>
+    constexpr auto operator () (Tfn&& fn, Tvr&& vr, Args&&... args) const -> decltype(auto)
+    {
+        return extract_ref(fn)(extract_ref(std::forward<decltype(vr)>(vr)),std::forward<decltype(args)>(args)...);
+    };
 };
+constexpr apply_ref_t apply_ref{};
 
 /**
   @brief Make a tuple of const reference wrappers that wrap a pack of arguments.
   @param v A pack of arguments to put into the tuple wrapped in const references.
   @return Tuple with constant reference wrappers.
   */
-BOOST_HANA_CONSTEXPR_LAMBDA auto make_cref_tuple =[](auto&&... v) -> decltype(auto)
+struct make_cref_tuple_t
 {
-    return hana::make_tuple(cref(std::forward<decltype(v)>(v))...);
+    template <typename ... Args>
+    constexpr auto operator() (Args&&... args) const -> decltype(auto)
+    {
+        return hana::make_tuple(cref(std::forward<Args>(args))...);
+    };
 };
+constexpr make_cref_tuple_t make_cref_tuple{};
 
 /**
   @brief Make a tuple of reference wrappers that wrap a pack of arguments.
   @param v A pack of arguments to put into the tuple wrapped in references.
   @return Tuple with reference wrappers.
   */
-BOOST_HANA_CONSTEXPR_LAMBDA auto make_ref_tuple =[](auto&&... v) -> decltype(auto)
+struct make_ref_tuple_t
 {
-    return hana::make_tuple(ref(std::forward<decltype(v)>(v))...);
+    template <typename ... Args>
+    constexpr auto operator () (Args&&... args) const -> decltype(auto)
+    {
+        return hana::make_tuple(ref(std::forward<Args>(args))...);
+    };
 };
+constexpr make_ref_tuple_t make_ref_tuple{};
 
 //-------------------------------------------------------------
 

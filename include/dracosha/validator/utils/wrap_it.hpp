@@ -71,10 +71,11 @@ struct wrap_it_t
   @param aggregation Aggregation descriptor to take iterator name or desctiption from.
   @return Wrapped iterator.
   */
-BOOST_HANA_CONSTEXPR_LAMBDA auto wrap_it=[](auto&& it, auto&& aggregation)
+template <typename Ti, typename Ta>
+auto wrap_it(Ti&& it, Ta&& aggregation)
 {
     return wrap_it_t<decltype(it)>{std::forward<decltype(it)>(it),aggregation};
-};
+}
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 

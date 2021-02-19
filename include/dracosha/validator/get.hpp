@@ -33,10 +33,11 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
   If member can not be found by the key then behaviour depends on the object and member implementation,
   usually a kind of out_of_range exception will be thrown or some default value will be returned.
 */
-BOOST_HANA_CONSTEXPR_LAMBDA auto get=[](auto&& v, auto&& k) -> decltype(auto)
+template <typename Tv, typename Tk>
+auto get(Tv&& v, Tk&& k) -> decltype(auto)
 {
     return detail::get_impl<decltype(v),decltype(k)>(std::forward<decltype(v)>(v),std::forward<decltype(k)>(k));
-};
+}
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 

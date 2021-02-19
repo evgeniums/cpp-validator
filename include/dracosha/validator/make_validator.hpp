@@ -30,10 +30,11 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
   @brief Create validator instance.
   @param fn Validation handler that will be embedded into validator instance.
 */
-BOOST_HANA_CONSTEXPR_LAMBDA auto make_validator = [](auto fn)
+template <typename T>
+auto make_validator(T fn)
 {
     return validator_t<decltype(fn)>(std::move(fn));
-};
+}
 
 //-------------------------------------------------------------
 

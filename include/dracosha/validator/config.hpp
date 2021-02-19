@@ -32,4 +32,10 @@ DRACOSHA_VALIDATOR_NAMESPACE_END
 
 #define DRACOSHA_VALIDATOR_NAMESPACE dracosha::validator
 
+#if __cplusplus >= 201703L
+    #define DRACOSHA_VALIDATOR_INLINE_LAMBDA inline
+#else
+    #define DRACOSHA_VALIDATOR_INLINE_LAMBDA static
+#endif
+
 #endif // DRACOSHA_VALIDATOR_CONFIG_HPP

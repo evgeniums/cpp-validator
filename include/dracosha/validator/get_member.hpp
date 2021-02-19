@@ -34,7 +34,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
   In most cases a reference will be returned except for the cases of properties that return rvalues, e.g. size() or empty().
 */
-BOOST_HANA_CONSTEXPR_LAMBDA auto get_member= [](auto&& v, auto&& path) -> decltype(auto)
+template <typename Tv, typename Tpath>
+auto get_member(Tv&& v, Tpath&& path) -> decltype(auto)
 {
     return hana::fold(std::forward<decltype(path)>(path),std::forward<decltype(v)>(v),
             [](auto&& field, auto&& key) -> decltype(auto)
@@ -42,7 +43,7 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto get_member= [](auto&& v, auto&& path) -> declty
                 return get(std::forward<decltype(field)>(field),std::forward<decltype(key)>(key));
             }
         );
-};
+}
 
 //-------------------------------------------------------------
 

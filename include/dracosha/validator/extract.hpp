@@ -32,13 +32,14 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
   @param v Argument can be plain value or lazy handler.
   @return Either input argument or result of handler evaluation if input is a lazy handler.
   */
-BOOST_HANA_CONSTEXPR_LAMBDA auto extract = [](auto&& v) ->decltype(auto)
+template <typename Tv>
+auto extract(Tv&& v) -> decltype(auto)
 {
   return hana::if_(hana::is_a<lazy_tag,decltype(v)>,
     [](auto&& x) -> decltype(auto) { return extract_operand(x()); },
     [](auto&& x) -> decltype(auto) { return extract_operand(std::forward<decltype(x)>(x)); }
   )(std::forward<decltype(v)>(v));
-};
+}
 
 //-------------------------------------------------------------
 

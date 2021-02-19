@@ -141,12 +141,21 @@ constexpr dispatcher_t dispatcher{};
 constexpr dispatcher_t validate_inline{};
 
 /**
-  @brief Dispatch validation.
-  */
-BOOST_HANA_CONSTEXPR_LAMBDA auto dispatch = [](auto&&... args) -> decltype(auto)
+ * @brief Validation dispatching functor.
+ */
+struct dispatch_t
 {
-    return dispatcher.invoke(std::forward<decltype(args)>(args)...);
+    template <typename ...Args>
+    constexpr auto operator () (Args&&... args) const
+    {
+        return dispatcher.invoke(std::forward<decltype(args)>(args)...);
+    }
 };
+
+/**
+  @brief Callable for validation dispatching.
+  */
+constexpr dispatch_t dispatch{};
 
 //-------------------------------------------------------------
 

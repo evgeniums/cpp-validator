@@ -75,13 +75,14 @@ class operand : public object_wrapper<T>
   @param v Input.
   @return Either v as is or v.get() if input is of operand_tag.
   */
-BOOST_HANA_CONSTEXPR_LAMBDA auto extract_operand = [](auto&& v) ->decltype(auto)
+template <typename Tv>
+auto extract_operand(Tv&& v) ->decltype(auto)
 {
   return hana::if_(hana::is_a<operand_tag,decltype(v)>,
     [](auto&& x) -> decltype(auto) { return x.get(); },
     [](auto&& x) -> decltype(auto) { return hana::id(std::forward<decltype(x)>(x)); }
   )(std::forward<decltype(v)>(v));
-};
+}
 
 //-------------------------------------------------------------
 

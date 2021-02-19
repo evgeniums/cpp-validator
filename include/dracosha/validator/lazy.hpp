@@ -46,10 +46,11 @@ struct lazy_t
   @brief Construct handler for deferred invokation.
   @param fn Handler that will be invoked later on demand.
 */
-BOOST_HANA_CONSTEXPR_LAMBDA auto lazy = [](auto&& fn)
+template <typename T>
+auto lazy(T&& fn) -> decltype(auto)
 {
     return lazy_t<decltype(fn)>{std::forward<decltype(fn)>(fn)};
-};
+}
 
 //-------------------------------------------------------------
 

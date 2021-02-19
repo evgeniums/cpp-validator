@@ -35,7 +35,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  *
  * Can be used both as function call notation AND(...) and as infix notation (... ^AND^ ...).
  */
-BOOST_HANA_CONSTEXPR_LAMBDA auto AND=hana::infix([](auto&& ...xs) -> decltype(auto)
+DRACOSHA_VALIDATOR_INLINE_LAMBDA auto AND=hana::infix([](auto&& ...xs) -> decltype(auto)
 {
     return make_validator(
                 hana::reverse_partial(
