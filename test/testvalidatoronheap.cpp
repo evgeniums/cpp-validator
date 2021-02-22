@@ -33,10 +33,11 @@ BOOST_AUTO_TEST_CASE(CheckValidation)
                 _["field1"](eq,1)
             );
     static_assert(std::is_same<decltype(v0n),decltype(v0.get())>::value,"Types of validator on heap and shared validator must match");
-    delete v0n;
 
     BOOST_CHECK(v0->apply(a1));
+    BOOST_CHECK(v0n->apply(m1));
 
+    delete v0n;
 
     auto v1=shared_validator(
                 _["field1"](gte,10)

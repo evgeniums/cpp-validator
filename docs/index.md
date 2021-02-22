@@ -321,6 +321,43 @@ auto v2=validator(
 ```
 The examples above define validation condition "size of variable is not equal to 3 AND field1 of variable must be equal to "value1" OR size of field1 of variable is less than 3" where *field1* is a member of variable, *value* is a pseudo [property](#property) standing for member *field1* of variable, *size* is a [property](#property), *ne*, *eq* and *lt* are [operators](#operator), *3*, *10*, *"value1"* are [operands](#operand), *\^OR\^* and *\^AND\^* are [aggregations](#aggregation).
 
+## Dynamically allocated validator
+
+Validators can be dynamically allocated on the memory heap. There are two forms of dynamically allocated validators:
+- raw pointer variables created with `new_validator()` helper;
+- shared pointer variables created with `shared_validator()` helper.
+
+See examples below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+    // create raw pointer validator
+    auto raw_pointer_validator=new_validator(
+                    _["field1"](eq,1)
+                );
+                
+    // create shared pointer validator
+    auto shared_pointer_validator=shared_validator(
+                    _["field1"](eq,1)
+                );
+    
+    // validate check_var with validators
+    std::map<std::string,size_t> check_var={{"field1",1}};
+
+    assert(raw_pointer_validator->apply(check_var));
+    assert(shared_pointer_validator->apply(check_var));
+    
+    // delete raw pointer validator
+    delete raw_pointer_validator;
+    
+    return 0;
+}
+```
+
 ## Using validator for data validation
 
 ### Post-validation
