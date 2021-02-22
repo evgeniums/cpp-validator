@@ -167,7 +167,7 @@ constexpr _t _{};
 struct wrap_validator
 {
     /**
-     * @brief Wrap list of validators or validation operators into logical AND.
+     * @brief Forward list of validators or validation operators to logical AND.
      * @param args Arguments to forward to AND.
      * @return Validator.
      */
@@ -220,9 +220,94 @@ struct wrap_validator
 };
 
 /**
+ * @brief Helper for wrapping validators on heap.
+ */
+struct wrap_validator_on_heap
+{
+    /**
+     * @brief Forward list of validators or validation operators to logical AND.
+     * @param args Arguments to forward to AND.
+     * @return Validator.
+     */
+    template <typename ... Args>
+    constexpr auto operator () (Args&& ...args) const -> decltype(auto)
+    {
+        return AND_on_heap(std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Make validator from a property validator.
+     * @param v Property validator.
+     * @return Validator.
+     */
+    template <typename T>
+    constexpr auto operator () (T&& v,
+                                std::enable_if_t<hana::is_a<property_validator_tag,T>,void*> =nullptr
+            ) const -> decltype(auto)
+    {
+        return make_validator_on_heap(std::forward<T>(v));
+    }
+
+    /**
+     * @brief Just syntax sugar, return validator or validation operator as is.
+     * @param v Validator or validation operator.
+     * @return Input validator as is.
+     */
+    template <typename T>
+    constexpr auto operator () (T&& v,
+                                std::enable_if_t<std::is_pointer<std::remove_reference_t<T>>::value
+                                                &&
+                                                hana::is_a<validator_tag,typename std::pointer_traits<std::remove_reference_t<T>>::element_type>
+                                                ,
+                                                void*> =nullptr
+            ) const -> decltype(auto)
+    {
+        return hana::id(std::forward<T>(v));
+    }
+
+    /**
+     * @brief Create validator form operator and operand.
+     * @param op Operator.
+     * @param b Operand.
+     * @return Validator.
+     */
+    template <typename OpT, typename T>
+    constexpr auto operator () (OpT&& op,
+                                T&& b,
+                                std::enable_if_t<hana::is_a<operator_tag,OpT>,void*> =nullptr
+            ) const
+    {
+        return make_validator_on_heap(value(std::forward<OpT>(op),std::forward<T>(b)));
+    }
+};
+
+/**
   @brief Callable object for creating or wrapping validators.
 */
 constexpr wrap_validator validator{};
+
+/**
+  @brief Callable object for creating or wrapping validators on heap.
+*/
+constexpr wrap_validator_on_heap new_validator{};
+
+/**
+ * @brief Helper for wrapping validators in shared pointer.
+ */
+struct shared_validator_t
+{
+    template <typename ... Args>
+    auto operator () (Args&& ...args) const
+    {
+        using pointer_type=decltype(new_validator(std::forward<Args>(args)...));
+        using element_type=typename std::pointer_traits<pointer_type>::element_type;
+        return std::shared_ptr<element_type>(new_validator(std::forward<Args>(args)...));
+    }
+};
+/**
+  @brief Callable object for wrapping validator in shared pointer.
+*/
+constexpr shared_validator_t shared_validator{};
 
 //-------------------------------------------------------------
 

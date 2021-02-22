@@ -36,6 +36,16 @@ auto make_validator(T fn)
     return validator_t<decltype(fn)>(std::move(fn));
 }
 
+/**
+  @brief Create validator instance on heap.
+  @param fn Validation handler that will be embedded into validator instance.
+*/
+template <typename T>
+auto make_validator_on_heap(T fn)
+{
+    return new validator_t<decltype(fn)>(std::move(fn));
+}
+
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

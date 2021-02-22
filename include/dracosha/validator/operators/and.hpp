@@ -45,6 +45,23 @@ DRACOSHA_VALIDATOR_INLINE_LAMBDA auto AND=hana::infix([](auto&& ...xs) -> declty
            );
 });
 
+/**
+ * @brief Helper to create logical pseudo operator AND on heap.
+ * @param xs Intermediate validators whose result must be forwarded to logical AND.
+ * @return Logical "and" of intermediate validator results.
+ *
+ */
+template <typename ... Args>
+auto AND_on_heap(Args&& ...xs) -> decltype(auto)
+{
+    return make_validator_on_heap(
+                hana::reverse_partial(
+                    detail::aggregate_and,
+                    hana::make_tuple(std::forward<decltype(xs)>(xs)...)
+                )
+           );
+}
+
 //-------------------------------------------------------------
 
 /**
