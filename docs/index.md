@@ -18,6 +18,7 @@
 			* [Object's member](#objects-member)
 			* [Property of object's member](#property-of-objects-member)
 			* [Mixed](#mixed)
+		* [Dynamically allocated validator](#dynamically-allocated-validator)
 	* [Using validator for data validation](#using-validator-for-data-validation)
 		* [Post-validation](#post-validation)
 			* [validate() without report and without exception](#validate-without-report-and-without-exception)
@@ -95,6 +96,8 @@
 * [Contributing](#contributing)
 
 [//]: # (TOC End)
+
+
 
 ----
 
@@ -321,7 +324,7 @@ auto v2=validator(
 ```
 The examples above define validation condition "size of variable is not equal to 3 AND field1 of variable must be equal to "value1" OR size of field1 of variable is less than 3" where *field1* is a member of variable, *value* is a pseudo [property](#property) standing for member *field1* of variable, *size* is a [property](#property), *ne*, *eq* and *lt* are [operators](#operator), *3*, *10*, *"value1"* are [operands](#operand), *\^OR\^* and *\^AND\^* are [aggregations](#aggregation).
 
-## Dynamically allocated validator
+### Dynamically allocated validator
 
 Validators can be dynamically allocated on the memory heap. There are two forms of dynamically allocated validators:
 - raw pointer variables created with `new_validator()` helper;
