@@ -19,6 +19,7 @@ SET(SOURCES
     ${VALIDATOR_TEST_SRC}/testsetvalidated.cpp
     ${VALIDATOR_TEST_SRC}/testhabrexamples_ru.cpp
     ${VALIDATOR_TEST_SRC}/testvalidatoronheap.cpp
+    ${VALIDATOR_TEST_SRC}/testinvokeandor.cpp
 )
 
 SET (HEADERS

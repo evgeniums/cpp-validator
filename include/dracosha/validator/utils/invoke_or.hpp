@@ -157,4 +157,9 @@ constexpr decltype(invoke_or_configurable<invoke_or_inverse_traits>) invoke_or_i
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
+#ifndef DCS_FN
+// wrap operation into lambda
+#define DCS_FN(fn) [&](){return fn;}
+#endif
+
 #endif // DRACOSHA_VALIDATOR_INVOKE_AND_HPP
