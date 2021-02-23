@@ -32,6 +32,33 @@ struct TestRefStruct
     }
 };
 
+BOOST_AUTO_TEST_CASE(CheckFoldAnd)
+{
+    auto f1=hana::partial([](bool in){return in;});
+    auto f2=hana::partial(f1,true);
+    auto f3=hana::partial(f1,false);
+
+    BOOST_CHECK(f2());
+    BOOST_CHECK(!f3());
+
+    auto f4=[](auto&& op)
+    {
+        return op();
+    };
+    auto f5=hana::partial(hana::partial(f4),f2);
+    BOOST_CHECK(f5());
+
+    auto f6=[](auto&& op1, auto&& op2)
+    {
+        return op1()&&op2();
+    };
+
+    auto fns=hana::make_tuple(f2,f3);
+    auto fnst=hana::transform(fns,[f4](auto&& fn){return hana::partial(f4,fn);});
+    BOOST_CHECK(!hana::fuse(f6)(fns));
+    BOOST_CHECK(!hana::fuse(f6)(fnst));
+}
+
 BOOST_AUTO_TEST_CASE(CheckGetRef)
 {
     std::map<size_t,TestRefStruct> m;

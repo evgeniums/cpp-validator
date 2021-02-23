@@ -27,11 +27,25 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/apply.hpp>
 #include <dracosha/validator/utils/is_container.hpp>
 #include <dracosha/validator/utils/wrap_it.hpp>
+#include <dracosha/validator/utils/invoke_and.hpp>
+#include <dracosha/validator/utils/invoke_or.hpp>
 #include <dracosha/validator/operators/exists.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
+
+/**
+ * @brief Traits to use with inverse_or_configurable in OR aggregations.
+ */
+struct invoke_or_validator_traits
+{
+    template <typename T>
+    static bool check(T&& ret) noexcept
+    {
+        return ret.value()==status::code::success;
+    }
+};
 
 /**
  * @brief Helper for ANY/ALL aggregation of non-container types.
@@ -229,16 +243,17 @@ struct default_adapter_impl
     template <typename AdapterT, typename OpsT>
     static status validate_and(AdapterT&& adpt, OpsT&& ops)
     {
-        return hana::fold(std::forward<decltype(ops)>(ops),true,
-                    [&adpt](status prevResult, auto&& op)
-                    {
-                        if (!prevResult)
-                        {
-                            return prevResult;
-                        }
-                        return status(apply(std::forward<AdapterT>(adpt),std::forward<decltype(op)>(op)));
-                    }
-                );
+        return hana::fuse(invoke_and)
+                    (hana::transform(
+                         ops,
+                         [&adpt](auto&& op)
+                         {
+                             return [&adpt,&op]()
+                             {
+                                 return status(apply(std::forward<AdapterT>(adpt),std::forward<decltype(op)>(op)));
+                             };
+                         }
+                    ));
     }
 
     /**
@@ -256,16 +271,17 @@ struct default_adapter_impl
         return hana::if_(check_member_path(obj,member.path),
             [&adpt,&member,&ops](auto&&)
             {
-                return hana::fold(std::forward<decltype(ops)>(ops),true,
-                            [&member,&adpt](status prevResult, auto&& op)
-                            {
-                                if (!prevResult)
-                                {
-                                    return prevResult;
-                                }
-                                return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
-                            }
-                        );
+                return hana::fuse(invoke_and)
+                            (hana::transform(
+                                 ops,
+                                 [&member,&adpt](auto&& op)
+                                 {
+                                     return [&member,&adpt,&op]()
+                                     {
+                                         return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+                                     };
+                                 }
+                            ));
             },
             [](auto&&)
             {
@@ -282,16 +298,18 @@ struct default_adapter_impl
     {
         auto ok=hana::value(hana::length(ops))==0
                 ||
-               hana::fold(std::forward<decltype(ops)>(ops),false,
-                    [&adpt](status prevResult, auto&& op)
-                    {
-                        if (prevResult.value()==status::code::success)
-                        {
-                            return prevResult;
-                        }
-                        return status(apply(std::forward<AdapterT>(adpt),std::forward<decltype(op)>(op)));
-                    }
-                );
+                hana::fuse(invoke_or_configurable<invoke_or_validator_traits>)
+                            (hana::transform(
+                                 ops,
+                                 [&adpt](auto&& op)
+                                 {
+                                     return [&adpt,&op]()
+                                     {
+                                         return status(apply(std::forward<AdapterT>(adpt),std::forward<decltype(op)>(op)));
+                                     };
+                                 }
+                            ))
+                ;
         return ok;
     }
 
@@ -307,16 +325,17 @@ struct default_adapter_impl
             {
                 return hana::value(hana::length(ops))==0
                         ||
-                       hana::fold(std::forward<decltype(ops)>(ops),false,
-                            [&adpt,&member](status prevResult, auto&& op)
-                            {
-                                if (prevResult.value()==status::code::success)
-                                {
-                                    return prevResult;
-                                }
-                                return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
-                            }
-                        );
+                        hana::fuse(invoke_or_configurable<invoke_or_validator_traits>)
+                        (hana::transform(
+                             ops,
+                             [&member,&adpt](auto&& op)
+                             {
+                                 return [&member,&adpt,&op]()
+                                 {
+                                     return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+                                 };
+                             }
+                        ));
             },
             [](auto&&)
             {
