@@ -19,6 +19,8 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_HANA_TO_STD_TUPLE_HPP
 #define DRACOSHA_VALIDATOR_HANA_TO_STD_TUPLE_HPP
 
+#include <boost/hana/ext/std/tuple.hpp>
+
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/make_types_tuple.hpp>
 
@@ -27,25 +29,21 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
-  @brief Wrapper for making std::tuple.
-*/
-struct make_std_tuple_t
-{
-    template <typename ...Args>
-    constexpr auto operator () (Args&&... args) const
-    {
-        return std::make_tuple(std::forward<decltype(args)>(args)...);
-    }
-};
-constexpr make_std_tuple_t make_std_tuple{};
-
-/**
   @brief Convert hana::tuple to std::tuple.
   */
 template <typename Ts>
 auto hana_to_std_tuple(Ts&& ts)
 {
-    return hana::unpack(std::forward<decltype(ts)>(ts),make_std_tuple);
+    return hana::to<hana::ext::std::tuple_tag>(std::forward<Ts>(ts));
+}
+
+/**
+  @brief Convert std::tuple to hana::tuple.
+  */
+template <typename Ts>
+auto std_to_hana_tuple(Ts&& ts)
+{
+    return hana::to_tuple(std::forward<Ts>(ts));
 }
 
 //-------------------------------------------------------------

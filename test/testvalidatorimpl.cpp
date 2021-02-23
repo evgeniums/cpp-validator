@@ -59,6 +59,20 @@ BOOST_AUTO_TEST_CASE(CheckFoldAnd)
     BOOST_CHECK(!hana::fuse(f6)(fnst));
 }
 
+BOOST_AUTO_TEST_CASE(CheckTupleConversions)
+{
+    auto std_tuple1=std::make_tuple(1,2,"hello");
+    auto hana_tuple1=hana::make_tuple(1,2,"hello");
+
+    auto hana_tuple2=std_to_hana_tuple(std_tuple1);
+    static_assert(std::is_same<decltype(hana_tuple1),decltype(hana_tuple2)>::value,"Invalid conversion type");
+    BOOST_CHECK(hana::equal(hana_tuple1,hana_tuple2));
+
+    auto std_tuple2=hana_to_std_tuple(hana_tuple1);
+    static_assert(std::is_same<decltype(std_tuple1),decltype(std_tuple2)>::value,"Invalid conversion type");
+    BOOST_CHECK(std_tuple1==std_tuple2);
+}
+
 BOOST_AUTO_TEST_CASE(CheckGetRef)
 {
     std::map<size_t,TestRefStruct> m;
