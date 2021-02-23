@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/adjust_storable_type.hpp>
 #include <dracosha/validator/utils/make_types_tuple.hpp>
+#include <dracosha/validator/utils/hana_to_std_tuple.hpp>
 #include <dracosha/validator/apply.hpp>
 #include <dracosha/validator/dispatcher.hpp>
 #include <dracosha/validator/properties.hpp>
@@ -268,9 +269,9 @@ struct member
     member()=default;
 
     /**
-     * @brief Ctor of nested member
-     * @param key Key of current member
-     * @param parent_path Path to parent member which is of previous (upper) level
+     * @brief Constructor of nested member.
+     * @param key Key of current member.
+     * @param parent_path Path to parent member which is of previous (upper) level.
      */
     template <typename T1, typename ParentPathTs>
     member(T1&& key, ParentPathTs&& parent_path,
@@ -279,9 +280,9 @@ struct member
     {}
 
     /**
-     * @brief Ctor of nested member
-     * @param key Key of current member
-     * @param parent_path Path to parent member which is of previous (upper) level
+     * @brief Constructor of nested member.
+     * @param key Key of current member.
+     * @param parent_path Path to parent member which is of previous (upper) level.
      */
     template <typename ParentPathTs>
     member(type key, ParentPathTs&& parent_path,
@@ -290,8 +291,8 @@ struct member
     {}
 
     /**
-     * @brief Ctor
-     * @param key Key of current member
+     * @brief Ctor.
+     * @param key Key of current member.
      */
     template <typename T1>
     member(T1&& key)
@@ -299,24 +300,24 @@ struct member
     {}
 
     /**
-     * @brief Constructor with path
-     * @param path Member's path
+     * @brief Constructor from path.
+     * @param path Member's path.
      */
     member(path_type path)
          : path(std::move(path))
     {}
 
     /**
-     * @brief Ctor with key of string type
-     * @param str Key of current member
+     * @brief Constructor from key of string type.
+     * @param str Key of current member.
      */
     member(std::string str)
          : path(hana::make_tuple(std::move(str)))
     {}
 
     /**
-     * @brief Check if path of this member is equal to path of other member
-     * @param other Other member
+     * @brief Check if path of this member is equal to path of other member.
+     * @param other Other member.
      */
     template <typename T1>
     bool isEqual(const T1& other) const
@@ -325,7 +326,17 @@ struct member
     }
 
     /**
-     * @brief Callable operator
+     * @brief Check if path of this member is equal to path of other member.
+     * @param other Other member.
+     */
+    template <typename T1>
+    bool equals(const T1& other) const
+    {
+        return hana::equal(path,other.path);
+    }
+
+    /**
+     * @brief Callable operator.
      */
     template <typename ... Args>
     auto operator() (Args&&... args)
@@ -334,9 +345,9 @@ struct member
     }
 
     /**
-     * @brief Make member of parent type
-     * @param path Path of new member
-     * @return Member of parent type
+     * @brief Make member of parent type.
+     * @param path Path of new member.
+     * @return Member of parent type.
      */
     template <typename PathT>
     static auto make_parent(PathT&& path)
@@ -345,9 +356,9 @@ struct member
     }
 
     /**
-     * @brief Make super member prepending new key to the path
-     * @param key First key of super member
-     * @return Member of super type
+     * @brief Make super member prepending new key to the path.
+     * @param key First key of super member.
+     * @return Member of super type.
      */
     template <typename KeyT>
     auto make_super(KeyT&& first_key) const
@@ -357,8 +368,8 @@ struct member
     }
 
     /**
-     * @brief Get the last key in the path corresponding to the member at current level
-     * @return Key of current member
+     * @brief Get the last key in the path corresponding to the member at current level.
+     * @return Key of current member.
      */
     const type& key() const
     {
@@ -366,8 +377,8 @@ struct member
     }
 
     /**
-     * @brief Append next level to member
-     * @param key Member key
+     * @brief Append next level to member.
+     * @param key Member key.
      */
     template <typename T1>
     constexpr auto operator [] (T1&& key) const -> decltype(auto)
@@ -379,13 +390,13 @@ struct member
     }
 
     /**
-     * @brief member does not have explicit name
+     * @brief member does not have explicit name.
      */
     constexpr static bool has_name = false;
 };
 
 /**
- * @brief Member with excplicit name
+ * @brief Member with excplicit name.
  */
 template <typename T1, typename T2, typename ...ParentPathT>
 struct member_with_name : public member<T2,ParentPathT...>
@@ -393,9 +404,9 @@ struct member_with_name : public member<T2,ParentPathT...>
     using base_type=member<T2,ParentPathT...>;
 
     /**
-     * @brief Constructor with name
-     * @param path Member's path
-     * @name name member's name
+     * @brief Constructor with name.
+     * @param path Member's path.
+     * @name name member's name.
      */
     template <typename Tt1>
     member_with_name(typename base_type::path_type path,
@@ -405,8 +416,8 @@ struct member_with_name : public member<T2,ParentPathT...>
     {}
 
     /**
-     * @brief Get member's name
-     * @return Name
+     * @brief Get member's name.
+     * @return Name.
      */
     auto name() const
     {
@@ -414,14 +425,14 @@ struct member_with_name : public member<T2,ParentPathT...>
     }
 
     /**
-     * @brief member_with_name has explicit name
+     * @brief member_with_name has explicit name.
      */
     constexpr static bool has_name = true;
 
     /**
-     * @brief Bind compound validator to current member
-     * @param v Prepared partial validator
-     * @return Prepared partial validator bound to current member
+     * @brief Bind compound validator to current member.
+     * @param v Prepared partial validator.
+     * @return Prepared partial validator bound to current member.
      */
     template <typename Tt1>
     constexpr auto operator () (Tt1&& v) const -> decltype(auto)
@@ -430,10 +441,10 @@ struct member_with_name : public member<T2,ParentPathT...>
     }
 
     /**
-     * @brief Bind plain operator to current member
-     * @param op Operator
-     * @param b Argument to forward to operator
-     * @return Prepared partial validator of "value" property bound to current member
+     * @brief Bind plain operator to current member.
+     * @param op Operator.
+     * @param b Argument to forward to operator.
+     * @return Prepared partial validator of "value" property bound to current member.
      */
     template <typename OpT, typename Tt1>
     constexpr auto operator () (OpT&& op, Tt1&& b) const -> decltype(auto)
@@ -444,18 +455,49 @@ struct member_with_name : public member<T2,ParentPathT...>
     std::decay_t<T1> _name;
 };
 
+/**
+ * @brief Create a member with name from basic member.
+ * @param member Basic member.
+ * @param name Member name.
+ * @return Basic name wrapped with name into member with name.
+ */
 template <typename MemberT, typename T>
 auto make_member_with_name(MemberT&& member, T&& name)
 {
     return member.template create_derived<member_with_name>(std::forward<T>(name),std::move(member.path));
 }
 
+/**
+ * @brief Create plain member with one key in path.
+ * @param key Member's key.
+ * @return Created member.
+ */
 template <typename T>
 constexpr auto make_plain_member(T&& key)
 {
     return member<
                 typename adjust_storable_type<std::decay_t<T>>::type
             >(std::forward<T>(key));
+}
+
+/**
+ * @brief Make member from path.
+ * @param path Member's path.
+ * @return Created member.
+ */
+template <typename Ts>
+auto make_member(Ts&& path)
+{
+    static_assert(std::tuple_size<decltype(hana_to_std_tuple(path))>::value!=0,"Path can not be empty");
+
+    return hana::fold(
+        hana::drop_front(path),
+        make_plain_member(hana::front(path)),
+        [](auto&& parent_member, auto&& next_key)
+        {
+            return parent_member[std::forward<decltype(next_key)>(next_key)];
+        }
+    );
 }
 
 namespace detail
@@ -504,9 +546,9 @@ auto member_helper_t<Args...>::operator ()
 }
 
 /**
-* @brief Extract path from a member
-* @param member Member
-* @return Member's path
+* @brief Extract path from a member.
+* @param member Member.
+* @return Member's path.
 */
 template <typename T>
 auto member_path(T&& member,
@@ -517,9 +559,9 @@ auto member_path(T&& member,
 }
 
 /**
-* @brief Stub to emulate extracting path fro a member for non-members
-* @param v Value
-* @return Value wrapped into hana::tuple
+* @brief Stub to emulate extracting path for non-members.
+* @param v Value,
+* @return Value wrapped into hana::tuple,
 */
 template <typename T>
 auto member_path(T&& v,

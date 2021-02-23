@@ -59,6 +59,19 @@ BOOST_AUTO_TEST_CASE(CheckFoldAnd)
     BOOST_CHECK(!hana::fuse(f6)(fnst));
 }
 
+BOOST_AUTO_TEST_CASE(CheckMakeMember)
+{
+    std::ignore=make_member(hana::make_tuple(1));
+    std::ignore=make_member(hana::make_tuple(1,1.0f,"hello"));
+    auto m3=make_member(hana::make_tuple(1,2,std::string("hi")));
+    std::ignore=make_member(std::make_tuple(1,1.0f,"hello"));
+
+    auto m3_1=_[1][2]["hi"];
+    BOOST_CHECK(m3.equals(m3_1));
+
+//    std::ignore=make_member(hana::tuple<>());
+}
+
 BOOST_AUTO_TEST_CASE(CheckTupleConversions)
 {
     auto std_tuple1=std::make_tuple(1,2,"hello");
