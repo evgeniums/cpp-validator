@@ -697,12 +697,4 @@ BOOST_AUTO_TEST_CASE(CheckMemberHelper)
     BOOST_CHECK(true);
 }
 
-/**
-
-@todo
-    Move to separate project.
-    Generate config file.
-    Remove legacy files.
-*/
-
 BOOST_AUTO_TEST_SUITE_END()
