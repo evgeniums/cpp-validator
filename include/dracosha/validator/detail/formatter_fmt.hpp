@@ -26,10 +26,10 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/hana_to_std_tuple.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
-
 namespace fmt
 {
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 /**
  * @brief Define fmt formatter of concrete_phrase.
