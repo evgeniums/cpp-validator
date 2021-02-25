@@ -4,6 +4,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <dracosha/validator/utils/make_types_tuple.hpp>
 #include <dracosha/validator/validator.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
@@ -69,7 +70,10 @@ BOOST_AUTO_TEST_CASE(CheckMakeMember)
     auto m3_1=_[1][2]["hi"];
     BOOST_CHECK(m3.equals(m3_1));
 
-//    std::ignore=make_member(hana::tuple<>());
+#if 0
+    // must fail
+    std::ignore=make_member(hana::tuple<>());
+#endif
 }
 
 BOOST_AUTO_TEST_CASE(CheckTupleConversions)
@@ -84,6 +88,10 @@ BOOST_AUTO_TEST_CASE(CheckTupleConversions)
     auto std_tuple2=hana_to_std_tuple(hana_tuple1);
     static_assert(std::is_same<decltype(std_tuple1),decltype(std_tuple2)>::value,"Invalid conversion type");
     BOOST_CHECK(std_tuple1==std_tuple2);
+
+    constexpr auto types1=make_types_tuple(float{10.0f},"hello",int{100});
+    constexpr auto types2=hana::tuple_t<float,const char*,int>;
+    static_assert(hana::equal(types1,types2),"");
 }
 
 BOOST_AUTO_TEST_CASE(CheckGetRef)

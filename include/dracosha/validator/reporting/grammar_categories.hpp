@@ -20,7 +20,6 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_GRAMMAR_CATEGORIES_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/utils/make_types_tuple.hpp>
 #include <dracosha/validator/utils/feature_bitmask.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN

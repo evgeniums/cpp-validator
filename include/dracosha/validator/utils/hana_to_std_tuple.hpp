@@ -22,7 +22,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include <boost/hana/ext/std/tuple.hpp>
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/utils/make_types_tuple.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
