@@ -29,7 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! @ingroup group-config
 //! Macro expanding to the major version of the library, i.e. the `x` in `x.y.z`.
-#define DRACOSHA_VALIDATOR_MAJOR_VERSION 1
+#define DRACOSHA_VALIDATOR_MAJOR_VERSION 2
 
 //! @ingroup group-config
 //! Macro expanding to the minor version of the library, i.e. the `y` in `x.y.z`.
@@ -37,7 +37,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! @ingroup group-config
 //! Macro expanding to the patch level of the library, i.e. the `z` in `x.y.z`.
-#define DRACOSHA_VALIDATOR_PATCH_VERSION 5
+#define DRACOSHA_VALIDATOR_PATCH_VERSION 0
 
 //! @ingroup group-config
 //! Macro expanding to the full version of the library, in hexadecimal
