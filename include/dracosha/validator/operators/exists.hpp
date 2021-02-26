@@ -48,6 +48,26 @@ struct exists_t
     {
         return check_exists(a,b);
     }
+
+    template <typename T>
+    constexpr bool operator == (const T&) const
+    {
+        return false;
+    }
+    constexpr bool operator == (const exists_t&) const
+    {
+        return true;
+    }
+
+    template <typename T>
+    constexpr bool operator != (const T& other) const
+    {
+        return true;
+    }
+    constexpr bool operator != (const exists_t&) const
+    {
+        return false;
+    }
 };
 
 /**

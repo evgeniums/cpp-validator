@@ -64,7 +64,7 @@ struct validate_t
             error_report& err
         ) const
     {
-        err._message.clear();
+        err.reset();
         err.set_value(validator.apply(
                           make_reporting_adapter(
                               std::forward<ObjectT>(obj),
@@ -108,7 +108,7 @@ struct validate_t
             error_report& err
         ) const
     {
-        err._message.clear();
+        err.reset();
         err.set_value(validator.apply(
                           make_single_member_adapter(
                               std::forward<MemberT>(member),

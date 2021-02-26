@@ -51,6 +51,9 @@ SET (HEADERS
     include/dracosha/validator/range.hpp
     include/dracosha/validator/error.hpp
     include/dracosha/validator/set_validated.hpp
+    include/dracosha/validator/unset_validated.hpp
+    include/dracosha/validator/resize_validated.hpp
+    include/dracosha/validator/clear_validated.hpp
 
     include/dracosha/validator/operators/operator.hpp
     include/dracosha/validator/operators/exists.hpp

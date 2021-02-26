@@ -30,7 +30,17 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 /**
  * @brief Tag for all operator clases.
  */
-struct operator_tag;
+struct operator_tag
+{
+    constexpr bool operator ==(const operator_tag&) const
+    {
+        return true;
+    }
+    constexpr bool operator !=(const operator_tag&) const
+    {
+        return false;
+    }
+};
 
 /**
  * @brief Base operator class.

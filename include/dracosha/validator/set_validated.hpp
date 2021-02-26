@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** @file validator/validate.hpp
+/** @file validator/set_validated.hpp
 *
 *  Defines "set_validated" helpers.
 *
@@ -26,7 +26,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 /**
  * @brief Default implementation of member setter that uses [] to set element of container.
  */
-template <typename ObjectT, typename MemberT, bool Enable=true>
+template <typename ObjectT, typename MemberT, typename Enable=void>
 struct set_member_t
 {
     template <typename ObjectT1, typename MemberT1, typename ValueT>
@@ -49,7 +49,7 @@ constexpr set_member_t<ObjectT,MemberT> set_member_inst{};
 /**
  * @brief Set object's member.
  * @param obj Object whose member to set.
- * @param member Member name, only single level members are supported.
+ * @param member Member name.
  * @param val Value to set.
  */
 template <typename ObjectT, typename MemberT, typename ValueT>
@@ -65,7 +65,7 @@ void set_member(
 /**
  * @brief Set object's member with pre-validation with validation result put in the last argument.
  * @param obj Object whose member to set.
- * @param member Member name, only single level members are supported.
+ * @param member Member name.
  * @param val Value to set.
  * @param validator Validator to use for validation.
  * @param err Validation result.
@@ -89,7 +89,7 @@ void set_validated(
 /**
  * @brief Set object's member with pre-validation with exception if validation fails.
  * @param obj Object whose member to set.
- * @param member Member name, only single level members are supported.
+ * @param member Member name.
  * @param val Value to set.
  * @param validator Validator to use for validation.
  *

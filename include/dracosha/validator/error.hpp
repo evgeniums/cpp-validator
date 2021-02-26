@@ -62,6 +62,11 @@ class error
             return _status;
         }
 
+        void reset()
+        {
+            _status.reset();
+        }
+
         /**
          * @brief Convert error to bool.
          * @return true if validation failed, false if validation succeded.
@@ -105,6 +110,12 @@ class error_report : public error
         std::string message() const
         {
             return _message;
+        }
+
+        void reset()
+        {
+            _message.clear();
+            error::reset();
         }
 
     private:

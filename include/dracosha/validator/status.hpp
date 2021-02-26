@@ -76,6 +76,11 @@ class status
             return _code;
         }
 
+        void reset(code value=code::success)
+        {
+            _code=value;
+        }
+
     private:
 
         code _code;

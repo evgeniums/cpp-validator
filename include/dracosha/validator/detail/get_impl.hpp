@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/can_get.hpp>
+#include <dracosha/validator/detail/take_address_of.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -93,6 +94,24 @@ struct get_t<T1,T2,
         return property(std::forward<T1>(v),std::forward<T2>(k));
     }
 };
+
+//! @todo Fix member notation of properties size and empty.
+#if 0
+/**
+ * @brief Get from take_address_of_stub_t.
+ */
+template <typename T1,typename T2>
+struct get_t<T1,T2,
+            hana::when<std::is_same<std::decay_t<T1>,take_address_of_stub_t>::value>
+        >
+{
+    template <typename ...Args>
+    void* operator () (Args&&...) const
+    {
+        return nullptr;
+    }
+};
+#endif
 
 /**
  * @brief Get using at(key) method.

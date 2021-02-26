@@ -355,6 +355,14 @@ struct member
     }
 
     /**
+     * @brief Create member of parent type.
+     */
+    auto parent() const
+    {
+        return make_parent(hana::drop_back(path));
+    }
+
+    /**
      * @brief Make super member prepending new key to the path.
      * @param key First key of super member.
      * @return Member of super type.
