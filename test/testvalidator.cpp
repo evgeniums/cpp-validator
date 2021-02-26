@@ -838,4 +838,22 @@ BOOST_AUTO_TEST_CASE(CheckContains)
     BOOST_CHECK(!v4.apply(a2));
 }
 
+BOOST_AUTO_TEST_CASE(CheckNestedSize)
+{
+    std::map<std::string,std::map<std::string,std::string>> m1={
+            {"field1",
+                {
+                    {"k1","v1"},{"k2","v2"},{"k3","v3"}
+                }
+            }
+        };
+    auto a1=make_default_adapter(m1);
+
+    auto v1=validator(
+                _["field1"][size](gte,2),
+                _["field1"]["k2"](gte,"v2")
+            );
+    BOOST_CHECK(v1.apply(a1));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
