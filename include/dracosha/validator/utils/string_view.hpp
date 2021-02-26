@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/utils/string_view.hpp
+/** @file validator/utils/string_view.hpp
 *
 *  Defines alias for string_view: boost::string_view is used for C++14 standard and std::string_view is used for C++17 and newer stansards.
 *

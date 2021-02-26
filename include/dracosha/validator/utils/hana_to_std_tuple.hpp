@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/utils/hana_to_std_tuple.hpp
+/** @file validator/utils/hana_to_std_tuple.hpp
 *
 *  Defines converter of hana::tuple to std::tuple.
 *

@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/properties/size.hpp
+/** @file validator/properties/size.hpp
 *
 *  Defines "empty" property.
 *

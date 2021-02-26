@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/logical_not.hpp
+/** @file validator/detail/logical_not.hpp
 *
 *  Defines negation of intermediate validator or validation operators using logical NOT.
 *

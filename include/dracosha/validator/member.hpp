@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/member.hpp
+/** @file validator/member.hpp
 *
 *  Defines generic descriptor of a member to be validated in objects.
 *

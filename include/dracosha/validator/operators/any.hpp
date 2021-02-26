@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operators/any.hpp
+/** @file validator/operators/any.hpp
 *
 *  Defines aggregation pseudo operator ANY.
 *

@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/make_validator.hpp
+/** @file validator/make_validator.hpp
 *
 *  Defines creator of validator instances.
 *

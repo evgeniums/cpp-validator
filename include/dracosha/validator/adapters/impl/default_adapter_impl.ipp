@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/default_adapter_impl.ipp
+/** @file validator/detail/default_adapter_impl.ipp
 *
 *  Defines implementation of some helpers for default adapter.
 *

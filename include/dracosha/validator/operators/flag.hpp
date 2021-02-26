@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operators/flag.hpp
+/** @file validator/operators/flag.hpp
 *
 * Defines flag operator for validation of booleans.
 */

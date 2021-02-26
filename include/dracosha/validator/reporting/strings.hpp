@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reporting/strings.hpp
+/** @file validator/reporting/strings.hpp
 *
 * Defines formatter of miscellaneous strings.
 *

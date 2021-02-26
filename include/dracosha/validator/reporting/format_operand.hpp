@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reporting/format_operand.hpp
+/** @file validator/reporting/format_operand.hpp
 *
 * Defines helper for operands formatting.
 *

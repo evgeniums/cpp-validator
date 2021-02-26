@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/master_sampler.hpp
+/** @file validator/master_sampler.hpp
 *
 *  Defines wrapper of master sample object.
 *

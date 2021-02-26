@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/utils/get_it.hpp
+/** @file validator/utils/get_it.hpp
 *
 *  Defines helper for getting value from container's iterator.
 *

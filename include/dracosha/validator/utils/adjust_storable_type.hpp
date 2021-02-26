@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/utils/adjust_storable_type.hpp
+/** @file validator/utils/adjust_storable_type.hpp
 *
 *  Defines helpers for adjusting types used as storable elements in tuples.
 *

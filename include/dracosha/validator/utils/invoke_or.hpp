@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/utils/invoke_or.hpp
+/** @file validator/utils/invoke_or.hpp
 *
 *  Defines helpers to sequantially call each callable in a tupple with OR disjunction.
 *

@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reporting/grammar_categories.hpp
+/** @file validator/reporting/grammar_categories.hpp
 *
 * Defines grammatical categories of words and phrases.
 *

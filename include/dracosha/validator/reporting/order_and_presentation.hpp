@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reporting/order_and_presentation.hpp
+/** @file validator/reporting/order_and_presentation.hpp
 *
 *  Defines helper that adjusts order and presentation of formatting.
 *

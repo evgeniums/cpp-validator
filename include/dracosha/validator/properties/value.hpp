@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/properties/value.hpp
+/** @file validator/properties/value.hpp
 *
 *  Defines special property "value" that serves as proxy wrapper to the object itself.
 *

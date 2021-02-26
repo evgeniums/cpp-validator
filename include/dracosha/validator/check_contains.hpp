@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/check_contains.hpp
+/** @file validator/check_contains.hpp
 *
 *  Defines helper for checking if object contains a member.
 *

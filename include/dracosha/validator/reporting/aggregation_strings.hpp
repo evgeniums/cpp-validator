@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reporting/aggregation_strings.hpp
+/** @file validator/reporting/aggregation_strings.hpp
 *
 *  Defines description helpers for aggregation operators.
 *

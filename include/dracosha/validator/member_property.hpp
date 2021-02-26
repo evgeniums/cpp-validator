@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/member_property.hpp
+/** @file validator/member_property.hpp
 *
 * Defines pair of a member with the member's property.
 *

@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operators/comparison.hpp
+/** @file validator/operators/comparison.hpp
 *
 *  Defines comparison operators eq, neq, gt, lt, gte, lte
 *

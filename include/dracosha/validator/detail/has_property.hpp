@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/has_property.hpp
+/** @file validator/detail/has_property.hpp
 *
 * Defines implementation of checking if object has a property.
 *

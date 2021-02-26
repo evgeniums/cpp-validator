@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/formatter_std.hpp
+/** @file validator/detail/formatter_std.hpp
 *
 *  Defines formatter that uses std::stringstream for strings formatting.
 *

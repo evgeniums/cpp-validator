@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operators/op_report_without_operand.hpp
+/** @file validator/operators/op_report_without_operand.hpp
 *
 * Defines base class for operators that swallow operands in reports.
 */

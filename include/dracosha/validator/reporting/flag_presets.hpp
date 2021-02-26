@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reporting/flag_presets.hpp
+/** @file validator/reporting/flag_presets.hpp
 *
 *  Defines some presets of flag descriptions.
 *

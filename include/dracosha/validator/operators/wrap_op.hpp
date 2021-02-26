@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operators/wrap_op.hpp
+/** @file validator/operators/wrap_op.hpp
 *
 *  Defines operator wrapper.
 *

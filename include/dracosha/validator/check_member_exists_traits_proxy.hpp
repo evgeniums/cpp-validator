@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/check_member_exists_traits_proxy.hpp
+/** @file validator/check_member_exists_traits_proxy.hpp
 *
 *  Defines proxy class for adapters using traits that inherits with_check_member_exists.
 *

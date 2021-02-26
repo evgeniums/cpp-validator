@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/can_get.hpp
+/** @file validator/can_get.hpp
 *
 *  Defines helpers for checking if a member can be obtained from the object.
 *

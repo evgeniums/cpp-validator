@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/aggregate_or.hpp
+/** @file validator/detail/aggregate_or.hpp
 *
 *  Defines aggregation of intermediate validators or validation operators using logical AND.
 *

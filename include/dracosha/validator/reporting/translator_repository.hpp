@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reporting/translator_repository.hpp
+/** @file validator/reporting/translator_repository.hpp
 *
 *   Defines repository of translators.
 *

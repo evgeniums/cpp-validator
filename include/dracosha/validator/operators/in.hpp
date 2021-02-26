@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operators/in.hpp
+/** @file validator/operators/in.hpp
 *
 *  Defines in/nin operators.
 *

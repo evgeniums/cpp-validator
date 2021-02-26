@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operators/number_patterns.hpp
+/** @file validator/operators/number_patterns.hpp
 *
 *  Defines operator to validate some number patterns in strings.
 *

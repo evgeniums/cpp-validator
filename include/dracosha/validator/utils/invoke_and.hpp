@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/utils/invoke_and.hpp
+/** @file validator/utils/invoke_and.hpp
 *
 *  Defines helpers to sequantially call each callable in a tupple with AND conjunction.
 *

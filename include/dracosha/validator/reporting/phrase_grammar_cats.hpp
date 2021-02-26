@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reporting/phrase_grammar_cats.hpp
+/** @file validator/reporting/phrase_grammar_cats.hpp
 *
 * Defines Helpers for working with grammar categories of phrases.
 *

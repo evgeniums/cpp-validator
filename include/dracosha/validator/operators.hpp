@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operators.hpp
+/** @file validator/operators.hpp
 *
 *  Includes headers with operators.
 *

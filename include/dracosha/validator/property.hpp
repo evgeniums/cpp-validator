@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/property.hpp
+/** @file validator/property.hpp
 *
 * Defines classes to work with properties.
 * Property can be either a class member method or a class member variable.

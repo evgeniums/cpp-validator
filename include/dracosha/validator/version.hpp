@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/version.hpp
+/** @file validator/version.hpp
 *
 *  Defines macros for tracking the version of the library.
 *

@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/adapters/impl/single_member_adapter_impl.hpp
+/** @file validator/adapters/impl/single_member_adapter_impl.hpp
 *
 *  Defines implementation of adapter for single member validation.
 *

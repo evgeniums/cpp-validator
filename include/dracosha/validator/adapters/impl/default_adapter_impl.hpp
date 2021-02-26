@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/adapters/impl/default_adapter_impl.hpp
+/** @file validator/adapters/impl/default_adapter_impl.hpp
 *
 *  Defines implementation of default adapter.
 *

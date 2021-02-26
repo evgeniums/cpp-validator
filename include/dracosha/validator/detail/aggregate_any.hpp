@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/aggregate_any.hpp
+/** @file validator/detail/aggregate_any.hpp
 *
 *  Defines ANY aggregation for validating if any element satisfies validation conditions.
 *

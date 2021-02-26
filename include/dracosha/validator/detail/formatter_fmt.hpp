@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/formatter_fmt.hpp
+/** @file validator/detail/formatter_fmt.hpp
 *
 *  Defines formatter that uses fmt library for strings formatting.
 *

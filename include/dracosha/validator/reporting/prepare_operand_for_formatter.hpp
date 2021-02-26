@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reporting/prepare_operand_for_formatter.hpp
+/** @file validator/reporting/prepare_operand_for_formatter.hpp
 *
 * Defines helper for preparing operand for formatter.
 *

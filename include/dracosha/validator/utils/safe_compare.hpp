@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/utils/safe_compare.hpp
+/** @file validator/utils/safe_compare.hpp
 *
 *  Defines type safe operators to compare values.
 *

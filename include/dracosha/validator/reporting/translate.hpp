@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reporting/translate.hpp
+/** @file validator/reporting/translate.hpp
 *
 * Defines helper for translating using object that can optionally have or not have translators.
 *

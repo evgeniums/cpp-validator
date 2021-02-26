@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reporting/reporter_with_object_name.hpp
+/** @file validator/reporting/reporter_with_object_name.hpp
 *
 *  Defines reporter with object name.
 *

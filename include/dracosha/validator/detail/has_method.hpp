@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/has_method.hpp
+/** @file validator/detail/has_method.hpp
 *
 *  Defines helpers to check if class has a specific method.
 *  Supports methods at(key), has(key), contains(key), find(key), isSet(key) and brackets operator [key].

@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/utils/object_wrapper.hpp
+/** @file validator/utils/object_wrapper.hpp
 *
 *  Defines object wrapper to use in adapters.
 *

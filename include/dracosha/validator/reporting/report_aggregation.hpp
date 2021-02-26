@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reporting/report_aggregation.hpp
+/** @file validator/reporting/report_aggregation.hpp
 *
 *  Defines descriptor of report aggregation.
 *

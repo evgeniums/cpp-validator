@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reporting/no_translator.hpp
+/** @file validator/reporting/no_translator.hpp
 *
 *   Defines translator stub.
 *

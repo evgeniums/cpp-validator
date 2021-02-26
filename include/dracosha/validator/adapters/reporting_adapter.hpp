@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/adapters/reporting_adapter.hpp
+/** @file validator/adapters/reporting_adapter.hpp
 *
 *  Defines reporting adapter.
 *

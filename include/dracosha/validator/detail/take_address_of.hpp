@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/take_address_of.hpp
+/** @file validator/detail/take_address_of.hpp
 *
 *  Defines helper for taking address of result returned from a function.
 *

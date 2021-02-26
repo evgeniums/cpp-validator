@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/check_member_path.hpp
+/** @file validator/check_member_path.hpp
 *
 *  Defines helpers for checking existance of member path in type of an object.
 *

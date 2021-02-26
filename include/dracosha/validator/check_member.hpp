@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/check_member.hpp
+/** @file validator/check_member.hpp
 *
 *  Defines helper for checking if object can be queried if it contains a member and deduce type of that member.
 *

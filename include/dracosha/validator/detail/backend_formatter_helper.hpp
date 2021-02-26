@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/backend_formatter_helper.hpp
+/** @file validator/detail/backend_formatter_helper.hpp
 *
 *  Defines helper for backend formatter.
 *

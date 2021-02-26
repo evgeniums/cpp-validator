@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/operators/invert_op.hpp
+/** @file validator/operators/invert_op.hpp
 *
 *  Defines invertion operator.
 *

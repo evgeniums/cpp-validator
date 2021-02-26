@@ -1,4 +1,4 @@
-/**
+\/**
 @copyright Evgeny Sidorov 2020
 
 Distributed under the Boost Software License, Version 1.0.
@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/validate.hpp
+/** @file validator/validate.hpp
 *
 *  Defines "set_validated" helpers.
 *

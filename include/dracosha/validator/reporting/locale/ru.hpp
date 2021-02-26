@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reporting/locale/ru.hpp
+/** @file validator/reporting/locale/ru.hpp
 *
 *   Defines strings for localization for Russian language.
 *

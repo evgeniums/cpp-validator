@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/utils/to_string.hpp
+/** @file validator/utils/to_string.hpp
 *
 * Defines helper for strings conversion.
 *

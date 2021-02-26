@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/reorder_and_present.hpp
+/** @file validator/detail/reorder_and_present.hpp
 *
 *  Defines helpers for adjusting strings order and presentation.
 *

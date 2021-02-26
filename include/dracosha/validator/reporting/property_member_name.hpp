@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/reporting/property_member_name.hpp
+/** @file validator/reporting/property_member_name.hpp
 *
 * Defines helper to format property of a member.
 *

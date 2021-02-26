@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/detail/dispatcher_impl.hpp
+/** @file validator/detail/dispatcher_impl.hpp
 *
 *  Defines implementation of validation dispatcher.
 *

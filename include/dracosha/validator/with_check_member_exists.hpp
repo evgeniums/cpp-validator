@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/with_check_member_exists.hpp
+/** @file validator/with_check_member_exists.hpp
 *
 *  Defines helper class for checking if member exists.
 *

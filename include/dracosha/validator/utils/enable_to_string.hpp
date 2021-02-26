@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** \file validator/utils/enable_to_string.hpp
+/** @file validator/utils/enable_to_string.hpp
 *
 *  Defines base template for types that can be string convertible using description.
 *
