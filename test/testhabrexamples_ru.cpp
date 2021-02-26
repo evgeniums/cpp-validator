@@ -282,14 +282,14 @@ BOOST_AUTO_TEST_CASE(CheckHabrexample8)
     error_report err;
 
     // запись валидного значение в свойство bar_value объекта foo_instance
-    set_validated(foo_instance,bar_value,"Hello world",v,err);
+    set_validated(foo_instance,_[bar_value],"Hello world",v,err);
     if (!err)
     {
         // свойство bar_value объекта foo_instance успешно записано
     }
 
     // попытка записи невалидного значение в свойство bar_value объекта foo_instance
-    set_validated(foo_instance,bar_value,"unknown",v,err);
+    set_validated(foo_instance,_[bar_value],"unknown",v,err);
     if (err)
     {
         // запись не удалась

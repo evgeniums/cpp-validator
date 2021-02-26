@@ -151,7 +151,7 @@ auto property(Tv&& val, Tp&& prop) -> decltype(auto)
 
 #define DRACOSHA_VALIDATOR_PROPERTY(prop) DRACOSHA_VALIDATOR_PROPERTY_FLAG(prop,nullptr,nullptr)
 
-#define DRACOSHA_VALIDATOR_PROPERTY_TYPE(prop) type_p_##prop
+#define DRACOSHA_VALIDATOR_PROPERTY_TYPE(prop) decltype(_[prop])
 
 //-------------------------------------------------------------
 

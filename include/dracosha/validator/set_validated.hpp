@@ -1,4 +1,4 @@
-\/**
+/**
 @copyright Evgeny Sidorov 2020
 
 Distributed under the Boost Software License, Version 1.0.
@@ -26,7 +26,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 /**
  * @brief Default implementation of member setter that uses [] to set element of container.
  */
-template <typename ObjectT, typename MemberT>
+template <typename ObjectT, typename MemberT, bool Enable=true>
 struct set_member_t
 {
     template <typename ObjectT1, typename MemberT1, typename ValueT>
@@ -36,7 +36,7 @@ struct set_member_t
             ValueT&& val
         ) const
     {
-        obj[std::forward<MemberT1>(member)]=std::forward<ValueT>(val);
+        obj[member.key()]=std::forward<ValueT>(val);
     }
 };
 
@@ -79,7 +79,7 @@ void set_validated(
         error_report& err
     )
 {
-    validate(_[member],val,std::forward<ValidatorT>(validator),err);
+    validate(member,val,std::forward<ValidatorT>(validator),err);
     if (!err)
     {
         set_member(obj,member,std::forward<ValueT>(val));

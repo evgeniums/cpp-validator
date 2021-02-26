@@ -76,24 +76,24 @@ BOOST_AUTO_TEST_CASE(CheckSetValidatedContainer)
 
     std::map<std::string,size_t> m;
 
-    set_validated(m,"field1",1000,v,err);
+    set_validated(m,_["field1"],1000,v,err);
     BOOST_CHECK(!err);
     BOOST_REQUIRE(m.find("field1")!=m.end());
     BOOST_CHECK_EQUAL(m["field1"],1000);
 
-    set_validated(m,"field1",50,v,err);
+    set_validated(m,_["field1"],50,v,err);
     BOOST_CHECK(err);
     BOOST_REQUIRE(m.find("field1")!=m.end());
     BOOST_CHECK_EQUAL(m["field1"],1000);
 
-    BOOST_CHECK_NO_THROW(set_validated(m,"field1",300,v));
+    BOOST_CHECK_NO_THROW(set_validated(m,_["field1"],300,v));
     BOOST_REQUIRE(m.find("field1")!=m.end());
     BOOST_CHECK_EQUAL(m["field1"],300);
 
-    BOOST_CHECK_THROW(set_validated(m,"field1",50,v),validation_error);
+    BOOST_CHECK_THROW(set_validated(m,_["field1"],50,v),validation_error);
     try
     {
-        set_validated(m,"field1",50,v);
+        set_validated(m,_["field1"],50,v);
     }
     catch (const validation_error& e)
     {
@@ -113,21 +113,21 @@ BOOST_AUTO_TEST_CASE(CheckSetValidatedProperty)
     error_report err;
     TestSetValidatorStruct val;
 
-    set_validated(val,field1,1000,v,err);
+    set_validated(val,_[field1],1000,v,err);
     BOOST_CHECK(!err);
     BOOST_CHECK_EQUAL(val.field1,1000);
 
-    set_validated(val,field1,50,v,err);
+    set_validated(val,_[field1],50,v,err);
     BOOST_CHECK(err);
     BOOST_CHECK_EQUAL(val.field1,1000);
 
-    BOOST_CHECK_NO_THROW(set_validated(val,field1,300,v));
+    BOOST_CHECK_NO_THROW(set_validated(val,_[field1],300,v));
     BOOST_CHECK_EQUAL(val.field1,300);
 
-    BOOST_CHECK_THROW(set_validated(val,field1,50,v),validation_error);
+    BOOST_CHECK_THROW(set_validated(val,_[field1],50,v),validation_error);
     try
     {
-        set_validated(val,field1,50,v);
+        set_validated(val,_[field1],50,v);
     }
     catch (const validation_error& e)
     {
