@@ -75,58 +75,50 @@ class single_member_adapter_impl
         {
             std::ignore=from_check_member;
 
-            //! @todo Support c++14 with boost::hana
-            if constexpr (std::is_same<std::decay_t<decltype(exists)>,std::decay_t<decltype(_member.key())>>::value)
-            {
-                if (filter_member(member[exists]))
+            // check [exists] suffix only
+            return hana::if_(
+                std::is_same<std::decay_t<decltype(exists)>,std::decay_t<decltype(_member.key())>>{},
+                [](auto&& self, auto&& adpt, auto&& member, auto&& b)
                 {
-                    return status::code::ignore;
-                }
-                const auto& value=extract(adpt.traits().get());
-                return b==value;
-            }
-            else
-            {
-                return status::code::ignore;
-            }
+                    if (self->filter_member(member[exists]))
+                    {
+                        return status(status::code::ignore);
+                    }
+                    const auto& value=extract(adpt.traits().get());
+                    return status(b==value);
+                },
+                [](auto&&...){return status::code::ignore;}
+            )(
+                this,
+                std::forward<decltype(adpt)>(adpt),
+                std::forward<decltype(member)>(member),
+                std::forward<decltype(b)>(b)
+            );
         }
 
-        template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
-        status validate_size(AdapterT&& adpt, MemberT&& member, PropT&&, OpT&& op, T2&& b) const
+        template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT, typename SizePropT>
+        status validate_size_property(AdapterT&& adpt, MemberT&& member, PropT&&, OpT&& op, T2&& b, SizePropT&& size_p) const
         {
-            //! @todo Support c++14 with boost::hana
-            if constexpr (std::is_same<std::decay_t<decltype(size)>,std::decay_t<PropT>>::value)
-            {
-                if (filter_member(member[size]))
+            return hana::if_(
+                std::is_same<std::decay_t<SizePropT>,std::decay_t<PropT>>{},
+                [](auto&& self, auto&& adpt, auto&& member, auto&& op, auto&& b, auto&& size_p)
                 {
-                    return status::code::ignore;
-                }
-                const auto& value=extract(adpt.traits().get());
-                return op(value,b);
-            }
-            else
-            {
-                return status::code::ignore;
-            }
-        }
-
-        template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
-        status validate_empty(AdapterT&& adpt, MemberT&& member, PropT&&, OpT&& op, T2&& b) const
-        {
-            //! @todo Support c++14 with boost::hana
-            if constexpr (std::is_same<std::decay_t<decltype(empty)>,std::decay_t<PropT>>::value)
-            {
-                if (filter_member(member[empty]))
-                {
-                    return status::code::ignore;
-                }
-                const auto& value=extract(adpt.traits().get());
-                return op(value,b);
-            }
-            else
-            {
-                return status::code::ignore;
-            }
+                    if (self->filter_member(member[std::forward<decltype(size_p)>(size_p)]))
+                    {
+                        return status(status::code::ignore);
+                    }
+                    const auto& value=extract(adpt.traits().get());
+                    return status(op(value,b));
+                },
+                [](auto&&...){return status::code::ignore;}
+            )(
+                this,
+                std::forward<decltype(adpt)>(adpt),
+                std::forward<decltype(member)>(member),
+                std::forward<decltype(op)>(op),
+                std::forward<decltype(b)>(b),
+                std::forward<decltype(size_p)>(size_p)
+            );
         }
 
         template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
@@ -134,7 +126,7 @@ class single_member_adapter_impl
         {
             const auto& obj=extract(adpt.traits().get());
 
-            // do not filter member for ALL/AMY aggregation
+            // do not filter member for ALL/ANY aggregation
             if (_skip_member_filter)
             {
                 return hana::if_(check_member_path(obj,member.path),
@@ -152,38 +144,82 @@ class single_member_adapter_impl
                 )(member.path);
             }
 
-            //! @todo Support c++14 with boost::hana
-            if constexpr (std::is_same<std::decay_t<decltype(size)>,std::decay_t<decltype(_member.key())>>::value)
-            {
-                return validate_size(std::forward<AdapterT>(adpt),std::forward<MemberT>(member),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
-            }
-            else if constexpr (std::is_same<std::decay_t<decltype(empty)>,std::decay_t<decltype(_member.key())>>::value)
-            {
-                return validate_empty(std::forward<AdapterT>(adpt),std::forward<MemberT>(member),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
-            }
-            else
-            {
-                // normal validation
-                return hana::eval_if(
-                            (
-                                (check_member_path_types(_member,member))
-                                &&
-                                has_property_fn(obj,prop)
-                             ),
-                    [this,&member,&adpt,&prop,&op,&b](auto&&)
-                    {
-                        if (filter_member(member))
+            // select execution path depending on the type of adapter's member key
+            return hana::if_(
+                std::is_same<std::decay_t<decltype(size)>,std::decay_t<decltype(_member.key())>>{},
+                [](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
+                {
+                    // check [size] member path suffix
+                    return self->validate_size_property(
+                                    std::forward<decltype(adpt)>(adpt),
+                                    std::forward<decltype(member)>(member),
+                                    std::forward<decltype(prop)>(prop),
+                                    std::forward<decltype(op)>(op),
+                                    std::forward<decltype(b)>(b),
+                                    size
+                                );
+                },
+                [&obj](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
+                {
+                    // check [empty] member path suffix
+                    return hana::if_(
+                        std::is_same<std::decay_t<decltype(empty)>,std::decay_t<decltype(self->_member.key())>>{},
+                        [](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
                         {
-                            return status(status::code::ignore);
+                            return self->validate_size_property(
+                                            std::forward<decltype(adpt)>(adpt),
+                                            std::forward<decltype(member)>(member),
+                                            std::forward<decltype(prop)>(prop),
+                                            std::forward<decltype(op)>(op),
+                                            std::forward<decltype(b)>(b),
+                                            empty
+                                        );
+                        },
+                        [&obj](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
+                        {
+                            // check member path as is
+                            return hana::eval_if(
+                                        (
+                                            (check_member_path_types(self->_member,member))
+                                            &&
+                                            has_property_fn(obj,prop)
+                                         ),
+                                [&self,&member,&adpt,&prop,&op,&b](auto&&)
+                                {
+                                    if (self->filter_member(member))
+                                    {
+                                        return status(status::code::ignore);
+                                    }
+                                    return self->validate_property(
+                                                std::forward<decltype(adpt)>(adpt),
+                                                std::forward<decltype(prop)>(prop),
+                                                std::forward<decltype(op)>(op),
+                                                std::forward<decltype(b)>(b)
+                                            );
+                                },
+                                [](auto&&)
+                                {
+                                    return status(status::code::ignore);
+                                }
+                            );
                         }
-                        return validate_property(std::forward<AdapterT>(adpt),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
-                    },
-                    [](auto&&)
-                    {
-                        return status(status::code::ignore);
-                    }
-                );
-            }
+                    )(
+                        std::forward<decltype(self)>(self),
+                        std::forward<decltype(adpt)>(adpt),
+                        std::forward<decltype(member)>(member),
+                        std::forward<decltype(prop)>(prop),
+                        std::forward<decltype(op)>(op),
+                        std::forward<decltype(b)>(b)
+                    );
+                }
+            )(
+                this,
+                std::forward<decltype(adpt)>(adpt),
+                std::forward<decltype(member)>(member),
+                std::forward<decltype(prop)>(prop),
+                std::forward<decltype(op)>(op),
+                std::forward<decltype(b)>(b)
+            );
         }
 
         template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
