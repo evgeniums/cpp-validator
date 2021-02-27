@@ -125,15 +125,6 @@ class prevalidation_adapter_impl
         status validate(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
         {
             const auto& obj=extract(adpt.traits().get());
-            if (_member_checked)
-            {
-                return validate_property(
-                            std::forward<AdapterT>(adpt),
-                            std::forward<PropT>(prop),
-                            std::forward<OpT>(op),
-                            std::forward<T2>(b)
-                        );
-            }
 
             // select execution path depending on the type of adapter's member key
             return hana::if_(
@@ -168,6 +159,16 @@ class prevalidation_adapter_impl
                         },
                         [&obj](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
                         {
+                            if (self->_member_checked)
+                            {
+                                return self->validate_property(
+                                            std::forward<decltype(adpt)>(adpt),
+                                            std::forward<decltype(prop)>(prop),
+                                            std::forward<decltype(op)>(op),
+                                            std::forward<decltype(b)>(b)
+                                        );
+                            }
+
                             // check member path as is
                             return hana::eval_if(
                                         (
