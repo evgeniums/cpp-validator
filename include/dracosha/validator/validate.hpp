@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/validators.hpp>
 #include <dracosha/validator/adapters/default_adapter.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
-#include <dracosha/validator/adapters/single_member_adapter.hpp>
+#include <dracosha/validator/prevalidation/prevalidation_adapter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -108,9 +108,8 @@ struct validate_t
             error_report& err
         ) const
     {
-        err.reset();
         err.set_value(validator.apply(
-                          make_single_member_adapter(
+                          make_prevalidation_adapter(
                               std::forward<MemberT>(member),
                               std::forward<ValueT>(val),
                               err._message

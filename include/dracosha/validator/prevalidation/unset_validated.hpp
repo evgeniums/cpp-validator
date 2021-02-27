@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** @file validator/unset_validated.hpp
+/** @file validator/prevalidation/unset_validated.hpp
 *
 *  Defines "unset_validated" helpers.
 *

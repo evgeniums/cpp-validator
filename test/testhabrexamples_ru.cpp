@@ -5,7 +5,7 @@
 
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/validate.hpp>
-#include <dracosha/validator/set_validated.hpp>
+#include <dracosha/validator/prevalidation/set_validated.hpp>
 #include <dracosha/validator/operators/lexicographical.hpp>
 #include <dracosha/validator/reporting/extend_translator.hpp>
 #include <dracosha/validator/reporting/locale/ru.hpp>

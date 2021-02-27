@@ -94,7 +94,7 @@ auto property(Tv&& val, Tp&& prop) -> decltype(auto)
                                                                 {}); \
     struct type_p_##prop \
     { \
-        using hana_tag=property_tag; \
+        using hana_tag=DRACOSHA_VALIDATOR_NAMESPACE::property_tag; \
         template <typename T> \
         constexpr static auto get(T&& v) -> decltype(auto) \
         { \

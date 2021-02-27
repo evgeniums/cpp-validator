@@ -15,10 +15,10 @@ SET (VALIDATOR_TEST_SOURCES
     ${VALIDATOR_TEST_SRC}/testregex.cpp
     ${VALIDATOR_TEST_SRC}/teststrnumbers.cpp
     ${VALIDATOR_TEST_SRC}/testvalidate.cpp
-    ${VALIDATOR_TEST_SRC}/testsetvalidated.cpp
     ${VALIDATOR_TEST_SRC}/testhabrexamples_ru.cpp
     ${VALIDATOR_TEST_SRC}/testvalidatoronheap.cpp
     ${VALIDATOR_TEST_SRC}/testinvokeandor.cpp
+    ${VALIDATOR_TEST_SRC}/testprevalidation.cpp
 )
 
 TARGET_SOURCES(${PROJECT_NAME} PUBLIC ${VALIDATOR_TEST_SOURCES})

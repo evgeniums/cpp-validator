@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** @file validator/resize_validated.hpp
+/** @file validator/prevalidation/resize_validated.hpp
 *
 *  Defines "resize_validated" helpers.
 *

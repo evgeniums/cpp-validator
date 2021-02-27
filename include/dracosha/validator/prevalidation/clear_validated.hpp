@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** @file validator/clear_validated.hpp
+/** @file validator/prevalidation/clear_validated.hpp
 *
 *  Defines "clear_validated" helpers.
 *
