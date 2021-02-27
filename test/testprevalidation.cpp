@@ -93,7 +93,7 @@ struct NonCopyable
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestPrevalidation)
-
+#if 1
 BOOST_AUTO_TEST_CASE(CheckPrevalidationReport)
 {
     std::string rep1;
@@ -305,62 +305,6 @@ BOOST_AUTO_TEST_CASE(CheckSampleObjectPrevalidationReport)
     rep1.clear();
 }
 
-#if 0
-BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
-{
-    std::map<std::string,std::map<size_t,std::string>> m1={
-            {"field1",
-             {
-                 {1,"value1"},
-                 {2,"value2"},
-                 {3,"value3"},
-                 {4,"value4000"}
-             }
-            },
-            {"field2",
-             {
-                 {10,"value10"},
-                 {20,"value20"},
-                 {30,"value30"},
-                 {40,"value400"}
-             }
-            }
-        };
-    std::string rep1;
-    auto sa1=make_prevalidation_adapter(_["field2"],m1,rep1);
-
-    auto v1=validator(
-                _["field1"](ANY(size(gte,9))),
-                _["field2"](ANY(size(gte,8)))
-            );
-    BOOST_CHECK(v1.apply(sa1));
-    rep1.clear();
-
-    auto v2=validator(
-                _["field1"](ALL(size(gte,9))),
-                _["field2"](ALL(size(gte,8)))
-            );
-    BOOST_CHECK(!v2.apply(sa1));
-    BOOST_CHECK_EQUAL(rep1,"size of each element of field2 must be greater than or equal to 8");
-    rep1.clear();
-
-    auto v3=validator(
-                _["field1"](ALL(size(gte,9))),
-                _["field2"](ANY(size(gte,8)))
-            );
-    BOOST_CHECK(v3.apply(sa1));
-    rep1.clear();
-
-    auto v4=validator(
-                _["field1"](ANY(size(gte,1000))),
-                _["field2"](ANY(value(gte,"zzz")))
-            );
-    BOOST_CHECK(!v4.apply(sa1));
-    BOOST_CHECK_EQUAL(rep1,"at least one element of field2 must be greater than or equal to zzz");
-    rep1.clear();
-}
-#endif
-
 BOOST_AUTO_TEST_CASE(CheckPropertyPrevalidation)
 {
     auto v=validator(
@@ -460,6 +404,77 @@ BOOST_AUTO_TEST_CASE(CheckSetValidatedObject)
     BOOST_CHECK_NO_THROW(obj3.SetX(200.0););
 
     BOOST_CHECK_THROW(obj3.SetX(1000.0);,validation_error);
+}
+#endif
+BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
+{
+    std::string rep1;
+
+    auto v0=validator(
+                _['a'](ALL(value(gte,9)))
+            );
+    auto pa0=make_prevalidation_adapter(_['a'],10,rep1);
+    BOOST_CHECK(v0.apply(pa0));
+    rep1.clear();
+
+    auto v1=validator(
+                _["field1"](ALL(value(gte,9))),
+                _["field2"](size(gte,100))
+            );
+    auto pa1=make_prevalidation_adapter(_["field1"],10,rep1);
+    BOOST_CHECK(v1.apply(pa1));
+    rep1.clear();
+
+    auto v2=validator(
+                _["field1"]["field1_1"](ALL(value(gte,9))),
+                _["field2"](size(gte,100))
+            );
+    auto pa2=make_prevalidation_adapter(_["field1"]["field1_1"],10,rep1);
+    BOOST_CHECK(v2.apply(pa2));
+    rep1.clear();
+
+    auto pa3=make_prevalidation_adapter(_["field1"]["field1_1"],5,rep1);
+    BOOST_CHECK(!v2.apply(pa3));
+    rep1.clear();
+
+    static_assert(is_container_t<std::vector<int>>::value,"");
+
+    auto pa4=make_prevalidation_adapter(_["field1"]["field1_1"],std::vector<int>{10,11,12},rep1);
+    v2.apply(pa4);
+    BOOST_CHECK(v2.apply(pa4));
+    rep1.clear();
+
+    auto pa5=make_prevalidation_adapter(_["field1"]["field1_1"],std::vector<int>{1},rep1);
+
+    static_assert(hana::is_a<prevalidation_adapter_tag,typename decltype(pa5)::type>,"");
+
+    std::vector<int> vec1{1};
+    auto a1=adapter_with_aggregation_iterator(
+        pa5,
+        vec1.begin()
+    );
+    BOOST_CHECK(a1.traits().next_adapter_impl().is_member_checked());
+
+    BOOST_CHECK(!v2.apply(pa5));
+    rep1.clear();
+
+    auto pa6=make_prevalidation_adapter(_["field1"]["field1_1"],std::vector<int>{10,11,12,1},rep1);
+    BOOST_CHECK(!v2.apply(pa6));
+    rep1.clear();
+
+    auto v3=validator(
+                _["field1"]["field1_1"](ANY(value(gte,9))),
+                _["field2"](size(gte,100))
+            );
+
+    BOOST_CHECK(v3.apply(pa2));
+    rep1.clear();
+    BOOST_CHECK(!v3.apply(pa3));
+    rep1.clear();
+    BOOST_CHECK(v3.apply(pa6));
+    rep1.clear();
+    BOOST_CHECK(!v3.apply(pa5));
+    rep1.clear();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

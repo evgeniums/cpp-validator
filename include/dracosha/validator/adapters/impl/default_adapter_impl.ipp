@@ -22,8 +22,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/member.hpp>
 #include <dracosha/validator/adapters/impl/default_adapter_impl.hpp>
+#include <dracosha/validator/adapters/adapter_with_aggregation_iterator.hpp>
 #include <dracosha/validator/operators/all.hpp>
 #include <dracosha/validator/operators/any.hpp>
+
+#include <dracosha/validator/prevalidation/prevalidation_adapter_tag.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -38,7 +41,13 @@ status aggregate_impl<T,
     for (auto it=container.begin();it!=container.end();++it)
     {
         auto el_member=member<decltype(wrap_it(it,string_all))>(wrap_it(it,string_all));
-        auto ret=apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),el_member);
+        auto ret=apply_member(
+                    adapter_with_aggregation_iterator(
+                        std::forward<AdapterT>(adpt),
+                        it
+                    ),
+                    std::forward<OpT>(op),
+                    el_member);
         if (!ret)
         {
             return ret;
@@ -56,7 +65,14 @@ status aggregate_impl<T,
     for (auto it=container.begin();it!=container.end();++it)
     {
         auto el_member=member[wrap_it(it,string_all)];
-        auto ret=apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),el_member);
+        auto ret=apply_member(
+                        adapter_with_aggregation_iterator(
+                            std::forward<AdapterT>(adpt),
+                            it
+                        ),
+                        std::forward<OpT>(op),
+                        el_member
+                    );
         if (!ret)
         {
             return ret;
@@ -75,7 +91,14 @@ status aggregate_impl<T,
     for (auto it=container.begin();it!=container.end();++it)
     {
         auto el_member=member<decltype(wrap_it(it,string_any))>(wrap_it(it,string_any));
-        auto ret=apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),el_member);
+        auto ret=apply_member(
+                        adapter_with_aggregation_iterator(
+                            std::forward<decltype(adpt)>(adpt),
+                            it
+                        ),
+                        std::forward<decltype(op)>(op),
+                        el_member
+                    );
         if (ret)
         {
             return ret;
@@ -99,7 +122,14 @@ status aggregate_impl<T,
     for (auto it=container.begin();it!=container.end();++it)
     {
         auto el_member=member[wrap_it(it,string_any)];
-        auto ret=apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),el_member);
+        auto ret=apply_member(
+                        adapter_with_aggregation_iterator(
+                            std::forward<decltype(adpt)>(adpt),
+                            it
+                        ),
+                        std::forward<decltype(op)>(op),
+                        el_member
+                    );
         if (ret)
         {
             return ret;

@@ -28,6 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/operators/exists.hpp>
 #include <dracosha/validator/member.hpp>
 #include <dracosha/validator/adapters/impl/default_adapter_impl.hpp>
+#include <dracosha/validator/prevalidation/prevalidation_adapter_tag.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -48,7 +49,7 @@ class prevalidation_adapter_impl
 
         prevalidation_adapter_impl(CheckMemberT&& member)
             :_member(std::forward<CheckMemberT>(member)),
-             _skip_member_filter(false)
+              _member_checked(false)
         {}
 
         template <typename AdapterT, typename T2, typename OpT>
@@ -123,23 +124,14 @@ class prevalidation_adapter_impl
         status validate(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
         {
             const auto& obj=extract(adpt.traits().get());
-
-            // do not filter member for ALL/ANY aggregation
-            if (_skip_member_filter)
+            if (_member_checked)
             {
-                return hana::if_(check_member_path(obj,member.path),
-                    [&obj,&prop,&op,&b](auto&& path)
-                    {
-                        return op(
-                                    property(get_member(obj,std::forward<decltype(path)>(path)),std::forward<PropT>(prop)),
-                                    extract(std::forward<T2>(b))
-                                );
-                    },
-                    [](auto&&)
-                    {
-                        return status();
-                    }
-                )(member.path);
+                return validate_property(
+                            std::forward<AdapterT>(adpt),
+                            std::forward<PropT>(prop),
+                            std::forward<OpT>(op),
+                            std::forward<T2>(b)
+                        );
             }
 
             // select execution path depending on the type of adapter's member key
@@ -303,14 +295,23 @@ class prevalidation_adapter_impl
         template <typename AdapterT, typename MemberT, typename OpT>
         status validate_any(AdapterT&& adpt, MemberT&& member, OpT&& op) const
         {
-            if (filter_member(member))
-            {
-                return status(status::code::ignore);
-            }
-            _skip_member_filter=true;
-            auto ret=default_adapter_impl::validate_any(std::forward<AdapterT>(adpt),std::forward<decltype(member)>(member),std::forward<OpT>(op));
-            _skip_member_filter=false;
-            return ret;
+            auto self=this;
+            return hana::eval_if(
+                check_member_path_types(_member,member),
+                [&self,&member,&adpt,&op](auto&&)
+                {
+                    if (self->filter_member(member))
+                    {
+                        return status(status::code::ignore);
+                    }
+                    const auto& obj=extract(adpt.traits().get());
+                    return aggregate_impl<decltype(obj)>::any(obj,std::forward<AdapterT>(adpt),member,std::forward<OpT>(op));
+                },
+                [](auto&&)
+                {
+                    return status(status::code::ignore);
+                }
+            );
         }
 
         template <typename AdapterT, typename OpT>
@@ -322,14 +323,37 @@ class prevalidation_adapter_impl
         template <typename AdapterT, typename MemberT, typename OpT>
         status validate_all(AdapterT&& adpt, MemberT&& member, OpT&& op) const
         {
-            if (filter_member(member))
-            {
-                return status(status::code::ignore);
-            }
-            _skip_member_filter=true;
-            auto ret=default_adapter_impl::validate_all(std::forward<AdapterT>(adpt),std::forward<decltype(member)>(member),std::forward<OpT>(op));
-            _skip_member_filter=false;
-            return ret;
+            auto self=this;
+            return hana::eval_if(
+                check_member_path_types(_member,member),
+                [&self,&member,&adpt,&op](auto&&)
+                {
+                    if (self->filter_member(member))
+                    {
+                        return status(status::code::ignore);
+                    }
+                    const auto& obj=extract(adpt.traits().get());
+                    return aggregate_impl<decltype(obj)>::all(obj,std::forward<AdapterT>(adpt),member,std::forward<OpT>(op));
+                },
+                [](auto&&)
+                {
+                    return status(status::code::ignore);
+                }
+            );
+        }
+
+        const auto& member() const
+        {
+            return _member;
+        }
+
+        void set_member_checked(bool enable) noexcept
+        {
+            _member_checked=enable;
+        }
+        bool is_member_checked() const noexcept
+        {
+            return _member_checked;
         }
 
     private:
@@ -337,15 +361,11 @@ class prevalidation_adapter_impl
         template <typename MemberT>
         bool filter_member(const MemberT& member) const noexcept
         {
-            if (!_skip_member_filter && !_member.isEqual(member))
-            {
-                return true;
-            }
-            return false;
+            return !_member.isEqual(member);
         }
 
         CheckMemberT _member;
-        mutable bool _skip_member_filter;
+        mutable bool _member_checked;
 };
 
 //-------------------------------------------------------------

@@ -84,6 +84,7 @@ SET (HEADERS
     include/dracosha/validator/adapters/default_adapter.hpp
     include/dracosha/validator/adapters/reporting_adapter.hpp
     include/dracosha/validator/adapters/single_member_adapter.hpp
+    include/dracosha/validator/adapters/adapter_with_aggregation_iterator.hpp
     include/dracosha/validator/adapters/impl/default_adapter_impl.hpp
     include/dracosha/validator/adapters/impl/reporting_adapter_impl.hpp
     include/dracosha/validator/adapters/impl/single_member_adapter_impl.hpp
@@ -127,6 +128,7 @@ SET (HEADERS
     include/dracosha/validator/prevalidation/unset_validated.hpp
     include/dracosha/validator/prevalidation/resize_validated.hpp
     include/dracosha/validator/prevalidation/clear_validated.hpp
+    include/dracosha/validator/prevalidation/prevalidation_adapter_tag.hpp
     include/dracosha/validator/prevalidation/prevalidation_adapter.hpp
     include/dracosha/validator/prevalidation/prevalidation_adapter_impl.hpp
 

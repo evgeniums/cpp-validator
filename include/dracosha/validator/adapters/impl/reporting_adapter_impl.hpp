@@ -51,6 +51,16 @@ class reporting_adapter_impl
         ) : _reporter(std::forward<ReporterT>(reporter))
         {}
 
+        const auto& next_adapter_impl() const
+        {
+            return _next_adapter_impl;
+        }
+
+        auto& next_adapter_impl()
+        {
+            return _next_adapter_impl;
+        }
+
         template <typename AdapterT, typename T2, typename OpT>
         status validate_operator(AdapterT&& adpt, OpT&& op, T2&& b)
         {

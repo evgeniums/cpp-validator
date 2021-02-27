@@ -19,7 +19,10 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_IS_CONTAINER_HPP
 #define DRACOSHA_VALIDATOR_IS_CONTAINER_HPP
 
+#include <string>
+
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/utils/string_view.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -81,6 +84,7 @@ struct is_container_t<T,
             hana::when<
                 has_begin<T>::value && has_end<T>::value
                 && !std::is_same<std::decay_t<T>,std::string>::value
+                && !std::is_same<std::decay_t<T>,string_view>::value
             >
         >
 {

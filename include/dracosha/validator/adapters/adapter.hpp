@@ -40,6 +40,7 @@ class adapter
     public:
 
         using hana_tag=adapter_tag;
+        using type=TraitsT;
 
         /**
          * @brief Conctructor.

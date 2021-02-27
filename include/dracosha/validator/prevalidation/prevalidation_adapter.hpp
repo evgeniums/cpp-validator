@@ -25,7 +25,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/adapters/adapter.hpp>
 #include <dracosha/validator/reporting/reporter.hpp>
 #include <dracosha/validator/adapters/impl/reporting_adapter_impl.hpp>
+#include <dracosha/validator/adapters/adapter_with_aggregation_iterator.hpp>
 #include <dracosha/validator/prevalidation/prevalidation_adapter_impl.hpp>
+#include <dracosha/validator/prevalidation/prevalidation_adapter_tag.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -39,6 +41,8 @@ class prevalidation_adapter_traits : public object_wrapper<T>,
                                      public reporting_adapter_impl<ReporterT,prevalidation_adapter_impl<MemberT>>
 {
     public:
+
+        using hana_tag=prevalidation_adapter_tag;
 
         /**
          * @brief Constructor
@@ -120,6 +124,28 @@ auto make_prevalidation_adapter(
 {
     return make_prevalidation_adapter(std::forward<MemberT>(member),adjust_view_type(std::forward<T>(val)),make_reporter(dst));
 }
+
+template <typename AdapterT, typename IteratorT>
+struct adapter_with_aggregation_iterator_t<AdapterT,IteratorT,
+                                            hana::when<hana::is_a<prevalidation_adapter_tag,typename AdapterT::type>>
+                                          >
+{
+    template <typename AdapterT1, typename IteratorT1>
+    auto operator() (AdapterT1&& adapter, IteratorT1&& it) const
+    {
+        // cleanup traits type
+        auto& traits=std::add_lvalue_reference_t<std::decay_t<decltype(adapter.traits())>>(adapter.traits());
+
+        // create adapter with iterator element
+        auto res=make_prevalidation_adapter(traits.next_adapter_impl().member(),*it,traits.reporter());
+
+        // set member_checked flag
+        res.traits().next_adapter_impl().set_member_checked(true);
+
+        // done
+        return res;
+    }
+};
 
 //-------------------------------------------------------------
 
