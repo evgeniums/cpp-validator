@@ -48,7 +48,7 @@ class object_wrapper
          * @brief Get const reference to object.
          * @return Constant reference to wrapped object.
          */
-        constexpr const std::remove_reference_t<T>& get() const
+        constexpr const std::remove_reference_t<T>& get() const noexcept
         {
             return _obj;
         }
@@ -57,9 +57,17 @@ class object_wrapper
          * @brief Get reference to object.
          * @return Reference to wrapped object.
          */
-        std::remove_reference_t<T>& get()
+        std::remove_reference_t<T>& get() noexcept
         {
             return _obj;
+        }
+
+        /**
+          Return embedded object "as is".
+        **/
+        auto id() noexcept -> decltype(auto)
+        {
+            return hana::id(_obj);
         }
 
     private:

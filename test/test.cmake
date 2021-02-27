@@ -1,4 +1,7 @@
 SET (VALIDATOR_TEST_SOURCES
+
+    ${VALIDATOR_TEST_SRC}/testprevalidation.cpp
+
     ${VALIDATOR_TEST_SRC}/testvalidatorimpl.cpp
     ${VALIDATOR_TEST_SRC}/testvalidator.cpp
     ${VALIDATOR_TEST_SRC}/testreporter.cpp
@@ -18,14 +21,13 @@ SET (VALIDATOR_TEST_SOURCES
     ${VALIDATOR_TEST_SRC}/testhabrexamples_ru.cpp
     ${VALIDATOR_TEST_SRC}/testvalidatoronheap.cpp
     ${VALIDATOR_TEST_SRC}/testinvokeandor.cpp
-    ${VALIDATOR_TEST_SRC}/testprevalidation.cpp
 )
 
 TARGET_SOURCES(${PROJECT_NAME} PUBLIC ${VALIDATOR_TEST_SOURCES})
 
 IF (MINGW)
     # Fix string table overflow when compiling in debug mode
-#    SET_SOURCE_FILES_PROPERTIES(${VALIDATOR_TEST_SOURCES} PROPERTIES COMPILE_FLAGS -Og)
+    SET_SOURCE_FILES_PROPERTIES(${VALIDATOR_TEST_SOURCES} PROPERTIES COMPILE_FLAGS -Og)
 ENDIF (MINGW)
 
 FUNCTION(TestValidator)

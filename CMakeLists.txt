@@ -131,6 +131,7 @@ SET (HEADERS
     include/dracosha/validator/prevalidation/prevalidation_adapter_tag.hpp
     include/dracosha/validator/prevalidation/prevalidation_adapter.hpp
     include/dracosha/validator/prevalidation/prevalidation_adapter_impl.hpp
+    include/dracosha/validator/prevalidation/strict_any.hpp
 
     include/dracosha/validator/detail/has_method.hpp
     include/dracosha/validator/detail/has_property.hpp

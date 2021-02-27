@@ -48,8 +48,9 @@ class prevalidation_adapter_impl
     public:
 
         prevalidation_adapter_impl(CheckMemberT&& member)
-            :_member(std::forward<CheckMemberT>(member)),
-              _member_checked(false)
+            : _member(std::forward<CheckMemberT>(member)),
+              _member_checked(false),
+              _strict_any(false)
         {}
 
         template <typename AdapterT, typename T2, typename OpT>
@@ -289,12 +290,22 @@ class prevalidation_adapter_impl
         template <typename AdapterT, typename OpT>
         status validate_any(AdapterT&& adpt, OpT&& op) const
         {
+            if (!_strict_any)
+            {
+                return status(status::code::ignore);
+            }
+
             return default_adapter_impl::validate_any(std::forward<AdapterT>(adpt),std::forward<OpT>(op));
         }
 
         template <typename AdapterT, typename MemberT, typename OpT>
         status validate_any(AdapterT&& adpt, MemberT&& member, OpT&& op) const
         {
+            if (!_strict_any)
+            {
+                return status(status::code::ignore);
+            }
+
             auto self=this;
             return hana::eval_if(
                 check_member_path_types(_member,member),
@@ -356,6 +367,15 @@ class prevalidation_adapter_impl
             return _member_checked;
         }
 
+        void set_strict_any(bool enable) noexcept
+        {
+            _strict_any=enable;
+        }
+        bool is_strict_any() const noexcept
+        {
+            return _strict_any;
+        }
+
     private:
 
         template <typename MemberT>
@@ -366,6 +386,7 @@ class prevalidation_adapter_impl
 
         CheckMemberT _member;
         mutable bool _member_checked;
+        bool _strict_any;
 };
 
 //-------------------------------------------------------------

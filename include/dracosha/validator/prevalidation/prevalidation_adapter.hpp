@@ -28,6 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/adapters/adapter_with_aggregation_iterator.hpp>
 #include <dracosha/validator/prevalidation/prevalidation_adapter_impl.hpp>
 #include <dracosha/validator/prevalidation/prevalidation_adapter_tag.hpp>
+#include <dracosha/validator/prevalidation/strict_any.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -36,8 +37,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 /**
  * @brief Traits of prevalidation adapter.
  */
-template <typename MemberT, typename T, typename ReporterT>
-class prevalidation_adapter_traits : public object_wrapper<T>,
+template <typename MemberT, typename T, typename ReporterT, typename WrappedT>
+class prevalidation_adapter_traits : public object_wrapper<WrappedT>,
                                      public reporting_adapter_impl<ReporterT,prevalidation_adapter_impl<MemberT>>
 {
     public:
@@ -51,11 +52,11 @@ class prevalidation_adapter_traits : public object_wrapper<T>,
          * @param reporter Reporter to use for report construction if validation fails
          */
         prevalidation_adapter_traits(
-                    adapter<prevalidation_adapter_traits<MemberT,T,ReporterT>>&,
+                    adapter<prevalidation_adapter_traits<MemberT,T,ReporterT,WrappedT>>&,
                     MemberT&& member,
                     T&& val,
                     ReporterT&& reporter
-                ) : object_wrapper<T>(std::forward<T>(val)),
+                ) : object_wrapper<WrappedT>(std::forward<T>(val)),
                     reporting_adapter_impl<ReporterT,prevalidation_adapter_impl<MemberT>>(
                         std::forward<ReporterT>(reporter),
                         std::forward<MemberT>(member)
@@ -66,8 +67,8 @@ class prevalidation_adapter_traits : public object_wrapper<T>,
 /**
  * @brief Prevalidation adapter to validate single member before update.
  */
-template <typename MemberT, typename T, typename ReporterT>
-class prevalidation_adapter : public adapter<prevalidation_adapter_traits<MemberT,T,ReporterT>>
+template <typename MemberT, typename T, typename ReporterT, typename WrappedT=T>
+class prevalidation_adapter : public adapter<prevalidation_adapter_traits<MemberT,T,ReporterT,WrappedT>>
 {
     public:
 
@@ -83,7 +84,7 @@ class prevalidation_adapter : public adapter<prevalidation_adapter_traits<Member
                 MemberT&& member,
                 T&& val,
                 ReporterT&& reporter
-            ) : adapter<prevalidation_adapter_traits<MemberT,T,ReporterT>>(std::forward<MemberT>(member),std::forward<T>(val),std::forward<ReporterT>(reporter))
+            ) : adapter<prevalidation_adapter_traits<MemberT,T,ReporterT,WrappedT>>(std::forward<MemberT>(member),std::forward<T>(val),std::forward<ReporterT>(reporter))
         {}
 };
 
@@ -99,11 +100,33 @@ auto make_prevalidation_adapter(
                             T&& val,
                             ReporterT&& reporter,
                             std::enable_if_t<
-                                    hana::is_a<reporter_tag,ReporterT>,
+                                    hana::is_a<reporter_tag,ReporterT> && !hana::is_a<strict_any_tag,T>,
                                     void*>
                             =nullptr)
 {
-    return prevalidation_adapter<MemberT,T,ReporterT>(std::forward<MemberT>(member),adjust_view_type(std::forward<T>(val)),std::forward<ReporterT>(reporter));
+    using value_type=decltype(adjust_view_type(std::forward<T>(val)));
+    return prevalidation_adapter<MemberT,value_type,ReporterT>(std::forward<MemberT>(member),adjust_view_type(std::forward<T>(val)),std::forward<ReporterT>(reporter));
+}
+
+/**
+ * @brief Create prevalidation adapter.
+ * @param member Member to validate.
+ * @param val Value to validate with.
+ * @param reporter Reporter to use for report construction if validation fails.
+ */
+template <typename MemberT, typename T, typename ReporterT>
+auto make_prevalidation_adapter(
+                            MemberT&& member,
+                            T&& val,
+                            ReporterT&& reporter,
+                            std::enable_if_t<
+                                    hana::is_a<reporter_tag,ReporterT> && hana::is_a<strict_any_tag,T>,
+                                    void*>
+                            =nullptr)
+{
+    auto res=prevalidation_adapter<MemberT,T,ReporterT,typename std::decay_t<T>::type>(std::forward<MemberT>(member),std::forward<T>(val),std::forward<ReporterT>(reporter));
+    res.traits().next_adapter_impl().set_strict_any(true);
+    return res;
 }
 
 /**
@@ -122,7 +145,7 @@ auto make_prevalidation_adapter(
                                     void*>
                             =nullptr)
 {
-    return make_prevalidation_adapter(std::forward<MemberT>(member),adjust_view_type(std::forward<T>(val)),make_reporter(dst));
+    return make_prevalidation_adapter(std::forward<MemberT>(member),std::forward<T>(val),make_reporter(dst));
 }
 
 template <typename AdapterT, typename IteratorT>
