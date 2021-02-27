@@ -256,6 +256,22 @@ struct default_adapter_impl
                     ));
     }
 
+    template <typename AdapterT, typename MemberT, typename OpsT>
+    static status validate_member_and(AdapterT&& adpt, MemberT&& member, OpsT&& ops)
+    {
+        return hana::fuse(invoke_and)
+                    (hana::transform(
+                         ops,
+                         [&member,&adpt](auto&& op)
+                         {
+                             return [&member,&adpt,&op]()
+                             {
+                                 return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+                             };
+                         }
+                    ));
+    }
+
     /**
      * @brief Validate a member using AND aggregation.
      */
@@ -271,17 +287,11 @@ struct default_adapter_impl
         return hana::if_(check_member_path(obj,member.path),
             [&adpt,&member,&ops](auto&&)
             {
-                return hana::fuse(invoke_and)
-                            (hana::transform(
-                                 ops,
-                                 [&member,&adpt](auto&& op)
-                                 {
-                                     return [&member,&adpt,&op]()
-                                     {
-                                         return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
-                                     };
-                                 }
-                            ));
+                return validate_member_and(
+                            std::forward<decltype(adpt)>(adpt),
+                            std::forward<decltype(member)>(member),
+                            std::forward<decltype(ops)>(ops)
+                          );
             },
             [](auto&&)
             {
@@ -313,6 +323,24 @@ struct default_adapter_impl
         return ok;
     }
 
+    template <typename AdapterT, typename MemberT, typename OpsT>
+    static status validate_member_or(AdapterT&& adpt, MemberT&& member, OpsT&& ops)
+    {
+        return hana::value(hana::length(ops))==0
+                ||
+                hana::fuse(invoke_or_configurable<invoke_or_validator_traits>)
+                (hana::transform(
+                     ops,
+                     [&member,&adpt](auto&& op)
+                     {
+                         return [&member,&adpt,&op]()
+                         {
+                             return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+                         };
+                     }
+                ));
+    }
+
     /**
      * @brief Validate a member using OR aggregation.
      */
@@ -323,19 +351,11 @@ struct default_adapter_impl
         return hana::if_(check_member_path(obj,member.path),
             [&adpt,&member,&ops](auto&&)
             {
-                return hana::value(hana::length(ops))==0
-                        ||
-                        hana::fuse(invoke_or_configurable<invoke_or_validator_traits>)
-                        (hana::transform(
-                             ops,
-                             [&member,&adpt](auto&& op)
-                             {
-                                 return [&member,&adpt,&op]()
-                                 {
-                                     return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
-                                 };
-                             }
-                        ));
+                return validate_member_or(
+                            std::forward<decltype(adpt)>(adpt),
+                            std::forward<decltype(member)>(member),
+                            std::forward<decltype(ops)>(ops)
+                          );
             },
             [](auto&&)
             {

@@ -259,18 +259,7 @@ class prevalidation_adapter_impl
             {
                 return status(status::code::ignore);
             }
-            return hana::fold(std::forward<decltype(ops)>(ops),true,
-                        [&member,&adpt](status prevResult, auto&& op)
-                        {
-                            if (!prevResult)
-                            {
-                                return prevResult;
-                            }
-                            return status(
-                                apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member))
-                            );
-                        }
-                    );
+            return default_adapter_impl::validate_member_and(std::forward<AdapterT>(adpt),std::forward<MemberT>(member),std::forward<OpsT>(ops));
         }
 
         template <typename AdapterT, typename OpsT>
@@ -286,18 +275,7 @@ class prevalidation_adapter_impl
             {
                 return status(status::code::ignore);
             }
-            return hana::value(hana::length(ops))==0
-                    ||
-                   hana::fold(std::forward<decltype(ops)>(ops),false,
-                        [&adpt,&member](status prevResult, auto&& op)
-                        {
-                            if (prevResult.value()==status::code::success)
-                            {
-                                return prevResult;
-                            }
-                            return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
-                        }
-                    );
+            return default_adapter_impl::validate_member_or(std::forward<AdapterT>(adpt),std::forward<MemberT>(member),std::forward<OpsT>(ops));
         }
 
         template <typename AdapterT, typename OpT>
