@@ -96,32 +96,6 @@ class prevalidation_adapter_impl
             );
         }
 
-//        template <typename PropT, typename MemberT, typename SizePropT>
-//        status filter_member_size(MemberT&& member, PropT&& prop, SizePropT&& size_p)
-//        {
-//            if (!(size_p==prop) || (size_p==size && prop==length))
-//            {
-//                return status(status::code::ignore);
-//            }
-
-//            if (size_p==empty)
-//            {
-//                if (filter_member(member[empty]))
-//                {
-//                    return status(status::code::ignore);
-//                }
-//            }
-//            else
-//            {
-//                if (filter_member(member[size]))
-//                {
-//                    return status(status::code::ignore);
-//                }
-//            }
-
-//            return status;
-//        }
-
         template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT, typename SizePropT>
         status validate_size_property(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b, SizePropT&& size_p) const
         {
