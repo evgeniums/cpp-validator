@@ -105,9 +105,28 @@ constexpr adjust_view_type_t<T> adjust_view_type{};
  * @return String view of value if applicable or value itself otherwise.
  */
 template <typename T>
-constexpr auto adjust_view_type (T&& v) -> decltype(auto)
+constexpr auto adjust_view_type(T&& v) -> decltype(auto)
 {
     return detail::adjust_view_type<T>(std::forward<T>(v));
+}
+
+template <typename T2, typename T1>
+constexpr auto unadjust_view_type(T1&& v) -> decltype(auto)
+{
+    return hana::if_(
+        hana::and_(
+            std::is_same<std::decay_t<T2>,std::string>{},
+            std::is_same<std::decay_t<T1>,string_view>{}
+        ),
+        [](auto&& v)
+        {
+            return std::string(v.data(),v.size());
+        },
+        [](auto&& v) -> decltype(auto)
+        {
+            return hana::id(std::forward<decltype(v)>(v));
+        }
+    )(std::forward<T1>(v));
 }
 
 //-------------------------------------------------------------
