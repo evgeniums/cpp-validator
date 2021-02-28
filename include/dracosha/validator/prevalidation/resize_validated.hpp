@@ -83,23 +83,22 @@ void resize_member(
  * then resizing to 0 will not emit error despite the validation condition
  * checking string content is not met.
  */
-template <typename ObjectT, typename MemberT, typename ValidatorT>
+template <typename ObjectT, typename MemberT, typename SizeT, typename ValidatorT>
 void resize_validated(
         ObjectT& obj,
         MemberT&& member,
-        size_t val,
+        SizeT&& val,
         ValidatorT&& validator,
         error_report& err
     )
 {
-    err.reset();
     validate(member[size],val,validator,err);
     if (!err)
     {
-        validate(member[empty],val==0,validator,err);
+        validate(member[empty],wrap_strict_any(extract_strict_any(val)==0,val),validator,err);
         if (!err)
         {
-            resize_member(obj,member,val);
+            resize_member(obj,member,extract_strict_any(val));
         }
     }
 }
@@ -115,16 +114,16 @@ void resize_validated(
  *
  * @note See note for overloaded function.
  */
-template <typename ObjectT, typename MemberT, typename ValidatorT>
+template <typename ObjectT, typename MemberT, typename SizeT, typename ValidatorT>
 void resize_validated(
         ObjectT& obj,
         MemberT&& member,
-        size_t size,
+        SizeT&& size,
         ValidatorT&& validator
     )
 {
     error_report err;
-    resize_validated(obj,std::forward<MemberT>(member),size,std::forward<ValidatorT>(validator),err);
+    resize_validated(obj,std::forward<MemberT>(member),std::forward<SizeT>(size),std::forward<ValidatorT>(validator),err);
     if (err)
     {
         throw validation_error(err);

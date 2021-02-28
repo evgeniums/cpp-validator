@@ -85,7 +85,6 @@ void clear_validated(
         error_report& err
     )
 {
-    err.reset();
     validate(member[empty],true,validator,err);
     if (!err)
     {

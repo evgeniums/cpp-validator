@@ -40,7 +40,7 @@ struct set_member_t
         if (check_exists(obj,parent_path))
         {
             auto& parent_element=get_member(obj,parent_path);
-            parent_element[member.key()]=std::forward<ValueT>(val);
+            parent_element[member.key()]=unadjust_view_type<decltype(parent_element[member.key()])>(std::forward<ValueT>(val));
         }
     }
 };
@@ -84,10 +84,11 @@ void set_validated(
         error_report& err
     )
 {
-    validate(member,val,std::forward<ValidatorT>(validator),err);
+    const auto& v=extract_strict_any(val);
+    validate(member,std::forward<ValueT>(val),std::forward<ValidatorT>(validator),err);
     if (!err)
     {
-        set_member(obj,member,std::forward<ValueT>(val));
+        set_member(obj,member,v);
     }
 }
 
