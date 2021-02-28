@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/get.hpp>
 #include <dracosha/validator/check_contains.hpp>
 #include <dracosha/validator/detail/take_address_of.hpp>
+#include <dracosha/validator/utils/hana_to_std_tuple.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -87,7 +88,18 @@ constexpr get_member_ptr_t get_member_ptr{};
 template <typename Tobj, typename Tpath>
 auto check_exists(Tobj&& obj, Tpath&& path)
 {
-    return hana::fold(std::forward<decltype(path)>(path),&obj,get_member_ptr)!=nullptr;
+    return hana::if_(
+         hana_tuple_empty<Tpath>{},
+         [](auto&&, auto&&)
+         {
+            // empty path means object itself
+            return true;
+         },
+         [](auto&& obj, auto&& path)
+         {
+            return hana::fold(std::forward<decltype(path)>(path),&obj,get_member_ptr)!=nullptr;
+         }
+    )(std::forward<decltype(obj)>(obj),std::forward<decltype(path)>(path));
 }
 
 //-------------------------------------------------------------

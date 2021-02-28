@@ -52,8 +52,8 @@ auto check_member_path(Tobj&& obj, Tpath&& path)
 template <typename Tm1, typename Tm2>
 auto check_member_path_types(const Tm1& member1,const Tm2& member2)
 {
-    auto path1_c=hana::transform(member1.path,hana::make_type);
-    auto path2_c=hana::transform(member2.path,hana::make_type);
+    auto path1_c=hana::transform(member1.path(),hana::make_type);
+    auto path2_c=hana::transform(member2.path(),hana::make_type);
 
     return hana::equal(path1_c,path2_c);
 }

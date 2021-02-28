@@ -96,30 +96,70 @@ class prevalidation_adapter_impl
             );
         }
 
+//        template <typename PropT, typename MemberT, typename SizePropT>
+//        status filter_member_size(MemberT&& member, PropT&& prop, SizePropT&& size_p)
+//        {
+//            if (!(size_p==prop) || (size_p==size && prop==length))
+//            {
+//                return status(status::code::ignore);
+//            }
+
+//            if (size_p==empty)
+//            {
+//                if (filter_member(member[empty]))
+//                {
+//                    return status(status::code::ignore);
+//                }
+//            }
+//            else
+//            {
+//                if (filter_member(member[size]))
+//                {
+//                    return status(status::code::ignore);
+//                }
+//            }
+
+//            return status;
+//        }
+
         template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT, typename SizePropT>
         status validate_size_property(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b, SizePropT&& size_p) const
         {
-            if (!((size_p==prop) || (size_p==size && prop==length)))
-            {
-                return status::code::ignore;
-            }
+            auto self=this;
+            return hana::eval_if(
+                hana::or_(
+                    std::is_same<std::decay_t<decltype(size)>,std::decay_t<PropT>>{},
+                    std::is_same<std::decay_t<decltype(length)>,std::decay_t<PropT>>{},
+                    std::is_same<std::decay_t<decltype(empty)>,std::decay_t<PropT>>{}
+                ),
+                [&](auto&& _)
+                {
+                    if (!((_(size_p)==prop) || (_(size_p)==size && _(prop)==length)))
+                    {
+                        return status(status::code::ignore);
+                    }
 
-            if (size_p==empty)
-            {
-                if (filter_member(member[empty]))
+                    if (_(size_p)==empty)
+                    {
+                        if (_(self)->filter_member(_(member)[empty]))
+                        {
+                            return status(status::code::ignore);
+                        }
+                    }
+                    else
+                    {
+                        if (_(self)->filter_member(_(member)[size]))
+                        {
+                            return status(status::code::ignore);
+                        }
+                    }
+                    const auto& value=extract(_(adpt).traits().get());
+                    return status(_(op)(value,_(b)));
+                },
+                [](auto&&)
                 {
-                    return status::code::ignore;
-                }
-            }
-            else
-            {
-                if (filter_member(member[size]))
-                {
-                    return status::code::ignore;
-                }
-            }
-            const auto& value=extract(adpt.traits().get());
-            return op(value,b);
+                    return status(status::code::ignore);
+                });
         }
 
         template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
@@ -135,7 +175,7 @@ class prevalidation_adapter_impl
                 ),
                 [](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
                 {
-                    // check [size] member path suffix
+                    // check size/empty member path suffix
                     return self->validate_size_property(
                                     std::forward<decltype(adpt)>(adpt),
                                     std::forward<decltype(member)>(member),
@@ -215,7 +255,7 @@ class prevalidation_adapter_impl
             const auto& obj=extract(adpt.traits().get());
             return status(op(
                         property(obj,std::forward<PropT>(prop)),
-                        property(get_member(extract(b)(),member.path),prop)
+                        property(get_member(extract(b)(),member.path()),prop)
                     ));
         }
 
@@ -228,10 +268,6 @@ class prevalidation_adapter_impl
         template <typename AdapterT, typename MemberT, typename OpsT>
         status validate_and(AdapterT&& adpt, MemberT&& member, OpsT&& ops) const
         {
-            if (filter_member(member))
-            {
-                return status(status::code::ignore);
-            }
             return default_adapter_impl::validate_member_and(std::forward<AdapterT>(adpt),std::forward<MemberT>(member),std::forward<OpsT>(ops));
         }
 
@@ -244,10 +280,6 @@ class prevalidation_adapter_impl
         template <typename AdapterT, typename MemberT, typename OpsT>
         status validate_or(AdapterT&& adpt, MemberT&& member, OpsT&& ops) const
         {
-            if (filter_member(member))
-            {
-                return status(status::code::ignore);
-            }
             return default_adapter_impl::validate_member_or(std::forward<AdapterT>(adpt),std::forward<MemberT>(member),std::forward<OpsT>(ops));
         }
 
@@ -260,7 +292,12 @@ class prevalidation_adapter_impl
         template <typename AdapterT, typename MemberT, typename OpT>
         status validate_not(AdapterT&& adpt, MemberT&& member, OpT&& op) const
         {
-            if (filter_member(member))
+            if (filter_member(member)
+               &&
+               filter_member(member[size])
+               &&
+               filter_member(member[empty])
+               )
             {
                 return status(status::code::ignore);
             }

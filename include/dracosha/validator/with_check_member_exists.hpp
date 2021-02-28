@@ -101,7 +101,7 @@ struct with_check_member_exists
     template <typename MemberT>
     bool check_member_exists(MemberT&& member) const
     {
-        if (!check_member_path(extract(_adapter.traits().get()),member.path))
+        if (!check_member_path(extract(_adapter.traits().get()),member.path()))
         {
             return false;
         }

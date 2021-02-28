@@ -20,11 +20,13 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_RESIZE_VALIDATED_HPP
 
 #include <dracosha/validator/validate.hpp>
+#include <dracosha/validator/check_exists.hpp>
+#include <dracosha/validator/get_member.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 /**
- * @brief Default implementation of that uses resize() to resize the object itself.
+ * @brief Default implementation of that uses resize() method of member's value.
  */
 template <typename ObjectT, typename MemberT, typename Enable=void>
 struct resize_member_t
@@ -36,10 +38,11 @@ struct resize_member_t
             size_t size
         ) const
     {
-        auto it=obj.find(member.key());
-        if (it!=obj.end())
+        auto path=member_path(member);
+        if (check_exists(obj,path))
         {
-            get_it(it).resize(size);
+            auto& element=get_member(obj,path);
+            element.resize(size);
         }
     }
 };

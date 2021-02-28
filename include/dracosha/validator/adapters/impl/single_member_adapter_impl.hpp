@@ -129,7 +129,7 @@ class single_member_adapter_impl
             // do not filter member for ALL/ANY aggregation
             if (_skip_member_filter)
             {
-                return hana::if_(check_member_path(obj,member.path),
+                return hana::if_(check_member_path(obj,member.path()),
                     [&obj,&prop,&op,&b](auto&& path)
                     {
                         return op(
@@ -141,7 +141,7 @@ class single_member_adapter_impl
                     {
                         return status();
                     }
-                )(member.path);
+                )(member.path());
             }
 
             // select execution path depending on the type of adapter's member key
@@ -243,7 +243,7 @@ class single_member_adapter_impl
             const auto& obj=extract(adpt.traits().get());
             return status(op(
                         property(obj,std::forward<PropT>(prop)),
-                        property(get_member(extract(b)(),member.path),prop)
+                        property(get_member(extract(b)(),member.path()),prop)
                     ));
         }
 

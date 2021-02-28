@@ -42,7 +42,7 @@ struct type_p_value
     {
         return true;
     }
-    template <typename ... Args> \
+    template <typename ... Args>
     constexpr auto operator () (Args&&... args) const;
 
     constexpr static const char* name()
@@ -56,6 +56,23 @@ struct type_p_value
     }
 
     constexpr static bool has_flag_str()
+    {
+        return false;
+    }
+
+    template <typename T> constexpr bool operator == (const T&&) const
+    {
+        return true;
+    }
+    template <typename T> constexpr bool operator != (const T&&) const
+    {
+        return false;
+    }
+    constexpr bool operator == (const type_p_value&) const
+    {
+        return true;
+    }
+    constexpr bool operator != (const type_p_value&) const
     {
         return false;
     }

@@ -36,7 +36,12 @@ struct set_member_t
             ValueT&& val
         ) const
     {
-        obj[member.key()]=std::forward<ValueT>(val);
+        auto parent_path=member.parent_path();
+        if (check_exists(obj,parent_path))
+        {
+            auto& parent_element=get_member(obj,parent_path);
+            parent_element[member.key()]=std::forward<ValueT>(val);
+        }
     }
 };
 

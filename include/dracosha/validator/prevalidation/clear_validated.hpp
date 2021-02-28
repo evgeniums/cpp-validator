@@ -36,10 +36,11 @@ struct clear_member_t
             MemberT1&& member
         ) const
     {
-        auto it=obj.find(member.key());
-        if (it!=obj.end())
+        auto path=member_path(member);
+        if (check_exists(obj,path))
         {
-            get_it(it).clear();
+            auto& element=get_member(obj,path);
+            element.clear();
         }
     }
 };

@@ -138,7 +138,7 @@ struct default_adapter_impl
     {
         std::ignore=from_check_member;
         const auto& obj=extract(adpt.traits().get());
-        return hana::if_(check_member_path(obj,member.path),
+        return hana::if_(check_member_path(obj,member.path()),
             [&obj,&b](auto&& path)
             {
                 return exists(obj,std::forward<decltype(path)>(path))==b;
@@ -147,7 +147,7 @@ struct default_adapter_impl
             {
                 return b==false;
             }
-        )(member.path);
+        )(member.path());
     }
 
     /**
@@ -164,7 +164,7 @@ struct default_adapter_impl
         }
 
         const auto& obj=extract(adpt.traits().get());
-        return hana::if_(check_member_path(obj,member.path),
+        return hana::if_(check_member_path(obj,member.path()),
             [&obj,&prop,&op,&b](auto&& path)
             {
                 return op(
@@ -176,7 +176,7 @@ struct default_adapter_impl
             {
                 return status();
             }
-        )(member.path);
+        )(member.path());
     }
 
     /**
@@ -193,7 +193,7 @@ struct default_adapter_impl
         }
 
         const auto& obj=extract(adpt.traits().get());
-        return hana::if_(check_member_path(obj,member.path),
+        return hana::if_(check_member_path(obj,member.path()),
             [&obj,&prop,&op](auto&& path, auto&& b_path)
             {
                 return status(op(
@@ -205,7 +205,7 @@ struct default_adapter_impl
             {
                 return status();
             }
-        )(member.path,b.path);
+        )(member.path(),b.path());
     }
 
     /**
@@ -222,7 +222,7 @@ struct default_adapter_impl
         }
 
         const auto& obj=extract(adpt.traits().get());
-        return hana::if_(check_member_path(obj,member.path),
+        return hana::if_(check_member_path(obj,member.path()),
             [&obj,&prop,&op,&b](auto&& path)
             {
                 return status(op(
@@ -234,7 +234,7 @@ struct default_adapter_impl
             {
                 return status();
             }
-        )(member.path);
+        )(member.path());
     }
 
     /**
@@ -284,7 +284,7 @@ struct default_adapter_impl
         }
 
         const auto& obj=extract(adpt.traits().get());
-        return hana::if_(check_member_path(obj,member.path),
+        return hana::if_(check_member_path(obj,member.path()),
             [&adpt,&member,&ops](auto&&)
             {
                 return validate_member_and(
@@ -297,7 +297,7 @@ struct default_adapter_impl
             {
                 return status();
             }
-        )(member.path);
+        )(member.path());
     }
 
     /**
@@ -348,7 +348,7 @@ struct default_adapter_impl
     static status validate_or(AdapterT&& adpt, MemberT&& member, OpsT&& ops)
     {
         const auto& obj=extract(adpt.traits().get());
-        return hana::if_(check_member_path(obj,member.path),
+        return hana::if_(check_member_path(obj,member.path()),
             [&adpt,&member,&ops](auto&&)
             {
                 return validate_member_or(
@@ -361,7 +361,7 @@ struct default_adapter_impl
             {
                 return status();
             }
-        )(member.path);
+        )(member.path());
     }
 
     /**
@@ -381,17 +381,17 @@ struct default_adapter_impl
     static status validate_any(AdapterT&& adpt, MemberT&& member, OpT&& op)
     {
         const auto& obj=extract(adpt.traits().get());
-        return hana::if_(check_member_path(obj,member.path),
+        return hana::if_(check_member_path(obj,member.path()),
             [&obj,&adpt,&member,&op](auto&&)
             {
-                const auto& container=get_member(obj,member.path);
+                const auto& container=get_member(obj,member.path());
                 return aggregate_impl<decltype(container)>::any(container,std::forward<decltype(adpt)>(adpt),member,std::forward<decltype(op)>(op));
             },
             [](auto&&)
             {
                 return status();
             }
-        )(member.path);
+        )(member.path());
     }
 
     /**
@@ -411,17 +411,17 @@ struct default_adapter_impl
     static status validate_all(AdapterT&& adpt, MemberT&& member, OpT&& op)
     {
         const auto& obj=extract(adpt.traits().get());
-        return hana::if_(check_member_path(obj,member.path),
+        return hana::if_(check_member_path(obj,member.path()),
             [&obj,&adpt,&member,&op](auto&&)
             {
-                const auto& container=get_member(obj,member.path);
+                const auto& container=get_member(obj,member.path());
                 return aggregate_impl<decltype(container)>::all(container,std::forward<decltype(adpt)>(adpt),member,std::forward<decltype(op)>(op));
             },
             [](auto&&)
             {
                 return status();
             }
-        )(member.path);
+        )(member.path());
     }
 
     /**
@@ -445,7 +445,7 @@ struct default_adapter_impl
         }
 
         const auto& obj=extract(adpt.traits().get());
-        return hana::if_(check_member_path(obj,member.path),
+        return hana::if_(check_member_path(obj,member.path()),
             [&adpt,&member,&op](auto&&)
             {
                 return status(!apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
@@ -458,7 +458,7 @@ struct default_adapter_impl
                 }
                 return status();
             }
-        )(member.path);
+        )(member.path());
     }
 };
 

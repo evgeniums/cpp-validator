@@ -197,7 +197,7 @@ struct member_helper_2args_t<OpT,T1,
                             key(std::forward<OpT>(op),std::forward<T1>(b))
                         );
         };
-        return hana::unpack(hana::reverse(std::move(member.path)),std::move(fn));
+        return hana::unpack(hana::reverse(std::move(member.path())),std::move(fn));
     }
 };
 
@@ -247,159 +247,193 @@ constexpr member_helper_t<Args...> member_helper{};
  * Member descriptor defines a path for extracting specific member/subobject from the object under validation.
  */
 template <typename T, typename ...ParentPathT>
-struct member
+class member
 {
-    using hana_tag=member_tag;
+    public:
 
-    using type=T;
-    using path_type=hana::tuple<ParentPathT...,type>;
+        using hana_tag=member_tag;
 
-    constexpr static const bool is_nested=sizeof...(ParentPathT)!=0;
+        using type=T;
+        using path_type=hana::tuple<ParentPathT...,type>;
 
-    path_type path;
+        constexpr static const bool is_nested=sizeof...(ParentPathT)!=0;
 
-    template <template <typename ...> class T1,
-              typename T2, typename PathT>
-    static auto create_derived(T2&& name, PathT&& path)
-    {
-        return T1<T2,T,ParentPathT...>(std::forward<PathT>(path),std::forward<T2>(name));
-    }
+        template <template <typename ...> class T1,
+                  typename T2, typename PathT>
+        static auto create_derived(T2&& name, PathT&& path)
+        {
+            return T1<T2,T,ParentPathT...>(std::forward<PathT>(path),std::forward<T2>(name));
+        }
 
-    member()=default;
+        member()=default;
 
-    /**
-     * @brief Constructor of nested member.
-     * @param key Key of current member.
-     * @param parent_path Path to parent member which is of previous (upper) level.
-     */
-    template <typename T1, typename ParentPathTs>
-    member(T1&& key, ParentPathTs&& parent_path,
-           std::enable_if_t<!std::is_constructible<std::string,ParentPathTs>::value,void*> =nullptr)
-         : path(hana::append(std::forward<ParentPathTs>(parent_path),std::forward<T1>(key)))
-    {}
+        /**
+         * @brief Constructor of nested member.
+         * @param key Key of current member.
+         * @param parent_path Path to parent member which is of previous (upper) level.
+         */
+        template <typename T1, typename ParentPathTs>
+        member(T1&& key, ParentPathTs&& parent_path,
+               std::enable_if_t<!std::is_constructible<std::string,ParentPathTs>::value,void*> =nullptr)
+             : _path(hana::append(std::forward<ParentPathTs>(parent_path),std::forward<T1>(key)))
+        {}
 
-    /**
-     * @brief Constructor of nested member.
-     * @param key Key of current member.
-     * @param parent_path Path to parent member which is of previous (upper) level.
-     */
-    template <typename ParentPathTs>
-    member(type key, ParentPathTs&& parent_path,
-           std::enable_if_t<!std::is_constructible<std::string,ParentPathTs>::value,void*> =nullptr)
-         : path(hana::append(std::forward<ParentPathTs>(parent_path),std::move(key)))
-    {}
+        /**
+         * @brief Constructor of nested member.
+         * @param key Key of current member.
+         * @param parent_path Path to parent member which is of previous (upper) level.
+         */
+        template <typename ParentPathTs>
+        member(type key, ParentPathTs&& parent_path,
+               std::enable_if_t<!std::is_constructible<std::string,ParentPathTs>::value,void*> =nullptr)
+             : _path(hana::append(std::forward<ParentPathTs>(parent_path),std::move(key)))
+        {}
 
-    /**
-     * @brief Ctor.
-     * @param key Key of current member.
-     */
-    template <typename T1>
-    member(T1&& key)
-         : path(hana::make_tuple(std::forward<T1>(key)))
-    {}
+        /**
+         * @brief Ctor.
+         * @param key Key of current member.
+         */
+        template <typename T1>
+        member(T1&& key)
+             : _path(hana::make_tuple(std::forward<T1>(key)))
+        {}
 
-    /**
-     * @brief Constructor from path.
-     * @param path Member's path.
-     */
-    member(path_type path)
-         : path(std::move(path))
-    {}
+        /**
+         * @brief Constructor from path.
+         * @param path Member's path.
+         */
+        member(path_type path)
+             : _path(std::move(path))
+        {}
 
-    /**
-     * @brief Constructor from key of string type.
-     * @param str Key of current member.
-     */
-    member(std::string str)
-         : path(hana::make_tuple(std::move(str)))
-    {}
+        /**
+         * @brief Constructor from key of string type.
+         * @param str Key of current member.
+         */
+        member(std::string str)
+             : _path(hana::make_tuple(std::move(str)))
+        {}
 
-    /**
-     * @brief Check if path of this member is equal to path of other member.
-     * @param other Other member.
-     */
-    template <typename T1>
-    bool isEqual(const T1& other) const
-    {
-        return hana::equal(path,other.path);
-    }
+        /**
+         * @brief Check if path of this member is equal to path of other member.
+         * @param other Other member.
+         */
+        template <typename T1>
+        bool isEqual(const T1& other) const
+        {
+            return hana::equal(_path,other.path());
+        }
 
-    /**
-     * @brief Check if path of this member is equal to path of other member.
-     * @param other Other member.
-     */
-    template <typename T1>
-    bool equals(const T1& other) const
-    {
-        return hana::equal(path,other.path);
-    }
+        /**
+         * @brief Check if path of this member is equal to path of other member.
+         * @param other Other member.
+         */
+        template <typename T1>
+        bool equals(const T1& other) const
+        {
+            return hana::equal(_path,other._path);
+        }
 
-    /**
-     * @brief Callable operator.
-     */
-    template <typename ... Args>
-    auto operator() (Args&&... args)
-    {
-        return detail::member_helper<Args...>(std::move(*this),std::forward<Args>(args)...);
-    }
+        /**
+         * @brief Callable operator.
+         */
+        template <typename ... Args>
+        auto operator() (Args&&... args)
+        {
+            return detail::member_helper<Args...>(std::move(*this),std::forward<Args>(args)...);
+        }
 
-    /**
-     * @brief Make member of parent type.
-     * @param path Path of new member.
-     * @return Member of parent type.
-     */
-    template <typename PathT>
-    static auto make_parent(PathT&& path)
-    {
-        return member<ParentPathT...>(std::forward<PathT>(path));
-    }
+        /**
+         * @brief Make member of parent type.
+         * @param path Path of new member.
+         * @return Member of parent type.
+         */
+        template <typename PathT>
+        static auto make_parent(PathT&& path)
+        {
+            return member<ParentPathT...>(std::forward<PathT>(path));
+        }
 
-    /**
-     * @brief Create member of parent type.
-     */
-    auto parent() const
-    {
-        return make_parent(hana::drop_back(path));
-    }
+        /**
+         * @brief Create member of parent type.
+         */
+        auto parent() const
+        {
+            return make_parent(parent_path());
+        }
 
-    /**
-     * @brief Make super member prepending new key to the path.
-     * @param key First key of super member.
-     * @return Member of super type.
-     */
-    template <typename KeyT>
-    auto make_super(KeyT&& first_key) const
-    {
-        using stype=typename adjust_storable_type<std::decay_t<KeyT>>::type;
-        return member<T,stype,ParentPathT...>(hana::prepend(path,stype(std::forward<KeyT>(first_key))));
-    }
+        /**
+         * @brief Make super member prepending new key to the path.
+         * @param key First key of super member.
+         * @return Member of super type.
+         */
+        template <typename KeyT>
+        auto make_super(KeyT&& first_key) const
+        {
+            using stype=typename adjust_storable_type<std::decay_t<KeyT>>::type;
+            return member<T,stype,ParentPathT...>(hana::prepend(_path,stype(std::forward<KeyT>(first_key))));
+        }
 
-    /**
-     * @brief Get the last key in the path corresponding to the member at current level.
-     * @return Key of current member.
-     */
-    const type& key() const
-    {
-        return hana::back(path);
-    }
+        /**
+         * @brief Get the last key in the path corresponding to the member at current level.
+         * @return Key of current member.
+         */
+        const type& key() const
+        {
+            return hana::back(_path);
+        }
 
-    /**
-     * @brief Append next level to member.
-     * @param key Member key.
-     */
-    template <typename T1>
-    constexpr auto operator [] (T1&& key) const -> decltype(auto)
-    {
-        auto path_types=hana::transform(path,hana::make_type);
-        auto key_and_path_types=hana::prepend(path_types,hana::type_c<typename adjust_storable_type<T1>::type>);
-        auto next_member_tmpl=hana::unpack(key_and_path_types,hana::template_<member>);
-        return typename decltype(next_member_tmpl)::type(std::forward<T1>(key),path);
-    }
+        /**
+         * @brief Get path depth of this member.
+         * @return Number of elements in path.
+         */
+        constexpr static size_t path_depth()
+        {
+            return hana_tuple_size<path_type>::value;
+        }
 
-    /**
-     * @brief member does not have explicit name.
-     */
-    constexpr static bool has_name = false;
+        /**
+         * @brief Get path.
+         * @return Path.
+         */
+        const auto& path() const
+        {
+            return _path;
+        }
+
+        /**
+         * @brief Get parent path.
+         * @return Parent path.
+         */
+        auto parent_path()
+        {
+            return hana::drop_back(_path);
+        }
+
+        /**
+         * @brief Append next level to member.
+         * @param key Member key.
+         */
+        template <typename T1>
+        constexpr auto operator [] (T1&& key) const -> decltype(auto)
+        {
+            auto path_types=hana::transform(_path,hana::make_type);
+            auto key_and_path_types=hana::prepend(path_types,hana::type_c<typename adjust_storable_type<T1>::type>);
+            auto next_member_tmpl=hana::unpack(key_and_path_types,hana::template_<member>);
+            return typename decltype(next_member_tmpl)::type(std::forward<T1>(key),_path);
+        }
+
+        /**
+         * @brief member does not have explicit name.
+         */
+        constexpr static bool has_name = false;
+
+    private:
+
+        path_type _path;
+
+        template <typename MemberT, typename T1>
+        friend auto make_member_with_name(MemberT&& member, T1&& name);
 };
 
 /**
@@ -471,7 +505,7 @@ struct member_with_name : public member<T2,ParentPathT...>
 template <typename MemberT, typename T>
 auto make_member_with_name(MemberT&& member, T&& name)
 {
-    return member.template create_derived<member_with_name>(std::forward<T>(name),std::move(member.path));
+    return member.template create_derived<member_with_name>(std::forward<T>(name),std::move(member._path));
 }
 
 /**
@@ -562,7 +596,7 @@ auto member_path(T&& member,
                  std::enable_if_t<hana::is_a<member_tag,T>,void*> =nullptr
                  ) -> decltype(auto)
 {
-    return member.path;
+    return member.path();
 }
 
 /**

@@ -35,7 +35,12 @@ struct unset_member_t
             MemberT1&& member
         ) const
     {
-        obj.erase(member.key());
+        auto parent_path=member.parent_path();
+        if (check_exists(obj,parent_path))
+        {
+            auto& parent_element=get_member(obj,parent_path);
+            parent_element.erase(member.key());
+        }
     }
 };
 
