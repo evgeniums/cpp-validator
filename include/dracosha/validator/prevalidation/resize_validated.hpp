@@ -112,7 +112,7 @@ void resize_validated(
  *
  * @throws validation_error if validation fails.
  *
- * @note See note for overloaded function.
+ * @note See note to overloaded function.
  */
 template <typename ObjectT, typename MemberT, typename SizeT, typename ValidatorT>
 void resize_validated(
