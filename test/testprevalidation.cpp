@@ -602,9 +602,9 @@ BOOST_AUTO_TEST_CASE(CheckUpdateValidatedWithSample)
                 _["field3"](ANY(value(gte,_(sample7))))
             );
     //! @todo Check element aggregations with sample.
-    set_validated(m7,_["field3"][0],strict_any("aaaaa"),v8,err);
+    set_validated(m7,_["field3"][0],"aaaaa",strict_any(v8),err);
     BOOST_CHECK(err);
-    set_validated(m7,_["field3"][0],strict_any("zzzzz"),v8,err);
+    set_validated(m7,_["field3"][0],"zzzzz",strict_any(v8),err);
     BOOST_CHECK(!err);
     BOOST_CHECK_EQUAL(m7["field3"][0],"zzzzz");
 }
@@ -827,10 +827,10 @@ BOOST_AUTO_TEST_CASE(CheckResizeValidated)
                 _["field2"](ALL(empty(flag,false))),
                 _["field3"](ALL(size(gte,_(m2))))
             );
-    resize_validated(m2,_["field1"][0],strict_any(3),v2,err);
+    resize_validated(m2,_["field1"][0],3,strict_any(v2),err);
     BOOST_CHECK(err);
     BOOST_CHECK_EQUAL(err.message(),std::string("size of element #0 of field1 must be greater than or equal to 4"));
-    resize_validated(m2,_["field2"][0],strict_any(0),v2,err);
+    resize_validated(m2,_["field2"][0],0,strict_any(v2),err);
     BOOST_CHECK(err);
     BOOST_CHECK_EQUAL(err.message(),std::string("element #0 of field2 must be not empty"));
     resize_validated(m2,_["field1"][0],3,v3,err);

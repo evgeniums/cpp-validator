@@ -92,13 +92,13 @@ void resize_validated(
         error_report& err
     )
 {
-    validate(member[size],val,validator,err);
+    validate(member[size],wrap_strict_any(val,validator),extract_strict_any(validator),err);
     if (!err)
     {
-        validate(member[empty],wrap_strict_any(extract_strict_any(val)==0,val),validator,err);
+        validate(member[empty],wrap_strict_any(val==0,validator),extract_strict_any(validator),err);
         if (!err)
         {
-            resize_member(obj,member,extract_strict_any(val));
+            resize_member(obj,member,val);
         }
     }
 }

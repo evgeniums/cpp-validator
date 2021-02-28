@@ -84,11 +84,10 @@ void set_validated(
         error_report& err
     )
 {
-    const auto& v=extract_strict_any(val);
-    validate(member,std::forward<ValueT>(val),std::forward<ValidatorT>(validator),err);
+    validate(member,wrap_strict_any(std::forward<ValueT>(val),validator),extract_strict_any(std::forward<ValidatorT>(validator)),err);
     if (!err)
     {
-        set_member(obj,member,v);
+        set_member(obj,member,std::forward<ValueT>(val));
     }
 }
 
