@@ -130,7 +130,14 @@ auto property(Tv&& val, Tp&& prop) -> decltype(auto)
         { \
             return flag_dscr!=nullptr && n_flag_dscr!=nullptr; \
         } \
-        \
+        template <typename T> constexpr bool operator == (const T&) const \
+        { \
+            return false; \
+        } \
+        template <typename T> constexpr bool operator != (const T&) const \
+        { \
+            return true; \
+        } \
         constexpr bool operator == (const type_p_##prop&) const \
         { \
             return true; \
