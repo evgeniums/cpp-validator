@@ -900,6 +900,19 @@ BOOST_AUTO_TEST_CASE(CheckSets)
         {"key1",{"field1","field3"}}
     };
     v2.apply(ms1);
+
+    auto v3=validator(
+        _["field1"](ANY(empty(flag,false)))
+    );
+    auto v4=validator(
+        _["field1"](ANY(empty(flag,true)))
+    );
+    std::map<std::string,std::set<std::string>> s3{
+        {"field1",{"value1","value2","value3"}},
+        {"field2",{"value1","value2","value3"}}
+    };
+    BOOST_CHECK(v3.apply(s3));
+    BOOST_CHECK(!v4.apply(s3));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -69,7 +69,7 @@ void clear_member(
  * @brief Clear object's member with pre-validation with validation result put in the last argument.
  * @param obj Object whose member to resize.
  * @param member Member name.
- * @param validator Validator to use for validation.
+ * @param validator Validator to use for validation. If wrapped into strict_any then strict ANY validation will be invoked.
  * @param err Validation result.
  *
  * @note Use with caution. Only "size", "length" and "empty" properties are validated.
@@ -85,10 +85,10 @@ void clear_validated(
         error_report& err
     )
 {
-    validate(member[empty],true,validator,err);
+    validate(member[empty],wrap_strict_any(true,validator),extract_strict_any(validator),err);
     if (!err)
     {
-        validate(member[size],0,validator,err);
+        validate(member[size],wrap_strict_any(0,validator),extract_strict_any(validator),err);
         if (!err)
         {
             clear_member(obj,member);
@@ -100,7 +100,7 @@ void clear_validated(
  * @brief Clear object's member with pre-validation with exception if validation fails.
  * @param obj Object whose member to set.
  * @param member Member name.
- * @param validator Validator to use for validation.
+ * @param validator Validator to use for validation. If wrapped into strict_any then strict ANY validation will be invoked.
  *
  * @throws validation_error if validation fails.
  *
