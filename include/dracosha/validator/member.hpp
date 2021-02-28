@@ -405,7 +405,7 @@ class member
          * @brief Get parent path.
          * @return Parent path.
          */
-        auto parent_path()
+        auto parent_path() const
         {
             return hana::drop_back(_path);
         }
