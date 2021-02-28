@@ -248,7 +248,7 @@ class prevalidation_adapter_impl
         template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
         status validate_with_master_sample(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
         {
-            if (filter_member(member))
+            if (filter_member_with_size(member))
             {
                 return status(status::code::ignore);
             }
@@ -292,12 +292,7 @@ class prevalidation_adapter_impl
         template <typename AdapterT, typename MemberT, typename OpT>
         status validate_not(AdapterT&& adpt, MemberT&& member, OpT&& op) const
         {
-            if (filter_member(member)
-               &&
-               filter_member(member[size])
-               &&
-               filter_member(member[empty])
-               )
+            if (filter_member_with_size(member))
             {
                 return status(status::code::ignore);
             }
@@ -316,19 +311,18 @@ class prevalidation_adapter_impl
         }
 
         template <typename AdapterT, typename MemberT, typename OpT>
-        status validate_any(AdapterT&& adpt, MemberT&& member, OpT&& op) const
+        status validate_any_impl(AdapterT&& adpt, MemberT&& member, OpT&& op) const
         {
-            if (!_strict_any)
-            {
-                return status(status::code::ignore);
-            }
-
             auto self=this;
             return hana::eval_if(
-                check_member_path_types(_member,member),
+                hana::or_(
+                            check_member_path_types(_member,member),
+                            check_member_path_types(_member,member[size]),
+                            check_member_path_types(_member,member[empty])
+                         ),
                 [&self,&member,&adpt,&op](auto&&)
                 {
-                    if (self->filter_member(member))
+                    if (self->filter_member_with_size(member))
                     {
                         return status(status::code::ignore);
                     }
@@ -342,6 +336,35 @@ class prevalidation_adapter_impl
             );
         }
 
+        template <typename AdapterT, typename MemberT, typename OpT>
+        status validate_any(AdapterT&& adpt, MemberT&& member, OpT&& op) const
+        {
+            if (!_strict_any)
+            {
+                return status(status::code::ignore);
+            }
+
+            return hana::if_(
+                hana::greater_equal(hana::size_c<hana_tuple_size<decltype(_member.path())>::value>,hana::size_c<2>),
+                [](auto&& self, AdapterT&& adpt, MemberT&& member, OpT&& op)
+                {
+                    if (hana::equal(size,self->_member.key()) || hana::equal(empty,self->_member.key()))
+                    {
+                        auto&& adjusted_member_path=hana::append(member.path(),hana::back(self->_member.parent_path()));
+                        auto adjusted_member=make_member(std::move(adjusted_member_path));
+                        return self->validate_any_impl(std::forward<AdapterT>(adpt),adjusted_member,std::forward<OpT>(op));
+                    }
+                    auto&& adjusted_member_path=hana::append(member.path(),hana::back(self->_member.path()));
+                    auto adjusted_member=make_member(std::move(adjusted_member_path));
+                    return self->validate_any_impl(std::forward<AdapterT>(adpt),adjusted_member,std::forward<OpT>(op));
+                },
+                [](auto&& self, AdapterT&& adpt, MemberT&& member, OpT&& op)
+                {
+                    return self->validate_any_impl(std::forward<AdapterT>(adpt),std::forward<MemberT>(member),std::forward<OpT>(op));
+                }
+            )(this,std::forward<AdapterT>(adpt),std::forward<MemberT>(member),std::forward<OpT>(op));
+        }
+
         template <typename AdapterT, typename OpT>
         status validate_all(AdapterT&& adpt, OpT&& op) const
         {
@@ -349,14 +372,18 @@ class prevalidation_adapter_impl
         }
 
         template <typename AdapterT, typename MemberT, typename OpT>
-        status validate_all(AdapterT&& adpt, MemberT&& member, OpT&& op) const
+        status validate_all_impl(AdapterT&& adpt, MemberT&& member, OpT&& op) const
         {
             auto self=this;
             return hana::eval_if(
-                check_member_path_types(_member,member),
+                hana::or_(
+                            check_member_path_types(_member,member),
+                            check_member_path_types(_member,member[size]),
+                            check_member_path_types(_member,member[empty])
+                         ),
                 [&self,&member,&adpt,&op](auto&&)
                 {
-                    if (self->filter_member(member))
+                    if (self->filter_member_with_size(member))
                     {
                         return status(status::code::ignore);
                     }
@@ -368,6 +395,30 @@ class prevalidation_adapter_impl
                     return status(status::code::ignore);
                 }
             );
+        }
+
+        template <typename AdapterT, typename MemberT, typename OpT>
+        status validate_all(AdapterT&& adpt, MemberT&& member, OpT&& op) const
+        {
+            return hana::if_(
+                hana::greater_equal(hana::size_c<hana_tuple_size<decltype(_member.path())>::value>,hana::size_c<2>),
+                [](auto&& self, AdapterT&& adpt, MemberT&& member, OpT&& op)
+                {
+                    if (hana::equal(size,self->_member.key()) || hana::equal(empty,self->_member.key()))
+                    {
+                        auto&& adjusted_member_path=hana::append(member.path(),hana::back(self->_member.parent_path()));
+                        auto adjusted_member=make_member(std::move(adjusted_member_path));
+                        return self->validate_all_impl(std::forward<AdapterT>(adpt),adjusted_member,std::forward<OpT>(op));
+                    }
+                    auto&& adjusted_member_path=hana::append(member.path(),hana::back(self->_member.path()));
+                    auto adjusted_member=make_member(std::move(adjusted_member_path));
+                    return self->validate_all_impl(std::forward<AdapterT>(adpt),adjusted_member,std::forward<OpT>(op));
+                },
+                [](auto&& self, AdapterT&& adpt, MemberT&& member, OpT&& op)
+                {
+                    return self->validate_all_impl(std::forward<AdapterT>(adpt),std::forward<MemberT>(member),std::forward<OpT>(op));
+                }
+            )(this,std::forward<AdapterT>(adpt),std::forward<MemberT>(member),std::forward<OpT>(op));
         }
 
         const auto& member() const
@@ -399,6 +450,16 @@ class prevalidation_adapter_impl
         bool filter_member(const MemberT& member) const noexcept
         {
             return !_member.isEqual(member);
+        }
+
+        template <typename MemberT>
+        bool filter_member_with_size(const MemberT& member) const noexcept
+        {
+            return filter_member(member)
+               &&
+               filter_member(member[size])
+               &&
+               filter_member(member[empty]);
         }
 
         CheckMemberT _member;

@@ -432,23 +432,23 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
                 _["field1"]["field1_1"](ALL(value(gte,9))),
                 _["field2"](size(gte,100))
             );
-    auto pa2=make_prevalidation_adapter(_["field1"]["field1_1"],10,rep1);
+    auto pa2=make_prevalidation_adapter(_["field1"]["field1_1"][0],10,rep1);
     BOOST_CHECK(v2.apply(pa2));
     rep1.clear();
 
-    auto pa3=make_prevalidation_adapter(_["field1"]["field1_1"],5,rep1);
+    auto pa3=make_prevalidation_adapter(_["field1"]["field1_1"][0],5,rep1);
     BOOST_CHECK(!v2.apply(pa3));
-    BOOST_CHECK_EQUAL(rep1,std::string("field1_1 of field1 must be greater than or equal to 9"));
+    BOOST_CHECK_EQUAL(rep1,std::string("element #0 of field1_1 of field1 must be greater than or equal to 9"));
     rep1.clear();
 
     static_assert(is_container_t<std::vector<int>>::value,"");
 
-    auto pa4=make_prevalidation_adapter(_["field1"]["field1_1"],std::vector<int>{10,11,12},rep1);
+    auto pa4=make_prevalidation_adapter(_["field1"]["field1_1"][value],std::vector<int>{10,11,12},rep1);
     v2.apply(pa4);
     BOOST_CHECK(v2.apply(pa4));
     rep1.clear();
 
-    auto pa5=make_prevalidation_adapter(_["field1"]["field1_1"],std::vector<int>{1},rep1);
+    auto pa5=make_prevalidation_adapter(_["field1"]["field1_1"][value],std::vector<int>{1},rep1);
 
     BOOST_TEST_CONTEXT("check adapter_with_aggregation_iterator"){
         static_assert(hana::is_a<prevalidation_adapter_tag,typename decltype(pa5)::type>,"");
@@ -461,12 +461,12 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     }
 
     BOOST_CHECK(!v2.apply(pa5));
-    BOOST_CHECK_EQUAL(rep1,std::string("each element of field1_1 of field1 must be greater than or equal to 9"));
+    BOOST_CHECK_EQUAL(rep1,std::string("each element of value of field1_1 of field1 must be greater than or equal to 9"));
     rep1.clear();
 
-    auto pa6=make_prevalidation_adapter(_["field1"]["field1_1"],std::vector<int>{10,11,12,1},rep1);
+    auto pa6=make_prevalidation_adapter(_["field1"]["field1_1"][value],std::vector<int>{10,11,12,1},rep1);
     BOOST_CHECK(!v2.apply(pa6));
-    BOOST_CHECK_EQUAL(rep1,std::string("each element of field1_1 of field1 must be greater than or equal to 9"));
+    BOOST_CHECK_EQUAL(rep1,std::string("each element of value of field1_1 of field1 must be greater than or equal to 9"));
     rep1.clear();
 
     auto v3=validator(
@@ -493,39 +493,39 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     // check strict ANY
 
     auto vec7=std::vector<int>{1,2,3,4};
-    auto pa7=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any(vec7),rep1);
+    auto pa7=make_prevalidation_adapter(_["field1"]["field1_1"][value],strict_any(vec7),rep1);
     BOOST_CHECK(!v3.apply(pa7));
-    BOOST_CHECK_EQUAL(rep1,std::string("at least one element of field1_1 of field1 must be greater than or equal to 9"));
+    BOOST_CHECK_EQUAL(rep1,std::string("at least one element of value of field1_1 of field1 must be greater than or equal to 9"));
     rep1.clear();
 
     int val8=8;
-    auto pa8=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any(val8),rep1);
+    auto pa8=make_prevalidation_adapter(_["field1"]["field1_1"][1],strict_any(val8),rep1);
     BOOST_CHECK(!v3.apply(pa8));
-    BOOST_CHECK_EQUAL(rep1,std::string("field1_1 of field1 must be greater than or equal to 9"));
+    BOOST_CHECK_EQUAL(rep1,std::string("element #1 of field1_1 of field1 must be greater than or equal to 9"));
     rep1.clear();
 
     auto vec9=std::vector<int>{1,2,3,4,9};
-    auto pa9=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any(vec9),rep1);
+    auto pa9=make_prevalidation_adapter(_["field1"]["field1_1"][value],strict_any(vec9),rep1);
     BOOST_CHECK(v3.apply(pa9));
     rep1.clear();
 
     int val10=10;
-    auto pa10=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any(val10),rep1);
+    auto pa10=make_prevalidation_adapter(_["field1"]["field1_1"][2],strict_any(val10),rep1);
     BOOST_CHECK(v3.apply(pa10));
     rep1.clear();
 
-    auto pa11=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any(11),rep1);
+    auto pa11=make_prevalidation_adapter(_["field1"]["field1_1"][3],strict_any(11),rep1);
     BOOST_CHECK(v3.apply(pa11));
     rep1.clear();
 
-    auto pa11_1=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any(7),rep1);
+    auto pa11_1=make_prevalidation_adapter(_["field1"]["field1_1"][4],strict_any(7),rep1);
     BOOST_CHECK(!v3.apply(pa11_1));
-    BOOST_CHECK_EQUAL(rep1,std::string("field1_1 of field1 must be greater than or equal to 9"));
+    BOOST_CHECK_EQUAL(rep1,std::string("element #4 of field1_1 of field1 must be greater than or equal to 9"));
     rep1.clear();
 
-    auto pa12=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any(std::vector<int>{1,2,3,4}),rep1);
+    auto pa12=make_prevalidation_adapter(_["field1"]["field1_1"][value],strict_any(std::vector<int>{1,2,3,4}),rep1);
     BOOST_CHECK(!v3.apply(pa12));
-    BOOST_CHECK_EQUAL(rep1,std::string("at least one element of field1_1 of field1 must be greater than or equal to 9"));
+    BOOST_CHECK_EQUAL(rep1,std::string("at least one element of value of field1_1 of field1 must be greater than or equal to 9"));
     rep1.clear();
 
     // check literals
@@ -534,31 +534,79 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
                 _["field2"](size(gte,100))
             );
 
-    auto pa13=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any("Hello"),rep1);
-    auto pa14=make_prevalidation_adapter(_["field1"]["field1_1"],"Hello",rep1);
-    auto pa14_1=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any("Aaa"),rep1);
+    auto pa13=make_prevalidation_adapter(_["field1"]["field1_1"][0],strict_any("Hello"),rep1);
+    auto pa14=make_prevalidation_adapter(_["field1"]["field1_1"][1],"Hello",rep1);
+    auto pa14_1=make_prevalidation_adapter(_["field1"]["field1_1"][2],strict_any("Aaa"),rep1);
 
     BOOST_CHECK(v4.apply(pa13));
     rep1.clear();
     BOOST_CHECK(v4.apply(pa14));
     rep1.clear();
     BOOST_CHECK(!v4.apply(pa14_1));
-    BOOST_CHECK_EQUAL(std::string("field1_1 of field1 must be greater than or equal to Hello"),rep1);
+    BOOST_CHECK_EQUAL(std::string("element #2 of field1_1 of field1 must be greater than or equal to Hello"),rep1);
     rep1.clear();
 
     auto v5=validator(
                 _["field1"]["field1_1"](ALL(value(gte,"Hello"))),
                 _["field2"](size(gte,100))
             );
-    auto pa15=make_prevalidation_adapter(_["field1"]["field1_1"],"Zzz",rep1);
+    auto pa15=make_prevalidation_adapter(_["field1"]["field1_1"][0],"Zzz",rep1);
     BOOST_CHECK(v5.apply(pa15));
     rep1.clear();
-    auto pa16=make_prevalidation_adapter(_["field1"]["field1_1"],"Aaa",rep1);
+    auto pa16=make_prevalidation_adapter(_["field1"]["field1_1"][1],"Aaa",rep1);
     BOOST_CHECK(!v5.apply(pa16));
-    BOOST_CHECK_EQUAL(std::string("field1_1 of field1 must be greater than or equal to Hello"),rep1);
+    BOOST_CHECK_EQUAL(std::string("element #1 of field1_1 of field1 must be greater than or equal to Hello"),rep1);
     rep1.clear();
 }
+#endif
 
+BOOST_AUTO_TEST_CASE(CheckUpdateValidatedWithSample)
+{
+    error_report err;
+    std::map<std::string,std::string> m6{
+        {"field1","value1"},
+        {"field2","value2"},
+        {"field3","value3"}
+    };
+    auto v6=validator(
+                _["field3"](value(gte,_(m6)))
+            );
+    set_validated(m6,_["field3"],"aaaaa",v6,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field3 must be greater than or equal to field3 of sample"));
+    set_validated(m6,_["field3"],"zzzzz",v6,err);
+    BOOST_CHECK(!err);
+
+    std::map<std::string,std::vector<std::string>> sample7{
+        {"field1",{"value1"}},
+        {"field2",{"value2"}},
+        {"field3",{"value3"}}
+    };
+    std::map<std::string,std::vector<std::string>> m7{
+        {"field1",{"value1"}},
+        {"field2",{"value2"}},
+        {"field3",{"0"}}
+    };
+    auto v7=validator(
+                _["field3"](ALL(value(gte,_(sample7))))
+            );
+
+    set_validated(m7,_["field3"][0],"aaaaa",v7,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("element #0 of field3 must be greater than or equal to element #0 of field3 of sample"));
+
+    auto v8=validator(
+                _["field3"](ANY(value(gte,_(sample7))))
+            );
+    //! @todo Check element aggregations with sample.
+    set_validated(m7,_["field3"][0],strict_any("aaaaa"),v8,err);
+    BOOST_CHECK(err);
+    set_validated(m7,_["field3"][0],strict_any("zzzzz"),v8,err);
+    BOOST_CHECK(!err);
+    BOOST_CHECK_EQUAL(m7["field3"][0],"zzzzz");
+}
+
+#if 1
 BOOST_AUTO_TEST_CASE(CheckUnsetValidated)
 {
     auto v1=validator(
@@ -596,7 +644,6 @@ BOOST_AUTO_TEST_CASE(CheckUnsetValidated)
     BOOST_CHECK_NO_THROW(unset_validated(m1,_["field3"],v1));
     BOOST_CHECK(m1.find("field3")==m1.end());
 }
-#endif
 
 BOOST_AUTO_TEST_CASE(CheckClearValidated)
 {
@@ -658,8 +705,9 @@ BOOST_AUTO_TEST_CASE(CheckResizeValidated)
 {
     auto v1=validator(
                 _["field1"](empty(flag,false)),
-                _["field2"](size(gte,5)),
-                _["field5"](length(gte,4))
+                _["field2"](size(gte,5) ^AND^ value(ne,"Invalid value")),
+                _["field5"](length(gte,4)),
+                _["field6"](NOT(length(lt,4)))
             );
 
     std::map<std::string,std::string> m1{
@@ -667,7 +715,8 @@ BOOST_AUTO_TEST_CASE(CheckResizeValidated)
         {"field2","value2"},
         {"field3","value3"},
         {"field4","value4"},
-        {"field5","value5"}
+        {"field5","value5"},
+        {"field6","value6"}
     };
 
     error_report err;
@@ -728,6 +777,43 @@ BOOST_AUTO_TEST_CASE(CheckResizeValidated)
     BOOST_CHECK_EQUAL(m1.find("field5")->second.size(),5);
     BOOST_CHECK_NO_THROW(resize_validated(m1,_["field5"],5,v1));
     BOOST_CHECK_EQUAL(m1.find("field5")->second.size(),5);
+
+    resize_validated(m1,_["field6"],3,v1,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(m1.find("field6")->second.size(),6);
+    BOOST_CHECK_EQUAL(err.message(),std::string("NOT length of field6 must be less than 4"));
+
+    std::map<std::string,std::vector<std::string>> m2{
+        {"field1",{"value1"}},
+        {"field2",{"value2"}},
+        {"field3",{"value3"}}
+    };
+    auto v2=validator(
+                _["field1"](ANY(size(gte,4))),
+                _["field2"](ANY(empty(flag,false)))
+            );
+    auto v3=validator(
+                _["field1"](ALL(size(gte,4))),
+                _["field2"](ALL(empty(flag,false))),
+                _["field3"](ALL(size(gte,_(m2))))
+            );
+    resize_validated(m2,_["field1"][0],strict_any(3),v2,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("size of element #0 of field1 must be greater than or equal to 4"));
+    resize_validated(m2,_["field2"][0],strict_any(0),v2,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("element #0 of field2 must be not empty"));
+    resize_validated(m2,_["field1"][0],3,v3,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("size of element #0 of field1 must be greater than or equal to 4"));
+    resize_validated(m2,_["field2"][0],0,v3,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("element #0 of field2 must be not empty"));
+
+    resize_validated(m2,_["field3"][0],2,v3,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("size of element #0 of field3 must be greater than or equal to size of element #0 of field3 of sample"));
 }
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()
