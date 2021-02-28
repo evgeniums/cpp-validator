@@ -30,11 +30,12 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename T, typename=hana::when<true>>
 struct get_it_t
 {
-    template <typename T1>
-    constexpr auto operator() (T1&& it) const -> decltype(auto)
-    {
-        return *it;
-    }
+     template <typename T1>
+     constexpr auto operator() (T1&& it) const -> decltype(auto)
+     {
+        auto& val=*it;
+        return val;
+     }
 };
 
 /**
@@ -50,7 +51,8 @@ struct get_it_t<T,
     template <typename T1>
     constexpr auto operator() (T1&& it) const -> decltype(auto)
     {
-        return it->second;
+        auto& val=it->second;
+        return val;
     }
 };
 /**
