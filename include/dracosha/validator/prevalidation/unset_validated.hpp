@@ -68,8 +68,11 @@ void unset_member(
  * @brief Unset object's member with pre-validation with validation result put in the last argument.
  * @param obj Object whose member to unset.
  * @param member Member.
- * @param validator Validator to use for validation.
+ * @param validator Validator to use for validation. If wrapped into strict_any then strict ANY validation will be invoked.
  * @param err Validation result.
+ *
+ * @note Use with caution. Only "exists" operator is checked.
+ *       Conditions with "contains" operator will be missed.
  */
 template <typename ObjectT, typename MemberT, typename ValidatorT>
 void unset_validated(
@@ -79,7 +82,7 @@ void unset_validated(
         error_report& err
     )
 {
-    validate(member[exists],false,std::forward<ValidatorT>(validator),err);
+    validate(member[exists],false,validator,err);
     if (!err)
     {
         unset_member(obj,member);
@@ -90,9 +93,11 @@ void unset_validated(
  * @brief Unset object's member with pre-validation with exception if validation fails.
  * @param obj Object whose member to unset.
  * @param member Member.
- * @param validator Validator to use for validation.
+ * @param validator Validator to use for validation. If wrapped into strict_any then strict ANY validation will be invoked.
  *
  * @throws validation_error if validation fails.
+ *
+ * @note See note to overloaded function.
  */
 template <typename ObjectT, typename MemberT, typename ValidatorT>
 void unset_validated(
