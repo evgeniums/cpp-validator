@@ -48,6 +48,38 @@ struct strict_any_t
 };
 constexpr strict_any_t strict_any{};
 
+template <typename T>
+auto extract_strict_any(T&& val) -> decltype(auto)
+{
+    return hana::if_(
+        hana::is_a<strict_any_tag,T>,
+        [](auto&& val) -> decltype(auto)
+        {
+            return val.get();
+        },
+        [](auto&& val) -> decltype(auto)
+        {
+            return hana::id(std::forward<decltype(val)>(val));
+        }
+    )(std::forward<T>(val));
+}
+
+template <typename T1, typename T2>
+auto wrap_strict_any(T1&& val, T2&&) -> decltype(auto)
+{
+    return hana::if_(
+        hana::is_a<strict_any_tag,T2>,
+        [](auto&& val)
+        {
+            return strict_any(val);
+        },
+        [](auto&& val) -> decltype(auto)
+        {
+            return hana::id(std::forward<decltype(val)>(val));
+        }
+    )(std::forward<T1>(val));
+}
+
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
