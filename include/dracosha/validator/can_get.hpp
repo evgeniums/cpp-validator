@@ -70,12 +70,17 @@ struct can_get_t<T1,T2,hana::when<hana::is_a<wrap_iterator_tag,T2>>>
     {
         return false;
     }
+
+    constexpr static bool find()
+    {
+        return false;
+    }
 };
 
 /**
  *  @brief Helper to check if member can be got from object by key.
  *
- *  Member is gettable if object has either at(key) method or brackets [key] operator
+ *  Member is gettable if object has either at(key) method or find(key) or brackets [key] operator
  *  and type of the key satisfies signature of the corresponding method/operator.
  */
 template <typename T1, typename T2>
@@ -89,7 +94,9 @@ struct can_get_t<T1,T2,hana::when<
     {
         return detail::has_at_c(hana::type_c<T1>,hana::type_c<T2>)
                ||
-               detail::has_brackets_c(hana::type_c<T1>,hana::type_c<T2>);
+               detail::has_brackets_c(hana::type_c<T1>,hana::type_c<T2>)
+               ||
+               detail::has_find_c(hana::type_c<T1>,hana::type_c<T2>);
     }
 
     constexpr static bool iterator()
@@ -110,6 +117,11 @@ struct can_get_t<T1,T2,hana::when<
     constexpr static bool at()
     {
         return detail::has_at_c(hana::type_c<T1>,hana::type_c<T2>);
+    }
+
+    constexpr static bool find()
+    {
+       return detail::has_find_c(hana::type_c<T1>,hana::type_c<T2>);
     }
 };
 
@@ -144,6 +156,11 @@ struct can_get_t<T1,T2,hana::when<hana::is_a<property_tag,T2>>>
     constexpr static bool at()
     {
         return false;
+    }
+
+    constexpr static bool find()
+    {
+       return false;
     }
 };
 

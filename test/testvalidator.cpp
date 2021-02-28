@@ -1,3 +1,4 @@
+#include <set>
 #include <boost/test/unit_test.hpp>
 
 #include <dracosha/validator/validator.hpp>
@@ -854,6 +855,51 @@ BOOST_AUTO_TEST_CASE(CheckNestedSize)
                 _["field1"]["k2"](gte,"v2")
             );
     BOOST_CHECK(v1.apply(a1));
+}
+
+BOOST_AUTO_TEST_CASE(CheckNestedAny)
+{
+    auto v2=validator(
+                _["field1"](ANY(value(contains,"value1")))
+            );
+    std::map<std::string,std::map<std::string,std::map<std::string,std::string>>> m2{
+        {"field1",{{"key1",
+                    {{"value1","subvalue1"}}
+                }}
+        }
+    };
+    std::map<std::string,std::map<std::string,std::map<std::string,std::string>>> m3{
+        {"field1",{{"key1",
+                    {{"value2","subvalue2"}}
+                }}
+        }
+    };
+    BOOST_CHECK(v2.apply(m2));
+    BOOST_CHECK(!v2.apply(m3));
+}
+
+BOOST_AUTO_TEST_CASE(CheckSets)
+{
+    auto v1=validator(
+                _["field1"](exists,true),
+                _["field2"](exists,false)
+            );
+    std::set<std::string> s1{
+        "field1","field3"
+    };
+    std::set<std::string> s2{
+        "field1","field2","field3"
+    };
+    BOOST_CHECK(v1.apply(s1));
+    BOOST_CHECK(!v1.apply(s1));
+
+    auto v2=validator(
+                _["key1"](contains,std::string("field1"))
+            );
+    std::map<std::string,std::set<std::string>> ms1{
+        {"key1",{"field1","field3"}}
+    };
+    v2.apply(ms1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

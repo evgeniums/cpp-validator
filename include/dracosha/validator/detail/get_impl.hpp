@@ -37,6 +37,7 @@ namespace get_helpers
         at = 2,
         brackets = 3,
         iterator = 4,
+        find = 5,
 
         none = -1
     };
@@ -56,7 +57,11 @@ namespace get_helpers
                     hana::if_(
                         can_get<T1, T2>.iterator(),
                         getter::iterator,
-                        getter::none
+                        hana::if_(
+                            can_get<T1, T2>.find(),
+                            getter::find,
+                            getter::none
+                        )
                     )
                 )
             )
@@ -95,24 +100,6 @@ struct get_t<T1,T2,
     }
 };
 
-//! @todo Fix member notation of properties size and empty.
-#if 0
-/**
- * @brief Get from take_address_of_stub_t.
- */
-template <typename T1,typename T2>
-struct get_t<T1,T2,
-            hana::when<std::is_same<std::decay_t<T1>,take_address_of_stub_t>::value>
-        >
-{
-    template <typename ...Args>
-    void* operator () (Args&&...) const
-    {
-        return nullptr;
-    }
-};
-#endif
-
 /**
  * @brief Get using at(key) method.
  */
@@ -136,6 +123,18 @@ struct get_t<T1,T2,
     auto operator () (T1&& v, T2&& k) const -> decltype(auto)
     {
       return v[std::forward<T2>(k)];
+    }
+};
+/**
+ * @brief Get using find(key) method.
+ */
+template <typename T1, typename T2>
+struct get_t<T1,T2,
+    hana::when<get_helpers::selector<T1, T2>::value == get_helpers::getter::find>>
+{
+    auto operator () (T1&& v, T2&& k) const -> decltype(auto)
+    {
+      return *(v.find(std::forward<T2>(k)));
     }
 };
 
