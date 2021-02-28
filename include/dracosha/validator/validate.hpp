@@ -108,6 +108,7 @@ struct validate_t
             error_report& err
         ) const
     {
+        err.reset();
         err.set_value(validator.apply(
                           make_prevalidation_adapter(
                               std::forward<MemberT>(member),
