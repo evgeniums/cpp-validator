@@ -1,3 +1,6 @@
+#include <set>
+#include <iterator>
+
 #include <boost/test/unit_test.hpp>
 
 #include <dracosha/validator/validator.hpp>
@@ -609,17 +612,16 @@ BOOST_AUTO_TEST_CASE(CheckUpdateValidatedWithSample)
 #if 1
 BOOST_AUTO_TEST_CASE(CheckUnsetValidated)
 {
+    error_report err;
+
     auto v1=validator(
                 _["field1"](exists,true)
             );
-
     std::map<std::string,std::string> m1{
         {"field1","value1"},
         {"field2","value2"},
         {"field3","value3"}
     };
-
-    error_report err;
 
     unset_validated(m1,_["field1"],v1,err);
     BOOST_CHECK(err);
@@ -699,6 +701,34 @@ BOOST_AUTO_TEST_CASE(CheckClearValidated)
 
     BOOST_CHECK_NO_THROW(clear_validated(m1,_["field4"],v1));
     BOOST_CHECK(m1.find("field4")->second.empty());
+
+    auto v2=validator(
+        _["field1"](ANY(empty(flag,false)))
+    );
+    auto v3=validator(
+        _["field1"](ANY(empty(flag,true)))
+    );
+    std::map<std::string,std::set<std::string>> s2{
+        {"field1",{"value1","value2","value3"}},
+        {"field2",{"value1","value2","value3"}}
+    };
+    BOOST_CHECK(v2.apply(s2));
+    BOOST_CHECK(!v3.apply(s2));
+
+    std::map<std::string,std::map<std::string,std::string>> m3{
+        {"field1",{{"value1","content1"},{"value2","content2"},{"value3","content3"}}},
+        {"field2",{{"value1","content1"},{"value2","content2"},{"value3","content3"}}}
+    };
+
+    clear_validated(m3,_["field1"]["value1"],strict_any(v2),err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(m3["field1"]["value1"].size(),8);
+    clear_validated(m3,_["field2"]["value1"],strict_any(v2),err);
+    BOOST_CHECK(!err);
+    BOOST_CHECK_EQUAL(m3["field2"]["value1"].size(),0);
+    clear_validated(m3,_["field1"]["value1"],v2,err);
+    BOOST_CHECK(!err);
+    BOOST_CHECK_EQUAL(m3["field1"]["value1"].size(),0);
 }
 
 BOOST_AUTO_TEST_CASE(CheckResizeValidated)
