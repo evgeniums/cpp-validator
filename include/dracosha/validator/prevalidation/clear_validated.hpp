@@ -20,11 +20,12 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_CLEAR_VALIDATED_HPP
 
 #include <dracosha/validator/validate.hpp>
+#include <dracosha/validator/utils/get_it.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 /**
- * @brief Default implementation of that uses clear() to clear the object itself.
+ * @brief Default implementation of that uses clear() to clear the object's element.
  */
 template <typename ObjectT, typename MemberT, typename Enable=void>
 struct clear_member_t
@@ -32,10 +33,14 @@ struct clear_member_t
     template <typename ObjectT1, typename MemberT1>
     void operator() (
             ObjectT1& obj,
-            MemberT1&&
+            MemberT1&& member
         ) const
     {
-        obj.clear();
+        auto it=obj.find(member.key());
+        if (it!=obj.end())
+        {
+            get_it(it).clear();
+        }
     }
 };
 
@@ -66,10 +71,10 @@ void clear_member(
  * @param validator Validator to use for validation.
  * @param err Validation result.
  *
- * @note Use with caution. Only "size" and "empty" properties are validated.
- * If there are some conditions regarding content then they are not checked.
+ * @note Use with caution. Only "size", "length" and "empty" properties are validated.
+ * In case there are some conditions validating content, they are not checked.
  * For example, clearing string validated with `validator(_[string_field](gte,"Hello world!"))`
- * will not emit error despite the validation condition regarding string content is not met.
+ * will not emit error despite the validation condition checking string content is not met.
  */
 template <typename ObjectT, typename MemberT, typename ValidatorT>
 void clear_validated(
@@ -79,6 +84,7 @@ void clear_validated(
         error_report& err
     )
 {
+    err.reset();
     validate(member[empty],true,validator,err);
     if (!err)
     {

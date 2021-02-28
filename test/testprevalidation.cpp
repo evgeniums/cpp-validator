@@ -5,9 +5,12 @@
 
 #include <dracosha/validator/prevalidation/prevalidation_adapter.hpp>
 #include <dracosha/validator/prevalidation/set_validated.hpp>
+#include <dracosha/validator/prevalidation/unset_validated.hpp>
+#include <dracosha/validator/prevalidation/clear_validated.hpp>
+#include <dracosha/validator/prevalidation/resize_validated.hpp>
 
 namespace hana=boost::hana;
-#if 1
+
 DRACOSHA_VALIDATOR_PROPERTY(field1)
 
 namespace {
@@ -69,7 +72,7 @@ public:
   }
 };
 }
-#endif
+
 namespace
 {
 
@@ -405,10 +408,9 @@ BOOST_AUTO_TEST_CASE(CheckSetValidatedObject)
 
     BOOST_CHECK_THROW(obj3.SetX(1000.0);,validation_error);
 }
-#endif
+
 BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
 {
-#if 1
     std::string rep1;
 
     auto v0=validator(
@@ -555,16 +557,177 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     BOOST_CHECK(!v5.apply(pa16));
     BOOST_CHECK_EQUAL(std::string("field1_1 of field1 must be greater than or equal to Hello"),rep1);
     rep1.clear();
+}
 
-#else
-    std::string rep1;
-    NonCopyable nc;
-    std::ignore=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any(nc),rep1);
+BOOST_AUTO_TEST_CASE(CheckUnsetValidated)
+{
+    auto v1=validator(
+                _["field1"](exists,true)
+            );
 
-    std::ignore=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any(1),rep1);
-    std::ignore=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any(NonCopyable{}),rep1);
+    std::map<std::string,std::string> m1{
+        {"field1","value1"},
+        {"field2","value2"},
+        {"field3","value3"}
+    };
 
+    error_report err;
+
+    unset_validated(m1,_["field1"],v1,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field1 must exist"));
+    BOOST_CHECK(m1.find("field1")!=m1.end());
+
+    BOOST_CHECK_THROW(unset_validated(m1,_["field1"],v1),validation_error);
+    try
+    {
+        unset_validated(m1,_["field1"],v1);
+    }
+    catch (const validation_error& e)
+    {
+        BOOST_CHECK_EQUAL(e.what(),"field1 must exist");
+    }
+    BOOST_CHECK(m1.find("field1")!=m1.end());
+
+    unset_validated(m1,_["field2"],v1,err);
+    BOOST_CHECK(!err);
+    BOOST_CHECK(m1.find("field2")==m1.end());
+
+    BOOST_CHECK_NO_THROW(unset_validated(m1,_["field3"],v1));
+    BOOST_CHECK(m1.find("field3")==m1.end());
+}
 #endif
+
+BOOST_AUTO_TEST_CASE(CheckClearValidated)
+{
+    auto v1=validator(
+                _["field1"](empty(flag,false)),
+                _["field2"](size(gte,2))
+            );
+
+    std::map<std::string,std::string> m1{
+        {"field1","value1"},
+        {"field2","value2"},
+        {"field3","value3"},
+        {"field4","value4"}
+    };
+
+    error_report err;
+
+    clear_validated(m1,_["field1"],v1,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field1 must be not empty"));
+    BOOST_CHECK(!m1.find("field1")->second.empty());
+
+    BOOST_CHECK_THROW(clear_validated(m1,_["field1"],v1),validation_error);
+    try
+    {
+        clear_validated(m1,_["field1"],v1);
+    }
+    catch (const validation_error& e)
+    {
+        BOOST_CHECK_EQUAL(e.what(),"field1 must be not empty");
+    }
+    BOOST_CHECK(!m1.find("field1")->second.empty());
+
+    clear_validated(m1,_["field2"],v1,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("size of field2 must be greater than or equal to 2"));
+    BOOST_CHECK(!m1.find("field2")->second.empty());
+
+    BOOST_CHECK_THROW(clear_validated(m1,_["field2"],v1),validation_error);
+    try
+    {
+        clear_validated(m1,_["field2"],v1);
+    }
+    catch (const validation_error& e)
+    {
+        BOOST_CHECK_EQUAL(e.what(),"size of field2 must be greater than or equal to 2");
+    }
+    BOOST_CHECK(!m1.find("field2")->second.empty());
+
+    clear_validated(m1,_["field3"],v1,err);
+    BOOST_CHECK(!err);
+    BOOST_CHECK(m1.find("field3")->second.empty());
+
+    BOOST_CHECK_NO_THROW(clear_validated(m1,_["field4"],v1));
+    BOOST_CHECK(m1.find("field4")->second.empty());
+}
+
+BOOST_AUTO_TEST_CASE(CheckResizeValidated)
+{
+    auto v1=validator(
+                _["field1"](empty(flag,false)),
+                _["field2"](size(gte,5)),
+                _["field5"](length(gte,4))
+            );
+
+    std::map<std::string,std::string> m1{
+        {"field1","value1"},
+        {"field2","value2"},
+        {"field3","value3"},
+        {"field4","value4"},
+        {"field5","value5"}
+    };
+
+    error_report err;
+
+    resize_validated(m1,_["field1"],0,v1,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field1 must be not empty"));
+    BOOST_CHECK_EQUAL(m1.find("field1")->second.size(),6);
+    BOOST_CHECK_THROW(resize_validated(m1,_["field1"],0,v1),validation_error);
+    try
+    {
+        resize_validated(m1,_["field1"],0,v1);
+    }
+    catch (const validation_error& e)
+    {
+        BOOST_CHECK_EQUAL(e.what(),"field1 must be not empty");
+    }
+    BOOST_CHECK_EQUAL(m1.find("field1")->second.size(),6);
+
+    resize_validated(m1,_["field2"],3,v1,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("size of field2 must be greater than or equal to 5"));
+    BOOST_CHECK_EQUAL(m1.find("field2")->second.size(),6);
+    BOOST_CHECK_THROW(resize_validated(m1,_["field2"],3,v1),validation_error);
+    try
+    {
+        resize_validated(m1,_["field2"],3,v1);
+    }
+    catch (const validation_error& e)
+    {
+        BOOST_CHECK_EQUAL(e.what(),"size of field2 must be greater than or equal to 5");
+    }
+    BOOST_CHECK_EQUAL(m1.find("field2")->second.size(),6);
+
+    resize_validated(m1,_["field3"],3,v1,err);
+    BOOST_CHECK(!err);
+    BOOST_CHECK_EQUAL(m1.find("field3")->second.size(),3);
+    BOOST_CHECK_NO_THROW(resize_validated(m1,_["field4"],3,v1));
+    BOOST_CHECK_EQUAL(m1.find("field4")->second.size(),3);
+
+    resize_validated(m1,_["field5"],3,v1,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("length of field5 must be greater than or equal to 4"));
+    BOOST_CHECK_EQUAL(m1.find("field5")->second.size(),6);
+    BOOST_CHECK_THROW(resize_validated(m1,_["field5"],3,v1),validation_error);
+    try
+    {
+        resize_validated(m1,_["field5"],3,v1);
+    }
+    catch (const validation_error& e)
+    {
+        BOOST_CHECK_EQUAL(e.what(),"length of field5 must be greater than or equal to 4");
+    }
+    BOOST_CHECK_EQUAL(m1.find("field5")->second.size(),6);
+
+    resize_validated(m1,_["field5"],5,v1,err);
+    BOOST_CHECK(!err);
+    BOOST_CHECK_EQUAL(m1.find("field5")->second.size(),5);
+    BOOST_CHECK_NO_THROW(resize_validated(m1,_["field5"],5,v1));
+    BOOST_CHECK_EQUAL(m1.find("field5")->second.size(),5);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
