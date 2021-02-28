@@ -68,28 +68,14 @@ struct has_end<T,
 };
 
 /**
- * @brief Default helper for checking if variable is a container.
- */
-template <typename T, typename =hana::when<true>>
-struct is_container_t
-{
-    constexpr static const bool value=false;
-};
-
-/**
- * @brief Helper for checking if variable is a container for case when type has begin() and end() methods.
- */
+ * @brief Check if type is a container.
+**/
 template <typename T>
-struct is_container_t<T,
-            hana::when<
-                has_begin<T>::value && has_end<T>::value
-                && !std::is_same<std::decay_t<T>,std::string>::value
-                && !std::is_same<std::decay_t<T>,string_view>::value
-            >
-        >
-{
-    constexpr static const bool value=true;
-};
+using is_container_t=std::integral_constant<bool,
+                                    has_begin<T>::value && has_end<T>::value
+                                    && !std::is_same<std::decay_t<T>,std::string>::value
+                                    && !std::is_same<std::decay_t<T>,string_view>::value
+                                >;
 
 /**
  * @brief Check if variable is a container.
