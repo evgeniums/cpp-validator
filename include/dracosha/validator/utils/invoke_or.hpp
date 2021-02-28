@@ -28,7 +28,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //---------------------------------------------------------------
 
 /**
- * @brief Traits for OR disjunction where result of each callable invovation is checked as bool as is.
+ * @brief Traits for OR disjunction where result of each callable invovation is checked as bool.
  */
 struct invoke_or_default_traits
 {
@@ -142,14 +142,14 @@ template <typename TraitsT>
 constexpr invoke_or_t<TraitsT> invoke_or_configurable{};
 
 /**
- * @brief Invoke callables one by one using OR disjunction where result is checked as bool as is.
+ * @brief Invoke callables one by one using OR disjunction where result of each callable is checked as bool.
  * @param fns Callables. All callables must return the same type that must be convertible to bool.
  * @return Accumulated return result of callables invocations.
  */
 constexpr decltype(invoke_or_configurable<invoke_or_default_traits>) invoke_or{};
 
 /**
- * @brief Invoke callables one by one using OR disjunction where result is checked as inverted bool.
+ * @brief Invoke callables one by one using OR disjunction where result of each callable is checked as inverted bool.
  * @param fns Callables. All callables must return the same type that must be convertible to bool.
  * @return Accumulated return result of callables invocations.
  */

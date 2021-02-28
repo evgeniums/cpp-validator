@@ -122,14 +122,14 @@ template <typename TraitsT>
 constexpr invoke_and_t<TraitsT> invoke_and_configurable{};
 
 /**
- * @brief Invoke callables one by one using AND conjunction where result is checked as bool as is.
+ * @brief Invoke callables one by one using AND conjunction where result of each callable is checked as bool.
  * @param fns Callables. All callables must return the same type that must be convertible to bool.
  * @return Accumulated return result of callables invocations.
  */
 constexpr decltype(invoke_and_configurable<invoke_and_default_traits>) invoke_and{};
 
 /**
- * @brief Invoke callables one by one using AND conjunction where result is checked as inverted bool.
+ * @brief Invoke callables one by one using AND conjunction where result of each callable is checked as inverted bool.
  * @param fns Callables. All callables must return the same type that must be convertible to bool.
  * @return Accumulated return result of callables invocations.
  */

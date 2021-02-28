@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** @file validator/utils/is_container.hpp
 *
-*  Defines helper to check of object is if container type.
+*  Defines helper to check if object is if container type.
 *
 */
 

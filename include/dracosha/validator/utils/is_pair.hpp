@@ -55,7 +55,7 @@ struct has_second
 };
 
 /**
- * @brief Helper to check if object has property "second" when it has.
+ * @brief Helper to check if object has property "second" for the case when it has indeed.
  */
 template <typename T>
 struct has_second<T,
@@ -65,7 +65,7 @@ struct has_second<T,
 };
 
 /**
- * @brief Default helper to check if object is of std::pair type. i.e has "first" and "second" properties.
+ * @brief Default helper to check if object is of std::pair type. i.e it has "first" and "second" properties.
  */
 template <typename T, typename =hana::when<true>>
 struct is_pair_t
@@ -74,7 +74,7 @@ struct is_pair_t
 };
 
 /**
- * @brief Helper to check if object is of std::pair type. i.e has "first" and "second" properties when it has.
+ * @brief Helper to check if object is of std::pair type. i.e it has "first" and "second" properties.
  */
 template <typename T>
 struct is_pair_t<T,
