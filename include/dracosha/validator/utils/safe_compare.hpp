@@ -20,8 +20,10 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_SAFE_COMPARE_HPP
 
 #include <type_traits>
+#include <string>
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/utils/string_view.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -267,6 +269,33 @@ struct safe_compare<LeftT, RightT,
     }
 };
 
+/**
+ *  @brief Helper for comparing string and string_view.
+ *
+ */
+template <typename LeftT, typename RightT>
+struct safe_compare<LeftT, RightT,
+        std::enable_if_t<
+            std::is_same<LeftT,string_view>::value && std::is_same<RightT,std::string>::value
+            ||
+            std::is_same<LeftT,std::string>::value && std::is_same<RightT,string_view>::value
+        >
+    >
+{
+    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
+    {
+        return string_view(left) < string_view(right);
+    }
+    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
+    {
+        return string_view(left) == string_view(right);
+    }
+    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
+    {
+        return string_view(left) <= string_view(right);
+    }
+};
+
 //-------------------------------------------------------------
 
 /**
@@ -277,6 +306,30 @@ struct safe_compare<LeftT, RightT,
  */
 template <typename LeftT, typename RightT>
 constexpr bool safe_compare_less(const LeftT& a, const RightT& b)
+{
+    return safe_compare<LeftT,RightT>::less(a,b);
+}
+
+/**
+ * @brief Compare if left value is equal to right value.
+ * @param a First value to compare.
+ * @param b Second valut to compare.
+ * @return Operation result.
+ */
+template <typename LeftT, typename RightT>
+constexpr bool safe_compare_equal(const LeftT& a, const RightT& b)
+{
+    return safe_compare<LeftT,RightT>::equal(a,b);
+}
+
+/**
+ * @brief Compare if left value is less than or equal to right value.
+ * @param a First value to compare.
+ * @param b Second valut to compare.
+ * @return Operation result.
+ */
+template <typename LeftT, typename RightT>
+constexpr bool safe_compare_less_equal(const LeftT& a, const RightT& b)
 {
     return safe_compare<LeftT,RightT>::less(a,b);
 }
