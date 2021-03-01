@@ -85,7 +85,7 @@ struct check_contains_t
                              ) const
     {
         return hana::if_(detail::has_find_it(a,b),
-            [](auto&& a1, auto&& b1) { return a1.find(std::forward<decltype(b1)>(b1))!=a1.end(); },
+            [](auto&& a1, auto&& b1) { return a1.find(b1)!=a1.end(); },
             hana::if_(detail::has_has(a,b),
                 [](auto&& a1, auto&& b1) { return a1.has(b1); },
                 hana::if_(detail::has_contains(a,b),

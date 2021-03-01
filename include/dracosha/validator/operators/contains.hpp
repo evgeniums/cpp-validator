@@ -39,7 +39,7 @@ struct contains_t : public op<contains_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return check_exists(a,hana::make_tuple(b));
+        return check_contains(a,b);
     }
 };
 
