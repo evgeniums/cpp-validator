@@ -276,9 +276,9 @@ struct safe_compare<LeftT, RightT,
 template <typename LeftT, typename RightT>
 struct safe_compare<LeftT, RightT,
         std::enable_if_t<
-            std::is_same<LeftT,string_view>::value && std::is_same<RightT,std::string>::value
+            (std::is_same<LeftT,string_view>::value && std::is_same<RightT,std::string>::value)
             ||
-            std::is_same<LeftT,std::string>::value && std::is_same<RightT,string_view>::value
+            (std::is_same<LeftT,std::string>::value && std::is_same<RightT,string_view>::value)
         >
     >
 {
