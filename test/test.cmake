@@ -1,8 +1,8 @@
 SET (VALIDATOR_TEST_SOURCES
 
-    ${VALIDATOR_TEST_SRC}/testvalidator.cpp
-
     ${VALIDATOR_TEST_SRC}/testprevalidation.cpp
+
+    ${VALIDATOR_TEST_SRC}/testvalidator.cpp
     ${VALIDATOR_TEST_SRC}/testvalidatorimpl.cpp
     ${VALIDATOR_TEST_SRC}/testreporter.cpp
     ${VALIDATOR_TEST_SRC}/testreporting.cpp

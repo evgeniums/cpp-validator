@@ -29,6 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/member.hpp>
 #include <dracosha/validator/adapters/impl/default_adapter_impl.hpp>
 #include <dracosha/validator/prevalidation/prevalidation_adapter_tag.hpp>
+#include <dracosha/validator/utils/value_as_container.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -141,61 +142,82 @@ class prevalidation_adapter_impl
         {
             const auto& obj=extract(adpt.traits().get());
 
-            // select execution path depending on the type of adapter's member key
             return hana::if_(
-                hana::or_(
-                    std::is_same<std::decay_t<decltype(size)>,std::decay_t<decltype(_member.key())>>{},
-                    std::is_same<std::decay_t<decltype(empty)>,std::decay_t<decltype(_member.key())>>{}
+                hana::and_(
+                    hana::is_a<value_as_container_tag,decltype(obj)>,
+                    hana::not_(std::is_same<std::decay_t<OpT>,std::decay_t<decltype(contains)>>{})
                 ),
-                [](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
+                [](auto&& ...)
                 {
-                    // check size/empty member path suffix
-                    return self->validate_size_property(
-                                    std::forward<decltype(adpt)>(adpt),
-                                    std::forward<decltype(member)>(member),
-                                    std::forward<decltype(prop)>(prop),
-                                    std::forward<decltype(op)>(op),
-                                    std::forward<decltype(b)>(b),
-                                    self->_member.key()
-                                );
+                    // only "contains" operator is suitable for check_contains_stub
+                    return status(status::code::ignore);
                 },
                 [&obj](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
                 {
-                    if (self->_member_checked)
-                    {
-                        return self->validate_property(
-                                    std::forward<decltype(adpt)>(adpt),
-                                    std::forward<decltype(prop)>(prop),
-                                    std::forward<decltype(op)>(op),
-                                    std::forward<decltype(b)>(b)
-                                );
-                    }
-
-                    // check member path as is
-                    return hana::eval_if(
-                                (
-                                    (check_member_path_types(self->_member,member))
-                                    &&
-                                    has_property_fn(obj,prop)
-                                 ),
-                        [&self,&member,&adpt,&prop,&op,&b](auto&&)
+                    // select execution path depending on the type of adapter's member key, if size/empty then check size
+                    return hana::if_(
+                        hana::or_(
+                            std::is_same<std::decay_t<decltype(size)>,std::decay_t<decltype(_member.key())>>{},
+                            std::is_same<std::decay_t<decltype(empty)>,std::decay_t<decltype(_member.key())>>{}
+                        ),
+                        [](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
                         {
-                            if (self->filter_member(member))
-                            {
-                                return status(status::code::ignore);
-                            }
-                            return self->validate_property(
-                                        std::forward<decltype(adpt)>(adpt),
-                                        std::forward<decltype(prop)>(prop),
-                                        std::forward<decltype(op)>(op),
-                                        std::forward<decltype(b)>(b)
-                                    );
+                            // check size/empty member path suffix
+                            return self->validate_size_property(
+                                            std::forward<decltype(adpt)>(adpt),
+                                            std::forward<decltype(member)>(member),
+                                            std::forward<decltype(prop)>(prop),
+                                            std::forward<decltype(op)>(op),
+                                            std::forward<decltype(b)>(b),
+                                            self->_member.key()
+                                        );
                         },
-                        [](auto&&)
+                        [&obj](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
                         {
-                            return status(status::code::ignore);
+                            if (self->_member_checked)
+                            {
+                                return self->validate_property(
+                                            std::forward<decltype(adpt)>(adpt),
+                                            std::forward<decltype(prop)>(prop),
+                                            std::forward<decltype(op)>(op),
+                                            std::forward<decltype(b)>(b)
+                                        );
+                            }
+
+                            // check member path as is
+                            return hana::eval_if(
+                                        (
+                                            (check_member_path_types(self->_member,member))
+                                            &&
+                                            has_property_fn(obj,prop)
+                                         ),
+                                [&self,&member,&adpt,&prop,&op,&b](auto&&)
+                                {
+                                    if (self->filter_member(member))
+                                    {
+                                        return status(status::code::ignore);
+                                    }
+                                    return self->validate_property(
+                                                std::forward<decltype(adpt)>(adpt),
+                                                std::forward<decltype(prop)>(prop),
+                                                std::forward<decltype(op)>(op),
+                                                std::forward<decltype(b)>(b)
+                                            );
+                                },
+                                [](auto&&)
+                                {
+                                    return status(status::code::ignore);
+                                }
+                            );
                         }
-                    );
+                    )(
+                        self,
+                        std::forward<decltype(adpt)>(adpt),
+                        std::forward<decltype(member)>(member),
+                        std::forward<decltype(prop)>(prop),
+                        std::forward<decltype(op)>(op),
+                        std::forward<decltype(b)>(b)
+                      );
                 }
             )(
                 this,

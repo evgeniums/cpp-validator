@@ -99,7 +99,7 @@ struct NonCopyable
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestPrevalidation)
-#if 1
+
 BOOST_AUTO_TEST_CASE(CheckPrevalidationReport)
 {
     std::string rep1;
@@ -108,8 +108,11 @@ BOOST_AUTO_TEST_CASE(CheckPrevalidationReport)
                 _[size](ne,100),
                 _["field1"](gte,"1"),
                 _["field10"](size(lt,3)),
-                _[10](gte,1000)
+                _[10](gte,1000),
+                _["field100"]["subfield100"](contains,"value10")
             );
+
+#if 1
     auto sa1=make_prevalidation_adapter(_["field1"],"value10",rep1);
     auto&& val1=sa1.traits().get();
     BOOST_CHECK_EQUAL(val1,"value10");
@@ -152,8 +155,25 @@ BOOST_AUTO_TEST_CASE(CheckPrevalidationReport)
     BOOST_CHECK(!v1.apply(sa9));
     BOOST_CHECK_EQUAL(rep1,"element #10 must be greater than or equal to 1000");
     rep1.clear();
-}
 
+    BOOST_CHECK(check_contains(value_as_container("value10"),"value10"));
+
+    auto sa10=make_prevalidation_adapter(_["field100"]["subfield100"],value_as_container("value1"),rep1);
+    BOOST_CHECK(!v1.apply(sa10));
+    BOOST_CHECK_EQUAL(rep1,"subfield100 of field100 must contain value10");
+#endif
+    auto sa11=make_prevalidation_adapter(_["field100"]["subfield100"],value_as_container("value10"),rep1);
+    BOOST_CHECK(v1.apply(sa11));
+    rep1.clear();
+
+    auto v2=validator(
+        _["field1"](contains,10)
+    );
+    auto sa21=make_prevalidation_adapter(_["field1"],20,rep1);
+    BOOST_CHECK(!check_contains(20,10));
+    BOOST_CHECK(!v2.apply(sa21));
+}
+#if 1
 BOOST_AUTO_TEST_CASE(CheckAggregationPrevalidationReport)
 {
     auto v1=validator(
@@ -561,7 +581,6 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     BOOST_CHECK_EQUAL(std::string("element #1 of field1_1 of field1 must be greater than or equal to Hello"),rep1);
     rep1.clear();
 }
-#endif
 
 BOOST_AUTO_TEST_CASE(CheckUpdateValidatedWithSample)
 {
@@ -609,13 +628,13 @@ BOOST_AUTO_TEST_CASE(CheckUpdateValidatedWithSample)
     BOOST_CHECK_EQUAL(m7["field3"][0],"zzzzz");
 }
 
-#if 1
 BOOST_AUTO_TEST_CASE(CheckUnsetValidated)
 {
     error_report err;
 
     auto v1=validator(
-                _["field1"](exists,true)
+                _["field1"](exists,true),
+                _["field1"](eq,100)
             );
     std::map<std::string,std::string> m1{
         {"field1","value1"},
@@ -645,6 +664,36 @@ BOOST_AUTO_TEST_CASE(CheckUnsetValidated)
 
     BOOST_CHECK_NO_THROW(unset_validated(m1,_["field3"],v1));
     BOOST_CHECK(m1.find("field3")==m1.end());
+
+    auto v2=validator(
+                _["field1"](contains,"value1"),
+                _["field1"](size(gte,3))
+            );
+    std::map<std::string,std::map<std::string,std::string>> m2{
+        {"field1",{{"value1","content1"},{"value2","content2"},{"value3","content3"}}}
+    };
+    unset_validated(m2,_["field1"]["value1"],v2,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field1 must contain value1"));
+    unset_validated(m2,_["field1"]["value2"],v2,err);
+    BOOST_CHECK(!err);
+    BOOST_CHECK_EQUAL(err.message(),std::string(""));
+
+    auto v3=validator(
+                _["field1"](ANY(contains,"content1"))
+            );
+    std::map<std::string,std::map<std::string,std::set<std::string>>> m3{
+        {"field1",{{"value1",{"content1"}},{"value2",{"content2"}},{"value3",{"content3"}}}}
+    };
+    auto& s3=m3["field1"]["value1"];
+    unset_validated(m3,_["field1"]["value1"]["content1"],strict_any(v3),err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("value1 of field1 must contain content1"));
+    BOOST_CHECK(s3.find("content1")!=s3.end());
+
+    unset_validated(m3,_["field1"]["value1"]["content1"],v3,err);
+    BOOST_CHECK(!err);
+    BOOST_CHECK(s3.find("content1")==s3.end());
 }
 
 BOOST_AUTO_TEST_CASE(CheckClearValidated)
@@ -845,5 +894,4 @@ BOOST_AUTO_TEST_CASE(CheckResizeValidated)
     BOOST_CHECK_EQUAL(err.message(),std::string("size of element #0 of field3 must be greater than or equal to size of element #0 of field3 of sample"));
 }
 #endif
-
 BOOST_AUTO_TEST_SUITE_END()

@@ -22,6 +22,7 @@ SET (HEADERS
     include/dracosha/validator/utils/feature_bitmask.hpp
     include/dracosha/validator/utils/invoke_and.hpp
     include/dracosha/validator/utils/invoke_or.hpp
+    include/dracosha/validator/utils/value_as_container.hpp
 
     include/dracosha/validator/property.hpp
     include/dracosha/validator/can_get.hpp

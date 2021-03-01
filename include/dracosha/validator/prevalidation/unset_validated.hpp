@@ -71,8 +71,7 @@ void unset_member(
  * @param validator Validator to use for validation. If wrapped into strict_any then strict ANY validation will be invoked.
  * @param err Validation result.
  *
- * @note Use with caution. Only "exists" operator is checked.
- *       Conditions with "contains" operator will be missed.
+ * Only condition rules with operators "exists" and "contains" are used in validation.
  */
 template <typename ObjectT, typename MemberT, typename ValidatorT>
 void unset_validated(
@@ -82,10 +81,31 @@ void unset_validated(
         error_report& err
     )
 {
-    validate(member[exists],false,validator,err);
+    // check "exist" operator
+    validate(member[exists],false,extract_strict_any(validator),err);
     if (!err)
     {
-        unset_member(obj,member);
+        // check "contains" operator
+        hana::eval_if(
+            hana::bool_<MemberT::is_nested>{},
+            [&](auto&& _)
+            {
+                validate(
+                            _(member).parent(),
+                            wrap_strict_any(value_as_container_inverse(_(member).key()),_(validator)),
+                            extract_strict_any(_(validator)),
+                            _(err)
+                         );
+            },
+            [](auto&&)
+            {}
+        );
+
+        // unset member
+        if (!err)
+        {
+            unset_member(obj,member);
+        }
     }
 }
 
