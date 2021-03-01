@@ -29,6 +29,104 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+template <typename T1, typename T2, typename Enable=hana::when<true>>
+struct lex_operators
+{
+    static bool eq(const T1& a, const T2& b)
+    {
+        return boost::algorithm::equals(a,b);
+    }
+
+    static bool ne (const T1& a, const T2& b)
+    {
+        return !boost::algorithm::equals(a,b);
+    }
+
+    static bool lt(const T1& a, const T2& b)
+    {
+        return boost::algorithm::lexicographical_compare(a,b);
+    }
+
+    static bool lte(const T1& a, const T2& b)
+    {
+        return boost::algorithm::lexicographical_compare(a,b)
+                ||
+               boost::algorithm::equals(a,b);
+    }
+
+    static bool gt(const T1& a, const T2& b)
+    {
+        return !lte(a,b);
+    }
+
+    static bool gte(const T1& a, const T2& b)
+    {
+        return !lt(a,b);
+    }
+
+    static bool ieq(const T1& a, const T2& b)
+    {
+        return boost::algorithm::iequals(a,b);
+    }
+
+    static bool ine(const T1& a, const T2& b)
+    {
+        return !boost::algorithm::iequals(a,b);
+    }
+
+    static bool ilt(const T1& a, const T2& b)
+    {
+        return boost::algorithm::ilexicographical_compare(a,b);
+    }
+
+    static bool ilte(const T1& a, const T2& b)
+    {
+        return boost::algorithm::ilexicographical_compare(a,b)
+                ||
+               boost::algorithm::iequals(a,b);
+    }
+
+    static bool igt(const T1& a, const T2& b)
+    {
+        return !ilte(a,b);
+    }
+
+    static bool igte(const T1& a, const T2& b)
+    {
+        return !ilt(a,b);
+    }
+
+    static bool contains(const T1& a, const T2& b)
+    {
+        return boost::algorithm::contains(a,b);
+    }
+
+    static bool icontains(const T1& a, const T2& b)
+    {
+        return boost::algorithm::icontains(a,b);
+    }
+
+    static bool starts_with(const T1& a, const T2& b)
+    {
+        return boost::algorithm::starts_with(a,b);
+    }
+
+    static bool istarts_with(const T1& a, const T2& b)
+    {
+        return boost::algorithm::istarts_with(a,b);
+    }
+
+    static bool ends_with(const T1& a, const T2& b)
+    {
+        return boost::algorithm::ends_with(a,b);
+    }
+
+    static bool iends_with(const T1& a, const T2& b)
+    {
+        return boost::algorithm::iends_with(a,b);
+    }
+};
+
 /**
  * @brief Definition of operator "lexicographically equal to".
  */
@@ -40,7 +138,7 @@ struct lex_eq_t : public op<lex_eq_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return boost::algorithm::equals(a,b);
+        return lex_operators<T1,T2>::eq(a,b);
     }
 };
 
@@ -60,7 +158,7 @@ struct lex_ne_t : public op<lex_ne_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return !boost::algorithm::equals(a,b);
+        return lex_operators<T1,T2>::ne(a,b);
     }
 };
 
@@ -80,7 +178,7 @@ struct lex_lt_t : public op<lex_lt_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return boost::algorithm::lexicographical_compare(a,b);
+        return lex_operators<T1,T2>::lt(a,b);
     }
 };
 
@@ -100,9 +198,7 @@ struct lex_lte_t : public op<lex_lte_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return boost::algorithm::lexicographical_compare(a,b)
-                ||
-               boost::algorithm::equals(a,b);
+        return lex_operators<T1,T2>::lte(a,b);
     }
 };
 
@@ -122,7 +218,7 @@ struct lex_gt_t : public op<lex_gt_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return !lex_lte(a,b);
+        return lex_operators<T1,T2>::gt(a,b);
     }
 };
 
@@ -142,7 +238,7 @@ struct lex_gte_t : public op<lex_gte_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return !lex_lt(a,b);
+        return lex_operators<T1,T2>::gte(a,b);
     }
 };
 
@@ -162,7 +258,7 @@ struct ilex_eq_t : public op<ilex_eq_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return boost::algorithm::iequals(a,b);
+        return lex_operators<T1,T2>::ieq(a,b);
     }
 };
 
@@ -182,7 +278,7 @@ struct ilex_ne_t : public op<ilex_ne_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return !boost::algorithm::iequals(a,b);
+        return lex_operators<T1,T2>::ine(a,b);
     }
 };
 
@@ -202,7 +298,7 @@ struct ilex_lt_t : public op<ilex_lt_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return boost::algorithm::ilexicographical_compare(a,b);
+        return lex_operators<T1,T2>::ilt(a,b);
     }
 };
 
@@ -222,9 +318,7 @@ struct ilex_lte_t : public op<ilex_lte_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return boost::algorithm::ilexicographical_compare(a,b)
-                ||
-               boost::algorithm::iequals(a,b);
+        return lex_operators<T1,T2>::ilte(a,b);
     }
 };
 
@@ -244,7 +338,7 @@ struct ilex_gt_t : public op<ilex_gt_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return !ilex_lte(a,b);
+        return lex_operators<T1,T2>::igt(a,b);
     }
 };
 
@@ -264,7 +358,7 @@ struct ilex_gte_t : public op<ilex_gte_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return !ilex_lt(a,b);
+        return lex_operators<T1,T2>::igte(a,b);
     }
 };
 
@@ -284,7 +378,7 @@ struct lex_contains_t : public op<lex_contains_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return boost::algorithm::contains(a,b);
+        return lex_operators<T1,T2>::contains(a,b);
     }
 };
 
@@ -304,7 +398,7 @@ struct ilex_contains_t : public op<ilex_contains_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return boost::algorithm::icontains(a,b);
+        return lex_operators<T1,T2>::icontains(a,b);
     }
 };
 
@@ -324,7 +418,7 @@ struct lex_starts_with_t : public op<lex_starts_with_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return boost::algorithm::starts_with(a,b);
+        return lex_operators<T1,T2>::starts_with(a,b);
     }
 };
 
@@ -344,7 +438,7 @@ struct ilex_starts_with_t : public op<ilex_starts_with_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return boost::algorithm::istarts_with(a,b);
+        return lex_operators<T1,T2>::istarts_with(a,b);
     }
 };
 
@@ -364,7 +458,7 @@ struct lex_ends_with_t : public op<lex_ends_with_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return boost::algorithm::ends_with(a,b);
+        return lex_operators<T1,T2>::ends_with(a,b);
     }
 };
 
@@ -384,7 +478,7 @@ struct ilex_ends_with_t : public op<ilex_ends_with_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return boost::algorithm::iends_with(a,b);
+        return lex_operators<T1,T2>::iends_with(a,b);
     }
 };
 

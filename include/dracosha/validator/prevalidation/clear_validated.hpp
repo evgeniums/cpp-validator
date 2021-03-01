@@ -75,10 +75,10 @@ void clear_member(
  * @param validator Validator to use for validation. If wrapped into strict_any then strict ANY validation will be invoked.
  * @param err Validation result.
  *
- * @note Use with caution. Only "size", "length" and "empty" properties as well as simple content comparison operators
- * (eq,lt,gt,lte,gte) are validated. If other operators are used to validate content, then they are not checked.
- * For example, clearing string validated with `validator(_[string_field](lex_gt,"Hello world!"))`
- * will not emit error despite the validation condition checking string content is not met.
+ * @note Use with caution. Only "size", "length" and "empty" properties as well as comparison and lexicographical operators
+ * are validated. If other operators are used to validate content, then they are not checked.
+ * For example, clearing string validated with `validator(_[string_field](regex_match,"Hello world!"))`
+ * will not emit error despite the validation condition is not met.
  */
 template <typename ObjectT, typename MemberT, typename ValidatorT>
 void clear_validated(
