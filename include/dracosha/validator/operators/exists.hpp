@@ -61,7 +61,7 @@ struct exists_t
     }
 
     template <typename T>
-    constexpr bool operator != (const T& other) const
+    constexpr bool operator != (const T&) const
     {
         return true;
     }

@@ -21,6 +21,11 @@ SET (VALIDATOR_TEST_SOURCES
     ${VALIDATOR_TEST_SRC}/testhabrexamples_ru.cpp
     ${VALIDATOR_TEST_SRC}/testvalidatoronheap.cpp
     ${VALIDATOR_TEST_SRC}/testinvokeandor.cpp
+
+    ${VALIDATOR_TEST_SRC}/testsetvalidated.cpp
+    ${VALIDATOR_TEST_SRC}/testunsetvalidated.cpp
+    ${VALIDATOR_TEST_SRC}/testresizevalidated.cpp
+    ${VALIDATOR_TEST_SRC}/testclearvalidated.cpp
 )
 
 TARGET_SOURCES(${PROJECT_NAME} PUBLIC ${VALIDATOR_TEST_SOURCES})
