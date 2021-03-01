@@ -22,11 +22,13 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/validate.hpp>
 #include <dracosha/validator/check_exists.hpp>
 #include <dracosha/validator/get_member.hpp>
+#include <dracosha/validator/prevalidation/true_if_size.hpp>
+#include <dracosha/validator/prevalidation/validate_value.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 /**
- * @brief Default implementation of that uses resize() method of member's value.
+ * @brief Default implementation of resize_member_t that uses resize() method of member's value.
  */
 template <typename ObjectT, typename MemberT, typename Enable=void>
 struct resize_member_t
@@ -77,11 +79,10 @@ void resize_member(
  * @param validator Validator to use for validation.
  * @param err Validation result.
  *
- * @note Use with caution. Only "size", "length" and "empty" properties are validated.
- * In case there are some conditions validating content, they are not checked.
- * For example, when resizing string with `validator(_[string_field](gte,"Hello world!"))`
- * then resizing to 0 will not emit error despite the validation condition
- * checking string content is not met.
+ * @note Use with caution. Only "size", "length" and "empty" properties as well as comparison and lexicographical operators
+ * are validated. If other operators are used to validate content, then they are not checked.
+ * For example, resizing string validated with `validator(_[string_field](regex_match,"Hello world!"))`
+ * will not emit error even in case the validation condition is not met.
  */
 template <typename ObjectT, typename MemberT, typename SizeT, typename ValidatorT>
 void resize_validated(
@@ -98,7 +99,11 @@ void resize_validated(
         validate(member[empty],wrap_strict_any(val==0,validator),extract_strict_any(validator),err);
         if (!err)
         {
-            resize_member(obj,member,val);
+            validate_value(std::forward<MemberT>(member),true_if_size{static_cast<size_t>(val)},std::forward<ValidatorT>(validator),err);
+            if (!err)
+            {
+                resize_member(obj,member,val);
+            }
         }
     }
 }

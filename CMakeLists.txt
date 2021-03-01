@@ -133,6 +133,10 @@ SET (HEADERS
     include/dracosha/validator/prevalidation/prevalidation_adapter.hpp
     include/dracosha/validator/prevalidation/prevalidation_adapter_impl.hpp
     include/dracosha/validator/prevalidation/strict_any.hpp
+    include/dracosha/validator/prevalidation/validate_empty.hpp
+    include/dracosha/validator/prevalidation/validate_value.hpp
+    include/dracosha/validator/prevalidation/true_if_empty.hpp
+    include/dracosha/validator/prevalidation/true_if_size.hpp
 
     include/dracosha/validator/detail/has_method.hpp
     include/dracosha/validator/detail/has_property.hpp

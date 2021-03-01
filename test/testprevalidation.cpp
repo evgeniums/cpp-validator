@@ -100,6 +100,7 @@ using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestPrevalidation)
 
+#if 1
 BOOST_AUTO_TEST_CASE(CheckPrevalidationReport)
 {
     std::string rep1;
@@ -112,7 +113,6 @@ BOOST_AUTO_TEST_CASE(CheckPrevalidationReport)
                 _["field100"]["subfield100"](contains,"value10")
             );
 
-#if 1
     auto sa1=make_prevalidation_adapter(_["field1"],"value10",rep1);
     auto&& val1=sa1.traits().get();
     BOOST_CHECK_EQUAL(val1,"value10");
@@ -161,7 +161,6 @@ BOOST_AUTO_TEST_CASE(CheckPrevalidationReport)
     auto sa10=make_prevalidation_adapter(_["field100"]["subfield100"],value_as_container("value1"),rep1);
     BOOST_CHECK(!v1.apply(sa10));
     BOOST_CHECK_EQUAL(rep1,"subfield100 of field100 must contain value10");
-#endif
     auto sa11=make_prevalidation_adapter(_["field100"]["subfield100"],value_as_container("value10"),rep1);
     BOOST_CHECK(v1.apply(sa11));
     rep1.clear();
@@ -173,7 +172,7 @@ BOOST_AUTO_TEST_CASE(CheckPrevalidationReport)
     BOOST_CHECK(!check_contains(20,10));
     BOOST_CHECK(!v2.apply(sa21));
 }
-#if 1
+
 BOOST_AUTO_TEST_CASE(CheckAggregationPrevalidationReport)
 {
     auto v1=validator(
@@ -430,6 +429,56 @@ BOOST_AUTO_TEST_CASE(CheckSetValidatedObject)
     BOOST_CHECK_NO_THROW(obj3.SetX(200.0););
 
     BOOST_CHECK_THROW(obj3.SetX(1000.0);,validation_error);
+}
+
+namespace {
+
+struct string_without_size : public std::string
+{
+    using std::string::string;
+
+    size_t size() const noexcept=delete;
+};
+
+struct string_without_size_empty : public string_without_size
+{
+    using string_without_size::string_without_size;
+
+    bool empty() const noexcept=delete;
+};
+
+}
+
+BOOST_AUTO_TEST_CASE(CheckSetValidatedEmpty)
+{
+    error_report err;
+    auto v1=validator(
+        _["field1"](empty(flag,false))
+    );
+    auto v2=validator(
+        _["field1"](size(gt,0))
+    );
+
+    std::map<std::string,std::string> m1{
+        {"field1","Hello world"}
+    };
+    BOOST_CHECK(v1.apply(m1));
+    set_validated(m1,_["field1"],"",v1,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field1 must be not empty"));
+    BOOST_CHECK(v1.apply(m1));
+
+    set_validated(m1,_["field1"],"",v2,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("size of field1 must be greater than 0"));
+    BOOST_CHECK(v2.apply(m1));
+
+    BOOST_CHECK(v1.apply(m1));
+    set_validated(m1,_["field1"],"hello",v1,err);
+    BOOST_CHECK(!err);
+
+    set_validated(m1,_["field1"],"hi",v2,err);
+    BOOST_CHECK(!err);
 }
 
 BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
@@ -698,6 +747,8 @@ BOOST_AUTO_TEST_CASE(CheckUnsetValidated)
 
 BOOST_AUTO_TEST_CASE(CheckClearValidated)
 {
+    error_report err;
+
     auto v1=validator(
                 _["field1"](empty(flag,false)),
                 _["field2"](size(gte,2))
@@ -709,8 +760,6 @@ BOOST_AUTO_TEST_CASE(CheckClearValidated)
         {"field3","value3"},
         {"field4","value4"}
     };
-
-    error_report err;
 
     clear_validated(m1,_["field1"],v1,err);
     BOOST_CHECK(err);
@@ -778,10 +827,124 @@ BOOST_AUTO_TEST_CASE(CheckClearValidated)
     clear_validated(m3,_["field1"]["value1"],v2,err);
     BOOST_CHECK(!err);
     BOOST_CHECK_EQUAL(m3["field1"]["value1"].size(),0);
+
+    auto v4=validator(
+        _["field1"](ne,""),
+        _["field2"](eq,"value2"),
+        _["field3"](gt,"value3"),
+        _["field4"](gte,"value4"),
+        _["field5"](lt,"value5"),
+        _["field6"](lte,"value6")
+    );
+    std::map<std::string,std::string> m4{
+        {"field1","value1"},
+        {"field2","value2"},
+        {"field3","value3"},
+        {"field4","value4"},
+        {"field5","value5"},
+        {"field6","value6"}
+    };
+    clear_validated(m4,_["field1"],v4,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field1 must be not equal to"));
+    clear_validated(m4,_["field2"],v4,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field2 must be equal to value2"));
+    clear_validated(m4,_["field3"],v4,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field3 must be greater than value3"));
+    clear_validated(m4,_["field4"],v4,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field4 must be greater than or equal to value4"));
+    clear_validated(m4,_["field5"],v4,err);
+    BOOST_CHECK(!err);
+    clear_validated(m4,_["field6"],v4,err);
+    BOOST_CHECK(!err);
+
+    auto v5=validator(
+        _["field1"](lex_ne,""),
+        _["field2"](lex_eq,"value2"),
+        _["field3"](lex_gt,"value3"),
+        _["field4"](lex_gte,"value4"),
+        _["field5"](lex_lt,"value5"),
+        _["field6"](lex_lte,"value6")
+    );
+    clear_validated(m4,_["field1"],v5,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field1 must be not equal to"));
+    clear_validated(m4,_["field2"],v5,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field2 must be equal to value2"));
+    clear_validated(m4,_["field3"],v5,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field3 must be greater than value3"));
+    clear_validated(m4,_["field4"],v5,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field4 must be greater than or equal to value4"));
+    clear_validated(m4,_["field5"],v5,err);
+    BOOST_CHECK(!err);
+    clear_validated(m4,_["field6"],v5,err);
+    BOOST_CHECK(!err);
+
+    auto v6=validator(
+        _["field1"](ilex_ne,""),
+        _["field2"](ilex_eq,"value2"),
+        _["field3"](ilex_gt,"value3"),
+        _["field4"](ilex_gte,"value4"),
+        _["field5"](ilex_lt,"value5"),
+        _["field6"](ilex_lte,"value6")
+    );
+    clear_validated(m4,_["field1"],v6,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field1 must be not equal to"));
+    clear_validated(m4,_["field2"],v6,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field2 must be equal to value2"));
+    clear_validated(m4,_["field3"],v6,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field3 must be greater than value3"));
+    clear_validated(m4,_["field4"],v6,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field4 must be greater than or equal to value4"));
+    clear_validated(m4,_["field5"],v6,err);
+    BOOST_CHECK(!err);
+    clear_validated(m4,_["field6"],v6,err);
+    BOOST_CHECK(!err);
+
+    auto v7=validator(
+        _["field1"](lex_contains,"value1"),
+        _["field2"](lex_starts_with,"value2"),
+        _["field3"](lex_ends_with,"value3"),
+        _["field4"](ilex_contains,"value4"),
+        _["field5"](ilex_starts_with,"value5"),
+        _["field6"](ilex_ends_with,"value6")
+    );
+    clear_validated(m4,_["field1"],v7,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field1 must contain value1"));
+    clear_validated(m4,_["field2"],v7,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field2 must start with value2"));
+    clear_validated(m4,_["field3"],v7,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field3 must end with value3"));
+    clear_validated(m4,_["field4"],v7,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field4 must contain value4"));
+    clear_validated(m4,_["field5"],v7,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field5 must start with value5"));
+    clear_validated(m4,_["field6"],v7,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("field6 must end with value6"));
 }
+#endif
 
 BOOST_AUTO_TEST_CASE(CheckResizeValidated)
 {
+    error_report err;
+
+#if 1
     auto v1=validator(
                 _["field1"](empty(flag,false)),
                 _["field2"](size(gte,5) ^AND^ value(ne,"Invalid value")),
@@ -797,8 +960,6 @@ BOOST_AUTO_TEST_CASE(CheckResizeValidated)
         {"field5","value5"},
         {"field6","value6"}
     };
-
-    error_report err;
 
     resize_validated(m1,_["field1"],0,v1,err);
     BOOST_CHECK(err);
@@ -892,6 +1053,138 @@ BOOST_AUTO_TEST_CASE(CheckResizeValidated)
     resize_validated(m2,_["field3"][0],2,v3,err);
     BOOST_CHECK(err);
     BOOST_CHECK_EQUAL(err.message(),std::string("size of element #0 of field3 must be greater than or equal to size of element #0 of field3 of sample"));
-}
 #endif
+
+    std::map<std::string,std::string> m4{
+        {"field1","value1"},
+        {"field2","value2"},
+        {"field3","value3"},
+        {"field4","value4"},
+        {"field5","value5"},
+        {"field6","value6"}
+    };
+
+    auto check_value_size=[&err,&m4](auto&& v)
+    {
+        resize_validated(m4,_["field1"],3,v,err);
+        BOOST_CHECK(!err);
+        resize_validated(m4,_["field1"],6,v,err);
+        BOOST_CHECK(!err);
+        resize_validated(m4,_["field1"],10,v,err);
+        BOOST_CHECK(!err);
+
+        resize_validated(m4,_["field2"],3,v,err);
+        BOOST_CHECK(err);
+        BOOST_CHECK_EQUAL(err.message(),std::string("field2 must be equal to value2"));
+        resize_validated(m4,_["field2"],6,v,err);
+        BOOST_CHECK(!err);
+        resize_validated(m4,_["field2"],10,v,err);
+        BOOST_CHECK(err);
+        BOOST_CHECK_EQUAL(err.message(),std::string("field2 must be equal to value2"));
+
+        resize_validated(m4,_["field3"],3,v,err);
+        BOOST_CHECK(err);
+        BOOST_CHECK_EQUAL(err.message(),std::string("field3 must be greater than value3"));
+        resize_validated(m4,_["field3"],6,v,err);
+        BOOST_CHECK(!err);
+        resize_validated(m4,_["field3"],10,v,err);
+        BOOST_CHECK(!err);
+
+        resize_validated(m4,_["field4"],3,v,err);
+        BOOST_CHECK(err);
+        BOOST_CHECK_EQUAL(err.message(),std::string("field4 must be greater than or equal to value4"));
+        resize_validated(m4,_["field4"],6,v,err);
+        BOOST_CHECK(!err);
+        resize_validated(m4,_["field4"],10,v,err);
+        BOOST_CHECK(!err);
+
+        resize_validated(m4,_["field5"],3,v,err);
+        BOOST_CHECK(!err);
+        resize_validated(m4,_["field5"],6,v,err);
+        BOOST_CHECK(!err);
+        resize_validated(m4,_["field5"],10,v,err);
+        BOOST_CHECK(err);
+        BOOST_CHECK_EQUAL(err.message(),std::string("field5 must be less than value5"));
+
+        resize_validated(m4,_["field6"],3,v,err);
+        BOOST_CHECK(!err);
+        resize_validated(m4,_["field6"],6,v,err);
+        BOOST_CHECK(!err);
+        resize_validated(m4,_["field6"],10,v,err);
+        BOOST_CHECK(err);
+        BOOST_CHECK_EQUAL(err.message(),std::string("field6 must be less than or equal to value6"));
+    };
+
+    auto v4=validator(
+        _["field1"](ne,"value1"),
+        _["field2"](eq,"value2"),
+        _["field3"](gt,"value3"),
+        _["field4"](gte,"value4"),
+        _["field5"](lt,"value5"),
+        _["field6"](lte,"value6")
+    );
+    check_value_size(v4);
+
+    auto v5=validator(
+        _["field1"](lex_ne,"value1"),
+        _["field2"](lex_eq,"value2"),
+        _["field3"](lex_gt,"value3"),
+        _["field4"](lex_gte,"value4"),
+        _["field5"](lex_lt,"value5"),
+        _["field6"](lex_lte,"value6")
+    );
+    check_value_size(v5);
+
+    auto v6=validator(
+        _["field1"](ilex_ne,"value1"),
+        _["field2"](ilex_eq,"value2"),
+        _["field3"](ilex_gt,"value3"),
+        _["field4"](ilex_gte,"value4"),
+        _["field5"](ilex_lt,"value5"),
+        _["field6"](ilex_lte,"value6")
+    );
+    check_value_size(v5);
+
+    auto check_contains_size=[&err,&m4](auto&& v)
+    {
+        resize_validated(m4,_["field1"],3,v,err);
+        BOOST_CHECK(err);
+        BOOST_CHECK_EQUAL(err.message(),std::string("field1 must contain value1"));
+        resize_validated(m4,_["field1"],6,v,err);
+        BOOST_CHECK(!err);
+        resize_validated(m4,_["field1"],10,v,err);
+        BOOST_CHECK(!err);
+
+        resize_validated(m4,_["field2"],3,v,err);
+        BOOST_CHECK(err);
+        BOOST_CHECK_EQUAL(err.message(),std::string("field2 must start with value2"));
+        resize_validated(m4,_["field2"],6,v,err);
+        BOOST_CHECK(!err);
+        resize_validated(m4,_["field2"],10,v,err);
+        BOOST_CHECK(!err);
+
+        resize_validated(m4,_["field3"],3,v,err);
+        BOOST_CHECK(err);
+        BOOST_CHECK_EQUAL(err.message(),std::string("field3 must end with value3"));
+        resize_validated(m4,_["field3"],6,v,err);
+        BOOST_CHECK(!err);
+        resize_validated(m4,_["field3"],10,v,err);
+        BOOST_CHECK(!err);
+    };
+
+    auto v7=validator(
+        _["field1"](lex_contains,"value1"),
+        _["field2"](lex_starts_with,"value2"),
+        _["field3"](lex_ends_with,"value3")
+    );
+    check_contains_size(v7);
+
+    auto v8=validator(
+        _["field1"](ilex_contains,"value1"),
+        _["field2"](ilex_starts_with,"value2"),
+        _["field3"](ilex_ends_with,"value3")
+    );
+    check_contains_size(v8);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
