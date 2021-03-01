@@ -78,8 +78,10 @@ BOOST_AUTO_TEST_CASE(CheckMakeMember)
 
 BOOST_AUTO_TEST_CASE(CheckTupleConversions)
 {
-    auto std_tuple1=std::make_tuple(1,2,"hello");
-    auto hana_tuple1=hana::make_tuple(1,2,"hello");
+    std::string hello{"hello"};
+
+    auto std_tuple1=std::make_tuple(1,2,hello);
+    auto hana_tuple1=hana::make_tuple(1,2,hello);
 
     auto hana_tuple2=std_to_hana_tuple(std_tuple1);
     static_assert(std::is_same<decltype(hana_tuple1),decltype(hana_tuple2)>::value,"Invalid conversion type");
