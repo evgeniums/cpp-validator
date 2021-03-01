@@ -28,44 +28,21 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-/**
- * @brief Default helper for checking if type has begin() method.
- */
-template <typename T, typename=void>
-struct has_begin
-{
-    constexpr static const bool value=false;
-};
-
-/**
- * @brief Helper for checking if type has begin() method for case when it has.
- */
+DRACOSHA_VALIDATOR_INLINE_LAMBDA auto check_has_begin=hana::is_valid([](auto&& v) -> decltype((void)hana::traits::declval(v).begin()){});
 template <typename T>
-struct has_begin<T,
-        decltype((void)std::declval<std::decay_t<T>>().begin())
-        >
-{
-    constexpr static const bool value=true;
-};
+using has_begin =
+            std::integral_constant<
+                bool,
+                check_has_begin(hana::type_c<std::decay_t<T>>)
+            >;
 
-/**
- * @brief Default helper for checking if type has end() method.
- */
-template <typename T, typename=void>
-struct has_end
-{
-    constexpr static const bool value=false;
-};
-
-/**
- * @brief Helper for checking if type has end() method for case when it has.
- */
+DRACOSHA_VALIDATOR_INLINE_LAMBDA auto check_has_end=hana::is_valid([](auto&& v) -> decltype((void)hana::traits::declval(v).end()){});
 template <typename T>
-struct has_end<T,
-        decltype((void)std::declval<std::decay_t<T>>().end())>
-{
-    constexpr static const bool value=true;
-};
+using has_end =
+            std::integral_constant<
+                bool,
+                check_has_end(hana::type_c<std::decay_t<T>>)
+            >;
 
 /**
  * @brief Check if type is a container.
