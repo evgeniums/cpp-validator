@@ -51,6 +51,21 @@ struct all_t
                     )
                );
     }
+
+    /**
+     * @brief Create validator form operator and operand.
+     * @param op Operator.
+     * @param b Operand.
+     * @return Validator.
+     */
+    template <typename OpT, typename T>
+    constexpr auto operator () (OpT&& op,
+                                T&& b,
+                                std::enable_if_t<hana::is_a<operator_tag,OpT>,void*> =nullptr
+            ) const
+    {
+        return (*this)(value(std::forward<OpT>(op),std::forward<T>(b)));
+    }
 };
 /**
   @brief Aggregation operator ALL that requires for all container elements to satisfy a condition.
