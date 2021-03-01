@@ -46,7 +46,8 @@ struct exists_t
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return check_exists(a,b);
+        auto ok=check_exists(a,b);
+        return ok;
     }
 
     template <typename T>

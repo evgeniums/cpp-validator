@@ -32,7 +32,7 @@ namespace detail
 DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_at = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.at(std::forward<decltype(x)>(x))){});
 DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_has = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.has(std::forward<decltype(x)>(x))){});
 DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_contains = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.contains(std::forward<decltype(x)>(x))){});
-DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_find = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.find(std::forward<decltype(x)>(x))){});
+DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_find_it = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)*v.find(std::forward<decltype(x)>(x))){});
 DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_isSet = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v.isSet(std::forward<decltype(x)>(x))){});
 DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_brackets = hana::is_valid([](auto&& v, auto&& x) -> decltype((void)v[std::forward<decltype(x)>(x)]){});
 DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_size = hana::is_valid([](auto&& v) -> decltype((void)v.size()){});
@@ -46,8 +46,8 @@ DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_brackets_c = hana::is_valid([](auto&& 
                                                            )
                                                         {});
 
-DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_find_c = hana::is_valid([](auto v, auto x) -> decltype(
-                                                                    (void)hana::traits::declval(v).find(hana::traits::declval(x))
+DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_find_it_c = hana::is_valid([](auto v, auto x) -> decltype(
+                                                                    (void)*hana::traits::declval(v).find(hana::traits::declval(x))
                                                                 )
                                                             {});
 DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_has_c = hana::is_valid([](auto v, auto x) -> decltype(

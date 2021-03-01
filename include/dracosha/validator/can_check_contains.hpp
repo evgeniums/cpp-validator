@@ -38,7 +38,7 @@ struct can_check_contains_t
     constexpr static const bool value =
         hana::is_a<wrap_iterator_tag,T2>
         ||
-        detail::has_find_c(hana::type_c<T1>, hana::type_c<T2>)
+        detail::has_find_it_c(hana::type_c<T1>, hana::type_c<T2>)
         ||
         detail::has_has_c(hana::type_c<T1>, hana::type_c<T2>)
         ||

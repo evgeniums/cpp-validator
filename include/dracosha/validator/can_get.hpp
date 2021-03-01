@@ -96,7 +96,7 @@ struct can_get_t<T1,T2,hana::when<
                ||
                detail::has_brackets_c(hana::type_c<T1>,hana::type_c<T2>)
                ||
-               detail::has_find_c(hana::type_c<T1>,hana::type_c<T2>);
+               detail::has_find_it_c(hana::type_c<T1>,hana::type_c<T2>);
     }
 
     constexpr static bool iterator()
@@ -121,7 +121,7 @@ struct can_get_t<T1,T2,hana::when<
 
     constexpr static bool find()
     {
-       return detail::has_find_c(hana::type_c<T1>,hana::type_c<T2>);
+       return detail::has_find_it_c(hana::type_c<T1>,hana::type_c<T2>);
     }
 };
 

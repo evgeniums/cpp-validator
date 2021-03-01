@@ -881,6 +881,7 @@ BOOST_AUTO_TEST_CASE(CheckNestedAny)
 BOOST_AUTO_TEST_CASE(CheckSets)
 {
     auto v1=validator(
+                size(gte,2),
                 _["field1"](exists,true),
                 _["field2"](exists,false)
             );
@@ -890,8 +891,13 @@ BOOST_AUTO_TEST_CASE(CheckSets)
     std::set<std::string> s2{
         "field1","field2","field3"
     };
-    BOOST_CHECK(v1.apply(s1));
-    BOOST_CHECK(!v1.apply(s1));
+    BOOST_CHECK(check_exists(s1,member_path(_["field1"])));
+    auto ok=v1.apply(s1);
+    BOOST_CHECK(ok);
+    BOOST_CHECK(!v1.apply(s2));
+    auto v1_1=validator(contains,"field2");
+    BOOST_CHECK(!v1_1.apply(s1));
+    BOOST_CHECK(v1_1.apply(s2));
 
     auto v2=validator(
                 _["key1"](contains,std::string("field1"))

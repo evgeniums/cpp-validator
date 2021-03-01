@@ -87,6 +87,18 @@ struct check_member_t<T1,T2,hana::when<can_check_contains_t<T1, T2>::value
 };
 
 /**
+ * @brief Helper for checking if object can be queried if it contains a member and then deduce the type of that member.
+ *
+ * Case when find() method is avaliable.
+ */
+template <typename T1, typename T2>
+struct check_member_t<T1,T2,hana::when<can_check_contains_t<T1, T2>::value
+    && (detail::get_helpers::selector<T1, T2>::value == detail::get_helpers::getter::find)>>
+{
+    using type=std::decay_t<decltype(std::declval<T1>().find(std::declval<T2>()))>;
+};
+
+/**
   Instance to be used as check_member() callable.
 */
 constexpr hana::metafunction_t<check_member_t> check_member{};
