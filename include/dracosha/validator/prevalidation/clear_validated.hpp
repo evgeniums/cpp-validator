@@ -21,6 +21,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/validate.hpp>
 #include <dracosha/validator/utils/get_it.hpp>
+#include <dracosha/validator/prevalidation/validate_empty.hpp>
+#include <dracosha/validator/prevalidation/validate_value.hpp>
+#include <dracosha/validator/prevalidation/true_if_empty.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -67,14 +70,14 @@ void clear_member(
 
 /**
  * @brief Clear object's member with pre-validation with validation result put in the last argument.
- * @param obj Object whose member to resize.
+ * @param obj Object whose member to clear.
  * @param member Member name.
  * @param validator Validator to use for validation. If wrapped into strict_any then strict ANY validation will be invoked.
  * @param err Validation result.
  *
- * @note Use with caution. Only "size", "length" and "empty" properties are validated.
- * In case there are some conditions validating content, they are not checked.
- * For example, clearing string validated with `validator(_[string_field](gte,"Hello world!"))`
+ * @note Use with caution. Only "size", "length" and "empty" properties as well as simple content comparison operators
+ * (eq,lt,gt,lte,gte) are validated. If other operators are used to validate content, then they are not checked.
+ * For example, clearing string validated with `validator(_[string_field](lex_gt,"Hello world!"))`
  * will not emit error despite the validation condition checking string content is not met.
  */
 template <typename ObjectT, typename MemberT, typename ValidatorT>
@@ -85,10 +88,10 @@ void clear_validated(
         error_report& err
     )
 {
-    validate(member[empty],wrap_strict_any(true,validator),extract_strict_any(validator),err);
+    validate_empty(std::forward<MemberT>(member),std::forward<ValidatorT>(validator),err);
     if (!err)
     {
-        validate(member[size],wrap_strict_any(0,validator),extract_strict_any(validator),err);
+        validate_value(std::forward<MemberT>(member),true_if_empty,std::forward<ValidatorT>(validator),err);
         if (!err)
         {
             clear_member(obj,member);
@@ -98,7 +101,7 @@ void clear_validated(
 
 /**
  * @brief Clear object's member with pre-validation with exception if validation fails.
- * @param obj Object whose member to set.
+ * @param obj Object whose member to clear.
  * @param member Member name.
  * @param validator Validator to use for validation. If wrapped into strict_any then strict ANY validation will be invoked.
  *

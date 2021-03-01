@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** @file validator/prevalidation/resize_validated.hpp
+/** @file validator/prevalidation/set_validated.hpp
 *
 *  Defines "set_validated" helpers.
 *
@@ -20,6 +20,11 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_SET_VALIDATED_HPP
 
 #include <dracosha/validator/validate.hpp>
+#include <dracosha/validator/properties/size.hpp>
+#include <dracosha/validator/properties/empty.hpp>
+
+#include <dracosha/validator/prevalidation/validate_empty.hpp>
+#include <dracosha/validator/prevalidation/validate_value.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -84,7 +89,7 @@ void set_validated(
         error_report& err
     )
 {
-    validate(member,wrap_strict_any(std::forward<ValueT>(val),validator),extract_strict_any(std::forward<ValidatorT>(validator)),err);
+    validate_value(member,wrap_strict_any(std::forward<ValueT>(val),validator),extract_strict_any(std::forward<ValidatorT>(validator)),err);
     if (!err)
     {
         set_member(obj,member,std::forward<ValueT>(val));

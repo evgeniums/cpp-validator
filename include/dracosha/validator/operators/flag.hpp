@@ -25,6 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/reporting/flag_presets.hpp>
 #include <dracosha/validator/properties/value.hpp>
+#include <dracosha/validator/utils/safe_compare.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -46,7 +47,8 @@ struct flag_t
      * @param b Right operand.
      * @return Result of "is equal" operator.
      */
-    constexpr bool operator() (const bool& a, const bool& b) const
+    template <typename T1, typename T2>
+    constexpr bool operator() (const T1& a, const T2& b) const
     {
         return a==b;
     }
