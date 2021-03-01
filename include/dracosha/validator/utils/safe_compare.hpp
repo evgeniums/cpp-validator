@@ -366,7 +366,13 @@ struct safe_compare<LeftT, RightT,
  */
 template <typename LeftT,typename RightT>
 struct safe_compare<LeftT,RightT,
-                    std::enable_if_t<!std::is_same<LeftT, bool>::value && std::is_same<RightT, bool>::value>
+                    std::enable_if_t<
+                            std::is_same<RightT, bool>::value
+                            &&
+                            !std::is_same<LeftT, bool>::value
+                            &&
+                            std::is_convertible<LeftT, bool>::value
+                        >
                 >
 {
     constexpr static bool less(const LeftT& left, const RightT& right) noexcept
@@ -401,7 +407,13 @@ struct safe_compare<LeftT,RightT,
  */
 template <typename LeftT, typename RightT>
 struct safe_compare<LeftT, RightT,
-        std::enable_if_t<std::is_same<LeftT, bool>::value && !std::is_same<RightT, bool>::value>
+        std::enable_if_t<
+                std::is_same<LeftT, bool>::value
+                &&
+                !std::is_same<RightT, bool>::value
+                &&
+                std::is_convertible<RightT, bool>::value
+            >
     >
 {
     constexpr static bool less(const LeftT& left, const RightT& right) noexcept
