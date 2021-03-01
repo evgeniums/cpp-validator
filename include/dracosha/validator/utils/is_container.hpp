@@ -28,24 +28,48 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-DRACOSHA_VALIDATOR_INLINE_LAMBDA auto check_has_begin=hana::is_valid([](auto&& v) -> decltype((void)hana::traits::declval(v).begin()){});
-template <typename T>
-using has_begin =
-            std::integral_constant<
-                bool,
-                check_has_begin(hana::type_c<std::decay_t<T>>)
-            >;
-
-DRACOSHA_VALIDATOR_INLINE_LAMBDA auto check_has_end=hana::is_valid([](auto&& v) -> decltype((void)hana::traits::declval(v).end()){});
-template <typename T>
-using has_end =
-            std::integral_constant<
-                bool,
-                check_has_end(hana::type_c<std::decay_t<T>>)
-            >;
+/**
+ * @brief Default helper for checking if type has begin() method.
+ */
+template <typename T, typename=void>
+struct has_begin
+{
+    constexpr static const bool value=false;
+};
 
 /**
- * @brief Check if type is a container.
+ * @brief Helper for checking if type has begin() method for case when it has.
+ */
+template <typename T>
+struct has_begin<T,
+            std::enable_if_t<std::is_same<decltype((void)std::declval<std::decay_t<T>>().begin()),void>::value>
+        >
+{
+    constexpr static const bool value=true;
+};
+
+/**
+ * @brief Default helper for checking if type has end() method.
+ */
+template <typename T, typename=void>
+struct has_end
+{
+    constexpr static const bool value=false;
+};
+
+/**
+ * @brief Helper for checking if type has end() method for case when it has.
+ */
+template <typename T>
+struct has_end<T,
+        std::enable_if_t<std::is_same<decltype((void)std::declval<std::decay_t<T>>().end()),void>::value>
+    >
+{
+    constexpr static const bool value=true;
+};
+
+/**
+ * @brief Check if type is a container but not string or string_view.
 **/
 template <typename T>
 using is_container_t=std::integral_constant<bool,
@@ -55,7 +79,7 @@ using is_container_t=std::integral_constant<bool,
                                 >;
 
 /**
- * @brief Check if variable is a container.
+ * @brief Check if variable is a container but not string or string_view.
  * @param v Variable to check.
  * @return True if variable has begin() and end() methods.
  */
