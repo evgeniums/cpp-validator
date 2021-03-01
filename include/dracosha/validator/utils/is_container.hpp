@@ -37,13 +37,17 @@ struct has_begin
     constexpr static const bool value=false;
 };
 
+DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_begin_c = hana::is_valid([](auto&& v) -> decltype(
+                                                            (void)hana::traits::declval(v).begin()
+                                                           )
+                                                        {});
 /**
  * @brief Helper for checking if type has begin() method for case when it has.
  */
 template <typename T>
 struct has_begin<T,
-            std::enable_if_t<std::is_same<decltype((void)std::declval<std::decay_t<T>>().begin()),void>::value>
-        >
+        std::enable_if_t<has_begin_c(hana::type_c<std::decay_t<T>>)>
+    >
 {
     constexpr static const bool value=true;
 };
@@ -57,12 +61,16 @@ struct has_end
     constexpr static const bool value=false;
 };
 
+DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_end_c = hana::is_valid([](auto&& v) -> decltype(
+                                                            (void)hana::traits::declval(v).begin()
+                                                           )
+                                                        {});
 /**
  * @brief Helper for checking if type has end() method for case when it has.
  */
 template <typename T>
 struct has_end<T,
-        std::enable_if_t<std::is_same<decltype((void)std::declval<std::decay_t<T>>().end()),void>::value>
+        std::enable_if_t<has_end_c(hana::type_c<std::decay_t<T>>)>
     >
 {
     constexpr static const bool value=true;
