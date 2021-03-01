@@ -30,7 +30,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
-  Definition of stub object with comparison operator that returns true when other object is empty.
+  Definition of stub object to validate clearing.
  **/
 struct true_if_empty_t
 {
@@ -94,39 +94,39 @@ struct true_if_empty_t
     }
 
     template <typename T>
-    friend bool operator == (const T& other, const T& v) noexcept
+    friend bool operator == (const T& other, const true_if_empty_t& v) noexcept
     {
         return v==other;
     }
     template <typename T>
-    friend bool operator != (const T& other, const T& v) noexcept
+    friend bool operator != (const T& other, const true_if_empty_t& v) noexcept
     {
         return v!=other;
     }
     template <typename T>
-    friend bool operator < (const T& other, const T& v) noexcept
+    friend bool operator < (const T& other, const true_if_empty_t& v) noexcept
     {
         return v>other;
     }
     template <typename T>
-    friend bool operator <= (const T& other, const T& v) noexcept
+    friend bool operator <= (const T& other, const true_if_empty_t& v) noexcept
     {
         return v>=other;
     }
     template <typename T>
-    friend bool operator > (const T& other, const T& v) noexcept
+    friend bool operator > (const T& other, const true_if_empty_t& v) noexcept
     {
         return v<other;
     }
     template <typename T>
-    friend bool operator >= (const T& other, const T& v) noexcept
+    friend bool operator >= (const T& other, const true_if_empty_t& v) noexcept
     {
         return v<=other;
     }
 };
 
 /**
-  Stub object with comparison operator that returns true when other object is empty.
+  Stub object to validate clearing.
  **/
 constexpr true_if_empty_t true_if_empty{};
 

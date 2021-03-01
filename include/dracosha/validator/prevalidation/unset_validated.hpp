@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 /**
- * @brief Default implementation of member setter that uses erase() to unset element of container.
+ * @brief Default implementation of member unsetter that uses erase() to unset element of container.
  */
 template <typename ObjectT, typename MemberT, typename Enable=void>
 struct unset_member_t
