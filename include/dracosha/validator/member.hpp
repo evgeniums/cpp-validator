@@ -257,6 +257,7 @@ class member
         using path_type=hana::tuple<ParentPathT...,type>;
 
         constexpr static const bool is_nested=sizeof...(ParentPathT)!=0;
+        constexpr static const size_t path_size=sizeof...(ParentPathT)+1;
 
         template <template <typename ...> class T1,
                   typename T2, typename PathT>
@@ -389,7 +390,7 @@ class member
          */
         constexpr static size_t path_depth()
         {
-            return hana_tuple_size<path_type>::value;
+            return path_size;
         }
 
         /**
@@ -436,11 +437,14 @@ class member
         friend auto make_member_with_name(MemberT&& member, T1&& name);
 };
 
+struct member_with_name_tag{};
+
 /**
  * @brief Member with excplicit name.
  */
 template <typename T1, typename T2, typename ...ParentPathT>
-struct member_with_name : public member<T2,ParentPathT...>
+struct member_with_name : public member<T2,ParentPathT...>,
+                          public member_with_name_tag
 {
     using base_type=member<T2,ParentPathT...>;
 
@@ -460,7 +464,7 @@ struct member_with_name : public member<T2,ParentPathT...>
      * @brief Get member's name.
      * @return Name.
      */
-    auto name() const
+    auto name() const -> decltype(auto)
     {
         return _name;
     }
@@ -493,7 +497,7 @@ struct member_with_name : public member<T2,ParentPathT...>
         return (*this)(value(std::forward<OpT>(op),std::forward<Tt1>(b)));
     }
 
-    std::decay_t<T1> _name;
+    T1 _name;
 };
 
 /**
@@ -540,6 +544,22 @@ auto make_member(Ts&& path)
         }
     );
 }
+
+template <typename Ts, typename T>
+auto inherit_member(Ts&& path, T&& member)
+{
+    return hana::eval_if(
+        std::is_base_of<member_with_name_tag,std::decay_t<T>>{},
+        [&](auto&& _)
+        {
+            return make_member_with_name(make_member(_(path)),_(member).name());
+        },
+        [&](auto&& _)
+        {
+            return make_member(_(path));
+        }
+    );
+};
 
 namespace detail
 {
