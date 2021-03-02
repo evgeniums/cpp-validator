@@ -20,6 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_APPLY_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/filter_member.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -61,8 +62,18 @@ struct apply_member_t
     constexpr auto operator () (Ta&& a, Tv&& v, Tm&& member) const -> decltype(auto)
     {
         return hana::if_(hana::is_a<validator_tag,decltype(v)>,
-          [&a,&member](auto&& x) -> decltype(auto) { return x.apply(a,member); },
-          [&a,&member](auto&& x) -> decltype(auto) { return x(a,member); }
+          [&a,&member](auto&& x) -> decltype(auto)
+          {
+            auto fn=[&x](auto&&... args) -> decltype(auto)
+            {
+                return x.apply(std::forward<decltype(args)>(args)...);
+            };
+            return filter_member(fn,std::forward<decltype(a)>(a),std::forward<decltype(member)>(member));
+          },
+          [&a,&member](auto&& x) -> decltype(auto)
+          {
+            return filter_member(std::forward<decltype(x)>(x),std::forward<decltype(a)>(a),std::forward<decltype(member)>(member));
+          }
         )(std::forward<decltype(v)>(v));
     }
 };

@@ -154,6 +154,10 @@ SET (HEADERS
     include/dracosha/validator/detail/formatter_std.hpp
     include/dracosha/validator/detail/backend_formatter_helper.hpp
     include/dracosha/validator/detail/hint_helper.hpp
+
+    include/dracosha/validator/filter_member.hpp
+    include/dracosha/validator/filter_member.ipp
+    include/dracosha/validator/filter_path.hpp
 )
 
 ADD_CUSTOM_TARGET(headers SOURCES ${HEADERS})
