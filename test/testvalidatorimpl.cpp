@@ -94,6 +94,9 @@ BOOST_AUTO_TEST_CASE(CheckTupleConversions)
     constexpr auto types1=make_types_tuple(float{10.0f},"hello",int{100});
     constexpr auto types2=hana::tuple_t<float,const char*,int>;
     static_assert(hana::equal(types1,types2),"");
+
+    BOOST_CHECK(std::get<0>(std_tuple1)==1);
+    BOOST_CHECK(hana_tuple1[hana::size_c<0>]==1);
 }
 
 BOOST_AUTO_TEST_CASE(CheckGetRef)

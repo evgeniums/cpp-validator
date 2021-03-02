@@ -36,6 +36,13 @@ struct get_it_t
         auto& val=*it;
         return val;
      }
+
+     template <typename T1>
+     constexpr static auto key(T1&& it) -> decltype(auto)
+     {
+        auto& val=*it;
+        return val;
+     }
 };
 
 /**
@@ -54,6 +61,13 @@ struct get_it_t<T,
         auto& val=it->second;
         return val;
     }
+
+    template <typename T1>
+    constexpr static auto key(T1&& it) -> decltype(auto)
+    {
+       auto& val=it->first;
+       return val;
+    }
 };
 /**
  * @brief Instance of helper for getting value from container's iterator.
@@ -70,6 +84,12 @@ template <typename T>
 constexpr auto get_it(T&& it) -> decltype(auto)
 {
     return get_it_impl<T>(std::forward<T>(it));
+}
+
+template <typename T>
+constexpr auto key_it(T&& it) -> decltype(auto)
+{
+    return get_it_impl<T>.key(std::forward<T>(it));
 }
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

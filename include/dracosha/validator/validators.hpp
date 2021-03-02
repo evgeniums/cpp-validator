@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/adjust_storable_type.hpp>
+#include <dracosha/validator/adapters/default_adapter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -60,7 +61,7 @@ class validator_with_hint_t
 
         /**
          * @brief Invoke validating with supplied args and override reporting description with ecplicit description.
-         * @param adpt Reporting adapter.
+         * @param adpt Adapter.
          * @param args Arguments to forward to embedded executor.
          * @return Validation status.
          */
@@ -72,7 +73,7 @@ class validator_with_hint_t
             {
                 return adpt.hint_after(ret,_hint);
             }
-            ret=_fn(std::forward<AdapterT>(adpt),std::forward<Args>(args)...);
+            ret=_fn(ensure_adapter(std::forward<AdapterT>(adpt)),std::forward<Args>(args)...);
             return adpt.hint_after(ret,_hint);
         }
 
@@ -105,13 +106,14 @@ class validator_t
 
         /**
          * @brief Invoke validating with supplied args.
+         * @param adpt Adapter.
          * @param args Arguments to forward to embedded executor.
          * @return Validation status.
          */
-        template <typename ... Args>
-        auto apply(Args&&... args) const
+        template <typename AdapterT, typename ... Args>
+        auto apply(AdapterT&& adpt, Args&&... args) const
         {
-            return _fn(std::forward<Args>(args)...);
+            return _fn(ensure_adapter(std::forward<AdapterT>(adpt)),std::forward<Args>(args)...);
         }
 
         /**

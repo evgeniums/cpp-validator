@@ -39,6 +39,7 @@ enum class aggregation_id : int
 };
 
 struct aggregation_op_tag;
+struct element_aggregation_tag;
 
 /**
  * @brief Aggregation operator descriptor.

@@ -39,7 +39,7 @@ template <typename PathT, typename AdapterT, typename MemberT, typename HandlerT
 status apply_generated_paths_t::operator () (PathT&& current_path, AdapterT&& adapter, MemberT&& member, HandlerT&& handler) const
 {
     return hana::eval_if(
-        hana::equal(hana::size(current_path),hana::size(member.path())),
+        hana::greater_equal(hana::size(current_path),hana::size(member.path())),
         [&](auto&& _)
         {
             return generate_paths<std::decay_t<decltype(hana::back(current_path))>>(_(current_path),_(adapter),_(handler));
@@ -72,7 +72,7 @@ status apply_member_path_t::operator ()
                     }
 
                     return hana::if_(
-                        hana::equal(hana::size(generated_path),hana::size(member.path())),
+                        hana::greater_equal(hana::size(generated_path),hana::size(member.path())),
                         [](auto&& generated_path, auto&& fn, auto&& adapter, auto&& member)
                         {
                             return status(fn(adapter,inherit_member(std::forward<decltype(generated_path)>(generated_path),std::forward<decltype(member)>(member))));

@@ -89,6 +89,22 @@ auto make_default_adapter(T&& v)
     return default_adapter<T>(std::forward<T>(v));
 }
 
+template <typename T>
+auto ensure_adapter(T&& v) -> decltype(auto)
+{
+    return hana::if_(
+        hana::is_a<adapter_tag,T>,
+        [](auto&& v) -> decltype(auto)
+        {
+            return hana::id(std::forward<decltype(v)>(v));
+        },
+        [](auto&& v)
+        {
+            return make_default_adapter(std::forward<decltype(v)>(v));
+        }
+    )(std::forward<T>(v));
+}
+
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
