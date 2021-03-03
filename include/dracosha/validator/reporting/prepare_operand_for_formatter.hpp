@@ -52,7 +52,9 @@ struct prepare_operand_for_formatter_t<OpT,T,
 {
     auto operator () (OpT&&, T&& b) const -> decltype(auto)
     {
-        return make_member_operand(make_plain_member(std::forward<T>(b)));
+        return make_member_operand(
+                        make_plain_member(std::forward<T>(b))
+                    );
     }
 };
 

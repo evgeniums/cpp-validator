@@ -37,6 +37,8 @@ using string_view=boost::string_view;
 using string_view=std::string_view;
 #endif
 
+struct adjust_view_ignore{};
+
 namespace detail
 {
 
@@ -53,7 +55,11 @@ struct adjust_view_type_t
  */
 template <typename T>
 struct adjust_view_type_t<T,
-                    hana::when<std::is_constructible<string_view,T>::value>
+                    hana::when<
+                            std::is_constructible<string_view,T>::value
+                            &&
+                            !std::is_base_of<adjust_view_ignore,std::decay_t<T>>::value
+                        >
                     >
 {
     using type=string_view;
@@ -75,7 +81,11 @@ struct adjust_view_type_t<T,
  */
 template <typename T>
 struct adjust_view_type_t<T,
-                    hana::when<!std::is_constructible<string_view,T>::value>
+                    hana::when<
+                            !std::is_constructible<string_view,T>::value
+                            ||
+                            std::is_base_of<adjust_view_ignore,std::decay_t<T>>::value
+                        >
                     >
 {
     using type=std::decay_t<T>;

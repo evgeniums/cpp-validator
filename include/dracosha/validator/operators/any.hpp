@@ -35,6 +35,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  */
 struct any_t
 {
+    using hana_tag=element_aggregation_tag;
+
     template <typename ... Ops>
     constexpr auto operator() (Ops&&... ops) const
     {

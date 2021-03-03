@@ -32,7 +32,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/operand_formatter.hpp>
 #include <dracosha/validator/reporting/report_aggregation.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
-#include <dracosha/validator/reporting/prepare_operand_for_formatter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

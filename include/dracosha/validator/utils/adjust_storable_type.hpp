@@ -23,6 +23,10 @@ Distributed under the Boost Software License, Version 1.0.
 #include <type_traits>
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/property.hpp>
+#include <dracosha/validator/operators/aggregation.hpp>
+#include <dracosha/validator/utils/wrap_it.hpp>
+#include <dracosha/validator/utils/object_wrapper.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -40,7 +44,21 @@ struct adjust_storable_type
  */
 template <typename T>
 struct adjust_storable_type<T,
-                        hana::when<std::is_constructible<std::string,T>::value>
+                        hana::when<
+                                !hana::is_a<property_tag,T>
+                                &&
+                                !hana::is_a<element_aggregation_tag,T>
+                                &&
+                                !hana::is_a<wrap_iterator_tag,T>
+                                &&
+                                !hana::is_a<operator_tag,T>
+                                &&
+                                !hana::is_a<object_wrapper_tag,T>
+                                &&
+                                std::is_constructible<std::string,T>::value
+                                &&
+                                !std::is_same<std::string,std::decay_t<T>>::value
+                            >
                     >
 {
     using type=std::string;
@@ -53,10 +71,44 @@ struct adjust_storable_type<T,
  */
 template <typename T>
 struct adjust_storable_type<T,
-                        hana::when<!std::is_constructible<std::string,T>::value>
+                        hana::when<
+                            hana::is_a<property_tag,T>
+                            ||
+                            hana::is_a<element_aggregation_tag,T>
+                            ||
+                            hana::is_a<object_wrapper_tag,T>
+                            ||
+                            hana::is_a<wrap_iterator_tag,T>
+                            ||
+                            hana::is_a<operator_tag,T>
+                        >
                     >
 {
     using type=std::decay_t<T>;
+};
+
+template <typename T>
+struct adjust_storable_type<T,
+                        hana::when<
+                            (
+                            !std::is_constructible<std::string,T>::value
+                            ||
+                            std::is_same<std::string,std::decay_t<T>>::value
+                            )
+                            &&
+                            !hana::is_a<property_tag,T>
+                            &&
+                            !hana::is_a<element_aggregation_tag,T>
+                            &&
+                            !hana::is_a<object_wrapper_tag,T>
+                            &&
+                            !hana::is_a<wrap_iterator_tag,T>
+                            &&
+                            !hana::is_a<operator_tag,T>
+                        >
+                    >
+{
+    using type=object_wrapper<T>;
 };
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

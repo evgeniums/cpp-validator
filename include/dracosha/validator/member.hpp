@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/adjust_storable_type.hpp>
 #include <dracosha/validator/utils/hana_to_std_tuple.hpp>
+#include <dracosha/validator/utils/invoke_and.hpp>
 #include <dracosha/validator/apply.hpp>
 #include <dracosha/validator/dispatcher.hpp>
 #include <dracosha/validator/properties.hpp>
@@ -241,6 +242,9 @@ constexpr member_helper_t<Args...> member_helper{};
 
 }
 
+template <typename Ts>
+auto make_member(Ts&& path);
+
 /**
  *  @brief Generic descriptor of a member to be validated.
  *
@@ -285,7 +289,7 @@ class member
          * @param parent_path Path to parent member which is of previous (upper) level.
          */
         template <typename ParentPathTs>
-        member(type key, ParentPathTs&& parent_path,
+        member(type&& key, ParentPathTs&& parent_path,
                std::enable_if_t<!std::is_constructible<std::string,ParentPathTs>::value,void*> =nullptr)
              : _path(hana::append(std::forward<ParentPathTs>(parent_path),std::move(key)))
         {}
@@ -296,7 +300,7 @@ class member
          */
         template <typename T1>
         member(T1&& key)
-             : _path(hana::make_tuple(std::forward<T1>(key)))
+             : _path(hana::make_tuple(T(std::forward<T1>(key))))
         {}
 
         /**
@@ -322,7 +326,7 @@ class member
         template <typename T1>
         bool isEqual(const T1& other) const
         {
-            return hana::equal(_path,other.path());
+            return equals(other);
         }
 
         /**
@@ -332,7 +336,29 @@ class member
         template <typename T1>
         bool equals(const T1& other) const
         {
-            return hana::equal(_path,other._path);
+            const auto& self=*this;
+            return hana::eval_if(
+                hana::equal(hana::size(path()),hana::size(other.path())),
+                [&](auto&& _)
+                {
+                    auto pairs=hana::zip(_(self).path(),_(other).path());
+                    return hana::fuse(invoke_and)
+                                (hana::transform(
+                                     pairs,
+                                     [](auto&& pair)
+                                     {
+                                         return [&pair]()
+                                         {
+                                             return safe_compare_equal(hana::front(pair),hana::back(pair));
+                                         };
+                                     }
+                                ));
+                },
+                [&](auto&&)
+                {
+                    return false;
+                }
+            );
         }
 
         /**
@@ -352,7 +378,7 @@ class member
         template <typename PathT>
         static auto make_parent(PathT&& path)
         {
-            return member<ParentPathT...>(std::forward<PathT>(path));
+            return make_member(std::forward<PathT>(path));
         }
 
         /**
@@ -371,7 +397,7 @@ class member
         template <typename KeyT>
         auto make_super(KeyT&& first_key) const
         {
-            using stype=typename adjust_storable_type<std::decay_t<KeyT>>::type;
+            using stype=typename adjust_storable_type<KeyT>::type;
             return member<T,stype,ParentPathT...>(hana::prepend(_path,stype(std::forward<KeyT>(first_key))));
         }
 
@@ -379,9 +405,9 @@ class member
          * @brief Get the last key in the path corresponding to the member at current level.
          * @return Key of current member.
          */
-        const type& key() const
+        const auto key() const -> decltype(auto)
         {
-            return hana::back(_path);
+            return extract_object_wrapper(hana::back(_path));
         }
 
         /**
@@ -416,12 +442,13 @@ class member
          * @param key Member key.
          */
         template <typename T1>
-        constexpr auto operator [] (T1&& key) const -> decltype(auto)
+        constexpr auto operator [] (T1&& key) const
         {
+            using type=typename adjust_storable_type<T1>::type;
             auto path_types=hana::transform(_path,hana::make_type);
-            auto key_and_path_types=hana::prepend(path_types,hana::type_c<typename adjust_storable_type<T1>::type>);
+            auto key_and_path_types=hana::prepend(path_types,hana::type_c<type>);
             auto next_member_tmpl=hana::unpack(key_and_path_types,hana::template_<member>);
-            return typename decltype(next_member_tmpl)::type(std::forward<T1>(key),_path);
+            return typename decltype(next_member_tmpl)::type(type(std::forward<T1>(key)),_path);
         }
 
         /**
@@ -520,9 +547,15 @@ auto make_member_with_name(MemberT&& member, T&& name)
 template <typename T>
 constexpr auto make_plain_member(T&& key)
 {
-    return member<
-                typename adjust_storable_type<std::decay_t<T>>::type
-            >(std::forward<T>(key));
+    using type=typename adjust_storable_type<T>::type;
+    return member<type>{type(std::forward<T>(key))};
+}
+
+template <typename T>
+constexpr auto make_typed_member(T&& key)
+{
+//    using type=typename adjust_storable_type<T>::type;
+    return member<std::decay_t<T>>{std::forward<T>(key)};
 }
 
 /**
@@ -537,7 +570,7 @@ auto make_member(Ts&& path)
 
     return hana::fold(
         hana::drop_front(path),
-        make_plain_member(hana::front(path)),
+        make_plain_member(std::move(hana::front(path))),
         [](auto&& parent_member, auto&& next_key)
         {
             return parent_member[std::forward<decltype(next_key)>(next_key)];

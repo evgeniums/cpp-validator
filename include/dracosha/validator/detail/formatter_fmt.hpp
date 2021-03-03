@@ -25,6 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/hana_to_std_tuple.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
+#include <dracosha/validator/utils/object_wrapper.hpp>
 
 namespace fmt
 {
@@ -42,6 +43,16 @@ struct formatter<concrete_phrase>
         return format_to(ctx.out(),ph.text());
     }
 };
+
+template <typename T>
+struct formatter<object_wrapper<T>>
+{
+    template <typename T1, typename FormatContext>
+    auto format(const T1& v, FormatContext& ctx) {
+        return format_to(ctx.out(),"{}",extract_object_wrapper(v));
+    }
+};
+
 }
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN

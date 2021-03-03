@@ -83,11 +83,11 @@ struct single_member_name_t
  * ID is forwarded to traits, then the result goes to decorator.
  */
 template <typename T, typename TraitsT>
-struct single_member_name_t<T,TraitsT,hana::when<can_single_member_name<T,TraitsT>::value>>
+struct single_member_name_t<T,TraitsT,hana::when<can_single_member_name<typename extract_object_wrapper_t<T>::type,TraitsT>::value>>
 {
     auto operator() (const T& id, const TraitsT& traits, grammar_categories grammar_cats) const -> decltype(auto)
     {
-        return decorate(traits,translate(traits,traits(id),grammar_cats));
+        return decorate(traits,translate(traits,traits(extract_object_wrapper(id)),grammar_cats));
     }
 };
 
@@ -99,15 +99,15 @@ struct single_member_name_t<T,TraitsT,hana::when<can_single_member_name<T,Traits
 template <typename T, typename TraitsT>
 struct single_member_name_t<T,TraitsT,
                                 hana::when<
-                                    !can_single_member_name<T,TraitsT>::value
-                                    && std::is_integral<std::decay_t<T>>::value
+                                    !can_single_member_name<typename extract_object_wrapper_t<T>::type,TraitsT>::value
+                                    && std::is_integral<typename extract_object_wrapper_t<T>::type>::value
                                 >
                             >
 {
     auto operator() (const T& id, const TraitsT& traits, grammar_categories grammar_cats) const
     {
         std::string dst;
-        backend_formatter.append(dst,translate(traits,std::string(string_element),grammar_cats),id);
+        backend_formatter.append(dst,translate(traits,std::string(string_element),grammar_cats),extract_object_wrapper(id));
         return decorate(traits,dst);
     }
 };

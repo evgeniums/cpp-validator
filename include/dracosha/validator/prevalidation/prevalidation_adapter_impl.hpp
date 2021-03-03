@@ -157,8 +157,8 @@ class prevalidation_adapter_impl
                     // select execution path depending on the type of adapter's member key, if size/empty then check size
                     return hana::if_(
                         hana::or_(
-                            std::is_same<std::decay_t<decltype(size)>,std::decay_t<decltype(_member.key())>>{},
-                            std::is_same<std::decay_t<decltype(empty)>,std::decay_t<decltype(_member.key())>>{}
+                            std::is_same<std::decay_t<decltype(size)>,std::decay_t<decltype(self->_member.key())>>{},
+                            std::is_same<std::decay_t<decltype(empty)>,std::decay_t<decltype(self->_member.key())>>{}
                         ),
                         [](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
                         {
