@@ -102,9 +102,10 @@ struct generate_paths_t<KeyT,hana::when<std::is_same<all_t,std::decay_t<KeyT>>::
     status operator () (PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
     {
         const auto& obj=extract(adapter.traits().get());
-        auto&& parent_path=hana::drop_back(path);
+        const auto parent_path=hana::drop_back(path);
 
-        if (!adapter.traits().check_member_exists(make_member(parent_path)))
+        auto&& parent=make_member(parent_path);
+        if (!adapter.traits().check_member_exists(parent))
         {
             return adapter.traits().not_found_status();
         }

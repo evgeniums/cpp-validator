@@ -37,7 +37,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename Tobj, typename Tpath>
 auto check_member_path(Tobj&& obj, Tpath&& path)
 {
-    auto path_c=hana::transform(path,hana::make_type);
+    auto path_c=hana::transform(path,extract_object_wrapper_type_c);
     auto obj_c=hana::type_c<decltype(obj)>;
 
     return !hana::is_nothing(hana::monadic_fold_left<hana::optional_tag>(path_c,obj_c,hana::sfinae(check_member)));
