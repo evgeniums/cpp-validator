@@ -73,30 +73,39 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, StringT&&
         return adapter.traits().not_found_status();
     }
 
-    const auto& parent_element=get_member(obj,parent_path);
-    return hana::eval_if(
-        is_container_t<std::decay_t<decltype(parent_element)>>{},
-        [&](auto&& _)
+    return hana::eval_if(check_member_path(obj,parent_path),
+        [&](auto&& _v)
         {
-            aggregate_report<AdapterT>::open(adapter,str,parent);
-            bool empty=true;
-            for (auto it=_(parent_element).begin();it!=_(parent_element).end();++it)
-            {
-                status ret=_(handler)(hana::append(parent_path,wrap_it(it,str)));
-                if (!pred(ret))
+            const auto& parent_element=get_member(_v(obj),_v(parent_path));
+            return hana::eval_if(
+                is_container_t<std::decay_t<decltype(parent_element)>>{},
+                [&](auto&& _)
                 {
+                    aggregate_report<AdapterT>::open(adapter,str,parent);
+                    bool empty=true;
+                    for (auto it=_(parent_element).begin();it!=_(parent_element).end();++it)
+                    {
+                        status ret=_(handler)(hana::append(parent_path,wrap_it(it,str)));
+                        if (!pred(ret))
+                        {
+                            aggregate_report<AdapterT>::close(adapter,ret);
+                            return ret;
+                        }
+                        empty=false;
+                    }
+                    auto ret=empt(empty);
                     aggregate_report<AdapterT>::close(adapter,ret);
                     return ret;
+                },
+                [&](auto&& _)
+                {
+                    return _(handler)(std::forward<decltype(path)>(path));
                 }
-                empty=false;
-            }
-            auto ret=empt(empty);
-            aggregate_report<AdapterT>::close(adapter,ret);
-            return ret;
+            );
         },
-        [&](auto&& _)
+        [](auto&&)
         {
-            return _(handler)(std::forward<decltype(path)>(path));
+            return status{status::code::ignore};
         }
     );
 }

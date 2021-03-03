@@ -77,7 +77,13 @@ struct value_as_container_inverse_wrapper : public value_as_container_wrapper<T>
      * Get value with at() interface for using with getters.
      */
     template <typename T1>
-    auto at(const T& value) const -> decltype(auto)
+    auto at(T1&& value/*,
+            std::enable_if_t<
+                    std::is_constructible<
+                            std::decay_t<T>,
+                            T1
+                        >::value
+            , void*> =nullptr*/) const -> decltype(auto)
     {
         if (!contains(value))
         {

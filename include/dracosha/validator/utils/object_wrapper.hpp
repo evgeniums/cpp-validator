@@ -52,11 +52,14 @@ struct object_wrapper_tag
     }
 };
 
+struct object_wrapper_base{};
+
 /**
  * @brief Wrapper of object that can wrap either object or reference to the object.
  */
 template <typename T>
-class object_wrapper : public adjust_view_ignore
+class object_wrapper : public adjust_view_ignore,
+                       public object_wrapper_base
 {
     public:
 
@@ -187,7 +190,8 @@ struct extract_object_wrapper_t
 };
 template <typename T>
 struct extract_object_wrapper_t<T,
-            hana::when<hana::is_a<object_wrapper_tag,T>>
+            hana::when<hana::is_a<object_wrapper_tag,T>
+            >
         >
 {
     using type=std::decay_t<typename std::decay_t<T>::type>;
@@ -197,7 +201,9 @@ template <typename T>
 auto extract_object_wrapper(T&& val) -> decltype(auto)
 {
     return hana::if_(
-        hana::is_a<object_wrapper_tag,T>,
+        hana::or_(
+                    hana::is_a<object_wrapper_tag,T>
+                   ),
         [](auto&& val) -> decltype(auto)
         {
             return val.get();

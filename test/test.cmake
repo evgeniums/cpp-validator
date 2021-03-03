@@ -1,7 +1,5 @@
 SET (VALIDATOR_TEST_SOURCES
 
-    ${VALIDATOR_TEST_SRC}/testprevalidation.cpp
-
     ${VALIDATOR_TEST_SRC}/testvalidator.cpp
     ${VALIDATOR_TEST_SRC}/testvalidatorimpl.cpp
     ${VALIDATOR_TEST_SRC}/testreporter.cpp
@@ -20,6 +18,7 @@ SET (VALIDATOR_TEST_SOURCES
     ${VALIDATOR_TEST_SRC}/testvalidatoronheap.cpp
     ${VALIDATOR_TEST_SRC}/testinvokeandor.cpp
 
+    ${VALIDATOR_TEST_SRC}/testprevalidation.cpp
     ${VALIDATOR_TEST_SRC}/testvalidate.cpp
     ${VALIDATOR_TEST_SRC}/testsetvalidated.cpp
     ${VALIDATOR_TEST_SRC}/testunsetvalidated.cpp
@@ -29,7 +28,6 @@ SET (VALIDATOR_TEST_SOURCES
     ${VALIDATOR_TEST_SRC}/testnestedallany.cpp
 
 #    ${VALIDATOR_TEST_SRC}/testsinglemember.cpp
-
 )
 
 TARGET_SOURCES(${PROJECT_NAME} PUBLIC ${VALIDATOR_TEST_SOURCES})

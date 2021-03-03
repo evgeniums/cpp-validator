@@ -405,7 +405,7 @@ class member
          * @brief Get the last key in the path corresponding to the member at current level.
          * @return Key of current member.
          */
-        const auto key() const -> decltype(auto)
+        auto key() const -> decltype(auto)
         {
             return extract_object_wrapper(hana::back(_path));
         }

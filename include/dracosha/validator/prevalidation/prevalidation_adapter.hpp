@@ -40,7 +40,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  */
 template <typename MemberT, typename T, typename ReporterT, typename WrappedT>
 class prevalidation_adapter_traits : public object_wrapper<WrappedT>,
-                                     public reporting_adapter_impl<ReporterT,prevalidation_adapter_impl<MemberT>>
+                                     public reporting_adapter_impl<ReporterT,prevalidation_adapter_impl<MemberT>>,
+                                     public with_check_member_exists<adapter<prevalidation_adapter_traits<MemberT,T,ReporterT,WrappedT>>>
 {
     public:
 
@@ -53,7 +54,7 @@ class prevalidation_adapter_traits : public object_wrapper<WrappedT>,
          * @param reporter Reporter to use for report construction if validation fails
          */
         prevalidation_adapter_traits(
-                    adapter<prevalidation_adapter_traits<MemberT,T,ReporterT,WrappedT>>&,
+                    adapter<prevalidation_adapter_traits<MemberT,T,ReporterT,WrappedT>>& adpt,
                     MemberT&& member,
                     T&& val,
                     ReporterT&& reporter
@@ -61,8 +62,11 @@ class prevalidation_adapter_traits : public object_wrapper<WrappedT>,
                     reporting_adapter_impl<ReporterT,prevalidation_adapter_impl<MemberT>>(
                         std::forward<ReporterT>(reporter),
                         std::forward<MemberT>(member)
-                    )
-        {}
+                    ),
+                    with_check_member_exists<adapter<prevalidation_adapter_traits<MemberT,T,ReporterT,WrappedT>>>(adpt)
+        {
+            this->set_check_member_exists_before_validation(true);
+        }
 };
 
 /**

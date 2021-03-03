@@ -98,7 +98,7 @@ struct generate_paths_t<KeyT,hana::when<std::is_same<all_t,std::decay_t<KeyT>>::
 {
     template <typename PathT, typename AdapterT, typename HandlerT>
     status operator () (PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
-    { 
+    {
         return element_aggregation::invoke(
             [](status ret)
             {
