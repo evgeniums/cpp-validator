@@ -23,7 +23,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/operators/comparison.hpp>
-#include <dracosha/validator/operators/contains.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -372,8 +371,8 @@ constexpr ilex_gte_t ilex_gte{};
  */
 struct lex_contains_t : public op<lex_contains_t>
 {
-    constexpr static const char* description=contains_t::description;
-    constexpr static const char* n_description=contains_t::n_description;
+    constexpr static const char* description="must contain";
+    constexpr static const char* n_description="must not contain";
 
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
@@ -392,8 +391,8 @@ constexpr lex_contains_t lex_contains{};
  */
 struct ilex_contains_t : public op<ilex_contains_t>
 {
-    constexpr static const char* description=contains_t::description;
-    constexpr static const char* n_description=contains_t::n_description;
+    constexpr static const char* description=lex_contains_t::description;
+    constexpr static const char* n_description=lex_contains_t::n_description;
 
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
