@@ -305,7 +305,10 @@ BOOST_AUTO_TEST_CASE(TestNestedAny)
           }
         }
     }};
-    BOOST_CHECK(!v3.apply(m5));
+    std::string rep;
+    auto a5=make_reporting_adapter(m5,rep);
+    BOOST_CHECK(!v3.apply(a5));
+    BOOST_CHECK_EQUAL(rep,std::string("size of each element of level3 of at least one element of level1 must be greater than or equal to 5"));
 
     std::map<std::string,
              std::map<std::string,

@@ -28,11 +28,13 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+struct reporting_adapter_tag{};
+
 /**
  * @brief Implementation of reporting adapter.
  */
 template <typename ReporterT, typename NextAdapterImplT>
-class reporting_adapter_impl
+class reporting_adapter_impl : public reporting_adapter_tag
 {
     public:
 
