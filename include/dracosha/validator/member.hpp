@@ -349,7 +349,7 @@ class member
                                      {
                                          return [&pair]()
                                          {
-                                             return safe_compare_equal(hana::front(pair),hana::back(pair));
+                                             return safe_compare_equal(extract_object_wrapper(hana::front(pair)),extract_object_wrapper(hana::back(pair)));
                                          };
                                      }
                                 ));
