@@ -17,17 +17,14 @@ SET (VALIDATOR_TEST_SOURCES
     ${VALIDATOR_TEST_SRC}/testhabrexamples_ru.cpp
     ${VALIDATOR_TEST_SRC}/testvalidatoronheap.cpp
     ${VALIDATOR_TEST_SRC}/testinvokeandor.cpp
-
     ${VALIDATOR_TEST_SRC}/testprevalidation.cpp
     ${VALIDATOR_TEST_SRC}/testvalidate.cpp
     ${VALIDATOR_TEST_SRC}/testsetvalidated.cpp
     ${VALIDATOR_TEST_SRC}/testunsetvalidated.cpp
     ${VALIDATOR_TEST_SRC}/testresizevalidated.cpp
     ${VALIDATOR_TEST_SRC}/testclearvalidated.cpp
-
     ${VALIDATOR_TEST_SRC}/testnestedallany.cpp
-
-#    ${VALIDATOR_TEST_SRC}/testsinglemember.cpp
+    ${VALIDATOR_TEST_SRC}/testsinglemember.cpp
 )
 
 TARGET_SOURCES(${PROJECT_NAME} PUBLIC ${VALIDATOR_TEST_SOURCES})

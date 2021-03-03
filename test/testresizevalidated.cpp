@@ -13,8 +13,6 @@ BOOST_AUTO_TEST_SUITE(TestPrevalidation)
 BOOST_AUTO_TEST_CASE(CheckResizeValidated)
 {
     error_report err;
-
-#if 1
     auto v1=validator(
                 _["field1"](empty(flag,false)),
                 _["field2"](size(gte,5) ^AND^ value(ne,"Invalid value")),
@@ -123,7 +121,6 @@ BOOST_AUTO_TEST_CASE(CheckResizeValidated)
     resize_validated(m2,_["field3"][0],2,v3,err);
     BOOST_CHECK(err);
     BOOST_CHECK_EQUAL(err.message(),std::string("size of element #0 of field3 must be greater than or equal to size of element #0 of field3 of sample"));
-#endif
 
     std::map<std::string,std::string> m4{
         {"field1","value1"},
