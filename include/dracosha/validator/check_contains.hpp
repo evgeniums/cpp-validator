@@ -78,13 +78,14 @@ struct check_contains_t
     template <typename T1, typename T2>
     constexpr bool operator () (
                                 const T1& v,
-                                const T2& b,
+                                const T2& k,
                                 std::enable_if_t<
                                     (!hana::is_a<wrap_iterator_tag,T2> && !has_property<typename extract_object_wrapper_t<T1>::type,T2>() && can_check_contains<typename extract_object_wrapper_t<T1>::type,T2>()),
                                                                     void*> =nullptr
                              ) const
     {
         const auto& a=extract_object_wrapper(v);
+        const auto& b=extract_object_wrapper(k);
         return hana::if_(detail::has_find_it(a,b),
             [](auto&& a1, auto&& b1) { return a1.find(b1)!=a1.end(); },
             hana::if_(detail::has_has(a,b),
@@ -100,7 +101,7 @@ struct check_contains_t
                         )
                     )
                 )
-        )(std::forward<decltype(a)>(a),std::forward<decltype(b)>(b));
+        )(a,b);
     }
 
     /**

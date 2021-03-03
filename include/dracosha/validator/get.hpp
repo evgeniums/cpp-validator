@@ -36,7 +36,11 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename Tv, typename Tk>
 auto get(Tv&& v, Tk&& k) -> decltype(auto)
 {
-    return detail::get_impl<decltype(v),decltype(k)>(std::forward<decltype(v)>(v),std::forward<decltype(k)>(k));
+    return detail::get_impl<decltype(v),decltype(extract_object_wrapper(std::forward<Tk>(k)))>
+            (
+                std::forward<decltype(v)>(v),
+                extract_object_wrapper(std::forward<Tk>(k))
+             );
 }
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

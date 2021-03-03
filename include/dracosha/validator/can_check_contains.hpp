@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/properties/size.hpp>
 #include <dracosha/validator/utils/wrap_it.hpp>
+#include <dracosha/validator/utils/object_wrapper.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -32,9 +33,10 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 /**
  *  Helper for checking if object of type T1 can be queried if it contains a member accessible by key of type T2.
  */
-template <typename T1, typename T2>
+template <typename T1, typename ArgT>
 struct can_check_contains_t
 {
+    using T2=typename extract_object_wrapper_t<ArgT>::type;
     constexpr static const bool value =
         hana::is_a<wrap_iterator_tag,T2>
         ||

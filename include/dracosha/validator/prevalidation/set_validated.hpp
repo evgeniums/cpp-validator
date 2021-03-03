@@ -69,7 +69,12 @@ void set_member(
         ValueT&& val
     )
 {
-    set_member_inst<std::decay_t<ObjectT>,std::decay_t<MemberT>>(obj,std::forward<MemberT>(member),std::forward<ValueT>(val));
+    set_member_inst<std::decay_t<ObjectT>,typename extract_object_wrapper_t<MemberT>::type>
+            (
+                obj,
+                extract_object_wrapper(std::forward<MemberT>(member)),
+                std::forward<ValueT>(val)
+             );
 }
 
 /**
@@ -89,7 +94,7 @@ void set_validated(
         error_report& err
     )
 {
-    validate_value(member,wrap_strict_any(std::forward<ValueT>(val),validator),extract_strict_any(std::forward<ValidatorT>(validator)),err);
+    validate_value(member,wrap_strict_any(val,validator),extract_strict_any(std::forward<ValidatorT>(validator)),err);
     if (!err)
     {
         set_member(obj,member,std::forward<ValueT>(val));
