@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/utils/wrap_it.hpp>
+#include <dracosha/validator/utils/object_wrapper.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -46,7 +47,11 @@ struct to_string_t
  *  @brief Convert to string if string is constructible of argument.
  */
 template <typename T>
-struct to_string_t<T,hana::when<std::is_constructible<std::string,T>::value>>
+struct to_string_t<T,hana::when<
+            std::is_constructible<std::string,T>::value
+            &&
+            !hana::is_a<property_tag,T>
+        >>
 {
     template <typename T1>
     std::string operator () (T1&& id) const
@@ -88,7 +93,7 @@ struct can_to_string
     constexpr static const bool value=false;
 };
 /**
- *  @brief Check if sdt::to_string() can be callable with the given type.
+ *  @brief Check if std::to_string() can be callable with the given type.
  */
 template <typename T>
 struct can_to_string<T,
@@ -123,7 +128,7 @@ constexpr to_string_t<T> to_string_inst{};
 template <typename T>
 std::string to_string(const T& v)
 {
-    return to_string_inst<T>(v);
+    return to_string_inst<std::decay_t<decltype(extract_object_wrapper(v))>>(extract_object_wrapper(v));
 }
 
 //-------------------------------------------------------------
