@@ -30,6 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/adapters/impl/default_adapter_impl.hpp>
 #include <dracosha/validator/prevalidation/prevalidation_adapter_tag.hpp>
 #include <dracosha/validator/utils/value_as_container.hpp>
+#include <dracosha/validator/prevalidation/strict_any.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -44,14 +45,13 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  * @note Currently nested ALL/ANY aggregation operators are not supported.
  */
 template <typename CheckMemberT>
-class prevalidation_adapter_impl
+class prevalidation_adapter_impl : public strict_any_tag
 {
     public:
 
         prevalidation_adapter_impl(CheckMemberT&& member)
             : _member(std::forward<CheckMemberT>(member)),
-              _member_checked(false),
-              _strict_any(false)
+              _member_checked(false)
         {}
 
         template <typename AdapterT, typename T2, typename OpT>
@@ -298,7 +298,7 @@ class prevalidation_adapter_impl
         template <typename AdapterT, typename OpT>
         status validate_any(AdapterT&& adpt, OpT&& op) const
         {
-            if (!_strict_any)
+            if (!is_strict_any())
             {
                 return status(status::code::ignore);
             }
@@ -335,7 +335,7 @@ class prevalidation_adapter_impl
         template <typename AdapterT, typename MemberT, typename OpT>
         status validate_any(AdapterT&& adpt, MemberT&& member, OpT&& op) const
         {
-            if (!_strict_any)
+            if (!is_strict_any())
             {
                 return status(status::code::ignore);
             }
@@ -431,15 +431,6 @@ class prevalidation_adapter_impl
             return _member_checked;
         }
 
-        void set_strict_any(bool enable) noexcept
-        {
-            _strict_any=enable;
-        }
-        bool is_strict_any() const noexcept
-        {
-            return _strict_any;
-        }
-
     private:
 
         template <typename MemberT>
@@ -460,7 +451,6 @@ class prevalidation_adapter_impl
 
         CheckMemberT _member;
         mutable bool _member_checked;
-        bool _strict_any;
 };
 
 //-------------------------------------------------------------

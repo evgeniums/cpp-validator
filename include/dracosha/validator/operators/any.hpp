@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/make_validator.hpp>
 #include <dracosha/validator/operators/and.hpp>
 #include <dracosha/validator/detail/aggregate_any.hpp>
+#include <dracosha/validator/prevalidation/strict_any.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -98,6 +99,29 @@ constexpr string_any_t string_any{};
 
 //-------------------------------------------------------------
 
+template <typename AdapterT, typename = hana::when<true>>
+struct check_strict_any
+{
+    template <typename T>
+    static constexpr bool skip(T&&) noexcept
+    {
+        return false;
+    }
+};
+template <typename AdapterT>
+struct check_strict_any<AdapterT,
+        hana::when<
+            std::is_base_of<strict_any_tag,typename std::decay_t<AdapterT>::type>::value
+        >>
+{
+    template <typename T>
+    static bool skip(T&& adapter) noexcept
+    {
+        //! @todo Test it
+        return !adapter.traits().is_strict_any();
+    }
+};
+
 template <typename KeyT>
 struct generate_paths_t<KeyT,hana::when<std::is_same<any_t,std::decay_t<KeyT>>::value>>
 {
@@ -105,15 +129,20 @@ struct generate_paths_t<KeyT,hana::when<std::is_same<any_t,std::decay_t<KeyT>>::
     status operator () (PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
     {
         return element_aggregation::invoke(
-            [](status ret)
+            [&adapter](status& ret)
             {
+//                if (check_strict_any<AdapterT>::skip(adapter))
+//                {
+//                    ret=status{status::code::ignore};
+//                    return false;
+//                }
                 return ret.value()!=status::code::success;
             },
             [](bool empty)
             {
                 if (empty)
                 {
-                    return status(status::code::success);
+                    return status(status::code::ignore);
                 }
                 return status(status::code::fail);
             },

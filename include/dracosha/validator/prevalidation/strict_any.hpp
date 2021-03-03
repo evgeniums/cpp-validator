@@ -27,7 +27,23 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-struct strict_any_tag;
+class strict_any_tag
+{
+    public:
+
+        void set_strict_any(bool enable) noexcept
+        {
+            _strict_any=enable;
+        }
+        bool is_strict_any() const noexcept
+        {
+            return _strict_any;
+        }
+
+    private:
+
+        bool _strict_any{false};
+};
 
 template <typename T>
 struct strict_any_wrapper : public object_wrapper<T>
