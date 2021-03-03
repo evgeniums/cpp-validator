@@ -46,7 +46,7 @@ status apply_generated_paths_t::operator () (PathT&& current_path, AdapterT&& ad
         },
         [&](auto&& _)
         {
-            auto&& key=hana::at(_(member).path(),hana::size(_(current_path)));
+            auto&& key=make_object_wrapper_ref(hana::at(_(member).path(),hana::size(_(current_path))));
             return generate_paths<std::decay_t<decltype(key)>>(
                         hana::append(_(current_path),std::move(key)),
                         _(adapter),

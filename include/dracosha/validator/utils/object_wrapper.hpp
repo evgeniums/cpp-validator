@@ -241,6 +241,23 @@ auto make_object_wrapper(T&& v)
     return object_wrapper<T>(std::forward<T>(v));
 }
 
+template <typename T>
+auto make_object_wrapper_ref(T&& v) -> decltype(auto)
+{
+    return hana::eval_if(
+        hana::is_a<object_wrapper_tag,T>,
+        [&](auto&& _)
+        {
+            const auto& val=extract_object_wrapper(_(v));
+            return object_wrapper<decltype(val)>(val);
+        },
+        [&](auto&& _) -> decltype(auto)
+        {
+            return hana::id(_(v));
+        }
+    );
+}
+
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
