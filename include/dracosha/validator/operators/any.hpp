@@ -98,6 +98,35 @@ constexpr string_any_t string_any{};
 
 //-------------------------------------------------------------
 
+template <typename KeyT>
+struct generate_paths_t<KeyT,hana::when<std::is_same<any_t,std::decay_t<KeyT>>::value>>
+{
+    template <typename PathT, typename AdapterT, typename HandlerT>
+    status operator () (PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
+    {
+        return element_aggregation::invoke(
+            [](status ret)
+            {
+                return ret.value()!=status::code::success;
+            },
+            [](bool empty)
+            {
+                if (empty)
+                {
+                    return status(status::code::success);
+                }
+                return status(status::code::fail);
+            },
+            string_any,
+            std::forward<PathT>(path),
+            std::forward<AdapterT>(adapter),
+            std::forward<HandlerT>(handler)
+        );
+    }
+};
+
+//-------------------------------------------------------------
+
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
 #endif // DRACOSHA_VALIDATOR_ANY_HPP

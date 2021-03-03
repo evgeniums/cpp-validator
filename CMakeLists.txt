@@ -61,6 +61,7 @@ SET (HEADERS
     include/dracosha/validator/operators/any.hpp
     include/dracosha/validator/operators/all.hpp
     include/dracosha/validator/operators/aggregation.hpp
+    include/dracosha/validator/operators/aggregation.ipp
     include/dracosha/validator/operators/logical.hpp
     include/dracosha/validator/operators/invert_op.hpp
     include/dracosha/validator/operators/flag.hpp

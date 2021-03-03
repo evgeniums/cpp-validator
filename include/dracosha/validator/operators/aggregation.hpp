@@ -20,6 +20,8 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_AGGREGATION_HPP
 
 #include <dracosha/validator/config.hpp>
+
+#include <dracosha/validator/status.hpp>
 #include <dracosha/validator/operators/operator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -40,6 +42,14 @@ enum class aggregation_id : int
 
 struct aggregation_op_tag;
 struct element_aggregation_tag;
+
+struct element_aggregation
+{
+    using hana_tag=element_aggregation_tag;
+
+    template <typename PredicateT, typename EmptyFnT, typename StringT, typename PathT, typename AdapterT, typename HandlerT>
+    static status invoke(PredicateT&& pred, EmptyFnT&& empt, StringT&& str, PathT&& path, AdapterT&& adapter, HandlerT&& handler);
+};
 
 /**
  * @brief Aggregation operator descriptor.

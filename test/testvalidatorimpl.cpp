@@ -23,13 +23,44 @@ struct TestRefStruct
     }
 
     TestRefStruct(const TestRefStruct&)=delete;
-    TestRefStruct(const TestRefStruct&&)=delete;
     TestRefStruct& operator = (const TestRefStruct&)=delete;
     TestRefStruct& operator = (TestRefStruct&&)=delete;
 
     TestRefStruct(TestRefStruct&&) noexcept
     {
         BOOST_TEST_MESSAGE("Move TestRefStruct ctor");
+    }
+};
+
+struct TestStruct2
+{
+    TestStruct2()
+    {
+        BOOST_TEST_MESSAGE("TestStruct2 default ctor");
+    }
+    ~TestStruct2()
+    {
+        BOOST_TEST_MESSAGE("TestStruct2 dtor");
+    }
+
+    TestStruct2(const TestStruct2&)
+    {
+        BOOST_TEST_MESSAGE("TestStruct2 copy ctor");
+    }
+    TestStruct2& operator = (const TestStruct2&)
+    {
+        BOOST_TEST_MESSAGE("TestStruct2 copy assignment operator");
+        return *this;
+    }
+    TestStruct2& operator = (TestStruct2&&)
+    {
+        BOOST_TEST_MESSAGE("TestStruct2 move assignment operator");
+        return *this;
+    }
+
+    TestStruct2(TestStruct2&&) noexcept
+    {
+        BOOST_TEST_MESSAGE("TestStruct2 move ctor");
     }
 };
 
@@ -62,6 +93,12 @@ BOOST_AUTO_TEST_CASE(CheckFoldAnd)
 
 BOOST_AUTO_TEST_CASE(CheckMakeMember)
 {
+    std::ignore=make_plain_member(int(1));
+    auto&& ts1=hana::make_tuple(int(1));
+    auto&& i1=hana::front(ts1);
+    static_assert(std::is_same<decltype(i1),int&>::value,"");
+    std::ignore=make_plain_member(i1);
+
     std::ignore=make_member(hana::make_tuple(1));
     std::ignore=make_member(hana::make_tuple(1,1.0f,"hello"));
     auto m3=make_member(hana::make_tuple(1,2,std::string("hi")));
@@ -69,12 +106,67 @@ BOOST_AUTO_TEST_CASE(CheckMakeMember)
 
     auto m3_1=_[1][2]["hi"];
     BOOST_CHECK(m3.equals(m3_1));
+    BOOST_CHECK(m3_1.equals(m3));
+
+    std::string hello("hello");
+    auto m5=_[1]["haha"][std::string("hi")][hello][size];
+    std::ignore=_[hello];
+    BOOST_CHECK(!m5.equals(m3_1));
+    BOOST_CHECK(!m3_1.equals(m5));
+
+//    int abcd=m3.path();
+//    int abcd1=m3_1.path();
+
+    BOOST_CHECK(hana::back(m3.path())==hana::back(m3_1.path()));
+
+    std::ignore=make_member(std::make_tuple(value));
+
+    auto m1=make_member(std::make_tuple(1,2,"hi",size));
+    std::ignore=make_member(m1.path());
+    std::ignore=inherit_member(m1.path(),m1);
+
+    std::vector<int> vec1={1,2,3,4,5};
+
+    auto index=make_object_wrapper(1);
+    auto ok=can_check_contains<decltype(vec1),decltype(int())>();
+    BOOST_CHECK(ok);
+    BOOST_CHECK_EQUAL(vec1[index],2);
+    auto mv=make_member(std::make_tuple(3));
+    BOOST_CHECK(check_member_path(vec1,mv.path()));
+
+    auto v2=m1(gte,5);
+    BOOST_CHECK(v2.apply(vec1));
+
+    auto m7=make_member(hana::make_tuple("hi"));
+    auto m8=make_member(hana::make_tuple(std::string("hi")));
+    auto m9=make_member(m7.path());
+    auto m10=make_member(m8.path());
+
+//    TestStruct2 ts2;
+//    auto t2=hana::make_tuple(std::move(ts2));
+
+//    auto& ts3=hana::back(t2);
+//    auto t3=hana::append(hana::tuple<>(),ts3);
+
+    BOOST_TEST_MESSAGE("Key as lvalue begin");
+    TestStruct2 ts12{};
+    auto m12=_[ts12][10][11];
+    auto m13=m12.parent();
+    std::ignore=m13;
+    BOOST_TEST_MESSAGE("Key as lvalue end");
+
+    BOOST_TEST_MESSAGE("Key as rvalue begin");
+    auto m14=_[TestStruct2{}][10];
+//    auto m15=m14.parent();
+    BOOST_TEST_MESSAGE("Key as rvalue end");
 
 #if 0
     // must fail
     std::ignore=make_member(hana::tuple<>());
 #endif
 }
+
+#if 1
 
 BOOST_AUTO_TEST_CASE(CheckTupleConversions)
 {
@@ -709,5 +801,5 @@ BOOST_AUTO_TEST_CASE(CheckMemberHelper)
     auto v=_["field1"](gte,100);
     BOOST_CHECK(true);
 }
-
+#endif
 BOOST_AUTO_TEST_SUITE_END()

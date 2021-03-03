@@ -58,10 +58,8 @@ constexpr string_all_t string_all{};
  * @param op Validator to apply to each element of the container.
  * @return Success if all elements of the container passed validator.
  */
-struct all_t
+struct all_t : public element_aggregation
 {
-    using hana_tag=element_aggregation_tag;
-
     template <typename ... Ops>
     constexpr auto operator() (Ops&&... ops) const
     {
@@ -100,35 +98,21 @@ struct generate_paths_t<KeyT,hana::when<std::is_same<all_t,std::decay_t<KeyT>>::
 {
     template <typename PathT, typename AdapterT, typename HandlerT>
     status operator () (PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
-    {
-        const auto& obj=extract(adapter.traits().get());
-        const auto parent_path=hana::drop_back(path);
-
-        auto&& parent=make_member(parent_path);
-        if (!adapter.traits().check_member_exists(parent))
-        {
-            return adapter.traits().not_found_status();
-        }
-
-        const auto& parent_element=get_member(obj,parent_path);
-        return hana::eval_if(
-            is_container_t<std::decay_t<decltype(parent_element)>>{},
-            [&](auto&& _)
+    { 
+        return element_aggregation::invoke(
+            [](status ret)
             {
-                for (auto it=_(parent_element).begin();it!=_(parent_element).end();++it)
-                {
-                    status ret=_(handler)(hana::append(parent_path,wrap_it(it,string_all)));
-                    if (ret.value()==status::code::fail)
-                    {
-                        return ret;
-                    }
-                }
+                return ret==true;
+            },
+            [](bool empty)
+            {
+                std::ignore=empty;
                 return status(status::code::success);
             },
-            [&](auto&& _)
-            {
-                return _(handler)(std::forward<decltype(path)>(path));
-            }
+            string_all,
+            std::forward<PathT>(path),
+            std::forward<AdapterT>(adapter),
+            std::forward<HandlerT>(handler)
         );
     }
 };
