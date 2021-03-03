@@ -131,11 +131,11 @@ struct generate_paths_t<KeyT,hana::when<std::is_same<any_t,std::decay_t<KeyT>>::
         return element_aggregation::invoke(
             [&adapter](status& ret)
             {
-//                if (check_strict_any<AdapterT>::skip(adapter))
-//                {
-//                    ret=status{status::code::ignore};
-//                    return false;
-//                }
+                if (check_strict_any<AdapterT>::skip(adapter))
+                {
+                    ret=status{status::code::ignore};
+                    return false;
+                }
                 return ret.value()!=status::code::success;
             },
             [](bool empty)
