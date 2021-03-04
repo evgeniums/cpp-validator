@@ -30,14 +30,34 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 /**
+ * @brief String descriptions helper for operator ANY.
+ */
+struct string_any_t : public aggregate_op<string_any_t>,
+                      public enable_to_string<string_any_t>
+{
+    constexpr static const aggregation_id id=aggregation_id::ANY;
+    constexpr static const char* open_token="";
+    constexpr static const char* close_token="";
+    constexpr static const char* conjunction_token="";
+
+    constexpr static const char* description="at least one element";
+};
+
+/**
+  @brief Instance of string description helper for operator ANY.
+*/
+constexpr string_any_t string_any{};
+
+//-------------------------------------------------------------
+
+/**
  * @brief Definition of aggregation pseudo operator ANY to check if any element of a container satisfies condition.
  * @param op Validator to apply to elements of the container.
  * @return Success if any element of the container passed validator.
  */
-struct any_t
+struct any_t : public element_aggregation,
+               public enable_to_string<string_any_t>
 {
-    using hana_tag=element_aggregation_tag;
-
     template <typename ... Ops>
     constexpr auto operator() (Ops&&... ops) const
     {
@@ -75,27 +95,6 @@ struct any_t
   @brief Aggregation operator ANY that requires for at least one of container elements to satisfy a condition.
 */
 constexpr any_t ANY{};
-
-//-------------------------------------------------------------
-
-/**
- * @brief String descriptions helper for operator ANY.
- */
-struct string_any_t : public aggregate_op<string_any_t>,
-                      public enable_to_string<string_any_t>
-{
-    constexpr static const aggregation_id id=aggregation_id::ANY;
-    constexpr static const char* open_token="";
-    constexpr static const char* close_token="";
-    constexpr static const char* conjunction_token="";
-
-    constexpr static const char* description="at least one element";
-};
-
-/**
-  @brief Instance of string description helper for operator ANY.
-*/
-constexpr string_any_t string_any{};
 
 //-------------------------------------------------------------
 

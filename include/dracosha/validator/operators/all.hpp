@@ -58,7 +58,8 @@ constexpr string_all_t string_all{};
  * @param op Validator to apply to each element of the container.
  * @return Success if all elements of the container passed validator.
  */
-struct all_t : public element_aggregation
+struct all_t : public element_aggregation,
+               public enable_to_string<string_all_t>
 {
     template <typename ... Ops>
     constexpr auto operator() (Ops&&... ops) const

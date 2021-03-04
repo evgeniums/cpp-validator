@@ -41,7 +41,30 @@ enum class aggregation_id : int
 };
 
 struct aggregation_op_tag;
-struct element_aggregation_tag;
+struct element_aggregation_tag
+{
+    template <typename T>
+    constexpr bool operator == (T) const noexcept
+    {
+        return true;
+    }
+    template <typename T>
+    constexpr bool operator != (T) const noexcept
+    {
+        return false;
+    }
+
+    template <typename T>
+    constexpr friend bool operator == (T, const element_aggregation_tag&) noexcept
+    {
+        return true;
+    }
+    template <typename T>
+    constexpr friend bool operator != (T, const element_aggregation_tag&) noexcept
+    {
+        return true;
+    }
+};
 
 struct element_aggregation
 {
@@ -49,6 +72,28 @@ struct element_aggregation
 
     template <typename PredicateT, typename EmptyFnT, typename StringT, typename PathT, typename AdapterT, typename HandlerT>
     static status invoke(PredicateT&& pred, EmptyFnT&& empt, StringT&& str, PathT&& path, AdapterT&& adapter, HandlerT&& handler);
+
+    template <typename T>
+    constexpr bool operator == (T) const noexcept
+    {
+        return true;
+    }
+    template <typename T>
+    constexpr bool operator != (T) const noexcept
+    {
+        return false;
+    }
+
+    template <typename T>
+    constexpr friend bool operator == (T, const element_aggregation&) noexcept
+    {
+        return true;
+    }
+    template <typename T>
+    constexpr friend bool operator != (T, const element_aggregation&) noexcept
+    {
+        return true;
+    }
 };
 
 /**
