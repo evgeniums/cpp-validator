@@ -27,6 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/can_check_contains.hpp>
 #include <dracosha/validator/utils/safe_compare.hpp>
 #include <dracosha/validator/utils/wrap_it.hpp>
+#include <dracosha/validator/utils/extract_object_wrapper.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

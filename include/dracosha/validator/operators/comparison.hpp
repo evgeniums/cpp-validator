@@ -35,7 +35,7 @@ struct eq_t : public op<eq_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return safe_compare<T1,T2>::equal(a,b);
+        return safe_compare_equal(a,b);
     }
 
     constexpr static const char* description="must be equal to";
@@ -54,7 +54,7 @@ struct ne_t : public op<ne_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return safe_compare<T1,T2>::not_equal(a,b);
+        return safe_compare_not_equal(a,b);
     }
 
     constexpr static const char* description="must be not equal to";
@@ -73,7 +73,7 @@ struct lt_t : public op<lt_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return safe_compare<T1,T2>::less(a,b);
+        return safe_compare_less(a,b);
     }
 
     constexpr static const char* description="must be less than";
@@ -92,7 +92,7 @@ struct lte_t : public op<lte_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return safe_compare<T1,T2>::less_equal(a,b);
+        return safe_compare_less_equal(a,b);
     }
 
     constexpr static const char* description="must be less than or equal to";
@@ -111,7 +111,7 @@ struct gt_t : public op<gt_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return safe_compare<T1,T2>::greater(a,b);
+        return safe_compare_greater(a,b);
     }
 
     constexpr static const char* description="must be greater than";
@@ -130,7 +130,7 @@ struct gte_t : public op<gte_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return safe_compare<T1,T2>::greater_equal(a,b);
+        return safe_compare_greater_equal(a,b);
     }
 
     constexpr static const char* description="must be greater than or equal to";

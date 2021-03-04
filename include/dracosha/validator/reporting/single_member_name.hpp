@@ -27,6 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
 #include <dracosha/validator/utils/to_string.hpp>
+#include <dracosha/validator/utils/extract_object_wrapper.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/validate.hpp>
 #include <dracosha/validator/properties/size.hpp>
 #include <dracosha/validator/properties/empty.hpp>
-
+#include <dracosha/validator/utils/extract_object_wrapper.hpp>
 #include <dracosha/validator/prevalidation/validate_empty.hpp>
 #include <dracosha/validator/prevalidation/validate_value.hpp>
 

@@ -24,10 +24,13 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/string_view.hpp>
+#include <dracosha/validator/utils/extract_object_wrapper.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
+
+namespace detail {
 
 /**
  * @brief Safe less than or equal to if operation is not possible.
@@ -35,7 +38,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename LeftT, typename RightT, typename=void>
 struct safe_lte
 {
-    constexpr static bool f(const LeftT&, const RightT&) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool f(const LeftT1&, const RightT1&) noexcept
     {
         return false;
     }
@@ -56,7 +60,8 @@ struct safe_lte<LeftT,RightT,
             >
         >
 {
-    constexpr static bool f(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool f(const LeftT1& left, const RightT1& right) noexcept
     {
         return left <= right;
     }
@@ -68,7 +73,8 @@ struct safe_lte<LeftT,RightT,
 template <typename LeftT, typename RightT, typename=void>
 struct safe_lt
 {
-    constexpr static bool f(const LeftT&, const RightT&) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool f(const LeftT1&, const RightT1&) noexcept
     {
         return false;
     }
@@ -90,7 +96,8 @@ struct safe_lt<LeftT,RightT,
             >
         >
 {
-    constexpr static bool f(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool f(const LeftT1& left, const RightT1& right) noexcept
     {
         return left < right;
     }
@@ -102,7 +109,8 @@ struct safe_lt<LeftT,RightT,
 template <typename LeftT, typename RightT, typename=void>
 struct safe_eq
 {
-    constexpr static bool f(const LeftT&, const RightT&) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool f(const LeftT1&, const RightT1&) noexcept
     {
         return false;
     }
@@ -124,7 +132,8 @@ struct safe_eq<LeftT,RightT,
             >
         >
 {
-    constexpr static bool f(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool f(const LeftT1& left, const RightT1& right) noexcept
     {
         return left == right;
     }
@@ -136,7 +145,8 @@ struct safe_eq<LeftT,RightT,
 template <typename LeftT, typename RightT, typename=void>
 struct safe_ne
 {
-    constexpr static bool f(const LeftT&, const RightT&) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool f(const LeftT1&, const RightT1&) noexcept
     {
         return true;
     }
@@ -158,7 +168,8 @@ struct safe_ne<LeftT,RightT,
             >
         >
 {
-    constexpr static bool f(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool f(const LeftT1& left, const RightT1& right) noexcept
     {
         return left != right;
     }
@@ -170,7 +181,8 @@ struct safe_ne<LeftT,RightT,
 template <typename LeftT, typename RightT, typename=void>
 struct safe_gte
 {
-    constexpr static bool f(const LeftT&, const RightT&) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool f(const LeftT1&, const RightT1&) noexcept
     {
         return false;
     }
@@ -191,7 +203,8 @@ struct safe_gte<LeftT,RightT,
             >
         >
 {
-    constexpr static bool f(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool f(const LeftT1& left, const RightT1& right) noexcept
     {
         return left >= right;
     }
@@ -203,7 +216,8 @@ struct safe_gte<LeftT,RightT,
 template <typename LeftT, typename RightT, typename=void>
 struct safe_gt
 {
-    constexpr static bool f(const LeftT&, const RightT&) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool f(const LeftT1&, const RightT1&) noexcept
     {
         return false;
     }
@@ -225,7 +239,8 @@ struct safe_gt<LeftT,RightT,
             >
         >
 {
-    constexpr static bool f(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool f(const LeftT1& left, const RightT1& right) noexcept
     {
         return left > right;
     }
@@ -239,27 +254,33 @@ struct safe_gt<LeftT,RightT,
 template <typename LeftT, typename RightT, typename=void>
 struct safe_compare
 {
-    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool less(const LeftT1& left, const RightT1& right) noexcept
     {
         return safe_lt<LeftT,RightT>::f(left,right);
     }
-    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool less_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return safe_lte<LeftT,RightT>::f(left,right);
     }
-    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return safe_eq<LeftT,RightT>::f(left,right);
     }
-    constexpr static bool not_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool not_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return safe_ne<LeftT,RightT>::f(left,right);
     }
-    constexpr static bool greater(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool greater(const LeftT1& left, const RightT1& right) noexcept
     {
         return safe_gt<LeftT,RightT>::f(left,right);
     }
-    constexpr static bool greater_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool greater_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return safe_gte<LeftT,RightT>::f(left,right);
     }
@@ -279,7 +300,8 @@ struct safe_compare<LeftT,RightT,
                         >
                     >
 {
-    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool less(const LeftT1& left, const RightT1& right) noexcept
     {
         if (left < 0)
         {
@@ -287,15 +309,18 @@ struct safe_compare<LeftT,RightT,
         }
         return static_cast<std::make_unsigned_t<LeftT>>(left) < right;
     }
-    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return static_cast<std::make_unsigned_t<LeftT>>(left) == right;
     }
-    constexpr static bool not_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool not_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return !equal(left,right);
     }
-    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool less_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         if (left < 0)
         {
@@ -303,11 +328,13 @@ struct safe_compare<LeftT,RightT,
         }
         return static_cast<std::make_unsigned_t<LeftT>>(left) <= right;
     }
-    constexpr static bool greater(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool greater(const LeftT1& left, const RightT1& right) noexcept
     {
         return !less_equal(left,right);
     }
-    constexpr static bool greater_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool greater_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return !less(left,right);
     }
@@ -326,7 +353,8 @@ struct safe_compare<LeftT, RightT,
             !std::is_same<LeftT, bool>::value>
     >
 {
-    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool less(const LeftT1& left, const RightT1& right) noexcept
     {
         if (right < 0)
         {
@@ -334,15 +362,18 @@ struct safe_compare<LeftT, RightT,
         }
         return left < static_cast<std::make_unsigned_t<RightT>>(right);
     }
-    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return left == static_cast<std::make_unsigned_t<RightT>>(right);
     }
-    constexpr static bool not_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool not_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return !equal(left,right);
     }
-    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool less_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         if (right < 0)
         {
@@ -350,11 +381,13 @@ struct safe_compare<LeftT, RightT,
         }
         return left <= static_cast<std::make_unsigned_t<RightT>>(right);
     }
-    constexpr static bool greater(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool greater(const LeftT1& left, const RightT1& right) noexcept
     {
         return !less_equal(left,right);
     }
-    constexpr static bool greater_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool greater_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return !less(left,right);
     }
@@ -375,27 +408,33 @@ struct safe_compare<LeftT,RightT,
                         >
                 >
 {
-    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool less(const LeftT1& left, const RightT1& right) noexcept
     {
         return static_cast<bool>(left) < right;
     }
-    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return static_cast<bool>(left)==right;
     }
-    constexpr static bool not_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool not_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return !equal(left,right);
     }
-    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool less_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return static_cast<bool>(left) <= right;
     }
-    constexpr static bool greater(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool greater(const LeftT1& left, const RightT1& right) noexcept
     {
         return !less_equal(left,right);
     }
-    constexpr static bool greater_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool greater_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return !less(left,right);
     }
@@ -416,27 +455,33 @@ struct safe_compare<LeftT, RightT,
             >
     >
 {
-    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool less(const LeftT1& left, const RightT1& right) noexcept
     {
         return left < static_cast<bool>(right);
     }
-    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return left==static_cast<bool>(right);
     }
-    constexpr static bool not_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool not_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return !equal(left,right);
     }
-    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool less_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return left <= static_cast<bool>(right);
     }
-    constexpr static bool greater(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool greater(const LeftT1& left, const RightT1& right) noexcept
     {
         return !less_equal(left,right);
     }
-    constexpr static bool greater_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool greater_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return !less(left,right);
     }
@@ -455,31 +500,39 @@ struct safe_compare<LeftT, RightT,
         >
     >
 {
-    constexpr static bool less(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool less(const LeftT1& left, const RightT1& right) noexcept
     {
         return string_view(left) < string_view(right);
     }
-    constexpr static bool equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return string_view(left) == string_view(right);
     }
-    constexpr static bool not_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool not_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return !equal(left,right);
     }
-    constexpr static bool less_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool less_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return string_view(left) <= string_view(right);
     }
-    constexpr static bool greater(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool greater(const LeftT1& left, const RightT1& right) noexcept
     {
         return !less_equal(left,right);
     }
-    constexpr static bool greater_equal(const LeftT& left, const RightT& right) noexcept
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool greater_equal(const LeftT1& left, const RightT1& right) noexcept
     {
         return !less(left,right);
     }
 };
+
+}
 
 //-------------------------------------------------------------
 
@@ -492,7 +545,8 @@ struct safe_compare<LeftT, RightT,
 template <typename LeftT, typename RightT>
 constexpr bool safe_compare_less(const LeftT& a, const RightT& b)
 {
-    return safe_compare<LeftT,RightT>::less(a,b);
+    return detail::safe_compare<typename extract_object_wrapper_t<LeftT>::type,typename extract_object_wrapper_t<RightT>::type>
+            ::less(extract_object_wrapper(a),extract_object_wrapper(b));
 }
 
 /**
@@ -504,7 +558,8 @@ constexpr bool safe_compare_less(const LeftT& a, const RightT& b)
 template <typename LeftT, typename RightT>
 constexpr bool safe_compare_greater(const LeftT& a, const RightT& b)
 {
-    return safe_compare<LeftT,RightT>::greater(a,b);
+    return detail::safe_compare<typename extract_object_wrapper_t<LeftT>::type,typename extract_object_wrapper_t<RightT>::type>
+            ::greater(extract_object_wrapper(a),extract_object_wrapper(b));
 }
 
 /**
@@ -516,7 +571,8 @@ constexpr bool safe_compare_greater(const LeftT& a, const RightT& b)
 template <typename LeftT, typename RightT>
 constexpr bool safe_compare_equal(const LeftT& a, const RightT& b)
 {
-    return safe_compare<LeftT,RightT>::equal(a,b);
+    return detail::safe_compare<typename extract_object_wrapper_t<LeftT>::type,typename extract_object_wrapper_t<RightT>::type>
+            ::equal(extract_object_wrapper(a),extract_object_wrapper(b));
 }
 
 /**
@@ -528,7 +584,8 @@ constexpr bool safe_compare_equal(const LeftT& a, const RightT& b)
 template <typename LeftT, typename RightT>
 constexpr bool safe_compare_not_equal(const LeftT& a, const RightT& b)
 {
-    return safe_compare<LeftT,RightT>::not_equal(a,b);
+    return detail::safe_compare<typename extract_object_wrapper_t<LeftT>::type,typename extract_object_wrapper_t<RightT>::type>
+            ::not_equal(extract_object_wrapper(a),extract_object_wrapper(b));
 }
 
 /**
@@ -540,7 +597,8 @@ constexpr bool safe_compare_not_equal(const LeftT& a, const RightT& b)
 template <typename LeftT, typename RightT>
 constexpr bool safe_compare_less_equal(const LeftT& a, const RightT& b)
 {
-    return safe_compare<LeftT,RightT>::less(a,b);
+    return detail::safe_compare<typename extract_object_wrapper_t<LeftT>::type,typename extract_object_wrapper_t<RightT>::type>
+            ::less(extract_object_wrapper(a),extract_object_wrapper(b));
 }
 
 /**
@@ -552,7 +610,8 @@ constexpr bool safe_compare_less_equal(const LeftT& a, const RightT& b)
 template <typename LeftT, typename RightT>
 constexpr bool safe_compare_greater_equal(const LeftT& a, const RightT& b)
 {
-    return safe_compare<LeftT,RightT>::greater_equal(a,b);
+    return detail::safe_compare<typename extract_object_wrapper_t<LeftT>::type,typename extract_object_wrapper_t<RightT>::type>
+            ::greater_equal(extract_object_wrapper(a),extract_object_wrapper(b));
 }
 
 //-------------------------------------------------------------

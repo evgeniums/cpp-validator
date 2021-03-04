@@ -26,6 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/hana_to_std_tuple.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
+#include <dracosha/validator/utils/extract_object_wrapper.hpp>
 
 namespace fmt
 {
