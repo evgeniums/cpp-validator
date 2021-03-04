@@ -12,8 +12,6 @@ BOOST_AUTO_TEST_SUITE(TestNestedAllAny)
 
 BOOST_AUTO_TEST_CASE(TestNestedAll)
 {
-    //! @todo Implement aggregation without members
-#if 0
     auto v1=validator(
                 _[ALL](size(gte,5))
             );
@@ -29,7 +27,7 @@ BOOST_AUTO_TEST_CASE(TestNestedAll)
         {"field3","val"}
     };
     BOOST_CHECK(!v1.apply(m2));
-#endif
+
     auto v2=validator(
                 _["level1"][ALL]["level3"](size(gte,5))
             );
@@ -192,10 +190,8 @@ BOOST_AUTO_TEST_CASE(TestNestedAll)
 
 BOOST_AUTO_TEST_CASE(TestNestedAny)
 {
-    //! @todo Implement aggregation without members
-#if 0
     auto v1=validator(
-                _[ALL](size(gte,5))
+                _[ANY](size(gte,5))
             );
     std::map<std::string,std::string> m1{
         {"field1","value1"},
@@ -204,12 +200,18 @@ BOOST_AUTO_TEST_CASE(TestNestedAny)
     };
     BOOST_CHECK(v1.apply(m1));
     std::map<std::string,std::string> m2{
-        {"field1","value1"},
-        {"field2","value2"},
-        {"field3","val"}
+        {"field1","val1"},
+        {"field2","val2"},
+        {"field3","value3"}
     };
-    BOOST_CHECK(!v1.apply(m2));
-#endif
+    BOOST_CHECK(v1.apply(m2));
+    std::map<std::string,std::string> m2_1{
+        {"field1","val1"},
+        {"field2","val2"},
+        {"field3","val3"}
+    };
+    BOOST_CHECK(!v1.apply(m2_1));
+
     auto v2=validator(
                 _["level1"][ANY]["level3"](size(gte,5))
             );

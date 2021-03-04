@@ -69,7 +69,17 @@ struct _t
     template <typename T>
     constexpr auto operator [] (T&& key) const
     {
-        return make_plain_member(std::forward<T>(key));
+        return hana::if_(
+            hana::is_a<element_aggregation_tag,T>,
+            [](auto&& key) -> decltype(auto)
+            {
+                return hana::id(std::forward<decltype(key)>(key));
+            },
+            [](auto&& key)
+            {
+                return make_plain_member(std::forward<T>(key));
+            }
+        )(std::forward<T>(key));
     }
 
     /**
