@@ -706,11 +706,15 @@ BOOST_AUTO_TEST_CASE(CheckValidateMemberAny)
     auto a4=make_default_adapter(m4);
     BOOST_CHECK(v4->apply(a4));
     BOOST_CHECK(v5->apply(a4));
-    BOOST_CHECK(!v6->apply(a4));
+    // ignored invalid path because std::string is not a container for validator
+    // ignored means true
+    BOOST_CHECK(v6->apply(a4));
     auto v7=shared_validator(
                 _["field1"](ANY(value(gte,"zzzz") ^OR^ size(gte,50)))
             );
-    BOOST_CHECK(!v7->apply(a4));
+    // ignored invalid path because std::string is not a container for validator
+    // ignored means true
+    BOOST_CHECK(v7->apply(a4));
 
     std::map<size_t,std::string> m5={
         {1,"value10"},{2,"value100"},{3,""},{4,"hello"}
@@ -794,7 +798,9 @@ BOOST_AUTO_TEST_CASE(CheckValidateMmemberAll)
     auto v7=shared_validator(
                 _["field1"](ALL(value(gte,"zzzz") ^OR^ size(gte,50)))
             );
-    BOOST_CHECK(!v7->apply(a4));
+    // ignored invalid path because std::string is not a container for validator
+    // ignored means true
+    BOOST_CHECK(v7->apply(a4));
 
     std::map<size_t,std::string> m5={
         {1,"value10"},{2,"value100"},{3,"hi"},{4,"hello"}

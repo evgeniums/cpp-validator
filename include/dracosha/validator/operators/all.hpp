@@ -25,7 +25,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/get_it.hpp>
 #include <dracosha/validator/make_validator.hpp>
 #include <dracosha/validator/operators/and.hpp>
-#include <dracosha/validator/detail/aggregate_all.hpp>
 #include <dracosha/validator/filter_member.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -64,19 +63,11 @@ struct all_t : public element_aggregation,
     template <typename ... Ops>
     constexpr auto operator() (Ops&&... ops) const
     {
-        return (*this)(AND(std::forward<Ops>(ops)...));
+        return (*this)(make_validator(std::forward<Ops>(ops)...));
     }
 
     template <typename OpT>
-    constexpr auto operator() (OpT&& op) const
-    {
-        return make_validator(
-                    hana::reverse_partial(
-                        detail::aggregate_all,
-                        std::forward<OpT>(op)
-                    )
-               );
-    }
+    constexpr auto operator() (OpT&& op) const;
 
     /**
      * @brief Create validator form operator and operand.

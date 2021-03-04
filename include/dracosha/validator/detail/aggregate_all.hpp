@@ -21,6 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/dispatcher.hpp>
+#include <dracosha/validator/operators/all.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -43,7 +44,7 @@ struct aggregate_all_t
     template <typename T, typename OpT>
     constexpr bool operator ()(T&& a,OpT&& op) const
     {
-        return dispatcher.validate_all(std::forward<decltype(a)>(a),std::forward<decltype(op)>(op));
+        return apply_member(std::forward<T>(a),std::forward<OpT>(op),make_plain_member(ALL));
     }
 
     /**
@@ -56,7 +57,7 @@ struct aggregate_all_t
     template <typename T, typename OpT, typename MemberT>
     constexpr bool operator () (T&& a,MemberT&& member,OpT&& op) const
     {
-        return dispatcher.validate_all(std::forward<decltype(a)>(a),std::forward<decltype(member)>(member),std::forward<decltype(op)>(op));
+        return apply_member(std::forward<T>(a),std::forward<OpT>(op),member[ALL]);
     }
 };
 

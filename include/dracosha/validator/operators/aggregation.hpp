@@ -66,6 +66,8 @@ struct element_aggregation_tag
     }
 };
 
+
+//! @todo Move to separate file
 struct element_aggregation
 {
     using hana_tag=element_aggregation_tag;

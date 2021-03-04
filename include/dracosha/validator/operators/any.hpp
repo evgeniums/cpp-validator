@@ -22,7 +22,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/make_validator.hpp>
 #include <dracosha/validator/operators/and.hpp>
-#include <dracosha/validator/detail/aggregate_any.hpp>
 #include <dracosha/validator/prevalidation/strict_any.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -61,19 +60,11 @@ struct any_t : public element_aggregation,
     template <typename ... Ops>
     constexpr auto operator() (Ops&&... ops) const
     {
-        return (*this)(AND(std::forward<Ops>(ops)...));
+        return (*this)(make_validator(std::forward<Ops>(ops)...));
     }
 
     template <typename OpT>
-    constexpr auto operator() (OpT&& op) const
-    {
-        return make_validator(
-                    hana::reverse_partial(
-                        detail::aggregate_any,
-                        std::forward<OpT>(op)
-                    )
-               );
-    }
+    constexpr auto operator() (OpT&& op) const;
 
     /**
      * @brief Create validator form operator and operand.
@@ -116,7 +107,6 @@ struct check_strict_any<AdapterT,
     template <typename T>
     static bool skip(T&& adapter) noexcept
     {
-        //! @todo Test it
         return !adapter.traits().is_strict_any();
     }
 };

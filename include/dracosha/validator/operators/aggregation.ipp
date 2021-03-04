@@ -25,6 +25,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/extract.hpp>
 #include <dracosha/validator/get_member.hpp>
 #include <dracosha/validator/adapters/impl/reporting_adapter_impl.hpp>
+#include <dracosha/validator/detail/aggregate_all.hpp>
+#include <dracosha/validator/detail/aggregate_any.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -117,6 +119,28 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, StringT&&
             return status{status::code::ignore};
         }
     );
+}
+
+template <typename OpT>
+constexpr auto all_t::operator() (OpT&& op) const
+{
+    return make_validator(
+                hana::reverse_partial(
+                    detail::aggregate_all,
+                    std::forward<OpT>(op)
+                )
+           );
+}
+
+template <typename OpT>
+constexpr auto any_t::operator() (OpT&& op) const
+{
+    return make_validator(
+                hana::reverse_partial(
+                    detail::aggregate_any,
+                    std::forward<OpT>(op)
+                )
+           );
 }
 
 //-------------------------------------------------------------

@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(CheckUnsetValidated)
     auto& s3=m3["field1"]["value1"];
     unset_validated(m3,_["field1"]["value1"]["content1"],strict_any(v3),err);
     BOOST_CHECK(err);
-    BOOST_CHECK_EQUAL(err.message(),std::string("value1 of field1 must contain content1"));
+    BOOST_CHECK_EQUAL(err.message(),std::string("at least one element of field1 must contain content1"));
     BOOST_CHECK(s3.find("content1")!=s3.end());
 
     unset_validated(m3,_["field1"]["value1"]["content1"],v3,err);
