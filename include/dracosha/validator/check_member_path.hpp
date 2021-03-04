@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/check_member.hpp>
 #include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/utils/safe_compare.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -44,6 +45,23 @@ auto check_member_path(Tobj&& obj, Tpath&& path)
     return !hana::is_nothing(hana::monadic_fold_left<hana::optional_tag>(path_c,obj_c,hana::sfinae(check_member)));
 }
 
+struct element_aggregation_tag;
+struct path_types_equal_t
+{
+    template <typename LeftT, typename RightT>
+    constexpr auto operator () (LeftT, RightT) const noexcept
+    {
+        using T1=typename std::decay_t<LeftT>::type;
+        using T2=typename std::decay_t<RightT>::type;
+        return hana::or_(
+                    typename safe_eq<T1,T2>::comparable{},
+                    hana::is_a<element_aggregation_tag,T1>,
+                    hana::is_a<element_aggregation_tag,T2>
+                  );
+    }
+};
+constexpr path_types_equal_t path_types_equal{};
+
 /**
   * @brief Check if members have paths of the same types.
   * @param member1 First member.
@@ -56,7 +74,31 @@ auto check_member_path_types(const Tm1& member1,const Tm2& member2)
     auto path1_c=hana::transform(member1.path(),extract_object_wrapper_type_c);
     auto path2_c=hana::transform(member2.path(),extract_object_wrapper_type_c);
 
-    return hana::equal(path1_c,path2_c);
+    return hana::eval_if(
+        hana::not_equal(hana::size(path1_c),hana::size(path2_c)),
+        [](auto&&)
+        {
+            return hana::false_c;
+        },
+        [&](auto&& _)
+        {
+            return hana::fold(
+                hana::zip(_(path1_c),_(path2_c)),
+                hana::true_c,
+                [](auto pred, auto&& v)
+                {
+                    return hana::if_(
+                        hana::not_(pred),
+                        pred,
+                        path_types_equal(
+                            hana::front(v),
+                            hana::back(v)
+                        )
+                    );
+                }
+            );
+        }
+    );
 }
 
 //-------------------------------------------------------------
