@@ -245,6 +245,27 @@ constexpr member_helper_t<Args...> member_helper{};
 template <typename Ts>
 auto make_member(Ts&& path);
 
+template <typename ... PathT>
+struct is_memmber_aggregated
+{
+    constexpr static const auto value=hana::fold(
+                hana::tuple_t<PathT...>,
+                hana::bool_<false>{},
+                [](auto prev, auto v)
+                {
+                    using type_c=decltype(v);
+                    using type=typename type_c::type;
+                    return hana::if_(
+                        prev,
+                        prev,
+                        hana::bool_
+                        <
+                            hana::is_a<element_aggregation_tag,type>
+                        >{}
+                    );
+            });
+};
+
 /**
  *  @brief Generic descriptor of a member to be validated.
  *
@@ -259,6 +280,8 @@ class member
 
         using type=T;
         using path_type=hana::tuple<ParentPathT...,type>;
+
+        using is_aggregated=decltype(is_memmber_aggregated<ParentPathT...,type>::value);
 
         constexpr static const bool is_nested=sizeof...(ParentPathT)!=0;
         constexpr static const size_t path_size=sizeof...(ParentPathT)+1;

@@ -20,6 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_FILTER_MEMBER_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/filter_path.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -49,8 +50,25 @@ struct apply_member_path_t
 };
 constexpr apply_member_path_t apply_member_path{};
 
+
 template <typename AdapterT, typename MemberT, typename Enable=hana::when<true>>
 struct filter_member_invoker
+{
+    template <typename FnT, typename AdapterT1, typename MemberT1>
+    static status invoke(FnT&& fn, AdapterT1&& adapter, MemberT1&& member)
+    {
+        if (filter_path(adapter,member.path()))
+        {
+            return status::code::ignore;
+        }
+        return fn(std::forward<AdapterT1>(adapter),std::forward<MemberT1>(member));
+    }
+};
+
+template <typename AdapterT, typename MemberT>
+struct filter_member_invoker<AdapterT,MemberT,
+            hana::when<MemberT::is_aggregated::value>
+        >
 {
     template <typename FnT, typename AdapterT1, typename MemberT1>
     static auto invoke(FnT&& fn, AdapterT1&& adapter, MemberT1&& member)

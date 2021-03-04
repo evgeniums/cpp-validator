@@ -10,6 +10,47 @@ using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestNestedAllAny)
 
+BOOST_AUTO_TEST_CASE(TestIsAggregated)
+{
+    auto c1=hana::fold(
+        hana::tuple_t<int,char,std::string>,
+        hana::bool_<false>{},
+        [](auto&& prev, auto&& v)
+        {
+            return hana::if_(
+                prev,
+                prev,
+                hana::bool_
+                <
+                    hana::is_a<element_aggregation_tag,typename extract_object_wrapper_t<decltype(v)>::type>
+                >{}
+            );
+    });
+    static_assert(!decltype(c1)::value,"");
+
+    {
+        auto m1=_[1][2]["hello"][size];
+        static_assert(!decltype(m1)::is_aggregated::value,"m2 is not aggregated");
+    }
+
+    {
+        auto m2=_[1][ANY]["hello"][size];
+        static_assert(decltype(m2)::is_aggregated::value,"m2 is aggregated");
+    }
+
+    {
+        auto m3=_[1]["hello"][ALL];
+        static_assert(decltype(m3)::is_aggregated::value,"m2 is aggregated");
+    }
+
+    {
+        auto m4=_[1][ANY]["hello"][ALL];
+        static_assert(decltype(m4)::is_aggregated::value,"m2 is aggregated");
+    }
+
+    BOOST_CHECK(true);
+}
+
 BOOST_AUTO_TEST_CASE(TestNestedAll)
 {
     auto v1=validator(

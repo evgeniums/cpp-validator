@@ -24,7 +24,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/hana_to_std_tuple.hpp>
 #include <dracosha/validator/filter_member.hpp>
 #include <dracosha/validator/member.hpp>
-#include <dracosha/validator/filter_path.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
