@@ -32,6 +32,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/make_validator.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
 #include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/operators/any.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -247,7 +248,7 @@ template <typename Ts>
 auto make_member(Ts&& path);
 
 template <typename ... PathT>
-struct is_memmber_aggregated
+struct is_member_aggregated
 {
     constexpr static const auto value=hana::fold(
                 hana::tuple_t<PathT...>,
@@ -262,6 +263,27 @@ struct is_memmber_aggregated
                         hana::bool_
                         <
                             hana::is_a<element_aggregation_tag,type>
+                        >{}
+                    );
+            });
+};
+
+template <typename ... PathT>
+struct is_member_with_any
+{
+    constexpr static const auto value=hana::fold(
+                hana::tuple_t<PathT...>,
+                hana::false_{},
+                [](auto prev, auto v)
+                {
+                    using type_c=decltype(v);
+                    using type=typename type_c::type;
+                    return hana::if_(
+                        prev,
+                        prev,
+                        hana::bool_
+                        <
+                            std::is_same<type,std::decay_t<decltype(ANY)>>::value
                         >{}
                     );
             });
@@ -282,7 +304,13 @@ class member
         using type=T;
         using path_type=hana::tuple<ParentPathT...,type>;
 
-        using is_aggregated=decltype(is_memmber_aggregated<ParentPathT...,type>::value);
+        using is_aggregated=decltype(is_member_aggregated<ParentPathT...,type>::value);
+        using is_with_any=decltype(is_member_with_any<ParentPathT...,type>::value);
+
+        constexpr static bool has_any() noexcept
+        {
+            return is_with_any::value;
+        }
 
         constexpr static const bool is_nested=sizeof...(ParentPathT)!=0;
         constexpr static const size_t path_size=sizeof...(ParentPathT)+1;
@@ -362,7 +390,7 @@ class member
         {
             const auto& self=*this;
             return hana::eval_if(
-                hana::equal(hana::size(path()),hana::size(other.path())),
+                check_member_path_types(self,other),
                 [&](auto&& _)
                 {
                     auto pairs=hana::zip(_(self).path(),_(other).path());
