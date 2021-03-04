@@ -101,13 +101,24 @@ struct with_check_member_exists
     template <typename MemberT>
     bool check_member_exists(MemberT&& member) const
     {
-        if (!check_member_path(extract(_adapter.traits().get()),member.path()))
+        return check_path_exists(member.path());
+    }
+
+    /**
+     * @brief Check if path exists.
+     * @param path Path to check.
+     * @return Status of checking.
+     */
+    template <typename PathT>
+    bool check_path_exists(const PathT& path) const
+    {
+        if (!check_member_path(extract(_adapter.traits().get()),path))
         {
             return false;
         }
         if (is_check_member_exists_before_validation())
         {
-            return _adapter.validate_exists(member,exists,true,true);
+            return _adapter.check_path_exists(path,true);
         }
         return true;
     }

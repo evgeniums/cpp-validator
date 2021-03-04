@@ -48,10 +48,20 @@ struct aggregate_report<AdapterT,
             std::is_base_of<reporting_adapter_tag,typename std::decay_t<AdapterT>::type>::value
         >>
 {
-    template <typename AdapterT1, typename AggregationT, typename MemberT>
-    static void open(AdapterT1&& adapter, AggregationT&& str, MemberT&& member)
+    template <typename AdapterT1, typename AggregationT, typename PathT>
+    static void open(AdapterT1&& adapter, AggregationT&& str, PathT&& path)
     {
-         adapter.traits().reporter().aggregate_open(str,member);
+        hana::eval_if(
+            hana::equal(hana::size(path),hana::size_c<0>),
+            [&](auto&&)
+            {
+                adapter.traits().reporter().aggregate_open(str);
+            },
+            [&](auto&& _)
+            {
+                adapter.traits().reporter().aggregate_open(str,make_member(_(path)));
+            }
+        );
     }
 
     template <typename AdapterT1>
@@ -67,8 +77,7 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, StringT&&
     const auto& obj=extract(adapter.traits().get());
     const auto parent_path=hana::drop_back(path);
 
-    auto&& parent=make_member(parent_path);
-    if (!adapter.traits().check_member_exists(parent))
+    if (!adapter.traits().check_path_exists(parent_path))
     {
         return adapter.traits().not_found_status();
     }
@@ -81,7 +90,7 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, StringT&&
                 is_container_t<std::decay_t<decltype(parent_element)>>{},
                 [&](auto&& _)
                 {
-                    aggregate_report<AdapterT>::open(adapter,str,parent);
+                    aggregate_report<AdapterT>::open(adapter,str,parent_path);
                     bool empty=true;
                     for (auto it=_(parent_element).begin();it!=_(parent_element).end();++it)
                     {

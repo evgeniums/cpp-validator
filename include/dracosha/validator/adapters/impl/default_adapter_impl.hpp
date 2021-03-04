@@ -137,17 +137,7 @@ struct default_adapter_impl
     static status validate_exists(AdapterT&& adpt, MemberT&& member, OpT&&, T2&& b, bool from_check_member)
     {
         std::ignore=from_check_member;
-        const auto& obj=extract(adpt.traits().get());
-        return hana::if_(check_member_path(obj,member.path()),
-            [&obj,&b](auto&& path)
-            {
-                return exists(obj,std::forward<decltype(path)>(path))==b;
-            },
-            [&b](auto&&)
-            {
-                return b==false;
-            }
-        )(member.path());
+        return adpt.check_path_exists(member.path(),b);
     }
 
     /**

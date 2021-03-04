@@ -110,6 +110,28 @@ class adapter
         }
 
         /**
+         * @brief Check if path exists in object.
+         * @param path Path to check.
+         * @param b Boolean flag to compare result with.
+         * @return Operation result.
+         */
+        template <typename T2, typename PathT>
+        bool check_path_exists(PathT&& path, T2&& b) const
+        {
+            const auto& obj=extract(traits().get());
+            return hana::if_(check_member_path(obj,path),
+                [&obj,&b](auto&& path)
+                {
+                    return exists(obj,std::forward<decltype(path)>(path))==b;
+                },
+                [&b](auto&&)
+                {
+                    return b==false;
+                }
+            )(path);
+        }
+
+        /**
          *  @brief Normal validation of a member.
          *  @param member Member descriptor.
          *  @param prop Property to validate.
