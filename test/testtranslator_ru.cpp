@@ -320,7 +320,7 @@ BOOST_AUTO_TEST_CASE(CheckValidatorWithObjectNameRu)
 BOOST_AUTO_TEST_CASE(CheckLexInIntervalRu)
 {
     std::string rep;
-    size_t val=10;
+    int val=10;
 
     auto&& tr1=validator_translator_ru();
     auto ra1=make_reporting_adapter(val,make_reporter(rep,make_formatter(tr1)));

@@ -6,6 +6,7 @@
 
 #include <dracosha/validator/utils/make_types_tuple.hpp>
 #include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/utils/make_object_wrapper.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
