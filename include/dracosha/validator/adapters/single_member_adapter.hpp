@@ -35,7 +35,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  * @brief Traits of reporting adapter that validates only single member.
  */
 template <typename MemberT, typename T, typename ReporterT>
-class single_member_adapter_traits : public object_wrapper<T>,
+class single_member_adapter_traits : public adapter_traits,
+                                     public object_wrapper<T>,
                                      public reporting_adapter_impl<ReporterT,single_member_adapter_impl<MemberT>>
 {
     public:

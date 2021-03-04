@@ -28,6 +28,11 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 struct adapter_tag;
 
+struct adapter_traits
+{
+    using expand_aggregation_members=std::integral_constant<bool,true>;
+};
+
 /**
  * @brief Template of validation adapter.
  *
@@ -41,6 +46,8 @@ class adapter
 
         using hana_tag=adapter_tag;
         using type=TraitsT;
+
+        using expand_aggregation_members=typename TraitsT::expand_aggregation_members;
 
         /**
          * @brief Conctructor.

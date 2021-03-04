@@ -35,7 +35,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  * @brief Default adapter traits.
  */
 template <typename T>
-class default_adapter_traits :  public object_wrapper<T>,
+class default_adapter_traits :  public adapter_traits,
+                                public object_wrapper<T>,
                                 public with_check_member_exists<adapter<default_adapter_traits<T>>>,
                                 public default_adapter_impl
 {

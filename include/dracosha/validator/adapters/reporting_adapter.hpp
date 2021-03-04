@@ -33,7 +33,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  * @brief Traits of reporting adapter.
  */
 template <typename T, typename ReporterT>
-struct reporting_adapter_traits : public object_wrapper<T>,
+struct reporting_adapter_traits : public adapter_traits,
+                                  public object_wrapper<T>,
                                   public with_check_member_exists<adapter<reporting_adapter_traits<T,ReporterT>>>,
                                   public reporting_adapter_impl<ReporterT,default_adapter_impl>
 {

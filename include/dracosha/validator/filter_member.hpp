@@ -67,7 +67,11 @@ struct filter_member_invoker
 
 template <typename AdapterT, typename MemberT>
 struct filter_member_invoker<AdapterT,MemberT,
-            hana::when<MemberT::is_aggregated::value>
+            hana::when<
+                MemberT::is_aggregated::value
+                &&
+                AdapterT::expand_aggregation_members::value
+            >
         >
 {
     template <typename FnT, typename AdapterT1, typename MemberT1>

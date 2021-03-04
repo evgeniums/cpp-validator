@@ -39,13 +39,16 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  * @brief Traits of prevalidation adapter.
  */
 template <typename MemberT, typename T, typename ReporterT, typename WrappedT>
-class prevalidation_adapter_traits : public object_wrapper<WrappedT>,
+class prevalidation_adapter_traits : public adapter_traits,
+                                     public object_wrapper<WrappedT>,
                                      public reporting_adapter_impl<ReporterT,prevalidation_adapter_impl<MemberT>>,
                                      public with_check_member_exists<adapter<prevalidation_adapter_traits<MemberT,T,ReporterT,WrappedT>>>
 {
     public:
 
         using hana_tag=prevalidation_adapter_tag;
+
+        using expand_aggregation_members=std::integral_constant<bool,false>;
 
         /**
          * @brief Constructor
