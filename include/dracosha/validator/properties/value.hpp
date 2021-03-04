@@ -61,11 +61,11 @@ struct type_p_value
 
     template <typename T> constexpr bool operator == (const T&&) const
     {
-        return true;
+        return false;
     }
     template <typename T> constexpr bool operator != (const T&&) const
     {
-        return false;
+        return true;
     }
     constexpr bool operator == (const type_p_value&) const
     {
