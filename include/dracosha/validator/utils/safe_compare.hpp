@@ -30,6 +30,53 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+struct property_tag;
+
+/**
+ * @brief Safe equal to if operation is not possible.
+ */
+template <typename LeftT, typename RightT, typename=void>
+struct safe_eq
+{
+    using comparable=std::false_type;
+
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool f(const LeftT1&, const RightT1&) noexcept
+    {
+        return false;
+    }
+};
+
+/**
+ * @brief Safe equal to if operation is possible.
+ */
+template <typename LeftT, typename RightT>
+struct safe_eq<LeftT,RightT,
+            std::enable_if_t
+            <
+                std::is_same<
+                       bool,
+                       decltype(
+                           std::declval<LeftT>()==std::declval<RightT>()
+                        )
+                   >::value
+                &&
+                decltype(hana::equal(
+                    hana::is_a<property_tag,RightT>,
+                    hana::is_a<property_tag,LeftT>
+                ))::value
+            >
+        >
+{
+    using comparable=std::true_type;
+
+    template <typename LeftT1, typename RightT1>
+    constexpr static bool f(const LeftT1& left, const RightT1& right) noexcept
+    {
+        return left == right;
+    }
+};
+
 namespace detail {
 
 /**
@@ -100,42 +147,6 @@ struct safe_lt<LeftT,RightT,
     constexpr static bool f(const LeftT1& left, const RightT1& right) noexcept
     {
         return left < right;
-    }
-};
-
-/**
- * @brief Safe equal to if operation is not possible.
- */
-template <typename LeftT, typename RightT, typename=void>
-struct safe_eq
-{
-    template <typename LeftT1, typename RightT1>
-    constexpr static bool f(const LeftT1&, const RightT1&) noexcept
-    {
-        return false;
-    }
-};
-
-/**
- * @brief Safe equal to if operation is possible.
- */
-template <typename LeftT, typename RightT>
-struct safe_eq<LeftT,RightT,
-            std::enable_if_t
-            <
-                std::is_same<
-                       bool,
-                       decltype(
-                           std::declval<LeftT>()==std::declval<RightT>()
-                        )
-                   >::value
-            >
-        >
-{
-    template <typename LeftT1, typename RightT1>
-    constexpr static bool f(const LeftT1& left, const RightT1& right) noexcept
-    {
-        return left == right;
     }
 };
 
