@@ -5,6 +5,7 @@
 
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
+#include <dracosha/validator/utils/extract_object_wrapper.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -67,7 +68,10 @@ BOOST_AUTO_TEST_CASE(TestNestedAll)
         {"field2","value2"},
         {"field3","val"}
     };
-    BOOST_CHECK(!v1.apply(m2));
+    std::string rep;
+    auto a2=make_reporting_adapter(m2,rep);
+    BOOST_CHECK(!v1.apply(a2));
+    BOOST_CHECK_EQUAL(rep,std::string("size of each element must be greater than or equal to 5"));
 
     auto v2=validator(
                 _["level1"][ALL]["level3"](size(gte,5))
@@ -252,6 +256,11 @@ BOOST_AUTO_TEST_CASE(TestNestedAny)
         {"field3","val3"}
     };
     BOOST_CHECK(!v1.apply(m2_1));
+    std::string rep;
+    auto a2=make_reporting_adapter(m2_1,rep);
+    BOOST_CHECK(!v1.apply(a2));
+    BOOST_CHECK_EQUAL(rep,std::string("size of at least one element must be greater than or equal to 5"));
+    rep.clear();
 
     auto v2=validator(
                 _["level1"][ANY]["level3"](size(gte,5))
@@ -348,7 +357,6 @@ BOOST_AUTO_TEST_CASE(TestNestedAny)
           }
         }
     }};
-    std::string rep;
     auto a5=make_reporting_adapter(m5,rep);
     BOOST_CHECK(!v3.apply(a5));
     BOOST_CHECK_EQUAL(rep,std::string("size of each element of level3 of at least one element of level1 must be greater than or equal to 5"));
