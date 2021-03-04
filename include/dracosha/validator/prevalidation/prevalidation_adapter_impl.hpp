@@ -140,6 +140,11 @@ class prevalidation_adapter_impl : public strict_any_tag
         template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
         status validate(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
         {
+            if (member.has_any() && !is_strict_any())
+            {
+                return status(status::code::ignore);
+            }
+
             const auto& obj=extract(adpt.traits().get());
 
             return hana::if_(
@@ -149,7 +154,7 @@ class prevalidation_adapter_impl : public strict_any_tag
                 ),
                 [](auto&& ...)
                 {
-                    // only "contains" operator is suitable for check_contains_stub
+                    // only "contains" operator is suitable for value_as_container_tag
                     return status(status::code::ignore);
                 },
                 [&obj](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
@@ -186,11 +191,10 @@ class prevalidation_adapter_impl : public strict_any_tag
 
                             // check member path as is
                             return hana::eval_if(
-                                        (
-                                            (check_member_path_types(self->_member,member))
-                                            &&
-                                            has_property_fn(obj,prop)
-                                         ),
+                                hana::and_(
+                                    check_member_path_types(self->_member,member),
+                                    has_property_fn(obj,prop)
+                                ),
                                 [&self,&member,&adpt,&prop,&op,&b](auto&&)
                                 {
                                     if (self->filter_member(member))
@@ -244,6 +248,11 @@ class prevalidation_adapter_impl : public strict_any_tag
         template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
         status validate_with_master_sample(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b) const
         {
+            if (member.has_any() && !is_strict_any())
+            {
+                return status(status::code::ignore);
+            }
+
             if (filter_member_with_size(member))
             {
                 return status(status::code::ignore);
@@ -346,6 +355,7 @@ class prevalidation_adapter_impl : public strict_any_tag
                 {
                     if (hana::equal(size,self->_member.key()) || hana::equal(empty,self->_member.key()))
                     {
+                        // special case when member ends with [size] or [empty]
                         auto&& adjusted_member_path=hana::append(member.path(),hana::back(self->_member.parent_path()));
                         auto adjusted_member=make_member(std::move(adjusted_member_path));
                         return self->validate_any_impl(std::forward<AdapterT>(adpt),adjusted_member,std::forward<OpT>(op));
@@ -402,6 +412,7 @@ class prevalidation_adapter_impl : public strict_any_tag
                 {
                     if (hana::equal(size,self->_member.key()) || hana::equal(empty,self->_member.key()))
                     {
+                        // special case when member ends with [size] or [empty]
                         auto&& adjusted_member_path=hana::append(member.path(),hana::back(self->_member.parent_path()));
                         auto adjusted_member=make_member(std::move(adjusted_member_path));
                         return self->validate_all_impl(std::forward<AdapterT>(adpt),adjusted_member,std::forward<OpT>(op));
