@@ -37,7 +37,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename MemberT, typename T, typename ReporterT>
 class single_member_adapter_traits : public adapter_traits,
                                      public object_wrapper<T>,
-                                     public reporting_adapter_impl<ReporterT,single_member_adapter_impl<MemberT>>
+                                     public reporting_adapter_impl<ReporterT,single_member_adapter_impl<MemberT>>,
+                                     public with_check_member_exists<adapter<single_member_adapter_traits<MemberT,T,ReporterT>>>
 {
     public:
 
@@ -48,7 +49,7 @@ class single_member_adapter_traits : public adapter_traits,
          * @param reporter Reporter to use for report construction if validation fails
          */
         single_member_adapter_traits(
-                    adapter<single_member_adapter_traits<MemberT,T,ReporterT>>&,
+                    adapter<single_member_adapter_traits<MemberT,T,ReporterT>>& adpt,
                     MemberT&& member,
                     T&& val,
                     ReporterT&& reporter
@@ -56,7 +57,8 @@ class single_member_adapter_traits : public adapter_traits,
                     reporting_adapter_impl<ReporterT,single_member_adapter_impl<MemberT>>(
                         std::forward<ReporterT>(reporter),
                         std::forward<MemberT>(member)
-                    )
+                    ),
+                    with_check_member_exists<adapter<single_member_adapter_traits<MemberT,T,ReporterT>>>(adpt)
         {}
 };
 

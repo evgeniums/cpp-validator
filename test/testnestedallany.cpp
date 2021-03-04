@@ -392,4 +392,74 @@ BOOST_AUTO_TEST_CASE(TestNestedAny)
     BOOST_CHECK(v3.apply(m6));
 }
 
+BOOST_AUTO_TEST_CASE(TestMixedAgrregations)
+{
+    std::string rep;
+
+    auto v1=validator(
+                _["level1"](size(gte,1)),
+                _["level1"][ANY]["level3"](size(gte,5) ^AND^ size(lt,100))
+            );
+    std::map<std::string,
+             std::map<std::string,
+                      std::map<std::string,std::string>
+                     >
+            > m1
+    {{
+        "level1",
+        {
+          {
+            "level2_1",
+            {{
+                "level3",
+                {
+                    "val1"
+                }
+            }}
+          },
+          {
+            "level2_2",
+            {{
+              "level3",
+              {
+                  "val2"
+              }
+            }}
+          }
+        }
+    }};
+    BOOST_CHECK(!v1.apply(m1));
+    auto a1=make_reporting_adapter(m1,rep);
+    BOOST_CHECK(!v1.apply(a1));
+    BOOST_CHECK_EQUAL(rep,std::string("size of level3 of at least one element of level1 must be greater than or equal to 5"));
+    std::map<std::string,
+             std::map<std::string,
+                      std::map<std::string,std::string>
+                     >
+            > m2
+    {{
+        "level1",
+        {
+          {
+            "level2_1",
+            {{
+                "level3",
+                {
+                    "value1"
+                }
+            }}
+          },
+          {
+            "level2_2",
+            {{
+              "level3",
+              {
+                  "value2"
+              }
+            }}
+          }
+        }
+    }};
+    BOOST_CHECK(v1.apply(m2));
+}
 BOOST_AUTO_TEST_SUITE_END()

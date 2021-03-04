@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/adjust_storable_type.hpp>
+#include <dracosha/validator/utils/reference_wrapper.hpp>
 #include <dracosha/validator/adapters/default_adapter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN

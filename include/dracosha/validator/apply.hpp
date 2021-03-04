@@ -39,9 +39,9 @@ struct apply_t
     constexpr auto operator () (Ta&& a, Tv&& v) const -> decltype(auto)
     {
         return hana::if_(hana::is_a<validator_tag,decltype(v)>,
-          [&a](auto&& x) -> decltype(auto) { return x.apply(a); },
-          [&a](auto&& x) -> decltype(auto) { return x(a); }
-        )(std::forward<decltype(v)>(v));
+          [](auto&& a, auto&& x) -> decltype(auto) { return x.apply(std::forward<decltype(a)>(a)); },
+          [](auto&& a, auto&& x) -> decltype(auto) { return x(std::forward<decltype(a)>(a)); }
+        )(std::forward<decltype(a)>(a),std::forward<decltype(v)>(v));
     }
 };
 /**
@@ -62,7 +62,7 @@ struct apply_member_t
     constexpr auto operator () (Ta&& a, Tv&& v, Tm&& member) const -> decltype(auto)
     {
         return hana::if_(hana::is_a<validator_tag,decltype(v)>,
-          [&a,&member](auto&& x) -> decltype(auto)
+          [&member](auto&& a, auto&& x) -> decltype(auto)
           {
             auto fn=[&x](auto&&... args) -> decltype(auto)
             {
@@ -70,11 +70,11 @@ struct apply_member_t
             };
             return filter_member(fn,std::forward<decltype(a)>(a),std::forward<decltype(member)>(member));
           },
-          [&a,&member](auto&& x) -> decltype(auto)
+          [&member](auto&& a, auto&& x) -> decltype(auto)
           {
             return filter_member(std::forward<decltype(x)>(x),std::forward<decltype(a)>(a),std::forward<decltype(member)>(member));
           }
-        )(std::forward<decltype(v)>(v));
+        )(std::forward<decltype(a)>(a),std::forward<decltype(v)>(v));
     }
 };
 /**

@@ -143,7 +143,10 @@ class reporting_adapter_impl : public reporting_adapter_tag
         {
             return aggregate(
                             string_and,
-                            [this,&adpt,&member,&ops](){return _next_adapter_impl.validate_and(std::forward<AdapterT>(adpt),member,std::forward<OpsT>(ops));},
+                            [this,&adpt,&member,&ops]()
+                            {
+                                return _next_adapter_impl.validate_and(std::forward<AdapterT>(adpt),member,std::forward<OpsT>(ops));
+                            },
                             member
                         );
         }

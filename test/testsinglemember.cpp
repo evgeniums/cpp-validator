@@ -295,8 +295,6 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     std::string rep1;
     auto sa1=make_single_member_adapter(_["field2"],m1,rep1);
 
-    //! @todo Fix mixing logical and element aggregations
-#if 0
     auto v1=validator(
                 _["field1"](ANY(size(gte,9))),
                 _["field2"](ANY(size(gte,8)))
@@ -326,7 +324,6 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     BOOST_CHECK(!v4.apply(sa1));
     BOOST_CHECK_EQUAL(rep1,"at least one element of field2 must be greater than or equal to zzz");
     rep1.clear();
-#endif
 }
 
 BOOST_AUTO_TEST_CASE(CheckSingleMemberProp)

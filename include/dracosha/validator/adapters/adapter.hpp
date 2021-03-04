@@ -56,7 +56,8 @@ class adapter
         template <typename ...Args>
         adapter(Args&&... args)
             : _traits(*this,std::forward<Args>(args)...)
-        {}
+        {
+        }
 
         /**
          * @brief Get traits.
