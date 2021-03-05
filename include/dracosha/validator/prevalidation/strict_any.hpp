@@ -21,6 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
+#include <dracosha/validator/utils/make_object_wrapper.hpp>
 #include <dracosha/validator/utils/string_view.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -51,6 +52,11 @@ struct strict_any_wrapper : public object_wrapper<T>
     using hana_tag=strict_any_tag;
 
     using object_wrapper<T>::object_wrapper;
+
+    auto to_wrapper()
+    {
+        return make_object_wrapper(std::move(this->_obj));
+    }
 };
 
 struct strict_any_t

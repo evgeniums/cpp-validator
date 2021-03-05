@@ -48,7 +48,8 @@ struct true_if_size
             },
             [&](auto&&)
             {
-                return false;
+                // checking only size property, all the rest are ignored
+                return true;
             }
         );
     }
@@ -66,7 +67,8 @@ struct true_if_size
             },
             [&](auto&&)
             {
-                return false;
+                // checking only size property, all the rest are ignored
+                return true;
             }
         );
     }
@@ -90,7 +92,8 @@ struct true_if_size
             },
             [&](auto&&)
             {
-                return false;
+                // checking only size property, all the rest are ignored
+                return true;
             }
         );
     }
@@ -104,6 +107,7 @@ struct true_if_size
     template <typename T>
     bool operator !=(const T&) const noexcept
     {
+        // we don't know content, so this comparison is always true and does not depend on size
         return true;
     }
 

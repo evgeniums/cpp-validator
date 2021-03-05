@@ -96,6 +96,17 @@ class prevalidation_adapter : public adapter<prevalidation_adapter_traits<Member
         {}
 };
 
+
+template <typename MemberT, typename T, typename ReporterT>
+auto make_prevalidation_adapter_impl(
+                            MemberT&& member,
+                            T&& val,
+                            ReporterT&& reporter)
+{
+    using value_type=decltype(adjust_view_type(std::forward<T>(val)));
+    return prevalidation_adapter<MemberT,value_type,ReporterT>(std::forward<MemberT>(member),adjust_view_type(std::forward<T>(val)),std::forward<ReporterT>(reporter));
+}
+
 /**
  * @brief Create prevalidation adapter.
  * @param member Member to validate.
@@ -112,8 +123,23 @@ auto make_prevalidation_adapter(
                                     void*>
                             =nullptr)
 {
-    using value_type=decltype(adjust_view_type(std::forward<T>(val)));
-    return prevalidation_adapter<MemberT,value_type,ReporterT>(std::forward<MemberT>(member),adjust_view_type(std::forward<T>(val)),std::forward<ReporterT>(reporter));
+    using key_type=decltype(member.key());
+    using value_type=typename extract_object_wrapper_t<T>::type;
+
+    return hana::eval_if(
+        hana::and_(
+           hana::is_a<range_tag,value_type>,
+           !hana::is_a<element_aggregation_tag,typename extract_object_wrapper_t<key_type>::type>
+        ),
+        [&](auto&&)
+        {
+            return make_prevalidation_adapter_impl(member[ALL],std::forward<T>(val),std::forward<ReporterT>(reporter));
+        },
+        [&](auto&&)
+        {
+            return make_prevalidation_adapter_impl(std::forward<MemberT>(member),std::forward<T>(val),std::forward<ReporterT>(reporter));
+        }
+    );
 }
 
 /**
@@ -132,9 +158,9 @@ auto make_prevalidation_adapter(
                                     void*>
                             =nullptr)
 {
-    auto res=prevalidation_adapter<MemberT,T,ReporterT,typename std::decay_t<T>::type>(std::forward<MemberT>(member),std::forward<T>(val),std::forward<ReporterT>(reporter));
-    res.traits().next_adapter_impl().set_strict_any(true);
-    return res;
+    auto adapter=make_prevalidation_adapter(std::forward<MemberT>(member),val.to_wrapper(),std::forward<ReporterT>(reporter));
+    adapter.traits().next_adapter_impl().set_strict_any(true);
+    return adapter;
 }
 
 /**
@@ -168,7 +194,7 @@ struct adapter_with_aggregation_iterator_t<AdapterT,IteratorT,
         auto& traits=std::add_lvalue_reference_t<std::decay_t<decltype(adapter.traits())>>(adapter.traits());
 
         // create adapter with iterator element
-        auto res=make_prevalidation_adapter(traits.next_adapter_impl().member(),*it,traits.reporter());
+        auto res=make_prevalidation_adapter(traits.next_adapter_impl().check_member(),*it,traits.reporter());
 
         // set member_checked flag
         res.traits().next_adapter_impl().set_member_checked(true);

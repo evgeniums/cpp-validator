@@ -57,6 +57,8 @@ constexpr string_any_t string_any{};
 struct any_t : public element_aggregation,
                public enable_to_string<string_any_t>
 {
+    using type=any_t;
+
     template <typename ... Ops>
     constexpr auto operator() (Ops&&... ops) const
     {
@@ -79,6 +81,28 @@ struct any_t : public element_aggregation,
             ) const
     {
         return (*this)(value(std::forward<OpT>(op),std::forward<T>(b)));
+    }
+
+    template <typename T>
+    constexpr bool operator == (T) const noexcept
+    {
+        return true;
+    }
+    template <typename T>
+    constexpr bool operator != (T) const noexcept
+    {
+        return false;
+    }
+
+    template <typename T>
+    constexpr friend bool operator == (T, const any_t&) noexcept
+    {
+        return true;
+    }
+    template <typename T>
+    constexpr friend bool operator != (T, const any_t&) noexcept
+    {
+        return true;
     }
 };
 

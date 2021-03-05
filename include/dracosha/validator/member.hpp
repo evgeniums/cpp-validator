@@ -306,10 +306,15 @@ class member
 
         using is_aggregated=decltype(is_member_aggregated<ParentPathT...,type>::value);
         using is_with_any=decltype(is_member_with_any<ParentPathT...,type>::value);
+        using is_key_any=std::is_same<typename extract_object_wrapper_t<type>::type,std::decay_t<decltype(ANY)>>;
 
         constexpr static bool has_any() noexcept
         {
             return is_with_any::value;
+        }
+        constexpr static bool key_is_any() noexcept
+        {
+            return is_key_any::value;
         }
 
         constexpr static const bool is_nested=sizeof...(ParentPathT)!=0;

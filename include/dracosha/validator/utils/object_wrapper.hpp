@@ -178,7 +178,7 @@ class object_wrapper : public adjust_view_ignore,
             );
         }
 
-    private:
+    protected:
 
         T _obj;
 };

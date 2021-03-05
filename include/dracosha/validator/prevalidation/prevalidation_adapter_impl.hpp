@@ -31,6 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/prevalidation/prevalidation_adapter_tag.hpp>
 #include <dracosha/validator/utils/value_as_container.hpp>
 #include <dracosha/validator/prevalidation/strict_any.hpp>
+#include <dracosha/validator/range.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -50,7 +51,7 @@ class prevalidation_adapter_impl : public strict_any_tag
     public:
 
         prevalidation_adapter_impl(CheckMemberT&& member)
-            : _member(std::forward<CheckMemberT>(member)),
+            : _mmember(std::forward<CheckMemberT>(member)),
               _member_checked(false)
         {}
 
@@ -63,12 +64,43 @@ class prevalidation_adapter_impl : public strict_any_tag
         }
 
         template <typename AdapterT, typename T2, typename OpT, typename PropT>
-        status validate_property(AdapterT&& adpt, PropT&& prop, OpT&& op, T2&& b) const
+        status validate_property(AdapterT&& adpt, PropT&& prop, OpT&& op, T2&& b, bool any=false) const
         {
-            return default_adapter_impl::validate_property(std::forward<AdapterT>(adpt),
-                                                             std::forward<PropT>(prop),
-                                                             std::forward<OpT>(op),
-                                                             std::forward<T2>(b));
+            auto&& obj=extract_object_wrapper(extract(adpt.traits().get()));
+            auto&& val=extract(std::forward<T2>(b));
+            return hana::eval_if(
+                hana::is_a<range_tag,decltype(obj)>,
+                [&](auto&& _)
+                {
+                    auto ok=!any;
+                    for (auto&& it : _(obj).container)
+                    {
+                        ok=op(property(it,prop),val);
+                        if (any)
+                        {
+                            if (ok)
+                            {
+                               break;
+                            }
+                        }
+                        else
+                        {
+                            if (!ok)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    return ok;
+                },
+                [&](auto&&)
+                {
+                    return default_adapter_impl::validate_property(std::forward<AdapterT>(adpt),
+                                                                     std::forward<PropT>(prop),
+                                                                     std::forward<OpT>(op),
+                                                                     val);
+                }
+            );
         }
 
         template <typename AdapterT, typename T2, typename OpT, typename MemberT>
@@ -78,7 +110,7 @@ class prevalidation_adapter_impl : public strict_any_tag
 
             // check [exists] suffix only
             return hana::if_(
-                std::is_same<std::decay_t<decltype(exists)>,std::decay_t<decltype(_member.key())>>{},
+                std::is_same<std::decay_t<decltype(exists)>,std::decay_t<decltype(check_member().key())>>{},
                 [](auto&& self, auto&& adpt, auto&& member, auto&& b)
                 {
                     if (self->filter_member(member[exists]))
@@ -162,8 +194,8 @@ class prevalidation_adapter_impl : public strict_any_tag
                     // select execution path depending on the type of adapter's member key, if size/empty then check size
                     return hana::if_(
                         hana::or_(
-                            std::is_same<std::decay_t<decltype(size)>,std::decay_t<decltype(self->_member.key())>>{},
-                            std::is_same<std::decay_t<decltype(empty)>,std::decay_t<decltype(self->_member.key())>>{}
+                            std::is_same<std::decay_t<decltype(size)>,std::decay_t<decltype(self->check_member().key())>>{},
+                            std::is_same<std::decay_t<decltype(empty)>,std::decay_t<decltype(self->check_member().key())>>{}
                         ),
                         [](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
                         {
@@ -174,7 +206,7 @@ class prevalidation_adapter_impl : public strict_any_tag
                                             std::forward<decltype(prop)>(prop),
                                             std::forward<decltype(op)>(op),
                                             std::forward<decltype(b)>(b),
-                                            self->_member.key()
+                                            self->check_member().key()
                                         );
                         },
                         [&obj](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
@@ -185,15 +217,16 @@ class prevalidation_adapter_impl : public strict_any_tag
                                             std::forward<decltype(adpt)>(adpt),
                                             std::forward<decltype(prop)>(prop),
                                             std::forward<decltype(op)>(op),
-                                            std::forward<decltype(b)>(b)
+                                            std::forward<decltype(b)>(b),
+                                            member.key_is_any()
                                         );
                             }
 
                             // check member path as is
                             return hana::eval_if(
                                 hana::and_(
-                                    check_member_path_types(self->_member,member),
-                                    has_property_fn(obj,prop)
+                                    check_member_path_types(self->check_member(),member)/*,
+                                    has_property_fn(obj,prop)*/
                                 ),
                                 [&self,&member,&adpt,&prop,&op,&b](auto&&)
                                 {
@@ -205,7 +238,8 @@ class prevalidation_adapter_impl : public strict_any_tag
                                                 std::forward<decltype(adpt)>(adpt),
                                                 std::forward<decltype(prop)>(prop),
                                                 std::forward<decltype(op)>(op),
-                                                std::forward<decltype(b)>(b)
+                                                std::forward<decltype(b)>(b),
+                                                member.key_is_any()
                                             );
                                 },
                                 [](auto&&)
@@ -258,10 +292,10 @@ class prevalidation_adapter_impl : public strict_any_tag
                 return status(status::code::ignore);
             }
 
-            const auto& obj=extract(adpt.traits().get());            
+            const auto& obj=extract(adpt.traits().get());
             const auto& sample=extract(b)();
 
-            auto&& sample_might_have_path=check_member_path(sample,_member.path());
+            auto&& sample_might_have_path=check_member_path(sample,check_member().path());
             auto sample_has_path=hana::if_(sample_might_have_path,
                 [&sample](auto&& path)
                 {
@@ -271,7 +305,7 @@ class prevalidation_adapter_impl : public strict_any_tag
                 {
                     return false;
                 }
-            )(_member.path());
+            )(check_member().path());
             if (!sample_has_path)
             {
                 // if sample does not have member then ignore check
@@ -290,7 +324,7 @@ class prevalidation_adapter_impl : public strict_any_tag
                 {
                     return status(status::code::ignore);
                 }
-            )(_member.path());
+            )(check_member().path());
         }
 
         template <typename AdapterT, typename OpsT>
@@ -350,9 +384,9 @@ class prevalidation_adapter_impl : public strict_any_tag
             auto self=this;
             return hana::eval_if(
                 hana::or_(
-                            check_member_path_types(_member,member),
-                            check_member_path_types(_member,member[size]),
-                            check_member_path_types(_member,member[empty])
+                            check_member_path_types(check_member(),member),
+                            check_member_path_types(check_member(),member[size]),
+                            check_member_path_types(check_member(),member[empty])
                          ),
                 [&self,&member,&adpt,&op](auto&&)
                 {
@@ -379,17 +413,17 @@ class prevalidation_adapter_impl : public strict_any_tag
             }
 
             return hana::if_(
-                hana::greater_equal(hana::size_c<hana_tuple_size<decltype(_member.path())>::value>,hana::size_c<2>),
+                hana::greater_equal(hana::size_c<hana_tuple_size<decltype(check_member().path())>::value>,hana::size_c<2>),
                 [](auto&& self, AdapterT&& adpt, MemberT&& member, OpT&& op)
                 {
-                    if (hana::equal(size,self->_member.key()) || hana::equal(empty,self->_member.key()))
+                    if (hana::equal(size,self->check_member().key()) || hana::equal(empty,self->check_member().key()))
                     {
                         // special case when member ends with [size] or [empty]
-                        auto&& adjusted_member_path=hana::append(member.path(),hana::back(self->_member.parent_path()));
+                        auto&& adjusted_member_path=hana::append(member.path(),hana::back(self->check_member().parent_path()));
                         auto adjusted_member=make_member(std::move(adjusted_member_path));
                         return self->validate_any_impl(std::forward<AdapterT>(adpt),adjusted_member,std::forward<OpT>(op));
                     }
-                    auto&& adjusted_member_path=hana::append(member.path(),hana::back(self->_member.path()));
+                    auto&& adjusted_member_path=hana::append(member.path(),hana::back(self->check_member().path()));
                     auto adjusted_member=make_member(std::move(adjusted_member_path));
                     return self->validate_any_impl(std::forward<AdapterT>(adpt),adjusted_member,std::forward<OpT>(op));
                 },
@@ -412,9 +446,9 @@ class prevalidation_adapter_impl : public strict_any_tag
             auto self=this;
             return hana::eval_if(
                 hana::or_(
-                            check_member_path_types(_member,member),
-                            check_member_path_types(_member,member[size]),
-                            check_member_path_types(_member,member[empty])
+                            check_member_path_types(check_member(),member),
+                            check_member_path_types(check_member(),member[size]),
+                            check_member_path_types(check_member(),member[empty])
                          ),
                 [&self,&member,&adpt,&op](auto&&)
                 {
@@ -436,17 +470,17 @@ class prevalidation_adapter_impl : public strict_any_tag
         status validate_all(AdapterT&& adpt, MemberT&& member, OpT&& op) const
         {
             return hana::if_(
-                hana::greater_equal(hana::size_c<hana_tuple_size<decltype(_member.path())>::value>,hana::size_c<2>),
+                hana::greater_equal(hana::size_c<hana_tuple_size<decltype(check_member().path())>::value>,hana::size_c<2>),
                 [](auto&& self, AdapterT&& adpt, MemberT&& member, OpT&& op)
                 {
-                    if (hana::equal(size,self->_member.key()) || hana::equal(empty,self->_member.key()))
+                    if (hana::equal(size,self->check_member().key()) || hana::equal(empty,self->check_member().key()))
                     {
                         // special case when member ends with [size] or [empty]
-                        auto&& adjusted_member_path=hana::append(member.path(),hana::back(self->_member.parent_path()));
+                        auto&& adjusted_member_path=hana::append(member.path(),hana::back(self->check_member().parent_path()));
                         auto adjusted_member=make_member(std::move(adjusted_member_path));
                         return self->validate_all_impl(std::forward<AdapterT>(adpt),adjusted_member,std::forward<OpT>(op));
                     }
-                    auto&& adjusted_member_path=hana::append(member.path(),hana::back(self->_member.path()));
+                    auto&& adjusted_member_path=hana::append(member.path(),hana::back(self->check_member().path()));
                     auto adjusted_member=make_member(std::move(adjusted_member_path));
                     return self->validate_all_impl(std::forward<AdapterT>(adpt),adjusted_member,std::forward<OpT>(op));
                 },
@@ -455,11 +489,6 @@ class prevalidation_adapter_impl : public strict_any_tag
                     return self->validate_all_impl(std::forward<AdapterT>(adpt),std::forward<MemberT>(member),std::forward<OpT>(op));
                 }
             )(this,std::forward<AdapterT>(adpt),std::forward<MemberT>(member),std::forward<OpT>(op));
-        }
-
-        const auto& member() const
-        {
-            return _member;
         }
 
         void set_member_checked(bool enable) noexcept
@@ -471,12 +500,17 @@ class prevalidation_adapter_impl : public strict_any_tag
             return _member_checked;
         }
 
+        const auto& check_member() const
+        {
+            return _mmember.get();
+        }
+
     private:
 
         template <typename MemberT>
         bool filter_member(const MemberT& member) const noexcept
         {
-            return !_member.isEqual(member);
+            return !check_member().isEqual(member);
         }
 
         template <typename MemberT>
@@ -489,7 +523,7 @@ class prevalidation_adapter_impl : public strict_any_tag
                filter_member(member[empty]);
         }
 
-        CheckMemberT _member;
+        object_wrapper<CheckMemberT> _mmember;
         mutable bool _member_checked;
 };
 

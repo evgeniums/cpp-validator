@@ -60,6 +60,8 @@ constexpr string_all_t string_all{};
 struct all_t : public element_aggregation,
                public enable_to_string<string_all_t>
 {
+    using type=all_t;
+
     template <typename ... Ops>
     constexpr auto operator() (Ops&&... ops) const
     {
@@ -82,6 +84,28 @@ struct all_t : public element_aggregation,
             ) const
     {
         return (*this)(value(std::forward<OpT>(op),std::forward<T>(b)));
+    }
+
+    template <typename T>
+    constexpr bool operator == (T) const noexcept
+    {
+        return true;
+    }
+    template <typename T>
+    constexpr bool operator != (T) const noexcept
+    {
+        return false;
+    }
+
+    template <typename T>
+    constexpr friend bool operator == (T, const all_t&) noexcept
+    {
+        return true;
+    }
+    template <typename T>
+    constexpr friend bool operator != (T, const all_t&) noexcept
+    {
+        return true;
     }
 };
 
