@@ -381,16 +381,6 @@ class member
          * @param other Other member.
          */
         template <typename T1>
-        bool isEqual(const T1& other) const
-        {
-            return equals(other);
-        }
-
-        /**
-         * @brief Check if path of this member is equal to path of other member.
-         * @param other Other member.
-         */
-        template <typename T1>
         bool equals(const T1& other) const
         {
             const auto& self=*this;

@@ -127,7 +127,7 @@ struct lex_operators
 };
 
 /**
- * @brief Definition of operator "lexicographically equal to".
+ * @brief Definition of operator "lexicographically equals to".
  */
 struct lex_eq_t : public op<lex_eq_t>
 {
@@ -142,12 +142,12 @@ struct lex_eq_t : public op<lex_eq_t>
 };
 
 /**
-    @brief Operator "lexicographically equal to".
+    @brief Operator "lexicographically equals to".
 */
 constexpr lex_eq_t lex_eq{};
 
 /**
- * @brief Definition of operator "lexicographically not equal to".
+ * @brief Definition of operator "lexicographically not equals to".
  */
 struct lex_ne_t : public op<lex_ne_t>
 {
@@ -162,7 +162,7 @@ struct lex_ne_t : public op<lex_ne_t>
 };
 
 /**
-    @brief Operator "lexicographically not equal to".
+    @brief Operator "lexicographically not equals to".
 */
 constexpr lex_ne_t lex_ne{};
 
@@ -187,7 +187,7 @@ struct lex_lt_t : public op<lex_lt_t>
 constexpr lex_lt_t lex_lt{};
 
 /**
- * @brief Definition of operator "lexicographically less than or equal to".
+ * @brief Definition of operator "lexicographically less than or equals to".
  */
 struct lex_lte_t : public op<lex_lte_t>
 {
@@ -202,7 +202,7 @@ struct lex_lte_t : public op<lex_lte_t>
 };
 
 /**
-    @brief Operator "lexicographically less than or equal to".
+    @brief Operator "lexicographically less than or equals to".
 */
 constexpr lex_lte_t lex_lte{};
 
@@ -227,7 +227,7 @@ struct lex_gt_t : public op<lex_gt_t>
 constexpr lex_gt_t lex_gt{};
 
 /**
- * @brief Definition of operator "lexicographically greater than or equal to".
+ * @brief Definition of operator "lexicographically greater than or equals to".
  */
 struct lex_gte_t : public op<lex_gte_t>
 {
@@ -242,12 +242,12 @@ struct lex_gte_t : public op<lex_gte_t>
 };
 
 /**
- * @brief Operator "lexicographically greater than or equal to".
+ * @brief Operator "lexicographically greater than or equals to".
  */
 constexpr lex_gte_t lex_gte{};
 
 /**
- * @brief Definition of operator "lexicographically case insensitive equal to".
+ * @brief Definition of operator "lexicographically case insensitive equals to".
  */
 struct ilex_eq_t : public op<ilex_eq_t>
 {
@@ -262,12 +262,12 @@ struct ilex_eq_t : public op<ilex_eq_t>
 };
 
 /**
- * @brief Operator "lexicographically case insensitive equal to".
+ * @brief Operator "lexicographically case insensitive equals to".
  */
 constexpr ilex_eq_t ilex_eq{};
 
 /**
- * @brief Definition of operator "lexicographically case insensitive not equal to".
+ * @brief Definition of operator "lexicographically case insensitive not equals to".
  */
 struct ilex_ne_t : public op<ilex_ne_t>
 {
@@ -282,7 +282,7 @@ struct ilex_ne_t : public op<ilex_ne_t>
 };
 
 /**
- * @brief Operator "lexicographically case insensitive not equal to".
+ * @brief Operator "lexicographically case insensitive not equals to".
  */
 constexpr ilex_ne_t ilex_ne{};
 
@@ -307,7 +307,7 @@ struct ilex_lt_t : public op<ilex_lt_t>
 constexpr ilex_lt_t ilex_lt{};
 
 /**
- * @brief Definition of operator "lexicographically case insensitive less than or equal to".
+ * @brief Definition of operator "lexicographically case insensitive less than or equals to".
  */
 struct ilex_lte_t : public op<ilex_lte_t>
 {
@@ -322,7 +322,7 @@ struct ilex_lte_t : public op<ilex_lte_t>
 };
 
 /**
- * @brief Operator "lexicographically case insensitive less than or equal to".
+ * @brief Operator "lexicographically case insensitive less than or equals to".
  */
 constexpr ilex_lte_t ilex_lte{};
 
@@ -347,7 +347,7 @@ struct ilex_gt_t : public op<ilex_gt_t>
 constexpr ilex_gt_t ilex_gt{};
 
 /**
- * @brief Definition of operator "lexicographically case insensitive greater than or equal to".
+ * @brief Definition of operator "lexicographically case insensitive greater than or equals to".
  */
 struct ilex_gte_t : public op<ilex_gte_t>
 {
@@ -362,7 +362,7 @@ struct ilex_gte_t : public op<ilex_gte_t>
 };
 
 /**
- * @brief Operator "lexicographically case insensitive greater than or equal to".
+ * @brief Operator "lexicographically case insensitive greater than or equals to".
  */
 constexpr ilex_gte_t ilex_gte{};
 

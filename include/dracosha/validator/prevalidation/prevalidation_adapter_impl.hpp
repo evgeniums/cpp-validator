@@ -66,6 +66,8 @@ class prevalidation_adapter_impl : public strict_any_tag
         template <typename AdapterT, typename T2, typename OpT, typename PropT>
         status validate_property(AdapterT&& adpt, PropT&& prop, OpT&& op, T2&& b, bool any=false) const
         {
+            /*,
+                                                has_property_fn(obj,prop)*/
             auto&& obj=extract_object_wrapper(extract(adpt.traits().get()));
             auto&& val=extract(std::forward<T2>(b));
             return hana::eval_if(
@@ -225,8 +227,7 @@ class prevalidation_adapter_impl : public strict_any_tag
                             // check member path as is
                             return hana::eval_if(
                                 hana::and_(
-                                    check_member_path_types(self->check_member(),member)/*,
-                                    has_property_fn(obj,prop)*/
+                                    check_member_path_types(self->check_member(),member)
                                 ),
                                 [&self,&member,&adpt,&prop,&op,&b](auto&&)
                                 {
@@ -386,7 +387,7 @@ class prevalidation_adapter_impl : public strict_any_tag
         template <typename MemberT>
         bool filter_member(const MemberT& member) const noexcept
         {
-            return !check_member().isEqual(member);
+            return !check_member().equals(member);
         }
 
         template <typename MemberT>
