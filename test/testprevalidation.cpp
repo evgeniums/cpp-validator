@@ -319,11 +319,12 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     rep1.clear();
     BOOST_CHECK(v1_1.apply(pa1));
     rep1.clear();
-
+#endif
     auto v2=validator(
-                _["field1"]["field1_1"](ALL(value(gte,9))),
-                _["field2"](size(gte,100))
+                _["field1"]["field1_1"](ALL(value(gte,9)))/*,
+                _["field2"](size(gte,100))*/
             );
+#if 1
     auto v2_1=validator(
                 _["field1"]["field1_1"][ALL](gte,9),
                 _["field2"](size(gte,100))
@@ -362,12 +363,17 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     BOOST_CHECK(v2_1.apply(pa4));
     rep1.clear();
 
+#endif
+    BOOST_CHECK(safe_compare_equal(ALL,ALL));
+    BOOST_CHECK(safe_compare_equal(ALL,ANY));
+    BOOST_CHECK(ALL==ANY);
 
     auto pa5=make_prevalidation_adapter(_["field1"]["field1_1"],range({1}),rep1);
 
     BOOST_CHECK(!v2.apply(pa5));
     BOOST_CHECK_EQUAL(rep1,std::string("each element of field1_1 of field1 must be greater than or equal to 9"));
     rep1.clear();
+#if 1
     BOOST_CHECK(!v2_1.apply(pa5));
     BOOST_CHECK_EQUAL(rep1,std::string("each element of field1_1 of field1 must be greater than or equal to 9"));
     rep1.clear();
@@ -379,12 +385,12 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     BOOST_CHECK(!v2_1.apply(pa6));
     BOOST_CHECK_EQUAL(rep1,std::string("each element of field1_1 of field1 must be greater than or equal to 9"));
     rep1.clear();
-#endif
+
     auto v3=validator(
-                _["field1"]["field1_1"](ANY(value(gte,9)))/*,
-                _["field2"](size(gte,100))*/
+                _["field1"]["field1_1"](ANY(value(gte,9))),
+                _["field2"](size(gte,100))
             );
-#if 1
+
     auto v3_1=validator(
                 _["field1"]["field1_1"][ANY](gte,9),
                 _["field2"](size(gte,100))
@@ -462,14 +468,10 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     BOOST_CHECK_EQUAL(rep1,std::string("at least one element of field1_1 of field1 must be greater than or equal to 9"));
     rep1.clear();
 
-#endif
-
     auto vec9=std::vector<int>{1,2,3,4,9};
     auto pa9=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any(range(vec9)),rep1);
     BOOST_CHECK(v3.apply(pa9));
     rep1.clear();
-
-#if 1
 
     BOOST_CHECK(v3_1.apply(pa9));
     rep1.clear();

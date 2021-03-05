@@ -52,6 +52,8 @@ constexpr string_all_t string_all{};
 
 //-------------------------------------------------------------
 
+struct any_t;
+
 /**
  * @brief Definition of aggregation pseudo operator ALL for checking if all elements of a container satisfy condition.
  * @param op Validator to apply to each element of the container.
@@ -87,25 +89,43 @@ struct all_t : public element_aggregation,
     }
 
     template <typename T>
-    constexpr bool operator == (T) const noexcept
+    constexpr bool operator == (const T&) const noexcept
     {
         return true;
     }
     template <typename T>
-    constexpr bool operator != (T) const noexcept
+    constexpr bool operator != (const T&) const noexcept
+    {
+        return false;
+    }
+
+    bool operator == (const all_t&) const noexcept
+    {
+        return true;
+    }
+    bool operator != (const all_t&) const noexcept
+    {
+        return false;
+    }
+
+    bool operator == (const any_t&) const noexcept
+    {
+        return true;
+    }
+    bool operator != (const any_t&) const noexcept
     {
         return false;
     }
 
     template <typename T>
-    constexpr friend bool operator == (T, const all_t&) noexcept
+    constexpr friend bool operator == (const T&, const all_t&) noexcept
     {
         return true;
     }
     template <typename T>
-    constexpr friend bool operator != (T, const all_t&) noexcept
+    constexpr friend bool operator != (const T&, const all_t&) noexcept
     {
-        return true;
+        return false;
     }
 };
 

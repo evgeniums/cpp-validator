@@ -48,6 +48,7 @@ struct string_any_t : public aggregate_op<string_any_t>,
 constexpr string_any_t string_any{};
 
 //-------------------------------------------------------------
+struct all_t;
 
 /**
  * @brief Definition of aggregation pseudo operator ANY to check if any element of a container satisfies condition.
@@ -94,6 +95,24 @@ struct any_t : public element_aggregation,
         return false;
     }
 
+    bool operator == (const all_t&) const noexcept
+    {
+        return true;
+    }
+    bool operator != (const all_t&) const noexcept
+    {
+        return false;
+    }
+
+    bool operator == (const any_t&) const noexcept
+    {
+        return true;
+    }
+    bool operator != (const any_t&) const noexcept
+    {
+        return false;
+    }
+
     template <typename T>
     constexpr friend bool operator == (T, const any_t&) noexcept
     {
@@ -102,7 +121,7 @@ struct any_t : public element_aggregation,
     template <typename T>
     constexpr friend bool operator != (T, const any_t&) noexcept
     {
-        return true;
+        return false;
     }
 };
 
