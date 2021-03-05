@@ -52,17 +52,15 @@ struct aggregate_report<AdapterT,
     static void open(AdapterT1&& adapter, AggregationT&& str, PathT&& path)
     {
         auto& reporter=adapter.traits().reporter();
-        using type=std::decay_t<decltype(reporter)>;
-        auto& mutable_reporter=const_cast<type&>(reporter);
         hana::eval_if(
             hana::equal(hana::size(path),hana::size_c<0>),
             [&](auto&&)
             {
-                mutable_reporter.aggregate_open(str);
+                reporter.aggregate_open(str);
             },
             [&](auto&& _)
             {
-                mutable_reporter.aggregate_open(str,make_member(_(path)));
+                reporter.aggregate_open(str,make_member(_(path)));
             }
         );
     }
@@ -70,10 +68,7 @@ struct aggregate_report<AdapterT,
     template <typename AdapterT1>
     static void close(AdapterT1&& adapter, status ret)
     {
-        auto& reporter=adapter.traits().reporter();
-        using type=std::decay_t<decltype(reporter)>;
-        auto& mutable_reporter=const_cast<type&>(reporter);
-        mutable_reporter.aggregate_close(ret);
+        adapter.traits().reporter().aggregate_close(ret);
     }
 };
 

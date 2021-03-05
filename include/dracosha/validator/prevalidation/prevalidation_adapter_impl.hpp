@@ -106,7 +106,7 @@ class prevalidation_adapter_impl : public strict_any_tag
         }
 
         template <typename AdapterT, typename T2, typename OpT, typename MemberT>
-        status validate_exists(AdapterT&& adpt, MemberT&& member, OpT&&, T2&& b, bool from_check_member) const
+        status validate_exists(AdapterT&& adpt, MemberT&& member, OpT&&, T2&& b, bool from_check_member=false) const
         {
             std::ignore=from_check_member;
 

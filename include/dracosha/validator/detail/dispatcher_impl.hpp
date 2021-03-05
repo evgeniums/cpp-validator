@@ -113,7 +113,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     template <typename T2, typename OpT>
     status operator() (T1&& a, OpT&& op, T2&& b) const
     {
-        return a.validate_operator(std::forward<OpT>(op),std::forward<T2>(b));
+        return a.traits().validate_operator(a,std::forward<OpT>(op),std::forward<T2>(b));
     }
 
     /**
@@ -146,7 +146,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
                                      > =nullptr
                                  )
     {
-        return a.validate_property(std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
+        return a.traits().validate_property(a,std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
     }
 
     /**
@@ -168,7 +168,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
                                  > =nullptr
                                 )
     {
-        return a.validate_exists(std::forward<MemberT>(member),std::forward<OpT>(op),std::forward<T2>(b));
+        return a.traits().validate_exists(a,std::forward<MemberT>(member),std::forward<OpT>(op),std::forward<T2>(b));
     }
 
     /**
@@ -192,7 +192,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
                                  > =nullptr
                                 )
     {
-        return a.validate(std::forward<MemberT>(member),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
+        return a.traits().validate(a,std::forward<MemberT>(member),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
     }
 
     /**
@@ -212,7 +212,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
                                  > =nullptr
                                 )
     {
-        return a.validate_with_other_member(std::forward<MemberT>(member),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
+        return a.traits().validate_with_other_member(a,std::forward<MemberT>(member),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
     }
 
     /**
@@ -232,7 +232,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
                                  > =nullptr
                                 )
     {
-        return a.validate_with_master_sample(std::forward<MemberT>(member),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
+        return a.traits().validate_with_master_sample(a,std::forward<MemberT>(member),std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<T2>(b));
     }
 
     /**
@@ -242,7 +242,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     template <typename ... Args>
     static status validate_and(T1&& a, Args&&... args)
     {
-        return a.validate_and(std::forward<Args>(args)...);
+        return a.traits().validate_and(a,std::forward<Args>(args)...);
     }
 
     /**
@@ -252,7 +252,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     template <typename ... Args>
     static status validate_or(T1&& a, Args&&... args)
     {
-        return a.validate_or(std::forward<Args>(args)...);
+        return a.traits().validate_or(a,std::forward<Args>(args)...);
     }
 
     /**
@@ -262,7 +262,7 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
     template <typename ... Args>
     static status validate_not(T1&& a, Args&&... args)
     {
-        return a.validate_not(std::forward<Args>(args)...);
+        return a.traits().validate_not(a,std::forward<Args>(args)...);
     }
 };
 

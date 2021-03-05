@@ -23,7 +23,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/status.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
 #include <dracosha/validator/with_check_member_exists.hpp>
-#include <dracosha/validator/check_member_exists_traits_proxy.hpp>
 #include <dracosha/validator/adapters/adapter.hpp>
 #include <dracosha/validator/adapters/impl/default_adapter_impl.hpp>
 
@@ -37,7 +36,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename T>
 class default_adapter_traits :  public adapter_traits,
                                 public object_wrapper<T>,
-                                public with_check_member_exists<adapter<default_adapter_traits<T>>>,
+                                public with_check_member_exists<default_adapter_traits<T>>,
                                 public default_adapter_impl
 {
     public:
@@ -48,10 +47,9 @@ class default_adapter_traits :  public adapter_traits,
          * @param obj Object to wrap into adapter.
          */
         default_adapter_traits(
-                    const adapter<default_adapter_traits<T>>& adpt,
                     T&& obj
                 ) : object_wrapper<T>(std::forward<T>(obj)),
-                    with_check_member_exists<adapter<default_adapter_traits<T>>>(adpt)
+                    with_check_member_exists<default_adapter_traits<T>>(*this)
         {}
 };
 
@@ -62,22 +60,7 @@ class default_adapter_traits :  public adapter_traits,
  *
  */
 template <typename T>
-class default_adapter : public adapter<default_adapter_traits<T>>,
-                        public check_member_exists_traits_proxy<default_adapter<T>>
-{
-    public:
-
-        using type=T;
-
-        /**
-         * @brief Constructor.
-         * @param obj COnstant reference to object under validation.
-         */
-        default_adapter(T&& obj)
-            : adapter<default_adapter_traits<T>>(std::forward<T>(obj)),
-              check_member_exists_traits_proxy<default_adapter<T>>(*this)
-        {}
-};
+using default_adapter = adapter<default_adapter_traits<T>>;
 
 /**
   @brief Make default validation adapter wrapping the embedded object.

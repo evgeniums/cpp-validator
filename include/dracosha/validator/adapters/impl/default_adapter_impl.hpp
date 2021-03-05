@@ -83,10 +83,10 @@ struct default_adapter_impl
      * @brief Check if member exists.
      */
     template <typename AdapterT, typename T2, typename OpT, typename MemberT>
-    static status validate_exists(AdapterT&& adpt, MemberT&& member, OpT&&, T2&& b, bool from_check_member)
+    static status validate_exists(AdapterT&& adpt, MemberT&& member, OpT&&, T2&& b, bool from_check_member=false)
     {
         std::ignore=from_check_member;
-        return adpt.check_path_exists(member.path(),b);
+        return adpt.check_path_exists(adpt,member.path(),b);
     }
 
     /**
@@ -359,7 +359,7 @@ struct default_adapter_impl
             {
                 if (adpt.traits().unknown_member_mode()==if_member_not_found::abort)
                 {
-                    return status(adpt.validate_exists(member,exists,true));
+                    return status(adpt.traits().validate_exists(adpt,member,exists,true));
                 }
                 return status(status::code::ignore);
             }

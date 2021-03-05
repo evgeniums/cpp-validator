@@ -41,15 +41,15 @@ enum class if_member_not_found : int
 /**
  * @brief Base template for classes that can be queried if a member exists.
  */
-template <typename AdapterT>
+template <typename TraitsT>
 struct with_check_member_exists
 {
-    const AdapterT& _adapter;
+    const TraitsT& _traits;
     if_member_not_found _unknown_member_mode;
     bool _check_member_exists;
 
-    with_check_member_exists(const AdapterT& adpt):
-        _adapter(adpt),
+    with_check_member_exists(const TraitsT& traits):
+        _traits(traits),
         _unknown_member_mode(if_member_not_found::ignore),
         _check_member_exists(false)
     {}
@@ -104,6 +104,22 @@ struct with_check_member_exists
         return check_path_exists(member.path());
     }
 
+    template <typename PathT, typename T2>
+    bool check_path_exists(PathT&& path, T2&& b) const
+    {
+        const auto& obj=extract(_traits.get());
+        return hana::if_(check_member_path(obj,path),
+            [&obj,&b](auto&& path)
+            {
+                return exists(obj,std::forward<decltype(path)>(path))==b;
+            },
+            [&b](auto&&)
+            {
+                return b==false;
+            }
+        )(path);
+    }
+
     /**
      * @brief Check if path exists.
      * @param path Path to check.
@@ -112,13 +128,13 @@ struct with_check_member_exists
     template <typename PathT>
     bool check_path_exists(const PathT& path) const
     {
-        if (!check_member_path(extract(_adapter.traits().get()),path))
+        if (!check_member_path(extract(_traits.get()),path))
         {
             return false;
         }
         if (is_check_member_exists_before_validation())
         {
-            return _adapter.check_path_exists(path,true);
+            return check_path_exists(path,true);
         }
         return true;
     }

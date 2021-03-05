@@ -35,7 +35,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename T, typename ReporterT>
 struct reporting_adapter_traits : public adapter_traits,
                                   public object_wrapper<T>,
-                                  public with_check_member_exists<adapter<reporting_adapter_traits<T,ReporterT>>>,
+                                  public with_check_member_exists<reporting_adapter_traits<T,ReporterT>>,
                                   public reporting_adapter_impl<ReporterT,default_adapter_impl>
 {
     public:
@@ -47,12 +47,11 @@ struct reporting_adapter_traits : public adapter_traits,
          * @param reporter_args Parameters to forward to reporter's constructor.
          */
         reporting_adapter_traits(
-                    adapter<reporting_adapter_traits<T,ReporterT>>& adpt,
                     T&& obj,
                     ReporterT&& reporter
                 )
             : object_wrapper<T>(std::forward<T>(obj)),
-              with_check_member_exists<adapter<reporting_adapter_traits<T,ReporterT>>>(adpt),
+              with_check_member_exists<reporting_adapter_traits<T,ReporterT>>(*this),
               reporting_adapter_impl<ReporterT,default_adapter_impl>(std::forward<ReporterT>(reporter))
         {}
 };
@@ -61,25 +60,13 @@ struct reporting_adapter_traits : public adapter_traits,
  * @brief Reporting adapter that constructs report if validation fails.
  */
 template <typename T, typename ReporterT>
-class reporting_adapter : public adapter<reporting_adapter_traits<T,ReporterT>>,
-                          public check_member_exists_traits_proxy<reporting_adapter<T,ReporterT>>
+class reporting_adapter : public adapter<reporting_adapter_traits<T,ReporterT>>
 {
     public:
 
         using reporter_type=ReporterT;
 
-        /**
-         * @brief Constructor.
-         * @param obj Constant reference to object under validation.
-         * @param reporter_args Parameters to forward to reporter's constructor.
-         */
-        reporting_adapter(
-                T&& obj,
-                ReporterT&& reporter
-            )
-            : adapter<reporting_adapter_traits<T,ReporterT>>(std::forward<T>(obj),std::forward<ReporterT>(reporter)),
-              check_member_exists_traits_proxy<reporting_adapter<T,ReporterT>>(*this)
-        {}
+        using adapter<reporting_adapter_traits<T,ReporterT>>::adapter;
 };
 
 /**

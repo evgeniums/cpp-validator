@@ -41,7 +41,7 @@ template <typename MemberT, typename T, typename ReporterT, typename WrappedT>
 class prevalidation_adapter_traits : public adapter_traits,
                                      public object_wrapper<WrappedT>,
                                      public reporting_adapter_impl<ReporterT,prevalidation_adapter_impl<MemberT>>,
-                                     public with_check_member_exists<adapter<prevalidation_adapter_traits<MemberT,T,ReporterT,WrappedT>>>
+                                     public with_check_member_exists<prevalidation_adapter_traits<MemberT,T,ReporterT,WrappedT>>
 {
     public:
 
@@ -56,7 +56,6 @@ class prevalidation_adapter_traits : public adapter_traits,
          * @param reporter Reporter to use for report construction if validation fails
          */
         prevalidation_adapter_traits(
-                    adapter<prevalidation_adapter_traits<MemberT,T,ReporterT,WrappedT>>& adpt,
                     MemberT&& member,
                     T&& val,
                     ReporterT&& reporter
@@ -65,7 +64,7 @@ class prevalidation_adapter_traits : public adapter_traits,
                         std::forward<ReporterT>(reporter),
                         std::forward<MemberT>(member)
                     ),
-                    with_check_member_exists<adapter<prevalidation_adapter_traits<MemberT,T,ReporterT,WrappedT>>>(adpt)
+                    with_check_member_exists<prevalidation_adapter_traits<MemberT,T,ReporterT,WrappedT>>(*this)
         {
             this->set_check_member_exists_before_validation(true);
         }
@@ -81,18 +80,7 @@ class prevalidation_adapter : public adapter<prevalidation_adapter_traits<Member
 
         using reporter_type=ReporterT;
 
-        /**
-         * @brief Constructor
-         * @param member Member to validate
-         * @param val Value to validate with
-         * @param reporter Reporter to use for report construction if validation fails
-         */
-        prevalidation_adapter(
-                MemberT&& member,
-                T&& val,
-                ReporterT&& reporter
-            ) : adapter<prevalidation_adapter_traits<MemberT,T,ReporterT,WrappedT>>(std::forward<MemberT>(member),std::forward<T>(val),std::forward<ReporterT>(reporter))
-        {}
+        using adapter<prevalidation_adapter_traits<MemberT,T,ReporterT,WrappedT>>::adapter;
 };
 
 

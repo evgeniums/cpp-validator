@@ -62,20 +62,22 @@ class validator_with_hint_t
 
         /**
          * @brief Invoke validating with supplied args and override reporting description with ecplicit description.
-         * @param adpt Adapter.
+         * @param a Adapter.
          * @param args Arguments to forward to embedded executor.
          * @return Validation status.
          */
         template <typename AdapterT, typename ... Args>
-        auto apply(AdapterT&& adpt, Args&&... args) const
+        auto apply(AdapterT&& a, Args&&... args) const
         {
-            auto ret=adpt.hint_before(_hint);
+            auto&& adpt=ensure_adapter(std::forward<AdapterT>(a));
+
+            auto ret=adpt.hint_before(adpt,_hint);
             if (!ret)
             {
-                return adpt.hint_after(ret,_hint);
+                return adpt.hint_after(adpt,ret,_hint);
             }
-            ret=_fn(ensure_adapter(std::forward<AdapterT>(adpt)),std::forward<Args>(args)...);
-            return adpt.hint_after(ret,_hint);
+            ret=_fn(adpt,std::forward<Args>(args)...);
+            return adpt.hint_after(adpt,ret,_hint);
         }
 
     private:
