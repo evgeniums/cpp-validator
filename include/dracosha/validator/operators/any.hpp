@@ -20,6 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_ANY_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/operators/element_aggregation.hpp>
 #include <dracosha/validator/make_validator.hpp>
 #include <dracosha/validator/operators/and.hpp>
 #include <dracosha/validator/prevalidation/strict_any.hpp>
@@ -185,6 +186,24 @@ struct generate_paths_t<KeyT,hana::when<std::is_same<any_t,std::decay_t<KeyT>>::
         );
     }
 };
+
+struct is_aggregation_any_t
+{
+    template <typename PrevResultT, typename T>
+    constexpr auto operator () (PrevResultT prev, T) const
+    {
+        using type=typename T::type;
+        return hana::if_(
+            prev,
+            prev,
+            hana::bool_
+            <
+                std::is_same<type,std::decay_t<decltype(ANY)>>::value
+            >{}
+        );
+    }
+};
+constexpr is_aggregation_any_t is_aggregation_any{};
 
 //-------------------------------------------------------------
 

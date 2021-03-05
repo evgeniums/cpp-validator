@@ -32,6 +32,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/make_validator.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
 #include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/operators/element_aggregation.hpp>
 #include <dracosha/validator/operators/any.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -249,42 +250,6 @@ auto make_member(Ts&& path);
 
 namespace detail
 {
-
-struct is_element_aggregation_t
-{
-    template <typename PrevResultT, typename T>
-    constexpr auto operator () (PrevResultT prev, T) const
-    {
-        using type=typename T::type;
-        return hana::if_(
-            prev,
-            prev,
-            hana::bool_
-            <
-                hana::is_a<element_aggregation_tag,type>
-            >{}
-        );
-    }
-};
-constexpr is_element_aggregation_t is_element_aggregation{};
-
-struct is_aggregation_any_t
-{
-    template <typename PrevResultT, typename T>
-    constexpr auto operator () (PrevResultT prev, T) const
-    {
-        using type=typename T::type;
-        return hana::if_(
-            prev,
-            prev,
-            hana::bool_
-            <
-                std::is_same<type,std::decay_t<decltype(ANY)>>::value
-            >{}
-        );
-    }
-};
-constexpr is_aggregation_any_t is_aggregation_any{};
 
 template <typename ... PathT>
 struct is_member_aggregated

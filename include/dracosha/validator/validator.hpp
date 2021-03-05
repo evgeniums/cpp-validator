@@ -50,6 +50,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/operators/wrap_op.hpp>
 #include <dracosha/validator/filter_member.ipp>
 #include <dracosha/validator/operators/aggregation.ipp>
+#include <dracosha/validator/operators/element_aggregation.ipp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
