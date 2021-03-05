@@ -143,7 +143,7 @@ struct default_adapter_impl
     /**
      * @brief Validate a member.
      *
-     * If configured, the existance of the member can be checked before validation.
+     * If configured, the existence of the member can be checked before validation.
      */
     template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
     static status validate(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
@@ -164,7 +164,7 @@ struct default_adapter_impl
             },
             [](auto&&)
             {
-                return status();
+                return status(status::code::ignore);
             }
         )(member.path());
     }
@@ -193,7 +193,7 @@ struct default_adapter_impl
             },
             [](auto&&, auto&&)
             {
-                return status();
+                return status(status::code::ignore);
             }
         )(member.path(),b.path());
     }
@@ -202,6 +202,7 @@ struct default_adapter_impl
      * @brief Validate a member using member with the same path of sample object.
      *
      * If configured, the existance of the member can be checked before validation.
+     * If sample does not contain member then check is ignored.
      */
     template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
     static status validate_with_master_sample(AdapterT&& adpt, MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
@@ -212,17 +213,42 @@ struct default_adapter_impl
         }
 
         const auto& obj=extract(adpt.traits().get());
-        return hana::if_(check_member_path(obj,member.path()),
-            [&obj,&prop,&op,&b](auto&& path)
+        const auto& sample=extract(b)();
+
+        auto&& obj_might_have_path=check_member_path(sample,member.path());
+        auto&& sample_might_have_path=check_member_path(sample,member.path());
+
+        auto sample_has_path=hana::if_(sample_might_have_path,
+            [&sample](auto&& path)
+            {
+                return exists(sample,path);
+            },
+            [&b](auto&&)
+            {
+                return false;
+            }
+        )(member.path());
+        if (!sample_has_path)
+        {
+            // if sample does not have member then ignore check
+            return status(status::code::ignore);
+        }
+
+        return hana::if_(
+            hana::and_(
+                obj_might_have_path,
+                sample_might_have_path
+            ),
+            [&obj,&prop,&op,&b,&sample](auto&& path)
             {
                 return status(op(
                             property(get_member(obj,path),prop),
-                            property(get_member(extract(b)(),path),prop)
+                            property(get_member(sample,path),prop)
                         ));
             },
             [](auto&&)
             {
-                return status();
+                return status(status::code::ignore);
             }
         )(member.path());
     }
@@ -285,7 +311,7 @@ struct default_adapter_impl
             },
             [](auto&&)
             {
-                return status();
+                return status(status::code::ignore);
             }
         )(member.path());
     }
@@ -349,7 +375,7 @@ struct default_adapter_impl
             },
             [](auto&&)
             {
-                return status();
+                return status(status::code::ignore);
             }
         )(member.path());
     }
@@ -379,7 +405,7 @@ struct default_adapter_impl
             },
             [](auto&&)
             {
-                return status();
+                return status(status::code::ignore);
             }
         )(member.path());
     }
@@ -409,7 +435,7 @@ struct default_adapter_impl
             },
             [](auto&&)
             {
-                return status();
+                return status(status::code::ignore);
             }
         )(member.path());
     }
@@ -446,7 +472,7 @@ struct default_adapter_impl
                 {
                     return status(adpt.validate_exists(member,exists,true));
                 }
-                return status();
+                return status(status::code::ignore);
             }
         )(member.path());
     }

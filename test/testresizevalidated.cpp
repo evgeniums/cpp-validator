@@ -106,25 +106,21 @@ BOOST_AUTO_TEST_CASE(CheckResizeValidated)
     BOOST_CHECK_EQUAL(err.message(),std::string("size of at least one element of field1 must be greater than or equal to 4"));
     resize_validated(m2,_["field2"][0],0,strict_any(v2),err);
     BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("at least one element of field2 must be not empty"));
 
-    //! @todo Fix aggregation with sample
-#if 0
     auto v3=validator(
                 _["field1"](ALL(size(gte,4))),
                 _["field2"](ALL(empty(flag,false))),
                 _["field3"](ALL(size(gte,_(m2))))
-            );
-    BOOST_CHECK_EQUAL(err.message(),std::string("element #0 of field2 must be not empty"));
+            );    
     resize_validated(m2,_["field1"][0],3,v3,err);
     BOOST_CHECK(err);
-    BOOST_CHECK_EQUAL(err.message(),std::string("size of element #0 of field1 must be greater than or equal to 4"));
+    BOOST_CHECK_EQUAL(err.message(),std::string("size of each element of field1 must be greater than or equal to 4"));
     resize_validated(m2,_["field2"][0],0,v3,err);
     BOOST_CHECK(err);
-    BOOST_CHECK_EQUAL(err.message(),std::string("element #0 of field2 must be not empty"));
+    BOOST_CHECK_EQUAL(err.message(),std::string("each element of field2 must be not empty"));
     resize_validated(m2,_["field3"][0],2,v3,err);
-    BOOST_CHECK(err);
-    BOOST_CHECK_EQUAL(err.message(),std::string("size of element #0 of field3 must be greater than or equal to size of element #0 of field3 of sample"));
-#endif
+    BOOST_CHECK(!err); // not existing member is ignored
 
     std::map<std::string,std::string> m4{
         {"field1","value1"},

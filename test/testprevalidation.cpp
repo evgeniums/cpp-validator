@@ -236,7 +236,9 @@ BOOST_AUTO_TEST_CASE(CheckSampleObjectPrevalidationReport)
     auto v1=validator(
                 _[size](eq,1),
                 _[1](gte,_(sample)),
-                _[10](eq,_(sample))
+                _[10](eq,_(sample)),
+                _["hello"](eq,_(sample)),
+                _[100](eq,_(sample))
             );
     std::string rep1;
 
@@ -252,6 +254,12 @@ BOOST_AUTO_TEST_CASE(CheckSampleObjectPrevalidationReport)
     BOOST_CHECK(!v1.apply(sa3));
     BOOST_CHECK_EQUAL(rep1,"element #1 must be greater than or equal to element #1 of sample");
     rep1.clear();
+
+    auto sa4=make_prevalidation_adapter(_["hello"],5,rep1);
+    BOOST_CHECK(v1.apply(sa4));
+
+    auto sa5=make_prevalidation_adapter(_[100],5,rep1);
+    BOOST_CHECK(v1.apply(sa5));
 
     auto v2=validator(
                 _[size](eq,1),
@@ -413,7 +421,6 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     rep1.clear();
 #endif
 
-#if 1
     //"check that there is no extra copy in strict_any()"
     {
         std::ignore=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any(NonCopyable{}),rep1);
@@ -536,8 +543,8 @@ BOOST_AUTO_TEST_CASE(CheckUpdateValidatedWithSample)
         {"field2",{"value2"}},
         {"field3",{"value3"}}
     };
-    //! @todo Fix aggregation with sample
-#if 0
+
+    // test member not existing in sample
     std::map<std::string,std::vector<std::string>> m7{
         {"field1",{"value1"}},
         {"field2",{"value2"}},
@@ -548,19 +555,15 @@ BOOST_AUTO_TEST_CASE(CheckUpdateValidatedWithSample)
             );
 
     set_validated(m7,_["field3"][0],"aaaaa",v7,err);
-    BOOST_CHECK(err);
-    BOOST_CHECK_EQUAL(err.message(),std::string("element #0 of field3 must be greater than or equal to element #0 of field3 of sample"));
+    BOOST_CHECK(!err);
 
     auto v8=validator(
                 _["field3"](ANY(value(gte,_(sample7))))
             );
-    //! @todo Check element aggregations with sample.
     set_validated(m7,_["field3"][0],"aaaaa",strict_any(v8),err);
-    BOOST_CHECK(err);
+    BOOST_CHECK(!err); // not existing member in sample is ignored
     set_validated(m7,_["field3"][0],"zzzzz",strict_any(v8),err);
     BOOST_CHECK(!err);
     BOOST_CHECK_EQUAL(m7["field3"][0],"zzzzz");
-#endif
-#endif
 }
 BOOST_AUTO_TEST_SUITE_END()

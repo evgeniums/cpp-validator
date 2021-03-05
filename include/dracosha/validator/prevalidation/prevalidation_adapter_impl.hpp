@@ -257,11 +257,40 @@ class prevalidation_adapter_impl : public strict_any_tag
             {
                 return status(status::code::ignore);
             }
-            const auto& obj=extract(adpt.traits().get());
-            return status(op(
-                        property(obj,std::forward<PropT>(prop)),
-                        property(get_member(extract(b)(),member.path()),prop)
-                    ));
+
+            const auto& obj=extract(adpt.traits().get());            
+            const auto& sample=extract(b)();
+
+            auto&& sample_might_have_path=check_member_path(sample,_member.path());
+            auto sample_has_path=hana::if_(sample_might_have_path,
+                [&sample](auto&& path)
+                {
+                    return exists(sample,path);
+                },
+                [&b](auto&&)
+                {
+                    return false;
+                }
+            )(_member.path());
+            if (!sample_has_path)
+            {
+                // if sample does not have member then ignore check
+                return status(status::code::ignore);
+            }
+
+            return hana::if_(sample_might_have_path,
+                [&obj,&prop,&op,&sample](auto&& path)
+                {
+                    return status(op(
+                                property(obj,std::forward<PropT>(prop)),
+                                property(get_member(sample,path),prop)
+                            ));
+                },
+                [](auto&&)
+                {
+                    return status(status::code::ignore);
+                }
+            )(_member.path());
         }
 
         template <typename AdapterT, typename OpsT>

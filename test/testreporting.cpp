@@ -420,6 +420,23 @@ BOOST_AUTO_TEST_CASE(CheckSampleObjectReport)
     BOOST_CHECK(!v4.apply(ra2));
     BOOST_CHECK_EQUAL(rep1,"element #1 must be greater than element #1 of m3");
     rep1.clear();
+
+    std::map<std::string,size_t> m5={
+        {"one",5},
+        {"two",20}
+    };
+    auto v5=validator(
+                _[1](gt,_(m5))
+            );
+    BOOST_CHECK(v5.apply(ra2));
+
+    auto ra5=make_reporting_adapter(m5,rep1);
+    BOOST_CHECK(v5.apply(ra5));
+
+    auto v6=validator(
+                _["three"](gt,_(m5))
+            );
+    BOOST_CHECK(v6.apply(ra5));
 }
 
 BOOST_AUTO_TEST_CASE(CheckNotExistingMemberIgnoreReport)
