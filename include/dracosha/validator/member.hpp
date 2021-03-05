@@ -247,25 +247,53 @@ constexpr member_helper_t<Args...> member_helper{};
 template <typename Ts>
 auto make_member(Ts&& path);
 
+namespace detail
+{
+
+struct is_element_aggregation_t
+{
+    template <typename PrevResultT, typename T>
+    constexpr auto operator () (PrevResultT prev, T) const
+    {
+        using type=typename T::type;
+        return hana::if_(
+            prev,
+            prev,
+            hana::bool_
+            <
+                hana::is_a<element_aggregation_tag,type>
+            >{}
+        );
+    }
+};
+constexpr is_element_aggregation_t is_element_aggregation{};
+
+struct is_aggregation_any_t
+{
+    template <typename PrevResultT, typename T>
+    constexpr auto operator () (PrevResultT prev, T) const
+    {
+        using type=typename T::type;
+        return hana::if_(
+            prev,
+            prev,
+            hana::bool_
+            <
+                std::is_same<type,std::decay_t<decltype(ANY)>>::value
+            >{}
+        );
+    }
+};
+constexpr is_aggregation_any_t is_aggregation_any{};
+
 template <typename ... PathT>
 struct is_member_aggregated
 {
     constexpr static const auto value=hana::fold(
                 hana::tuple_t<PathT...>,
-                hana::bool_<false>{},
-                [](auto prev, auto v)
-                {
-                    using type_c=decltype(v);
-                    using type=typename type_c::type;
-                    return hana::if_(
-                        prev,
-                        prev,
-                        hana::bool_
-                        <
-                            hana::is_a<element_aggregation_tag,type>
-                        >{}
-                    );
-            });
+                hana::false_{},
+                is_element_aggregation
+            );
 };
 
 template <typename ... PathT>
@@ -274,20 +302,11 @@ struct is_member_with_any
     constexpr static const auto value=hana::fold(
                 hana::tuple_t<PathT...>,
                 hana::false_{},
-                [](auto prev, auto v)
-                {
-                    using type_c=decltype(v);
-                    using type=typename type_c::type;
-                    return hana::if_(
-                        prev,
-                        prev,
-                        hana::bool_
-                        <
-                            std::is_same<type,std::decay_t<decltype(ANY)>>::value
-                        >{}
-                    );
-            });
+                is_aggregation_any
+            );
 };
+
+}
 
 /**
  *  @brief Generic descriptor of a member to be validated.
@@ -304,8 +323,8 @@ class member
         using type=T;
         using path_type=hana::tuple<ParentPathT...,type>;
 
-        using is_aggregated=decltype(is_member_aggregated<ParentPathT...,type>::value);
-        using is_with_any=decltype(is_member_with_any<ParentPathT...,type>::value);
+        using is_aggregated=decltype(detail::is_member_aggregated<ParentPathT...,type>::value);
+        using is_with_any=decltype(detail::is_member_with_any<ParentPathT...,type>::value);
         using is_key_any=std::is_same<typename extract_object_wrapper_t<type>::type,std::decay_t<decltype(ANY)>>;
 
         constexpr static bool has_any() noexcept
