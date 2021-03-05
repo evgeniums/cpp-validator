@@ -317,44 +317,6 @@ class single_member_adapter_impl
             return status(!apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
         }
 
-        template <typename AdapterT, typename OpT>
-        status validate_any(AdapterT&& adpt, OpT&& op) const
-        {
-            return default_adapter_impl::validate_any(std::forward<AdapterT>(adpt),std::forward<OpT>(op));
-        }
-
-        template <typename AdapterT, typename MemberT, typename OpT>
-        status validate_any(AdapterT&& adpt, MemberT&& member, OpT&& op) const
-        {
-            if (filter_member(member))
-            {
-                return status(status::code::ignore);
-            }
-            _skip_member_filter=true;
-            auto ret=default_adapter_impl::validate_any(std::forward<AdapterT>(adpt),std::forward<decltype(member)>(member),std::forward<OpT>(op));
-            _skip_member_filter=false;
-            return ret;
-        }
-
-        template <typename AdapterT, typename OpT>
-        status validate_all(AdapterT&& adpt, OpT&& op) const
-        {
-            return default_adapter_impl::validate_all(std::forward<AdapterT>(adpt),std::forward<OpT>(op));
-        }
-
-        template <typename AdapterT, typename MemberT, typename OpT>
-        status validate_all(AdapterT&& adpt, MemberT&& member, OpT&& op) const
-        {
-            if (filter_member(member))
-            {
-                return status(status::code::ignore);
-            }
-            _skip_member_filter=true;
-            auto ret=default_adapter_impl::validate_all(std::forward<AdapterT>(adpt),std::forward<decltype(member)>(member),std::forward<OpT>(op));
-            _skip_member_filter=false;
-            return ret;
-        }
-
     private:
 
         template <typename MemberT>

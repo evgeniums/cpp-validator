@@ -108,30 +108,6 @@ struct dispatcher_t
     {
         return detail::dispatcher_impl<T1>.validate_not(std::forward<T1>(a),std::forward<Args>(args)...);
     }
-
-    /**
-     * @brief Execute validator to check if any element of a container satisfies the condition.
-     * @param a Object to validate or adapter.
-     * @param args Validation arguments.
-     * @return Success if any element of a container satisfies the condition.
-     */
-    template <typename T1, typename ...Args>
-    static status validate_any(T1&& a, Args&&... args)
-    {
-        return detail::dispatcher_impl<T1>.validate_any(std::forward<T1>(a),std::forward<Args>(args)...);
-    }
-
-    /**
-     * @brief Execute validator to check if all elements of a container satisfy the condition.
-     * @param a Object to validate or adapter.
-     * @param args Validation arguments.
-     * @return Success if all elements of a container satisfy the condition.
-     */
-    template <typename T1, typename ...Args>
-    static status validate_all(T1&& a, Args&&... args)
-    {
-        return detail::dispatcher_impl<T1>.validate_all(std::forward<T1>(a),std::forward<Args>(args)...);
-    }
 };
 
 /**

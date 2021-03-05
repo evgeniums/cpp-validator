@@ -189,44 +189,6 @@ class reporting_adapter_impl : public reporting_adapter_tag
                         );
         }
 
-        template <typename AdapterT, typename OpT>
-        status validate_any(AdapterT&& adpt, OpT&& op)
-        {
-            return aggregate(
-                            string_any,
-                            [this,&adpt,&op](){return _next_adapter_impl.validate_any(std::forward<AdapterT>(adpt),std::forward<OpT>(op));}
-                        );
-        }
-
-        template <typename AdapterT, typename MemberT, typename OpT>
-        status validate_any(AdapterT&& adpt, MemberT&& member, OpT&& op)
-        {
-            return aggregate(
-                            string_any,
-                            [this,&adpt,&member,&op](){return _next_adapter_impl.validate_any(std::forward<AdapterT>(adpt),member,std::forward<OpT>(op));},
-                            member
-                        );
-        }
-
-        template <typename AdapterT, typename OpT>
-        status validate_all(AdapterT&& adpt, OpT&& op)
-        {
-            return aggregate(
-                            string_all,
-                            [this,&adpt,&op](){return _next_adapter_impl.validate_all(std::forward<AdapterT>(adpt),std::forward<OpT>(op));}
-                        );
-        }
-
-        template <typename AdapterT, typename MemberT, typename OpT>
-        status validate_all(AdapterT&& adpt, MemberT&& member, OpT&& op)
-        {
-            return aggregate(
-                            string_all,
-                            [this,&adpt,&member,&op](){return _next_adapter_impl.validate_all(std::forward<AdapterT>(adpt),member,std::forward<OpT>(op));},
-                            member
-                        );
-        }
-
         status hint_before(const std::string&)
         {
             _reporter.begin_explicit_report();

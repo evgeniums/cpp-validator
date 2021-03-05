@@ -365,16 +365,6 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
 
     auto pa5=make_prevalidation_adapter(_["field1"]["field1_1"],range({1}),rep1);
 
-    BOOST_TEST_CONTEXT("check adapter_with_aggregation_iterator"){
-        static_assert(hana::is_a<prevalidation_adapter_tag,typename decltype(pa5)::type>,"");
-        std::vector<int> vec1{1};
-        auto a1=adapter_with_aggregation_iterator(
-            pa5,
-            vec1.begin()
-        );
-        BOOST_CHECK(a1.traits().next_adapter_impl().is_member_checked());
-    }
-
     BOOST_CHECK(!v2.apply(pa5));
     BOOST_CHECK_EQUAL(rep1,std::string("each element of field1_1 of field1 must be greater than or equal to 9"));
     rep1.clear();
