@@ -4,6 +4,7 @@
 
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/default_adapter.hpp>
+#include <dracosha/validator/adapters/reporting_adapter.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -57,6 +58,47 @@ BOOST_AUTO_TEST_CASE(TestValidatorWithMember)
         _["level1"](v3)
     );
     BOOST_CHECK(!v4.apply(m1));
+}
+
+BOOST_AUTO_TEST_CASE(TestValidatorWithMemberReport)
+{
+    std::string rep;
+
+    auto v1=validator(
+        _["level2"](exists,true)
+    );
+    auto v2=validator(
+        _["level1"](v1)
+    );
+
+    std::map<std::string,std::set<std::string>> m1{
+        {"level1",{"level2"}}
+    };
+    BOOST_CHECK(v2.apply(m1));
+
+    auto a1=make_reporting_adapter(m1,rep);
+    auto v3=validator(
+        _["level2"](exists,false)
+    );
+    auto v4=validator(
+        _["level1"](v3)
+    );
+    BOOST_CHECK(!v4.apply(a1));
+    BOOST_CHECK_EQUAL(rep,std::string("level2 of level1 must not exist"));
+    rep.clear();
+
+    //! @todo Fix custom member names in reports with nested validators
+#if 0
+    auto v5=validator(
+        _["level2"]("name2")(exists,false)
+    );
+    auto v6=validator(
+        _["level1"]("name1")(v5)
+    );
+    BOOST_CHECK(!v6.apply(a1));
+    BOOST_CHECK_EQUAL(rep,std::string("level2 of level1 must not exist"));
+    rep.clear();
+#endif
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -196,7 +196,8 @@ struct member_helper_2args_t<OpT,T1,
     {
         auto&& fn=[&member,&op,&b](auto&& key, auto&&... rpath)
         {
-            return member.make_parent(hana::reverse(hana::make_tuple(std::forward<decltype(rpath)>(rpath)...)))(
+            return inherit_member(hana::reverse(hana::make_tuple(std::forward<decltype(rpath)>(rpath)...)),member)
+                        (
                             key(std::forward<OpT>(op),std::forward<T1>(b))
                         );
         };
@@ -246,6 +247,9 @@ constexpr member_helper_t<Args...> member_helper{};
 
 template <typename Ts>
 auto make_member(Ts&& path);
+
+template <typename Ts, typename T>
+auto inherit_member(Ts&& path, T&& member);
 
 namespace detail
 {
@@ -379,22 +383,11 @@ class member
         }
 
         /**
-         * @brief Make member of parent type.
-         * @param path Path of new member.
-         * @return Member of parent type.
-         */
-        template <typename PathT>
-        static auto make_parent(PathT&& path)
-        {
-            return make_member(std::forward<PathT>(path));
-        }
-
-        /**
          * @brief Create member of parent type.
          */
         auto parent() const
         {
-            return make_parent(parent_path());
+            return inherit_member(parent_path(),*this);
         }
 
         /**
@@ -407,13 +400,6 @@ class member
         {
             using stype=typename adjust_storable_type<KeyT>::type;
             return member<T,stype,ParentPathT...>(hana::prepend(_path,stype(std::forward<KeyT>(first_key))));
-        }
-
-        template <typename SuperMemberT>
-        auto prepend_super_member(SuperMemberT&& super) const
-        {
-            auto new_path=hana::concat(super.path(),_path);
-            return make_member(std::move(new_path));
         }
 
         /**
@@ -571,7 +557,6 @@ constexpr auto make_plain_member(T&& key)
 template <typename T>
 constexpr auto make_typed_member(T&& key)
 {
-//    using type=typename adjust_storable_type<T>::type;
     return member<std::decay_t<T>>{std::forward<T>(key)};
 }
 
@@ -610,6 +595,13 @@ auto inherit_member(Ts&& path, T&& member)
         }
     );
 };
+
+template <typename SuperMemberT, typename MemberT>
+auto prepend_super_member(SuperMemberT&& super, MemberT&& member)
+{
+    auto new_path=hana::concat(super.path(),member.path());
+    return inherit_member(std::move(new_path),member);
+}
 
 namespace detail
 {

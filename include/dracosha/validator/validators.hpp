@@ -162,8 +162,11 @@ class validator_with_member_t
         template <typename AdapterT, typename SuperMemberT>
         auto apply(AdapterT&& adpt, SuperMemberT&& super) const
         {
-            return apply_member(ensure_adapter(std::forward<AdapterT>(adpt)),_prepared_validator,
-                                _member.prepend_super_member(std::forward<SuperMemberT>(super)));
+            return apply_member(
+                        ensure_adapter(std::forward<AdapterT>(adpt)),
+                        _prepared_validator,
+                        prepend_super_member(std::forward<SuperMemberT>(super),_member)
+                    );
         }
 
         /**
