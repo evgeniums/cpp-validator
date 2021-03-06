@@ -85,7 +85,7 @@ class reporter_with_object_name : public reporter<DstT,FormatterT>
         template <typename T2, typename OpT, typename MemberT>
         void validate_exists(const MemberT& member, const OpT& op, const T2& b)
         {
-            base_type::validate_exists(make_member(member),op,b);
+            base_type::validate_exists(as_member(member),op,b);
         }
 
         /**
@@ -98,7 +98,7 @@ class reporter_with_object_name : public reporter<DstT,FormatterT>
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
         {
-            base_type::validate(make_member(member),prop,op,b);
+            base_type::validate(as_member(member),prop,op,b);
         }
 
         /**
@@ -111,7 +111,7 @@ class reporter_with_object_name : public reporter<DstT,FormatterT>
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate_with_other_member(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
         {
-            base_type::validate_with_other_member(make_member(member),prop,op,make_member(b));
+            base_type::validate_with_other_member(as_member(member),prop,op,as_member(b));
         }
 
         /**
@@ -125,13 +125,13 @@ class reporter_with_object_name : public reporter<DstT,FormatterT>
         template <typename T2, typename OpT, typename PropT, typename MemberT, typename MemberSampleT>
         void validate_with_master_sample(const MemberT& member, const PropT& prop, const OpT& op, const MemberSampleT& member_sample, const T2& b)
         {
-            base_type::validate_with_master_sample(make_member(member),prop,op,member_sample,b);
+            base_type::validate_with_master_sample(as_member(member),prop,op,member_sample,b);
         }
 
     private:
 
         template <typename MemberT>
-        auto make_member(const MemberT& member)
+        auto as_member(const MemberT& member)
         {
             return member.make_super(_obj);
         }
