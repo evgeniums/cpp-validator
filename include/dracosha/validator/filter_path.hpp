@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/conditional_fold.hpp>
 #include <dracosha/validator/check_member_path.hpp>
+#include <dracosha/validator/member_path.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -90,38 +91,38 @@ class filter_path_traits : public BaseTraitsT,
 {
     public:
 
-        template <typename BaseTraitsT>
+        template <typename BaseTraitsT1>
         filter_path_traits(
-                BaseTraitsT&& traits,
+                BaseTraitsT1&& traits,
                 IncludePathsT include_paths,
                 ExcludePathsT exclude_paths
             )
-            : BaseTraitsT(std::forward<BaseTraitsT>(traits)),
+            : BaseTraitsT(std::forward<BaseTraitsT1>(traits)),
               _include_paths(std::move(include_paths)),
               _exclude_paths(std::move(exclude_paths))
         {
         }
 
-        template <typename BaseTraitsT>
+        template <typename BaseTraitsT1>
         filter_path_traits(
-                BaseTraitsT&& traits,
+                BaseTraitsT1&& traits,
                 IncludePathsT include_paths
             )
             : filter_path_traits(
-                  std::forward<BaseTraitsT>(traits),
+                  std::forward<BaseTraitsT1>(traits),
                   std::move(include_paths),
                   ExcludePathsT()
               )
         {
         }
 
-        template <typename BaseTraitsT>
+        template <typename BaseTraitsT1>
         filter_path_traits(
-                BaseTraitsT&& traits,
+                BaseTraitsT1&& traits,
                 ExcludePathsT exclude_paths
             )
             : filter_path_traits(
-                  std::forward<BaseTraitsT>(traits),
+                  std::forward<BaseTraitsT1>(traits),
                   IncludePathsT(),
                   std::move(exclude_paths)
               )
@@ -165,7 +166,7 @@ struct filter_path_t
 constexpr filter_path_t filter_path{};
 
 template <typename AdapterT, typename PathsT>
-auto include_paths(AdapterT&& adapter, PathsT&& paths)
+auto include_paths(AdapterT adapter, PathsT&& paths)
 {
     auto create=[&](auto&& traits)
     {
@@ -178,7 +179,7 @@ auto include_paths(AdapterT&& adapter, PathsT&& paths)
 }
 
 template <typename AdapterT, typename PathsT>
-auto exclude_paths(AdapterT&& adapter, PathsT&& paths)
+auto exclude_paths(AdapterT adapter, PathsT&& paths)
 {
     auto create=[&](auto&& traits)
     {
@@ -191,7 +192,7 @@ auto exclude_paths(AdapterT&& adapter, PathsT&& paths)
 }
 
 template <typename AdapterT, typename InPathsT, typename ExPathsT>
-auto include_and_exclude_paths(AdapterT&& adapter, InPathsT&& in_paths, ExPathsT&& ex_paths)
+auto include_and_exclude_paths(AdapterT adapter, InPathsT&& in_paths, ExPathsT&& ex_paths)
 {
     auto create=[&](auto&& traits)
     {
@@ -203,16 +204,6 @@ auto include_and_exclude_paths(AdapterT&& adapter, InPathsT&& in_paths, ExPathsT
     };
     return adapter.derive(create);
 }
-
-struct member_path_list_t
-{
-    template <typename ...Args>
-    constexpr auto operator () (Args&&... args) const
-    {
-        return hana::transform(hana::make_tuple(std::forward<Args>(args)...),member_path);
-    }
-};
-constexpr member_path_list_t member_path_list{};
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 

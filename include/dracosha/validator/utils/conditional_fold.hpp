@@ -55,7 +55,7 @@ struct conditional_fold_t
     {
         auto front=hana::front(foldable);
         auto new_prefix=hana::append(std::forward<PrefixT>(pfx),front);
-        StateT res=fn(state,new_prefix);
+        std::decay_t<StateT> res=fn(state,new_prefix);
         if (!pred(res))
         {
             return res;

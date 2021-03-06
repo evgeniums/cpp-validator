@@ -647,31 +647,6 @@ auto member_helper_t<Args...>::operator ()
 
 }
 
-/**
-* @brief Extract path from a member.
-* @param member Member.
-* @return Member's path.
-*/
-struct member_path_t
-{
-    template <typename MemberT>
-    auto operator () (const MemberT& member) const
-    {
-        return hana::eval_if(
-            hana::is_a<member_tag,MemberT>,
-            [&](auto&& _)
-            {
-                return _(member).path();
-            },
-            [&](auto&& _)
-            {
-                return hana::make_tuple(_(member));
-            }
-        );
-    }
-};
-constexpr member_path_t member_path{};
-
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

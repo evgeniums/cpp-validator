@@ -54,18 +54,48 @@ class adapter : public check_member_exists_traits_proxy<TraitsT>
          * @brief Conctructor.
          * @param args Arguments for forwarding to traits.
          */
-        template <typename ...Args>
-        adapter(Args&&... args)
-            : _traits(std::forward<Args>(args)...)
+        // GCC can not select copy constructor if there is also matching template constructor
+        template <typename T1>
+        adapter(T1&& v, std::enable_if_t<!hana::is_a<adapter_tag,T1>,void*> =nullptr)
+            : _traits(std::forward<T1>(v))
         {
             this->set_traits(&_traits);
         }
 
-        adapter(TraitsT traits)
-            : _traits(std::move(traits))
+        template <typename T1, typename T2, typename ...Args>
+        adapter(T1&& v1, T2&& v2, Args&&... args)
+            : _traits(std::forward<T1>(v1),std::forward<T2>(v2),std::forward<Args>(args)...)
         {
             this->set_traits(&_traits);
         }
+
+        adapter(adapter&& other)
+            : _traits(std::move(other._traits))
+        {
+            this->set_traits(&_traits);
+        }
+
+        adapter(const adapter& other)
+            : _traits(other._traits)
+        {
+            this->set_traits(&_traits);
+        }
+
+        adapter(TraitsT&& other)
+            : _traits(std::move(other))
+        {
+            this->set_traits(&_traits);
+        }
+
+        adapter(const TraitsT& other)
+            : _traits(other)
+        {
+            this->set_traits(&_traits);
+        }
+
+        ~adapter()=default;
+        adapter& operator = (adapter&& other)=default;
+        adapter& operator = (const adapter& other)=default;
 
         //! @todo Move traits to private section, implement wrapping methods.
 
