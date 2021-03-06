@@ -159,6 +159,13 @@ class validator_with_member_t
             return apply_member(ensure_adapter(std::forward<AdapterT>(adpt)),_prepared_validator,_member);
         }
 
+        template <typename AdapterT, typename SuperMemberT>
+        auto apply(AdapterT&& adpt, SuperMemberT&& super) const
+        {
+            return apply_member(ensure_adapter(std::forward<AdapterT>(adpt)),_prepared_validator,
+                                _member.prepend_super_member(std::forward<SuperMemberT>(super)));
+        }
+
         /**
          * @brief Create validator with hint.
          * @param h Hint.

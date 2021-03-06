@@ -24,6 +24,7 @@ SET (VALIDATOR_TEST_SOURCES
     ${VALIDATOR_TEST_SRC}/testclearvalidated.cpp
     ${VALIDATOR_TEST_SRC}/testnestedallany.cpp
     ${VALIDATOR_TEST_SRC}/testpartialpaths.cpp
+    ${VALIDATOR_TEST_SRC}/testnestedvalidators.cpp
 )
 
 TARGET_SOURCES(${PROJECT_NAME} PUBLIC ${VALIDATOR_TEST_SOURCES})

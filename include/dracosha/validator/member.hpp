@@ -409,6 +409,13 @@ class member
             return member<T,stype,ParentPathT...>(hana::prepend(_path,stype(std::forward<KeyT>(first_key))));
         }
 
+        template <typename SuperMemberT>
+        auto prepend_super_member(SuperMemberT&& super) const
+        {
+            auto new_path=hana::concat(super.path(),_path);
+            return make_member(std::move(new_path));
+        }
+
         /**
          * @brief Get the last key in the path corresponding to the member at current level.
          * @return Key of current member.
@@ -476,6 +483,8 @@ struct member_with_name_tag{};
 
 /**
  * @brief Member with excplicit name.
+ *
+ * @todo Test named members with element aggregations and nested validators.
  */
 template <typename T1, typename T2, typename ...ParentPathT>
 struct member_with_name : public member<T2,ParentPathT...>,
