@@ -72,7 +72,7 @@ struct member_helper_1arg_t<T1,
     template <typename MemberT>
     auto operator() (MemberT&& member, T1&& v) const
     {
-        return make_validator(hana::reverse_partial(apply_member,std::forward<T1>(v),std::forward<MemberT>(member)));
+        return make_member_validator(std::forward<MemberT>(member),std::forward<T1>(v));
     }
 };
 
@@ -517,7 +517,7 @@ struct member_with_name : public member<T2,ParentPathT...>,
     template <typename Tt1>
     constexpr auto operator () (Tt1&& v) const -> decltype(auto)
     {
-        return make_validator(hana::reverse_partial(apply_member,std::forward<Tt1>(v),*this));
+        return make_member_validator(*this,std::forward<Tt1>(v));
     }
 
     /**

@@ -32,38 +32,24 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct validator_tag;
 
-/**
- * @brief Validator with hint.
- *
- * Validator holds the validating executer and invokes apply() method to perform validation
- * using embedded executor.
- * Before and after validation validator calls hint_before() and hint_after() methods of adapter respectively.
- */
-template <typename Handler, typename HintT>
-class validator_with_hint_t
+template <typename ValidatorT, typename HintT>
+class validator_with_hint_t : public ValidatorT
 {
     public:
 
-        using hana_tag=validator_tag;
         using hint_type=typename adjust_storable_type<HintT>::type;
 
-        /**
-         * @brief Constructor.
-         * @param fn Validation handler that will be called to perform validating.
-         */
-        template <typename HintT1>
-        validator_with_hint_t(
-                Handler fn,
-                HintT1&& hint
-            ) : _fn(std::move(fn)),
-                _hint(std::forward<HintT1>(hint))
+        template <typename HintT1, typename ... Args>
+        validator_with_hint_t(HintT1&& hint, Args&&... args)
+            : ValidatorT(std::forward<Args>(args)...),
+              _hint(std::forward<HintT1>(hint))
         {
         }
 
         /**
-         * @brief Invoke validating with supplied args and override reporting description with ecplicit description.
-         * @param a Adapter.
-         * @param args Arguments to forward to embedded executor.
+         * @brief Apply validation to adapter.
+         * @param a Adapter or object to validate.
+         * @param args Arguments to pass for validation.
          * @return Validation status.
          */
         template <typename AdapterT, typename ... Args>
@@ -76,13 +62,12 @@ class validator_with_hint_t
             {
                 return adpt.hint_after(adpt,ret,_hint);
             }
-            ret=_fn(adpt,std::forward<Args>(args)...);
+            ret=ValidatorT::apply(adpt,std::forward<Args>(args)...);
             return adpt.hint_after(adpt,ret,_hint);
         }
 
     private:
 
-        Handler _fn;
         hint_type _hint;
 };
 
@@ -92,7 +77,7 @@ class validator_with_hint_t
  * Validator holds the validating executer and invokes apply() method to perform validation
  * using embedded executor.
  */
-template <typename Handler>
+template <typename HandlerT>
 class validator_t
 {
     public:
@@ -101,15 +86,15 @@ class validator_t
 
         /**
          * @brief Construtor
-         * @param fn Validation handler that will be called to perform validating.
+         * @param fn Validation HandlerT that will be called to perform validating.
          */
-        validator_t(Handler fn):_fn(std::move(fn))
+        validator_t(HandlerT fn):_fn(std::move(fn))
         {
         }
 
         /**
          * @brief Invoke validating with supplied args.
-         * @param adpt Adapter.
+         * @param adpt Adapter or object to validate.
          * @param args Arguments to forward to embedded executor.
          * @return Validation status.
          */
@@ -123,17 +108,21 @@ class validator_t
          * @brief Create validator with hint.
          * @param h Hint.
          * @return Validator with hint.
+         *
+         * This object becomes invalid as it is moved to new validator.
          */
         template <typename T>
         auto hint(T&& h)
         {
-            return validator_with_hint_t<Handler,T>(std::move(_fn),std::forward<T>(h));
+            return validator_with_hint_t<validator_t<HandlerT>,T>(std::forward<T>(h),std::move(_fn));
         }
 
         /**
          * @brief Create validator with hint.
          * @param h Hint.
          * @return Validator with hint.
+         *
+         * This object becomes invalid as it is moved to new validator.
          */
         template <typename T>
         auto operator () (T&& h)
@@ -143,7 +132,66 @@ class validator_t
 
     private:
 
-        Handler _fn;
+        HandlerT _fn;
+};
+
+template <typename MemberT, typename ValidatorT>
+class validator_with_member_t
+{
+    public:
+
+        using hana_tag=validator_tag;
+
+        validator_with_member_t(MemberT member, ValidatorT v)
+            : _member(std::move(member)),
+              _prepared_validator(std::move(v))
+        {
+        }
+
+        /**
+         * @brief Apply validation to adapter.
+         * @param adpt Adapter or object to validate.
+         * @return Validation status.
+         */
+        template <typename AdapterT>
+        auto apply(AdapterT&& adpt) const
+        {
+            return apply_member(ensure_adapter(std::forward<AdapterT>(adpt)),_prepared_validator,_member);
+        }
+
+        /**
+         * @brief Create validator with hint.
+         * @param h Hint.
+         * @return Validator with hint.
+         *
+         * This object becomes invalid as it is moved to new validator.
+         */
+        template <typename T>
+        auto hint(T&& h)
+        {
+            return validator_with_hint_t<validator_with_member_t<MemberT,ValidatorT>,T>(std::forward<T>(h),
+                                                                            std::move(_member),
+                                                                            std::move(_prepared_validator)
+                                                                            );
+        }
+
+        /**
+         * @brief Create validator with hint.
+         * @param h Hint.
+         * @return Validator with hint.
+         *
+         * This object becomes invalid as it is moved to new validator.
+         */
+        template <typename T>
+        auto operator () (T&& h)
+        {
+            return hint(std::forward<T>(h));
+        }
+
+    private:
+
+        MemberT _member;
+        ValidatorT _prepared_validator;
 };
 
 //-------------------------------------------------------------

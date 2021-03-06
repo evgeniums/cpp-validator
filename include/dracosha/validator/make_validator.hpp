@@ -37,6 +37,19 @@ auto make_validator(T fn)
 }
 
 /**
+  @brief Create member validator instance.
+  @param fn Validation handler that will be embedded into validator instance.
+*/
+template <typename MemberT, typename ValidatorT>
+auto make_member_validator(MemberT member, ValidatorT&& v)
+{
+    return validator_with_member_t<std::decay_t<MemberT>,std::decay_t<ValidatorT>>(
+        std::forward<MemberT>(member),
+        std::forward<ValidatorT>(v)
+    );
+}
+
+/**
   @brief Create validator instance on heap.
   @param fn Validation handler that will be embedded into validator instance.
 */
