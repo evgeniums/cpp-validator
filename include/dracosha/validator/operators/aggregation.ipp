@@ -53,7 +53,7 @@ struct aggregate_report<AdapterT,
     {
         auto& reporter=adapter.traits().reporter();
         hana::eval_if(
-            hana::equal(hana::size(path),hana::size_c<0>),
+            hana::is_empty(path),
             [&](auto&&)
             {
                 reporter.aggregate_open(str);

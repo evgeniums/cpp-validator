@@ -67,7 +67,7 @@ class adapter : public check_member_exists_traits_proxy<TraitsT>
          * @brief Get traits.
          * @return Reference to traits.
          */
-        TraitsT& traits()
+        TraitsT& traits() noexcept
         {
             return _traits;
         }
@@ -76,9 +76,15 @@ class adapter : public check_member_exists_traits_proxy<TraitsT>
          * @brief Get constant traits.
          * @return Const reference to traits.
          */
-        const TraitsT& traits() const
+        const TraitsT& traits() const noexcept
         {
             return _traits;
+        }
+
+        template <typename T>
+        auto derive(T&& creator)
+        {
+            return creator(std::move(_traits));
         }
 
         template <typename AdapterT, typename T2, typename PathT>

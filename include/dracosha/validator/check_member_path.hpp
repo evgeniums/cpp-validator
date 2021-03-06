@@ -62,17 +62,11 @@ struct path_types_equal_t
 };
 constexpr path_types_equal_t path_types_equal{};
 
-/**
-  * @brief Check if members have paths of the same types.
-  * @param member1 First member.
-  * @param Second member.
-  * @return Result of check operation.
-  */
-template <typename Tm1, typename Tm2>
-auto check_member_path_types(const Tm1& member1,const Tm2& member2)
+template <typename T1, typename T2>
+auto check_path_types(const T1& path1,const T2& path2)
 {
-    auto path1_c=hana::transform(member1.path(),extract_object_wrapper_type_c);
-    auto path2_c=hana::transform(member2.path(),extract_object_wrapper_type_c);
+    auto path1_c=hana::transform(path1,extract_object_wrapper_type_c);
+    auto path2_c=hana::transform(path2,extract_object_wrapper_type_c);
 
     return hana::eval_if(
         hana::not_equal(hana::size(path1_c),hana::size(path2_c)),
@@ -97,6 +91,46 @@ auto check_member_path_types(const Tm1& member1,const Tm2& member2)
                     );
                 }
             );
+        }
+    );
+}
+
+/**
+  * @brief Check if members have paths of the same types.
+  * @param member1 First member.
+  * @param Second member.
+  * @return Result of check operation.
+  */
+template <typename Tm1, typename Tm2>
+auto check_member_path_types(const Tm1& member1,const Tm2& member2)
+{
+    return check_path_types(member1.path(),member2.path());
+}
+
+
+template <typename T1, typename T2>
+bool check_paths_equal(const T1& path1, const T2& path2)
+{
+    return hana::eval_if(
+        check_path_types(path1,path2),
+        [&](auto&& _)
+        {
+            auto pairs=hana::zip(_(path1),_(path2));
+            return hana::fuse(invoke_and)
+                        (hana::transform(
+                             pairs,
+                             [](auto&& pair)
+                             {
+                                 return [&pair]()
+                                 {
+                                     return safe_compare_equal(extract_object_wrapper(hana::front(pair)),extract_object_wrapper(hana::back(pair)));
+                                 };
+                             }
+                        ));
+        },
+        [&](auto&&)
+        {
+            return false;
         }
     );
 }

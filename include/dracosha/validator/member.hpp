@@ -367,29 +367,7 @@ class member
         template <typename T1>
         bool equals(const T1& other) const
         {
-            const auto& self=*this;
-            return hana::eval_if(
-                check_member_path_types(self,other),
-                [&](auto&& _)
-                {
-                    auto pairs=hana::zip(_(self).path(),_(other).path());
-                    return hana::fuse(invoke_and)
-                                (hana::transform(
-                                     pairs,
-                                     [](auto&& pair)
-                                     {
-                                         return [&pair]()
-                                         {
-                                             return safe_compare_equal(extract_object_wrapper(hana::front(pair)),extract_object_wrapper(hana::back(pair)));
-                                         };
-                                     }
-                                ));
-                },
-                [&](auto&&)
-                {
-                    return false;
-                }
-            );
+            return check_paths_equal(_path,other.path());
         }
 
         /**
