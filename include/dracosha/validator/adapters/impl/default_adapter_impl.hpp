@@ -27,25 +27,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/apply.hpp>
 #include <dracosha/validator/utils/is_container.hpp>
 #include <dracosha/validator/utils/wrap_it.hpp>
-#include <dracosha/validator/utils/invoke_and.hpp>
-#include <dracosha/validator/utils/invoke_or.hpp>
+#include <dracosha/validator/utils/conditional_fold.hpp>
+
 #include <dracosha/validator/operators/exists.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
-
-//-------------------------------------------------------------
-
-/**
- * @brief Traits to use with inverse_or_configurable in OR aggregations.
- */
-struct invoke_or_validator_traits
-{
-    template <typename T>
-    static bool check(T&& ret) noexcept
-    {
-        return ret.value()==status::code::success;
-    }
-};
 
 //-------------------------------------------------------------
 /**
@@ -202,39 +188,47 @@ struct default_adapter_impl
         )(member.path());
     }
 
+    template <typename PredicateT, typename AdapterT, typename OpsT>
+    static status validate_aggregation(const PredicateT& pred, AdapterT&& adpt, OpsT&& ops)
+    {
+        return while_each(
+                              ops,
+                              pred,
+                              status(status::code::ignore),
+                              [&adpt](auto&& op)
+                              {
+                                return status(apply(std::forward<AdapterT>(adpt),std::forward<decltype(op)>(op)));
+                              }
+                          );
+    }
+
+    template <typename PredicateT, typename AdapterT, typename OpsT, typename MemberT>
+    static status validate_member_aggregation(const PredicateT& pred, AdapterT&& adpt, MemberT&& member, OpsT&& ops)
+    {
+        return while_each(
+                              ops,
+                              pred,
+                              status(status::code::ignore),
+                              [&member,&adpt](auto&& op)
+                              {
+                                return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+                              }
+                          );
+    }
+
     /**
      * @brief Validate AND aggregation.
      */
     template <typename AdapterT, typename OpsT>
     static status validate_and(AdapterT&& adpt, OpsT&& ops)
     {
-        return hana::fuse(invoke_and)
-                    (hana::transform(
-                         ops,
-                         [&adpt](auto&& op)
-                         {
-                             return [&adpt,&op]()
-                             {
-                                 return status(apply(std::forward<AdapterT>(adpt),std::forward<decltype(op)>(op)));
-                             };
-                         }
-                    ));
+        return validate_aggregation(predicate_and,std::forward<AdapterT>(adpt),std::forward<OpsT>(ops));
     }
 
     template <typename AdapterT, typename MemberT, typename OpsT>
     static status validate_member_and(AdapterT&& adpt, MemberT&& member, OpsT&& ops)
     {
-        return hana::fuse(invoke_and)
-                    (hana::transform(
-                         ops,
-                         [&member,&adpt](auto&& op)
-                         {
-                             return [&member,&adpt,&op]()
-                             {
-                                 return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
-                             };
-                         }
-                    ));
+        return validate_member_aggregation(predicate_and,std::forward<AdapterT>(adpt),std::forward<MemberT>(member),std::forward<OpsT>(ops));
     }
 
     /**
@@ -271,39 +265,13 @@ struct default_adapter_impl
     template <typename AdapterT, typename OpsT>
     static status validate_or(AdapterT&& adpt, OpsT&& ops)
     {
-        auto ok=hana::value(hana::length(ops))==0
-                ||
-                hana::fuse(invoke_or_configurable<invoke_or_validator_traits>)
-                            (hana::transform(
-                                 ops,
-                                 [&adpt](auto&& op)
-                                 {
-                                     return [&adpt,&op]()
-                                     {
-                                         return status(apply(std::forward<AdapterT>(adpt),std::forward<decltype(op)>(op)));
-                                     };
-                                 }
-                            ))
-                ;
-        return ok;
+        return validate_aggregation(status_predicate_or,std::forward<AdapterT>(adpt),std::forward<OpsT>(ops));
     }
 
     template <typename AdapterT, typename MemberT, typename OpsT>
     static status validate_member_or(AdapterT&& adpt, MemberT&& member, OpsT&& ops)
     {
-        return hana::value(hana::length(ops))==0
-                ||
-                hana::fuse(invoke_or_configurable<invoke_or_validator_traits>)
-                (hana::transform(
-                     ops,
-                     [&member,&adpt](auto&& op)
-                     {
-                         return [&member,&adpt,&op]()
-                         {
-                             return status(apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
-                         };
-                     }
-                ));
+        return validate_member_aggregation(status_predicate_or,std::forward<AdapterT>(adpt),std::forward<MemberT>(member),std::forward<OpsT>(ops));
     }
 
     /**

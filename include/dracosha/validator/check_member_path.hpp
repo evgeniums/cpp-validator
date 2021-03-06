@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/check_member.hpp>
 #include <dracosha/validator/utils/extract_object_wrapper.hpp>
 #include <dracosha/validator/utils/safe_compare.hpp>
+#include <dracosha/validator/utils/conditional_fold.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -116,17 +117,15 @@ bool check_paths_equal(const T1& path1, const T2& path2)
         [&](auto&& _)
         {
             auto pairs=hana::zip(_(path1),_(path2));
-            return hana::fuse(invoke_and)
-                        (hana::transform(
-                             pairs,
-                             [](auto&& pair)
-                             {
-                                 return [&pair]()
-                                 {
-                                     return safe_compare_equal(extract_object_wrapper(hana::front(pair)),extract_object_wrapper(hana::back(pair)));
-                                 };
-                             }
-                        ));
+            return while_each(
+                                  pairs,
+                                  predicate_and,
+                                  true,
+                                  [](auto&& pair)
+                                  {
+                                    return safe_compare_equal(extract_object_wrapper(hana::front(pair)),extract_object_wrapper(hana::back(pair)));
+                                  }
+                              );
         },
         [&](auto&&)
         {

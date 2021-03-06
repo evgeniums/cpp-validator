@@ -7,6 +7,7 @@
 #include <dracosha/validator/utils/make_types_tuple.hpp>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/utils/make_object_wrapper.hpp>
+#include <dracosha/validator/utils/conditional_fold.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -802,5 +803,42 @@ BOOST_AUTO_TEST_CASE(CheckMemberHelper)
     auto v=_["field1"](gte,100);
     BOOST_CHECK(true);
 }
+
+BOOST_AUTO_TEST_CASE(CheckWhileEachOrStatus)
+{
+    auto ok1=while_each(
+                    hana::make_tuple(status::code::ignore,status::code::success),
+                    status_predicate_or,
+                    status(status::code::ignore),
+                    [](status st)
+                    {
+                        return status(st);
+                    }
+                );
+    BOOST_CHECK(ok1==true);
+
+    auto ok2=while_each(
+                    hana::make_tuple(status::code::ignore,status::code::fail),
+                    status_predicate_or,
+                    status(status::code::ignore),
+                    [](status st)
+                    {
+                        return status(st);
+                    }
+                );
+    BOOST_CHECK(ok2==false);
+
+    auto ok3=while_each(
+                    hana::make_tuple(status::code::ignore,status::code::fail,status::code::success),
+                    status_predicate_or,
+                    status(status::code::ignore),
+                    [](status st)
+                    {
+                        return status(st);
+                    }
+                );
+    BOOST_CHECK(ok3==true);
+}
+
 #endif
 BOOST_AUTO_TEST_SUITE_END()

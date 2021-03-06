@@ -86,6 +86,15 @@ class status
         code _code;
 };
 
+struct status_predicate_or_t
+{
+    bool operator() (const status& v) const
+    {
+        return v.value()!=status::code::success;
+    }
+};
+constexpr status_predicate_or_t status_predicate_or{};
+
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
