@@ -68,18 +68,18 @@ struct has_path_t
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& path_ts, const T2& path) const
     {
-        return hana::fold(
+        return while_each(
             path_ts,
+            predicate_or,
             false,
-            [](bool has, auto&& current_path)
+            [&](auto&& current_path)
             {
-                return has || path_starts_with(path,current_path);
+                return path_starts_with(path,current_path);
             }
         );
     }
 };
 constexpr has_path_t has_path{};
-
 
 template <typename BaseTraitsT,
           typename IncludePathsT,
@@ -96,7 +96,7 @@ class filter_path_traits : public BaseTraitsT,
                 IncludePathsT include_paths,
                 ExcludePathsT exclude_paths
             )
-            : BaseTraitsT(std::forward<BaseTraitsT1>(traits)),
+            : BaseTraitsT(std::forward<BaseTraitsT>(traits)),
               _include_paths(std::move(include_paths)),
               _exclude_paths(std::move(exclude_paths))
         {
@@ -108,7 +108,7 @@ class filter_path_traits : public BaseTraitsT,
                 IncludePathsT include_paths
             )
             : filter_path_traits(
-                  std::forward<BaseTraitsT1>(traits),
+                  std::forward<BaseTraitsT>(traits),
                   std::move(include_paths),
                   ExcludePathsT()
               )
@@ -118,12 +118,12 @@ class filter_path_traits : public BaseTraitsT,
         template <typename BaseTraitsT>
         filter_path_traits(
                 BaseTraitsT&& traits,
-                ExcludePathsT exlude_paths
+                ExcludePathsT exclude_paths
             )
             : filter_path_traits(
-                  std::forward<BaseTraitsT1>(traits),
+                  std::forward<BaseTraitsT>(traits),
                   IncludePathsT(),
-                  _exclude_paths(std::move(exclude_paths))
+                  std::move(exclude_paths)
               )
         {
         }
@@ -164,45 +164,55 @@ struct filter_path_t
 };
 constexpr filter_path_t filter_path{};
 
-template <typename AdapterT, typename IncludePathsT>
-auto include_paths(AdapterT&& adapter, IncludePathsT&& include_paths)
+template <typename AdapterT, typename PathsT>
+auto include_paths(AdapterT&& adapter, PathsT&& paths)
 {
     auto create=[&](auto&& traits)
     {
-        return filter_path_traits<std::decay_t<decltype(traits)>,std::decay_t<IncludePathsT>,std::tuple<>>{
+        return filter_path_traits<std::decay_t<decltype(traits)>,std::decay_t<PathsT>,std::tuple<>>{
             std::move(traits),
-            std::forward<IncludePathsT>(include_paths)
+            std::forward<PathsT>(paths)
         };
     };
     return adapter.derive(create);
 }
 
-template <typename AdapterT, typename ExcludePathsT>
-auto exclude_paths(AdapterT&& adapter, ExcludePathsT&& exclude_paths)
+template <typename AdapterT, typename PathsT>
+auto exclude_paths(AdapterT&& adapter, PathsT&& paths)
 {
     auto create=[&](auto&& traits)
     {
-        return filter_path_traits<std::decay_t<AdapterT>,std::tuple<>,std::decay_t<ExcludePathsT>>{
+        return filter_path_traits<std::decay_t<decltype(traits)>,std::tuple<>,std::decay_t<PathsT>>{
             std::move(traits),
-            std::forward<ExcludePathsT>(exclude_paths)
+            std::forward<PathsT>(paths)
         };
     };
     return adapter.derive(create);
 }
 
-template <typename AdapterT, typename IncludePathsT, typename ExcludePathsT>
-auto include_and_exclude_paths(AdapterT&& adapter, ExcludePathsT&& exclude_paths)
+template <typename AdapterT, typename InPathsT, typename ExPathsT>
+auto include_and_exclude_paths(AdapterT&& adapter, InPathsT&& in_paths, ExPathsT&& ex_paths)
 {
     auto create=[&](auto&& traits)
     {
-        return filter_path_traits<std::decay_t<AdapterT>,std::decay_t<IncludePathsT>,std::decay_t<ExcludePathsT>>{
+        return filter_path_traits<std::decay_t<decltype(traits)>,std::decay_t<InPathsT>,std::decay_t<ExPathsT>>{
             std::move(traits),
-            std::forward<IncludePathsT>(include_paths),
-            std::forward<ExcludePathsT>(exclude_paths)
+            std::forward<InPathsT>(in_paths),
+            std::forward<ExPathsT>(ex_paths)
         };
     };
     return adapter.derive(create);
 }
+
+struct member_path_list_t
+{
+    template <typename ...Args>
+    constexpr auto operator () (Args&&... args) const
+    {
+        return hana::transform(hana::make_tuple(std::forward<Args>(args)...),member_path);
+    }
+};
+constexpr member_path_list_t member_path_list{};
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 

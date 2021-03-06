@@ -51,11 +51,11 @@ struct conditional_fold_t
     }
 
     template <typename PrefixT, typename StateT, typename HandlerT, typename PredicateT>
-    auto prefix(PrefixT&& prefix, const FoldableT& foldable, const PredicateT& pred, StateT&& state, const HandlerT& fn)
+    static auto prefix(PrefixT&& prefix, const FoldableT& foldable, const PredicateT& pred, StateT&& state, const HandlerT& fn)
     {
         auto front=hana::front(foldable);
         auto new_prefix=hana::append(std::forward<PrefixT>(prefix),front);
-        auto res=fn(state,new_prefix);
+        StateT res=fn(state,new_prefix);
         if (!pred(res))
         {
             return res;
@@ -130,7 +130,7 @@ struct while_prefix_t
             {
                 return hana::id(std::forward<InitT>(init));
             },
-            [&](auto&& _)
+            [&](auto&& _) -> InitT
             {
                 if (!pred(init))
                 {
