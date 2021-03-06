@@ -652,26 +652,25 @@ auto member_helper_t<Args...>::operator ()
 * @param member Member.
 * @return Member's path.
 */
-template <typename T>
-auto member_path(T&& member,
-                 std::enable_if_t<hana::is_a<member_tag,T>,void*> =nullptr
-                 ) -> decltype(auto)
+struct member_path_t
 {
-    return member.path();
-}
-
-/**
-* @brief Stub to emulate extracting path for non-members.
-* @param v Value,
-* @return Value wrapped into hana::tuple,
-*/
-template <typename T>
-auto member_path(T&& v,
-                 std::enable_if_t<!hana::is_a<member_tag,T>,void*> =nullptr
-                 )
-{
-    return hana::make_tuple(std::forward<T>(v));
-}
+    template <typename MemberT>
+    auto operator () (const MemberT& member) const
+    {
+        return hana::eval_if(
+            hana::is_a<member_tag,MemberT>,
+            [&](auto&& _)
+            {
+                return _(member).path();
+            },
+            [&](auto&& _)
+            {
+                return hana::make_tuple(_(member));
+            }
+        );
+    }
+};
+constexpr member_path_t member_path{};
 
 //-------------------------------------------------------------
 
