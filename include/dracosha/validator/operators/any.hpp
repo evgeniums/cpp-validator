@@ -99,9 +99,6 @@ struct any_t : public element_aggregation_with_modifier<ModifierT>,
 {
     using type=any_tag;
 
-//    using element_aggregation_with_modifier<ModifierT>::operator ==;
-//    using element_aggregation_with_modifier<ModifierT>::operator !=;
-
     template <typename ... Ops>
     constexpr auto operator() (Ops&&... ops) const
     {
@@ -136,39 +133,6 @@ struct any_t : public element_aggregation_with_modifier<ModifierT>,
     {
         return false;
     }
-
-//    template <typename T>
-//    constexpr friend bool operator == (const any_t<ModifierT>&, const T&) noexcept
-//    {
-//        return true;
-//    }
-//    template <typename T>
-//    constexpr friend bool operator != (const any_t<ModifierT>&, const T&) noexcept
-//    {
-//        return false;
-//    }
-
-//    template <typename Modifier1>
-//    constexpr friend bool operator == (const all_t<Modifier1>&, const any_t<ModifierT>&) noexcept
-//    {
-//        return true;
-//    }
-//    template <typename ModifierT1>
-//    constexpr friend bool operator != (const all_t<ModifierT1>&, const any_t<ModifierT>&) noexcept
-//    {
-//        return false;
-//    }
-
-//    template <typename Modifier1>
-//    constexpr friend bool operator == (const any_t<Modifier1>&, const any_t<ModifierT>&) noexcept
-//    {
-//        return true;
-//    }
-//    template <typename ModifierT1>
-//    constexpr friend bool operator != (const any_t<ModifierT1>&, const any_t<ModifierT>&) noexcept
-//    {
-//        return false;
-//    }
 };
 
 /**

@@ -57,17 +57,6 @@ struct element_aggregation
 
     template <typename PredicateT, typename EmptyFnT, typename StringT, typename PathT, typename AdapterT, typename HandlerT>
     static status invoke(PredicateT&& pred, EmptyFnT&& empt, StringT&& str, PathT&& path, AdapterT&& adapter, HandlerT&& handler);
-
-//    template <typename T>
-//    constexpr bool operator == (T) const noexcept
-//    {
-//        return true;
-//    }
-//    template <typename T>
-//    constexpr bool operator != (T) const noexcept
-//    {
-//        return false;
-//    }
 };
 
 template <typename ModifierT>
