@@ -56,7 +56,8 @@ struct true_if_empty_t
                     },
                     [&](auto&&)
                     {
-                        return false;
+                        // ignore check
+                        return true;
                     }
                 );
             }
