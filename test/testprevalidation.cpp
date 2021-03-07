@@ -465,11 +465,6 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     static_assert(hana::is_a<element_aggregation_tag,decltype(ANY)>,"");
     static_assert(hana::is_a<element_aggregation_tag,decltype(ALL)>,"");
 #endif
-//    int a=extract_object_wrapper_type_c(ANY);
-//    int b=hana::type<decltype(ANY)>{};
-//    static_assert(std::is_same<decltype(extract_object_wrapper_type_c(ANY)),hana::type<std::decay_t<decltype(ANY)>>>::value,"");
-//    static_assert(safe_eq<decltype(ANY),decltype(ALL)>::comparable::value,"");
-//    static_assert(safe_eq<decltype(ANY),decltype(ALL)>::comparable::value,"");
 
     auto eq1=path_types_equal(ANY,ALL);
     static_assert(decltype(eq1)::value,"");
