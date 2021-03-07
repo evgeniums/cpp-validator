@@ -2,7 +2,11 @@ SET (VALIDATOR_TEST_SOURCES
     ${VALIDATOR_TEST_SRC}/testvalidator.cpp
     ${VALIDATOR_TEST_SRC}/testvalidatorimpl.cpp
     ${VALIDATOR_TEST_SRC}/testreporter.cpp
+
     ${VALIDATOR_TEST_SRC}/testreporting.cpp
+    ${VALIDATOR_TEST_SRC}/testreportinghints.cpp
+    ${VALIDATOR_TEST_SRC}/testnomemberreporting.cpp
+
     ${VALIDATOR_TEST_SRC}/testtranslator.cpp
     ${VALIDATOR_TEST_SRC}/testfmtformatter.cpp
     ${VALIDATOR_TEST_SRC}/teststdformatter.cpp
