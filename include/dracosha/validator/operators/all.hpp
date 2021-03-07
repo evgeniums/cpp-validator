@@ -128,35 +128,35 @@ struct all_t : public element_aggregation_with_modifier<ModifierT>,
         return (*this)(value(std::forward<OpT>(op),std::forward<T>(b)));
     }
 
-//    template <typename ModifierT1>
-//    constexpr bool operator == (const all_t<ModifierT1>&) const noexcept
-//    {
-//        return true;
-//    }
-//    template <typename ModifierT1>
-//    constexpr bool operator != (const all_t<ModifierT1>&) const noexcept
-//    {
-//        return false;
-//    }
-
-//    template <typename ModifierT1>
-//    bool operator == (const any_t<ModifierT1>&) const noexcept
-//    {
-//        return true;
-//    }
-//    template <typename ModifierT1>
-//    bool operator != (const any_t<ModifierT1>&) const noexcept
-//    {
-//        return false;
-//    }
-
     template <typename T>
     constexpr friend bool operator == (const T&, const all_t<ModifierT>&) noexcept
     {
         return true;
     }
-    template <typename T, typename ModifierT1>
+    template <typename T>
     constexpr friend bool operator != (const T&, const all_t<ModifierT>&) noexcept
+    {
+        return false;
+    }
+
+    template <typename Modifier1>
+    constexpr friend bool operator == (const any_t<Modifier1>&, const all_t<ModifierT>&) noexcept
+    {
+        return true;
+    }
+    template <typename ModifierT1>
+    constexpr friend bool operator != (const any_t<ModifierT1>&, const all_t<ModifierT>&) noexcept
+    {
+        return false;
+    }
+
+    template <typename Modifier1>
+    constexpr friend bool operator == (const all_t<Modifier1>&, const all_t<ModifierT>&) noexcept
+    {
+        return true;
+    }
+    template <typename ModifierT1>
+    constexpr friend bool operator != (const all_t<ModifierT1>&, const all_t<ModifierT>&) noexcept
     {
         return false;
     }

@@ -87,9 +87,9 @@ constexpr auto all_t<ModifierT>::operator() (OpT&& op) const
 {
     return hana::eval_if(
         hana::is_a<element_aggregation_modifier_tag,OpT>,
-        [&](auto&& _)
+        [&](auto&&)
         {
-            return all_t<std::decay_t<decltype(_(op))>>{};
+            return all_t<std::decay_t<OpT>>{};
         },
         [&](auto&& _)
         {
@@ -109,9 +109,9 @@ constexpr auto any_t<ModifierT>::operator() (OpT&& op) const
 {
     return hana::eval_if(
         hana::is_a<element_aggregation_modifier_tag,OpT>,
-        [&](auto&& _)
+        [&](auto&&)
         {
-            return any_t<std::decay_t<decltype(_(op))>>{};
+            return any_t<std::decay_t<OpT>>{};
         },
         [&](auto&& _)
         {

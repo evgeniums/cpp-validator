@@ -363,7 +363,12 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     rep1.clear();
 
     BOOST_CHECK(safe_compare_equal(ALL,ALL));
+    BOOST_CHECK(safe_compare_equal(ANY,ANY));
     BOOST_CHECK(safe_compare_equal(ALL,ANY));
+    BOOST_CHECK(safe_compare_equal(ANY,ALL));
+
+    BOOST_CHECK(ALL==ALL);
+    BOOST_CHECK(ANY==ANY);
     BOOST_CHECK(ALL==ANY);
     BOOST_CHECK(ANY==ALL);
 
