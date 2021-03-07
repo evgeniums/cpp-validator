@@ -462,4 +462,157 @@ BOOST_AUTO_TEST_CASE(TestMixedAgrregations)
     }};
     BOOST_CHECK(v1.apply(m2));
 }
+
+BOOST_AUTO_TEST_CASE(TestAllMap)
+{
+    auto v1=validator(
+        _[ALL](gte,"value")
+    );
+
+    std::map<std::string,std::string> m1{
+        {"key1","value1"},
+        {"key2","value2"},
+        {"key3","value3"}
+    };
+    BOOST_CHECK(v1.apply(m1));
+
+    std::map<std::string,std::string> m2{
+        {"key1","val1"},
+        {"key2","val2"},
+        {"key3","val3"}
+    };
+    BOOST_CHECK(!v1.apply(m2));
+
+    std::set<std::string> s3{
+        "value1",
+        "value2",
+        "value3"
+    };
+    BOOST_CHECK(v1.apply(s3));
+
+    std::set<std::string> s4{
+        "val1",
+        "val2",
+        "val3"
+    };
+    BOOST_CHECK(!v1.apply(s4));
+}
+
+BOOST_AUTO_TEST_CASE(TestPair)
+{
+    auto v1=validator(
+        _[first](gt,"key")
+    );
+    auto p1=std::make_pair("key1","value1");
+    BOOST_CHECK(v1.apply(p1));
+    auto p2=std::make_pair(std::string("key"),std::string("value1"));
+    BOOST_CHECK(!v1.apply(p2));
+}
+
+BOOST_AUTO_TEST_CASE(TestAllWithModifiers)
+{
+    std::map<std::string,std::string> m1{
+        {"key1","value1"},
+        {"key2","value2"},
+        {"key3","value3"}
+    };
+    std::map<std::string,std::string> m2{
+        {"key1","val1"},
+        {"key2","val2"},
+        {"key","val3"}
+    };
+
+    auto v1=validator(
+        _[ALL(keys)](gt,"key")
+    );
+    BOOST_CHECK(v1.apply(m1));
+    BOOST_CHECK(!v1.apply(m2));
+
+    auto v2=validator(
+        _[ALL(values)](gt,"value")
+    );
+    BOOST_CHECK(v2.apply(m1));
+    BOOST_CHECK(!v2.apply(m2));
+
+    static_assert(decltype(is_element_aggregation(hana::true_{},_[ALL(iterators)].key()))::value,"");
+    static_assert(decltype(_[ALL(iterators)][second])::is_aggregated::value,"");
+    BOOST_CHECK(check_member_path(m1,_[ALL(iterators)].path()));
+
+    auto v3=validator(
+        _[ALL(iterators)](second(gt,"value"))
+    );
+    BOOST_CHECK(v3.apply(m1));
+    BOOST_CHECK(!v3.apply(m2));
+
+    auto v4=validator(
+        _[ALL(iterators)](first(gt,"key"))
+    );
+    BOOST_CHECK(v4.apply(m1));
+    BOOST_CHECK(!v4.apply(m2));
+
+    static_assert(std::is_base_of<all_tag,decltype(ALL(iterators))>::value,"");
+
+    auto v5=validator(
+        _[ALL(iterators)][first](gt,"key")
+    );
+    BOOST_CHECK(v5.apply(m1));
+    BOOST_CHECK(!v5.apply(m2));
+
+    auto v6=validator(
+        _[ALL(iterators)][second](gt,"value")
+    );
+    BOOST_CHECK(v6.apply(m1));
+    BOOST_CHECK(!v6.apply(m2));
+}
+
+BOOST_AUTO_TEST_CASE(TestAnyWithModifiers)
+{
+    std::map<std::string,std::string> m1{
+        {"key1","value1"},
+        {"key2","value2"},
+        {"key3","value3"}
+    };
+    std::map<std::string,std::string> m2{
+        {"k1","val1"},
+        {"k2","val2"},
+        {"k3","val3"}
+    };
+
+    auto v1=validator(
+        _[ANY(keys)](gt,"key")
+    );
+    BOOST_CHECK(v1.apply(m1));
+    BOOST_CHECK(!v1.apply(m2));
+
+    auto v2=validator(
+        _[ANY(values)](gt,"value")
+    );
+    BOOST_CHECK(v2.apply(m1));
+    BOOST_CHECK(!v2.apply(m2));
+
+    auto v3=validator(
+        _[ANY(iterators)](second(gt,"value"))
+    );
+    BOOST_CHECK(v3.apply(m1));
+    BOOST_CHECK(!v3.apply(m2));
+
+    auto v4=validator(
+        _[ANY(iterators)](first(gt,"key"))
+    );
+    BOOST_CHECK(v4.apply(m1));
+    BOOST_CHECK(!v4.apply(m2));
+
+    auto v5=validator(
+        _[ANY(iterators)][first](gt,"key")
+    );
+    BOOST_CHECK(v5.apply(m1));
+    BOOST_CHECK(!v5.apply(m2));
+
+    auto v6=validator(
+        _[ANY(iterators)][second](gt,"value")
+    );
+    BOOST_CHECK(v6.apply(m1));
+    BOOST_CHECK(!v6.apply(m2));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

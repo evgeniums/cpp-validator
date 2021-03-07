@@ -26,6 +26,7 @@ SET (HEADERS
     include/dracosha/validator/utils/invoke_or.hpp
     include/dracosha/validator/utils/value_as_container.hpp
     include/dracosha/validator/utils/conditional_fold.hpp
+    include/dracosha/validator/utils/to_string.hpp
 
     include/dracosha/validator/property.hpp
     include/dracosha/validator/can_get.hpp
@@ -86,6 +87,7 @@ SET (HEADERS
     include/dracosha/validator/properties/size.hpp
     include/dracosha/validator/properties/length.hpp
     include/dracosha/validator/properties/empty.hpp
+    include/dracosha/validator/properties/pair.hpp
     include/dracosha/validator/properties.hpp
 
     include/dracosha/validator/adapters/adapter.hpp
@@ -151,7 +153,6 @@ SET (HEADERS
     include/dracosha/validator/detail/logical_not.hpp
     include/dracosha/validator/detail/dispatcher_impl.hpp
     include/dracosha/validator/detail/take_address_of.hpp
-    include/dracosha/validator/utils/to_string.hpp
     include/dracosha/validator/detail/formatter_fmt.hpp
     include/dracosha/validator/detail/reorder_and_present.hpp
     include/dracosha/validator/detail/formatter_std.hpp

@@ -57,6 +57,23 @@ struct element_aggregation
 
     template <typename PredicateT, typename EmptyFnT, typename StringT, typename PathT, typename AdapterT, typename HandlerT>
     static status invoke(PredicateT&& pred, EmptyFnT&& empt, StringT&& str, PathT&& path, AdapterT&& adapter, HandlerT&& handler);
+
+    template <typename T>
+    constexpr bool operator == (T) const noexcept
+    {
+        return true;
+    }
+    template <typename T>
+    constexpr bool operator != (T) const noexcept
+    {
+        return false;
+    }
+};
+
+template <typename ModifierT>
+struct element_aggregation_with_modifier : public element_aggregation
+{
+    constexpr static const ModifierT& modifier=ModifierT::instance();
 };
 
 struct is_element_aggregation_t
@@ -76,6 +93,44 @@ struct is_element_aggregation_t
     }
 };
 constexpr is_element_aggregation_t is_element_aggregation{};
+
+struct element_aggregation_modifier_tag;
+
+template <typename DerivedT>
+struct element_aggregation_modifier
+{
+    using hana_tag=element_aggregation_modifier_tag;
+};
+
+struct keys_t : public element_aggregation_modifier<keys_t>
+{
+    constexpr static const keys_t& instance();
+};
+constexpr keys_t keys{};
+constexpr const keys_t& keys_t::instance()
+{
+    return keys;
+}
+
+struct values_t : public element_aggregation_modifier<values_t>
+{
+    constexpr static const values_t& instance();
+};
+constexpr values_t values{};
+constexpr const values_t& values_t::instance()
+{
+    return values;
+}
+
+struct iterators_t : public element_aggregation_modifier<iterators_t>
+{
+    constexpr static const iterators_t& instance();
+};
+constexpr iterators_t iterators{};
+constexpr const iterators_t& iterators_t::instance()
+{
+    return iterators;
+}
 
 //-------------------------------------------------------------
 

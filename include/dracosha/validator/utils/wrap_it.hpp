@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/get_it.hpp>
+#include <dracosha/validator/operators/element_aggregation.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -31,25 +32,44 @@ struct wrap_iterator_tag;
 /**
  * @brief Wrapper of container's iterator paired with explicit name or description.
  */
-template <typename T>
-struct wrap_it_t
+template <typename T, typename AggregationT, typename ModifierT>
+struct wrap_it_t : public AggregationT::type
 {
     using hana_tag=wrap_iterator_tag;
 
-    /**
-      @brief Get value from wrapped iterator.
-      */
-    auto get() -> decltype(auto)
-    {
-        return get_it(_it);
-    }
+    template <typename Ti, typename Ta, typename Tm>
+    wrap_it_t(Ti&& it, Ta&& aggregation, Tm&& modifier)
+            : _it(std::forward<Ti>(it)),
+              _aggregation_type(std::forward<Ta>(aggregation)),
+              _modifier(std::forward<Tm>(modifier))
+    {}
 
     /**
       @brief Get constant value from wrapped iterator.
       */
     auto get() const -> decltype(auto)
     {
-        return get_it(_it);
+        return hana::eval_if(
+            std::is_same<ModifierT,keys_t>{},
+            [&](auto&& _) -> decltype(auto)
+            {
+                return key_it(_(_it));
+            },
+            [&](auto&&) -> decltype(auto)
+            {
+                return hana::eval_if(
+                    std::is_same<ModifierT,iterators_t>{},
+                    [&](auto&& _) -> decltype(auto)
+                    {
+                        return *_(_it);
+                    },
+                    [&](auto&& _) -> decltype(auto)
+                    {
+                        return get_it(_(_it));
+                    }
+                );
+            }
+        );
     }
 
     /**
@@ -58,23 +78,52 @@ struct wrap_it_t
      */
     std::string name() const
     {
-        return _name;
+        return _aggregation_type(_modifier);
     }
 
-    T _it;
-    std::string _name;
+    template <typename T1>
+    constexpr bool operator == (T1) const noexcept
+    {
+        return true;
+    }
+    template <typename T1>
+    constexpr bool operator != (T1) const noexcept
+    {
+        return false;
+    }
+    template <typename T1>
+    constexpr friend bool operator == (const T1&, const wrap_it_t&) noexcept
+    {
+        return true;
+    }
+    template <typename T1>
+    constexpr friend bool operator != (const T1&, const wrap_it_t&) noexcept
+    {
+        return false;
+    }
+
+    private:
+
+        T _it;
+        AggregationT _aggregation_type;
+        ModifierT _modifier;
 };
 
 /**
   @brief Wrap iterator and pair it with explicit name or description.
   @param it Iterator.
   @param aggregation Aggregation descriptor to take iterator name or desctiption from.
+  @paran
   @return Wrapped iterator.
   */
-template <typename Ti, typename Ta>
-auto wrap_it(Ti&& it, Ta&& aggregation)
+template <typename Ti, typename Ta, typename Tm>
+auto wrap_it(Ti&& it, Ta&& aggregation, Tm&& modifier)
 {
-    return wrap_it_t<decltype(it)>{std::forward<decltype(it)>(it),aggregation};
+    return wrap_it_t<std::decay_t<Ti>,std::decay_t<Ta>,std::decay_t<Tm>>{
+        std::forward<Ti>(it),
+        std::forward<Ta>(aggregation),
+        std::forward<Tm>(modifier)
+    };
 }
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

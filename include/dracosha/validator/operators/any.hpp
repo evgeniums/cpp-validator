@@ -29,18 +29,53 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+template <typename ModifierT>
+struct all_t;
+
+struct any_tag
+{
+    template <typename T>
+    constexpr bool operator == (T) const noexcept
+    {
+        return true;
+    }
+    template <typename T>
+    constexpr bool operator != (T) const noexcept
+    {
+        return false;
+    }
+};
+
 /**
  * @brief String descriptions helper for operator ANY.
  */
 struct string_any_t : public aggregate_op<string_any_t>,
                       public enable_to_string<string_any_t>
 {
+    using type=any_tag;
+
     constexpr static const aggregation_id id=aggregation_id::ANY;
     constexpr static const char* open_token="";
     constexpr static const char* close_token="";
     constexpr static const char* conjunction_token="";
 
     constexpr static const char* description="at least one element";
+    constexpr static const char* iterator_description="at least one iterator";
+    constexpr static const char* key_description="at least one key";
+
+    std::string operator() (const values_t&) const
+    {
+        return description;
+    }
+    std::string operator() (const iterators_t&) const
+    {
+        return iterator_description;
+    }
+    std::string operator() (const keys_t&) const
+    {
+        return key_description;
+    }
+
 };
 
 /**
@@ -49,17 +84,23 @@ struct string_any_t : public aggregate_op<string_any_t>,
 constexpr string_any_t string_any{};
 
 //-------------------------------------------------------------
-struct all_t;
+struct any_aggregation_t{};
 
 /**
  * @brief Definition of aggregation pseudo operator ANY to check if any element of a container satisfies condition.
  * @param op Validator to apply to elements of the container.
  * @return Success if any element of the container passed validator.
  */
-struct any_t : public element_aggregation,
-               public enable_to_string<string_any_t>
+template <typename ModifierT>
+struct any_t : public element_aggregation_with_modifier<ModifierT>,
+               public enable_to_string<string_any_t>,
+               public any_tag,
+               public any_aggregation_t
 {
-    using type=any_t;
+    using type=any_tag;
+
+    using element_aggregation_with_modifier<ModifierT>::operator ==;
+    using element_aggregation_with_modifier<ModifierT>::operator !=;
 
     template <typename ... Ops>
     constexpr auto operator() (Ops&&... ops) const
@@ -85,51 +126,95 @@ struct any_t : public element_aggregation,
         return (*this)(value(std::forward<OpT>(op),std::forward<T>(b)));
     }
 
+//    template <typename T>
+//    constexpr bool operator == (T) const noexcept
+//    {
+//        return true;
+//    }
+//    template <typename T>
+//    constexpr bool operator != (T) const noexcept
+//    {
+//        return false;
+//    }
+
+//    template <typename ModifierT1>
+//    constexpr bool operator == (const any_t<ModifierT1>&) const noexcept
+//    {
+//        return true;
+//    }
+//    template <typename ModifierT1>
+//    constexpr bool operator != (const any_t<ModifierT1>&) const noexcept
+//    {
+//        return false;
+//    }
+
+//    template <typename ModifierT1>
+//    constexpr bool operator == (const all_t<ModifierT1>&) const noexcept
+//    {
+//        return true;
+//    }
+//    template <typename ModifierT1>
+//    constexpr bool operator != (const all_t<ModifierT1>&) const noexcept
+//    {
+//        return false;
+//    }
+
     template <typename T>
-    constexpr bool operator == (T) const noexcept
+    constexpr friend bool operator == (const T&, const any_t<ModifierT>&) noexcept
     {
         return true;
     }
     template <typename T>
-    constexpr bool operator != (T) const noexcept
+    constexpr friend bool operator != (const T&, const any_t<ModifierT>&) noexcept
     {
         return false;
     }
 
-    bool operator == (const all_t&) const noexcept
-    {
-        return true;
-    }
-    bool operator != (const all_t&) const noexcept
-    {
-        return false;
-    }
+//    template <typename T>
+//    constexpr bool operator == (T) const noexcept
+//    {
+//        return true;
+//    }
+//    template <typename T>
+//    constexpr bool operator != (T) const noexcept
+//    {
+//        return false;
+//    }
 
-    bool operator == (const any_t&) const noexcept
-    {
-        return true;
-    }
-    bool operator != (const any_t&) const noexcept
-    {
-        return false;
-    }
+//    bool operator == (const all_t&) const noexcept
+//    {
+//        return true;
+//    }
+//    bool operator != (const all_t&) const noexcept
+//    {
+//        return false;
+//    }
 
-    template <typename T>
-    constexpr friend bool operator == (T, const any_t&) noexcept
-    {
-        return true;
-    }
-    template <typename T>
-    constexpr friend bool operator != (T, const any_t&) noexcept
-    {
-        return false;
-    }
+//    bool operator == (const any_t&) const noexcept
+//    {
+//        return true;
+//    }
+//    bool operator != (const any_t&) const noexcept
+//    {
+//        return false;
+//    }
+
+//    template <typename T>
+//    constexpr friend bool operator == (T, const any_t&) noexcept
+//    {
+//        return true;
+//    }
+//    template <typename T>
+//    constexpr friend bool operator != (T, const any_t&) noexcept
+//    {
+//        return false;
+//    }
 };
 
 /**
   @brief Aggregation operator ANY that requires for at least one of container elements to satisfy a condition.
 */
-constexpr any_t ANY{};
+constexpr any_t<decltype(values)> ANY{};
 
 //-------------------------------------------------------------
 
@@ -156,7 +241,7 @@ struct check_strict_any<AdapterT,
 };
 
 template <typename KeyT>
-struct generate_paths_t<KeyT,hana::when<std::is_same<any_t,std::decay_t<KeyT>>::value>>
+struct generate_paths_t<KeyT,hana::when<std::is_base_of<any_aggregation_t,std::decay_t<KeyT>>::value>>
 {
     template <typename PathT, typename AdapterT, typename HandlerT>
     status operator () (PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
@@ -198,7 +283,7 @@ struct is_aggregation_any_t
             prev,
             hana::bool_
             <
-                std::is_same<type,std::decay_t<decltype(ANY)>>::value
+                std::is_base_of<any_tag,type>::value
             >{}
         );
     }

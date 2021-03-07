@@ -77,7 +77,7 @@ struct filter_member_invoker<AdapterT,MemberT,
     template <typename FnT, typename AdapterT1, typename MemberT1>
     static auto invoke(FnT&& fn, AdapterT1&& adapter, MemberT1&& member)
     {
-        return apply_member_path(hana::make_tuple(hana::front(member.path())),std::forward<FnT>(fn),std::forward<AdapterT1>(adapter),std::forward<MemberT1>(member));
+        return apply_member_path(hana::tuple<>{},std::forward<FnT>(fn),std::forward<AdapterT1>(adapter),std::forward<MemberT1>(member));
     }
 };
 

@@ -8,31 +8,30 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** @file validator/properties.hpp
+/** @file validator/properties/pair.hpp
 *
-*  Includes all headers with properties.
+*  Defines "first" and "second" properties to use with pairs/iterators.
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_PROPERTIES_HPP
-#define DRACOSHA_VALIDATOR_PROPERTIES_HPP
+#ifndef DRACOSHA_VALIDATOR_PAIR_HPP
+#define DRACOSHA_VALIDATOR_PAIR_HPP
 
-#include <dracosha/validator/properties/value.hpp>
-#include <dracosha/validator/properties/size.hpp>
-#include <dracosha/validator/properties/length.hpp>
-#include <dracosha/validator/properties/empty.hpp>
-#include <dracosha/validator/properties/pair.hpp>
-
-#include <dracosha/validator/utils/enable_to_string.hpp>
+#include <dracosha/validator/config.hpp>
+#include <dracosha/validator/property.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+DRACOSHA_VALIDATOR_PROPERTY(first)
+
+DRACOSHA_VALIDATOR_PROPERTY(second)
+
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_PROPERTIES_HPP
+#endif // DRACOSHA_VALIDATOR_PAIR_HPP

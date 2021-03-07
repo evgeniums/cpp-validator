@@ -319,12 +319,11 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     rep1.clear();
     BOOST_CHECK(v1_1.apply(pa1));
     rep1.clear();
-#endif
+
     auto v2=validator(
-                _["field1"]["field1_1"](ALL(value(gte,9)))/*,
-                _["field2"](size(gte,100))*/
+                _["field1"]["field1_1"](ALL(value(gte,9))),
+                _["field2"](size(gte,100))
             );
-#if 1
     auto v2_1=validator(
                 _["field1"]["field1_1"][ALL](gte,9),
                 _["field2"](size(gte,100))
@@ -363,17 +362,16 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     BOOST_CHECK(v2_1.apply(pa4));
     rep1.clear();
 
-#endif
     BOOST_CHECK(safe_compare_equal(ALL,ALL));
     BOOST_CHECK(safe_compare_equal(ALL,ANY));
     BOOST_CHECK(ALL==ANY);
+    BOOST_CHECK(ANY==ALL);
 
     auto pa5=make_prevalidation_adapter(_["field1"]["field1_1"],range({1}),rep1);
 
     BOOST_CHECK(!v2.apply(pa5));
     BOOST_CHECK_EQUAL(rep1,std::string("each element of field1_1 of field1 must be greater than or equal to 9"));
     rep1.clear();
-#if 1
     BOOST_CHECK(!v2_1.apply(pa5));
     BOOST_CHECK_EQUAL(rep1,std::string("each element of field1_1 of field1 must be greater than or equal to 9"));
     rep1.clear();
@@ -386,31 +384,34 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     BOOST_CHECK_EQUAL(rep1,std::string("each element of field1_1 of field1 must be greater than or equal to 9"));
     rep1.clear();
 
+    static_assert(std::is_base_of<any_tag,decltype(wrap_it(1,string_any,values))>::value,"");
+    static_assert(detail::is_member_with_any<size_t,decltype(ANY)>::value,"");
+    static_assert(decltype(_["field1"]["field1_1"][wrap_it(1,string_any,values)])::is_with_any::value,"");
+
     auto v3=validator(
                 _["field1"]["field1_1"](ANY(value(gte,9))),
                 _["field2"](size(gte,100))
             );
-
     auto v3_1=validator(
                 _["field1"]["field1_1"][ANY](gte,9),
                 _["field2"](size(gte,100))
             );
     BOOST_CHECK(v3.apply(pa2));
     rep1.clear();
-    BOOST_CHECK(v3.apply(pa3));
+    BOOST_CHECK(v3.apply(pa3)); // must be ok because ANY is not strict
     rep1.clear();
     BOOST_CHECK(v3_1.apply(pa2));
     rep1.clear();
-    BOOST_CHECK(v3_1.apply(pa3));
+    BOOST_CHECK(v3_1.apply(pa3)); // must be ok because ANY is not strict
     rep1.clear();
 
     BOOST_CHECK(v3.apply(pa6));
     rep1.clear();
-    BOOST_CHECK(v3.apply(pa5));
+    BOOST_CHECK(v3.apply(pa5)); // must be ok because ANY is not strict
     rep1.clear();
     BOOST_CHECK(v3_1.apply(pa6));
     rep1.clear();
-    BOOST_CHECK(v3_1.apply(pa5));
+    BOOST_CHECK(v3_1.apply(pa5)); // must be ok because ANY is not strict
     rep1.clear();
 
     //"check that there is no extra copy in strict_any()"
@@ -452,11 +453,20 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     BOOST_CHECK_EQUAL(rep1,std::string("at least one element of field1_1 of field1 must be greater than or equal to 9"));
     rep1.clear();
 
+    static_assert(hana::is_a<element_aggregation_tag,decltype(ANY)>,"");
+    static_assert(hana::is_a<element_aggregation_tag,decltype(ALL)>,"");
+#endif
+//    int a=extract_object_wrapper_type_c(ANY);
+//    int b=hana::type<decltype(ANY)>{};
+//    static_assert(std::is_same<decltype(extract_object_wrapper_type_c(ANY)),hana::type<std::decay_t<decltype(ANY)>>>::value,"");
+//    static_assert(safe_eq<decltype(ANY),decltype(ALL)>::comparable::value,"");
+//    static_assert(safe_eq<decltype(ANY),decltype(ALL)>::comparable::value,"");
+
     auto eq1=path_types_equal(ANY,ALL);
     static_assert(decltype(eq1)::value,"");
     auto eq2=check_member_path_types(_["field1"]["field1_1"][ANY],_["field1"]["field1_1"][ALL]);
     static_assert(decltype(eq2)::value,"");
-
+#if 1
     // validation with vector
     auto vec7=std::vector<int>{1,2,3,4};
     auto pa7=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any(range(vec7)),rep1);
@@ -513,10 +523,7 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     BOOST_CHECK(!v5.apply(pa16));
     BOOST_CHECK_EQUAL(std::string("each element of field1_1 of field1 must be greater than or equal to Hello"),rep1);
     rep1.clear();
-#endif
-
 }
-#if 1
 
 BOOST_AUTO_TEST_CASE(CheckUpdateValidatedWithSample)
 {
@@ -562,7 +569,8 @@ BOOST_AUTO_TEST_CASE(CheckUpdateValidatedWithSample)
     set_validated(m7,_["field3"][0],"zzzzz",strict_any(v8),err);
     BOOST_CHECK(!err);
     BOOST_CHECK_EQUAL(m7["field3"][0],"zzzzz");
-}
 #endif
+
+}
 
 BOOST_AUTO_TEST_SUITE_END()

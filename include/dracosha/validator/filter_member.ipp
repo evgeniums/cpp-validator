@@ -42,7 +42,7 @@ status apply_generated_paths_t::operator () (PathT&& current_path, AdapterT&& ad
         hana::greater_equal(hana::size(current_path),hana::size(member.path())),
         [&](auto&& _)
         {
-            return generate_paths<std::decay_t<decltype(hana::back(current_path))>>(_(current_path),_(adapter),_(handler));
+            return generate_paths<std::decay_t<decltype(hana::back(_(current_path)))>>(_(current_path),_(adapter),_(handler));
         },
         [&](auto&& _)
         {

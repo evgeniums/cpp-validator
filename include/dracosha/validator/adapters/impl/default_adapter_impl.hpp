@@ -92,8 +92,10 @@ struct default_adapter_impl
         return hana::if_(check_member_path(obj,member.path()),
             [&obj,&prop,&op,&b](auto&& path)
             {
+                auto&& val=get_member(obj,std::forward<decltype(path)>(path));
+                auto&& pr=property(val,std::forward<PropT>(prop));
                 return op(
-                            property(get_member(obj,std::forward<decltype(path)>(path)),std::forward<PropT>(prop)),
+                            pr,
                             extract(std::forward<T2>(b))
                         );
             },

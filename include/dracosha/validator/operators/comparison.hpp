@@ -111,7 +111,8 @@ struct gt_t : public op<gt_t>
     template <typename T1, typename T2>
     constexpr bool operator() (const T1& a, const T2& b) const
     {
-        return safe_compare_greater(a,b);
+        auto ok=safe_compare_greater(a,b);
+        return ok;
     }
 
     constexpr static const char* description="must be greater than";

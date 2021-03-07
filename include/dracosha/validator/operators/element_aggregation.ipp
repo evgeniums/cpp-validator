@@ -50,11 +50,13 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, StringT&&
                 is_container_t<std::decay_t<decltype(parent_element)>>{},
                 [&](auto&& _)
                 {
+                    const auto& el_aggregation=hana::back(path);
+
                     aggregate_report<AdapterT>::open(adapter,str,parent_path);
                     bool empty=true;
                     for (auto it=_(parent_element).begin();it!=_(parent_element).end();++it)
                     {
-                        status ret=_(handler)(hana::append(parent_path,wrap_it(it,str)));
+                        status ret=_(handler)(hana::append(parent_path,wrap_it(it,str,el_aggregation.modifier)));
                         if (!pred(ret))
                         {
                             aggregate_report<AdapterT>::close(adapter,ret);
@@ -79,26 +81,48 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, StringT&&
     );
 }
 
+template <typename ModifierT>
 template <typename OpT>
-constexpr auto all_t::operator() (OpT&& op) const
+constexpr auto all_t<ModifierT>::operator() (OpT&& op) const
 {
-    return make_validator(
-                hana::reverse_partial(
-                    detail::aggregate_all,
-                    std::forward<OpT>(op)
-                )
-           );
+    return hana::eval_if(
+        hana::is_a<element_aggregation_modifier_tag,OpT>,
+        [&](auto&& _)
+        {
+            return all_t<std::decay_t<decltype(_(op))>>{};
+        },
+        [&](auto&& _)
+        {
+            return make_validator(
+                        hana::reverse_partial(
+                            detail::aggregate_all,
+                            std::forward<OpT>(_(op))
+                        )
+                   );
+        }
+    );
 }
 
+template <typename ModifierT>
 template <typename OpT>
-constexpr auto any_t::operator() (OpT&& op) const
+constexpr auto any_t<ModifierT>::operator() (OpT&& op) const
 {
-    return make_validator(
-                hana::reverse_partial(
-                    detail::aggregate_any,
-                    std::forward<OpT>(op)
-                )
-           );
+    return hana::eval_if(
+        hana::is_a<element_aggregation_modifier_tag,OpT>,
+        [&](auto&& _)
+        {
+            return any_t<std::decay_t<decltype(_(op))>>{};
+        },
+        [&](auto&& _)
+        {
+            return make_validator(
+                        hana::reverse_partial(
+                            detail::aggregate_any,
+                            std::forward<OpT>(_(op))
+                        )
+                   );
+        }
+    );
 }
 
 //-------------------------------------------------------------

@@ -32,18 +32,52 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+template <typename ModifierT>
+struct any_t;
+
+struct all_tag
+{
+    template <typename T>
+    constexpr bool operator == (T) const noexcept
+    {
+        return true;
+    }
+    template <typename T>
+    constexpr bool operator != (T) const noexcept
+    {
+        return false;
+    }
+};
+
 /**
  * @brief String descriptions helper for operator ALL.
  */
 struct string_all_t : public aggregate_op<string_all_t>,
                       public enable_to_string<string_all_t>
 {
+    using type=all_tag;
+
     constexpr static const aggregation_id id=aggregation_id::ALL;
     constexpr static const char* open_token="";
     constexpr static const char* close_token="";
     constexpr static const char* conjunction_token="";
 
     constexpr static const char* description="each element";
+    constexpr static const char* iterator_description="each iterator";
+    constexpr static const char* key_description="each key";
+
+    std::string operator() (const values_t&) const
+    {
+        return description;
+    }
+    std::string operator() (const iterators_t&) const
+    {
+        return iterator_description;
+    }
+    std::string operator() (const keys_t&) const
+    {
+        return key_description;
+    }
 };
 
 /**
@@ -52,18 +86,23 @@ struct string_all_t : public aggregate_op<string_all_t>,
 constexpr string_all_t string_all{};
 
 //-------------------------------------------------------------
-
-struct any_t;
+struct all_aggregation_t{};
 
 /**
  * @brief Definition of aggregation pseudo operator ALL for checking if all elements of a container satisfy condition.
  * @param op Validator to apply to each element of the container.
  * @return Success if all elements of the container passed validator.
  */
-struct all_t : public element_aggregation,
-               public enable_to_string<string_all_t>
+template <typename ModifierT>
+struct all_t : public element_aggregation_with_modifier<ModifierT>,
+               public enable_to_string<string_all_t>,
+               public all_tag,
+               public all_aggregation_t
 {
-    using type=all_t;
+    using type=all_tag;
+
+    using element_aggregation_with_modifier<ModifierT>::operator ==;
+    using element_aggregation_with_modifier<ModifierT>::operator !=;
 
     template <typename ... Ops>
     constexpr auto operator() (Ops&&... ops) const
@@ -89,49 +128,42 @@ struct all_t : public element_aggregation,
         return (*this)(value(std::forward<OpT>(op),std::forward<T>(b)));
     }
 
-    template <typename T>
-    constexpr bool operator == (const T&) const noexcept
-    {
-        return true;
-    }
-    template <typename T>
-    constexpr bool operator != (const T&) const noexcept
-    {
-        return false;
-    }
+//    template <typename ModifierT1>
+//    constexpr bool operator == (const all_t<ModifierT1>&) const noexcept
+//    {
+//        return true;
+//    }
+//    template <typename ModifierT1>
+//    constexpr bool operator != (const all_t<ModifierT1>&) const noexcept
+//    {
+//        return false;
+//    }
 
-    bool operator == (const all_t&) const noexcept
-    {
-        return true;
-    }
-    bool operator != (const all_t&) const noexcept
-    {
-        return false;
-    }
-
-    bool operator == (const any_t&) const noexcept
-    {
-        return true;
-    }
-    bool operator != (const any_t&) const noexcept
-    {
-        return false;
-    }
+//    template <typename ModifierT1>
+//    bool operator == (const any_t<ModifierT1>&) const noexcept
+//    {
+//        return true;
+//    }
+//    template <typename ModifierT1>
+//    bool operator != (const any_t<ModifierT1>&) const noexcept
+//    {
+//        return false;
+//    }
 
     template <typename T>
-    constexpr friend bool operator == (const T&, const all_t&) noexcept
+    constexpr friend bool operator == (const T&, const all_t<ModifierT>&) noexcept
     {
         return true;
     }
-    template <typename T>
-    constexpr friend bool operator != (const T&, const all_t&) noexcept
+    template <typename T, typename ModifierT1>
+    constexpr friend bool operator != (const T&, const all_t<ModifierT>&) noexcept
     {
         return false;
     }
 };
 
 template <typename KeyT>
-struct generate_paths_t<KeyT,hana::when<std::is_same<all_t,std::decay_t<KeyT>>::value>>
+struct generate_paths_t<KeyT,hana::when<std::is_base_of<all_aggregation_t,std::decay_t<KeyT>>::value>>
 {
     template <typename PathT, typename AdapterT, typename HandlerT>
     status operator () (PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
@@ -157,7 +189,7 @@ struct generate_paths_t<KeyT,hana::when<std::is_same<all_t,std::decay_t<KeyT>>::
 /**
   @brief Aggregation operator ALL that requires for all container elements to satisfy a condition.
 */
-constexpr all_t ALL{};
+constexpr all_t<decltype(values)> ALL;
 
 //-------------------------------------------------------------
 
