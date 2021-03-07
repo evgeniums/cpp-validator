@@ -160,7 +160,7 @@ struct default_adapter_impl
             {
                 return exists(sample,path);
             },
-            [&b](auto&&)
+            [](auto&&)
             {
                 return false;
             }
@@ -176,7 +176,7 @@ struct default_adapter_impl
                 obj_might_have_path,
                 sample_might_have_path
             ),
-            [&obj,&prop,&op,&b,&sample](auto&& path)
+            [&obj,&prop,&op,&sample](auto&& path)
             {
                 return status(op(
                             property(get_member(obj,path),prop),

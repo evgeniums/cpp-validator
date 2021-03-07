@@ -503,7 +503,7 @@ BOOST_AUTO_TEST_CASE(TestPair)
     auto v1=validator(
         _[first](gt,"key")
     );
-    auto p1=std::make_pair("key1","value1");
+    auto p1=std::make_pair(std::string("key1"),std::string("value1"));
     BOOST_CHECK(v1.apply(p1));
     auto p2=std::make_pair(std::string("key"),std::string("value1"));
     BOOST_CHECK(!v1.apply(p2));

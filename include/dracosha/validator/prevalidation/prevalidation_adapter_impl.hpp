@@ -191,7 +191,7 @@ class prevalidation_adapter_impl : public strict_any_tag
                     // only "contains" operator is suitable for value_as_container_tag
                     return status(status::code::ignore);
                 },
-                [&obj](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
+                [](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
                 {
                     // select execution path depending on the type of adapter's member key, if size/empty then check size
                     return hana::if_(
@@ -211,7 +211,7 @@ class prevalidation_adapter_impl : public strict_any_tag
                                             self->check_member().key()
                                         );
                         },
-                        [&obj](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
+                        [](auto&& self, auto&& adpt, auto&& member, auto&& prop, auto&& op, auto&& b)
                         {
                             if (self->_member_checked)
                             {
@@ -302,7 +302,7 @@ class prevalidation_adapter_impl : public strict_any_tag
                 {
                     return exists(sample,path);
                 },
-                [&b](auto&&)
+                [](auto&&)
                 {
                     return false;
                 }

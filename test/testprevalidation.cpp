@@ -371,6 +371,10 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     BOOST_CHECK(ANY==ANY);
     BOOST_CHECK(ALL==ANY);
     BOOST_CHECK(ANY==ALL);
+    BOOST_CHECK(10==ALL);
+    BOOST_CHECK(ALL==10);
+    BOOST_CHECK(10==ANY);
+    BOOST_CHECK(ANY==10);
 
     auto pa5=make_prevalidation_adapter(_["field1"]["field1_1"],range({1}),rep1);
 
