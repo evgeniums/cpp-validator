@@ -85,44 +85,44 @@ template <typename ModifierT>
 template <typename OpT>
 constexpr auto all_t<ModifierT>::operator() (OpT&& op) const
 {
-    return hana::eval_if(
+    return hana::if_(
         hana::is_a<element_aggregation_modifier_tag,OpT>,
-        [&](auto&&)
+        [](auto&& op)
         {
-            return all_t<std::decay_t<OpT>>{};
+            return all_t<std::decay_t<decltype(op)>>{};
         },
-        [&](auto&& _)
+        [](auto&& op)
         {
             return make_validator(
                         hana::reverse_partial(
                             detail::aggregate_all,
-                            std::forward<OpT>(_(op))
+                            std::forward<decltype(op)>(op)
                         )
                    );
         }
-    );
+    )(std::forward<OpT>(op));
 }
 
 template <typename ModifierT>
 template <typename OpT>
 constexpr auto any_t<ModifierT>::operator() (OpT&& op) const
 {
-    return hana::eval_if(
+    return hana::if_(
         hana::is_a<element_aggregation_modifier_tag,OpT>,
-        [&](auto&&)
+        [](auto&& op)
         {
-            return any_t<std::decay_t<OpT>>{};
+            return any_t<std::decay_t<decltype(op)>>{};
         },
-        [&](auto&& _)
+        [](auto&& op)
         {
             return make_validator(
                         hana::reverse_partial(
                             detail::aggregate_any,
-                            std::forward<OpT>(_(op))
+                            std::forward<decltype(op)>(op)
                         )
                    );
         }
-    );
+    )(std::forward<OpT>(op));
 }
 
 //-------------------------------------------------------------
