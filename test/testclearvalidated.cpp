@@ -202,6 +202,13 @@ BOOST_AUTO_TEST_CASE(CheckClearValidated)
     clear_validated(m4,_["field6"],v7,err);
     BOOST_CHECK(err);
     BOOST_CHECK_EQUAL(err.message(),std::string("field6 must end with value6"));
+
+    auto v8=validator(
+                _["field1"](empty(flag,true)),
+                _["field2"](size(gte,2))
+            );
+    clear_validated(m1,_["field1"],v8,err);
+    BOOST_CHECK(!err);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
