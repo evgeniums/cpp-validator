@@ -46,8 +46,9 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, StringT&&
         [&](auto&& _v)
         {
             const auto& parent_element=get_member(_v(obj),_v(parent_path));
+            using parent_type=std::decay_t<decltype(parent_element)>;
             return hana::eval_if(
-                is_container_t<std::decay_t<decltype(parent_element)>>{},
+                is_container_t<parent_type>{},
                 [&](auto&& _)
                 {
                     const auto& el_aggregation=hana::back(path);

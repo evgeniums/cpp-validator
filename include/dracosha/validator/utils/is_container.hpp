@@ -81,7 +81,8 @@ struct has_end<T,
 **/
 template <typename T>
 using is_container_t=std::integral_constant<bool,
-                                    has_begin<T>::value && has_end<T>::value
+                                    has_begin<T>::value
+                                    && has_end<T>::value
                                     && !std::is_same<std::decay_t<T>,std::string>::value
                                     && !std::is_same<std::decay_t<T>,string_view>::value
                                 >;
