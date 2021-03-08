@@ -31,8 +31,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/make_validator.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
 #include <dracosha/validator/utils/extract_object_wrapper.hpp>
-#include <dracosha/validator/operators/element_aggregation.hpp>
-#include <dracosha/validator/operators/any.hpp>
+#include <dracosha/validator/aggregation/element_aggregation.hpp>
+#include <dracosha/validator/aggregation/any.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

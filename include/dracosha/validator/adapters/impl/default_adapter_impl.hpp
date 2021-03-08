@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/get_member.hpp>
 #include <dracosha/validator/apply.hpp>
 #include <dracosha/validator/utils/is_container.hpp>
-#include <dracosha/validator/utils/wrap_it.hpp>
+#include <dracosha/validator/aggregation/wrap_it.hpp>
 #include <dracosha/validator/utils/conditional_fold.hpp>
 
 #include <dracosha/validator/operators/exists.hpp>

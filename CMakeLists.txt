@@ -20,7 +20,7 @@ SET (HEADERS
     include/dracosha/validator/utils/is_container.hpp
     include/dracosha/validator/utils/is_pair.hpp
     include/dracosha/validator/utils/get_it.hpp
-    include/dracosha/validator/utils/wrap_it.hpp
+    include/dracosha/validator/aggregation/wrap_it.hpp
     include/dracosha/validator/utils/feature_bitmask.hpp
     include/dracosha/validator/utils/invoke_and.hpp
     include/dracosha/validator/utils/invoke_or.hpp
@@ -60,15 +60,15 @@ SET (HEADERS
     include/dracosha/validator/operators/operator.hpp
     include/dracosha/validator/operators/exists.hpp
     include/dracosha/validator/operators/comparison.hpp
-    include/dracosha/validator/operators/and.hpp
-    include/dracosha/validator/operators/or.hpp
-    include/dracosha/validator/operators/not.hpp
-    include/dracosha/validator/operators/any.hpp
-    include/dracosha/validator/operators/all.hpp
-    include/dracosha/validator/operators/aggregation.hpp
-    include/dracosha/validator/operators/aggregation.ipp
-    include/dracosha/validator/operators/element_aggregation.hpp
-    include/dracosha/validator/operators/element_aggregation.ipp
+    include/dracosha/validator/aggregation/and.hpp
+    include/dracosha/validator/aggregation/or.hpp
+    include/dracosha/validator/aggregation/not.hpp
+    include/dracosha/validator/aggregation/any.hpp
+    include/dracosha/validator/aggregation/all.hpp
+    include/dracosha/validator/aggregation/aggregation.hpp
+    include/dracosha/validator/aggregation/aggregation.ipp
+    include/dracosha/validator/aggregation/element_aggregation.hpp
+    include/dracosha/validator/aggregation/element_aggregation.ipp
     include/dracosha/validator/operators/logical.hpp
     include/dracosha/validator/operators/invert_op.hpp
     include/dracosha/validator/operators/flag.hpp

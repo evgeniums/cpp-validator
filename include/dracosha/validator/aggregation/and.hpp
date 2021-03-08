@@ -21,7 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/make_validator.hpp>
-#include <dracosha/validator/operators/aggregation.hpp>
+#include <dracosha/validator/aggregation/aggregation.hpp>
 #include <dracosha/validator/detail/aggregate_and.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN

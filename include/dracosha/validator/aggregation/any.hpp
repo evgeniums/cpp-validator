@@ -20,9 +20,9 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_ANY_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/operators/element_aggregation.hpp>
+#include <dracosha/validator/aggregation/element_aggregation.hpp>
 #include <dracosha/validator/make_validator.hpp>
-#include <dracosha/validator/operators/and.hpp>
+#include <dracosha/validator/aggregation/and.hpp>
 #include <dracosha/validator/prevalidation/strict_any.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN

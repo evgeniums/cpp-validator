@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** @file validator/operators/aggregation.ipp
+/** @file validator/aggregation/aggregation.ipp
 *
 *  Defines aggregation used for logical operators.
 *
@@ -20,7 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_AGGREGATION_IPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/operators/aggregation.hpp>
+#include <dracosha/validator/aggregation/aggregation.hpp>
 #include <dracosha/validator/member.hpp>
 #include <dracosha/validator/extract.hpp>
 #include <dracosha/validator/get_member.hpp>

@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** @file validator/operators/element_aggregation.ipp
+/** @file validator/aggregation/element_aggregation.ipp
 *
 *  Defines helpers used for element aggregations.
 *
@@ -20,7 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_ELEMENT_AGGREGATION_IPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/operators/element_aggregation.hpp>
+#include <dracosha/validator/aggregation/element_aggregation.hpp>
 #include <dracosha/validator/member.hpp>
 #include <dracosha/validator/extract.hpp>
 #include <dracosha/validator/get_member.hpp>

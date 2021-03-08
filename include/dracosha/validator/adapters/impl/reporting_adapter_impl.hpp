@@ -21,8 +21,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/adapters/impl/default_adapter_impl.hpp>
-#include <dracosha/validator/operators/any.hpp>
-#include <dracosha/validator/operators/all.hpp>
+#include <dracosha/validator/aggregation/any.hpp>
+#include <dracosha/validator/aggregation/all.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

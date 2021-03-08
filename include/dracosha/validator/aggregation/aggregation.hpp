@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** @file validator/operators/aggregation.hpp
+/** @file validator/aggregation/aggregation.hpp
 *
 *  Defines aggregation used for logical operators.
 *
