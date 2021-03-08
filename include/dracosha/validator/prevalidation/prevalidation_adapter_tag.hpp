@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** @file validator/prevalidation/prevalidation_adapter.hpp
+/** @file validator/adapters/prevalidation_adapter.hpp
 *
 *  Defines adapter for prevalidation of a single member with reporting.
 *

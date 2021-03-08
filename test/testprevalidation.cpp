@@ -4,7 +4,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/prevalidation/prevalidation_adapter.hpp>
+#include <dracosha/validator/adapters/prevalidation_adapter.hpp>
 #include <dracosha/validator/prevalidation/set_validated.hpp>
 
 namespace hana=boost::hana;
