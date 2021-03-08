@@ -432,6 +432,16 @@ BOOST_AUTO_TEST_CASE(TestMixedAgrregations)
     auto a1=make_reporting_adapter(m1,rep);
     BOOST_CHECK(!v1.apply(a1));
     BOOST_CHECK_EQUAL(rep,std::string("size of level3 of at least one element of level1 must be greater than or equal to 5"));
+    rep.clear();
+
+    auto v1_1=validator(
+                _["level1"](size(gte,1)),
+                _["level1"][ANY]["level3"]("any level3 of level1")(size(gte,5) ^AND^ size(lt,100))
+            );
+    BOOST_CHECK(!v1_1.apply(a1));
+    BOOST_CHECK_EQUAL(rep,std::string("size of any level3 of level1 must be greater than or equal to 5"));
+    rep.clear();
+
     std::map<std::string,
              std::map<std::string,
                       std::map<std::string,std::string>
