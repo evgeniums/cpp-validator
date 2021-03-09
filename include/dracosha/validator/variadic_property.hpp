@@ -199,8 +199,40 @@ struct type_variadic_p_##prop \
         return false; \
     } \
     \
+    template <typename ...Args> \
+    constexpr auto operator () (Args&&... args) const -> decltype(auto);\
 }; \
-constexpr type_variadic_p_##prop prop{};
+constexpr type_variadic_p_##prop prop{}; \
+template <typename StoredArgsT> \
+struct type_variadic_p_notation_##prop : public type_variadic_p_##prop \
+{ \
+    type_variadic_p_notation_##prop(StoredArgsT&& stored_args):_args(std::move(stored_args))\
+    {}\
+    \
+    template <typename T> \
+    auto get(T&& v) const -> decltype(auto) \
+    { \
+        auto apply=[&](auto&&... args) -> decltype(auto) \
+        { \
+            return type_variadic_p_##prop::apply(std::forward<T>(v),std::forward<decltype(args)>(args)...); \
+        }; \
+        return hana::unpack(_args,apply); \
+    } \
+    \
+    template <typename ...Args> \
+    constexpr auto operator () (Args&&... args) const \
+    {\
+        return make_property_validator(*this,std::forward<Args>(args)...); \
+    }\
+    \
+    StoredArgsT _args; \
+}; \
+template <typename ...Args> \
+constexpr auto type_variadic_p_##prop::operator () (Args&&... args) const -> decltype(auto) \
+{ \
+    auto stored_args=hana::make_tuple(std::forward<Args>(args)...); \
+    return type_variadic_p_notation_##prop<decltype(stored_args)>{std::move(stored_args)}; \
+}
 
 #define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(prop) DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HF(prop,always_has_property,nullptr,nullptr)
 #define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(prop,has) DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HF(prop,has,nullptr,nullptr)

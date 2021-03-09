@@ -55,7 +55,7 @@ constexpr auto has_property_fn(Ta&& a, Tb&& b)
 template <typename Tv, typename Tp>
 auto property(Tv&& val, Tp&& prop) -> decltype(auto)
 {
-    return std::decay_t<decltype(prop)>::get(std::forward<decltype(val)>(val));
+    return prop.get(std::forward<decltype(val)>(val));
 }
 
 //-------------------------------------------------------------

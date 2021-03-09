@@ -381,4 +381,25 @@ BOOST_AUTO_TEST_CASE(TestPropertyWithHasArg2)
     BOOST_CHECK(!v5.apply(o1));
 }
 
+BOOST_AUTO_TEST_CASE(TestPropertyNotation)
+{
+    WithChild o1;
+
+    auto p1=child_word(20,"hello");
+    BOOST_CHECK_EQUAL(p1.get(o1),25);
+
+    auto v1=p1(eq,25);
+    BOOST_CHECK(v1(o1));
+
+    auto v2=validator(
+        child_word(20,"hello")(eq,25)
+    );
+    BOOST_CHECK(v2.apply(o1));
+
+    auto v3=validator(
+        child_word(20,"hello")(eq,30)
+    );
+    BOOST_CHECK(!v3.apply(o1));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
