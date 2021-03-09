@@ -29,7 +29,17 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-template <typename FnT, typename AccumulatedArgsT, typename FnArgTypes>
+struct always_has_property_t
+{
+    template <typename ...Args>
+    constexpr static bool apply(Args&&...) noexcept
+    {
+        return true;
+    }
+};
+constexpr always_has_property_t always_has_property{};
+
+template <typename ObjT, typename FnT, typename AccumulatedArgsT, typename FnArgTypes, typename FnHasT>
 struct variadic_property_closure
 {
     template <typename T>
@@ -51,37 +61,59 @@ struct variadic_property_closure
             hana::equal(hana::plus(hana::size(_args),hana::size_c<1>),hana::size(_arg_types)),
             [](auto&& self, auto&& arg) -> decltype(auto)
             {
-                return hana::unpack(self->_args,hana::reverse_partial(self->_fn,std::forward<decltype(arg)>(arg)));
+                auto apply=[&](auto&&... args) -> decltype(auto)
+                {
+                    return self->_fn(self->_obj,std::forward<decltype(args)>(args)...);
+                };
+                return hana::unpack(self->_args,hana::reverse_partial(apply,std::forward<decltype(arg)>(arg)));
             },
             [](auto&& self, auto&& arg)
             {
                 auto next_args=hana::append(std::move(self->_args),std::forward<decltype(arg)>(arg));
-                return variadic_property_closure<FnT,decltype(next_args),FnArgTypes>{
+                return variadic_property_closure<ObjT,FnT,decltype(next_args),FnArgTypes,FnHasT>{
+                    std::move(self->_obj),
                     std::move(self->_fn),
                     std::move(next_args),
-                    std::move(self->_arg_types)
+                    std::move(self->_arg_types),
+                    std::move(self->_fn_has)
                 };
             }
         )(this,std::forward<T>(arg));
     }
 
     template <typename T>
-    constexpr static bool has(
-            T,
+    bool has(
+            T&& arg,
             std::enable_if_t<
                 variadic_property_closure::has_c<T>()
             , void*> =nullptr
-        )
+        ) const
     {
-        return true;
+        return hana::if_(
+            hana::equal(hana::plus(hana::size(_args),hana::size_c<1>),hana::size(_arg_types)),
+            [](auto&& self, auto&& arg)
+            {
+                auto apply=[&](auto&&... args)
+                {
+                    return self->_fn_has.apply(self->_obj,std::forward<decltype(args)>(args)...);
+                };
+                return hana::unpack(self->_args,hana::reverse_partial(apply,std::forward<decltype(arg)>(arg)));
+            },
+            [](auto&&, auto&&)
+            {
+                return true;
+            }
+        )(this,std::forward<T>(arg));
     }
 
+    ObjT _obj;
     FnT _fn;
     AccumulatedArgsT _args;
     FnArgTypes _arg_types;
+    FnHasT _fn_has;
 };
 
-#define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_FLAG(prop,flag_dscr,n_flag_dscr) \
+#define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HF(prop,has_prop,flag_dscr,n_flag_dscr) \
 struct might_have_variadic_t_##prop \
 { \
     template <typename T> \
@@ -95,19 +127,29 @@ struct type_variadic_p_##prop \
 { \
     using hana_tag=DRACOSHA_VALIDATOR_NAMESPACE::property_tag; \
     \
+    template <typename T, typename ... Args> \
+    static auto apply(T&& v, Args&&... args) -> decltype(auto) \
+    { \
+        return v.prop(std::forward<Args>(args)...); \
+    } \
+    \
     template <typename T> \
     static auto create_closure(T&& v) \
     { \
-        auto apply_prop_to_v=[&v](auto&&... args) -> decltype(auto) \
+        auto apply_prop_to_v=[](auto&& v, auto&&... args) -> decltype(auto) \
         { \
-            return v.prop(std::forward<decltype(args)>(args)...); \
+            return apply(std::forward<decltype(v)>(v),std::forward<decltype(args)>(args)...); \
         }; \
-        auto init_args=hana::tuple<>{}; \
-        auto arg_types=class_method_args<decltype(&std::decay_t<decltype(v)>::prop)>::types(); \
-        return variadic_property_closure<decltype(apply_prop_to_v),decltype(init_args),decltype(arg_types)>{ \
+        auto init_args=::boost::hana::tuple<>{}; \
+        auto arg_types=DRACOSHA_VALIDATOR_NAMESPACE::class_method_args<decltype(&std::decay_t<decltype(v)>::prop)>::types(); \
+        return DRACOSHA_VALIDATOR_NAMESPACE::variadic_property_closure< \
+                    T,decltype(apply_prop_to_v),decltype(init_args),decltype(arg_types),decltype(has_prop)> \
+                    { \
+                    std::forward<T>(v), \
                     std::move(apply_prop_to_v), \
                     std::move(init_args), \
-                    std::move(arg_types) \
+                    std::move(arg_types), \
+                    has_prop \
                 }; \
     } \
     \
@@ -120,8 +162,8 @@ struct type_variadic_p_##prop \
     template <typename T> \
     constexpr static bool has() \
     { \
-        return hana::sfinae(might_have_variadic_##prop)(std::add_pointer_t<T>(nullptr)) \
-                != hana::nothing; \
+        return ::boost::hana::sfinae(might_have_variadic_##prop)(std::add_pointer_t<T>(nullptr)) \
+                != ::boost::hana::nothing; \
     } \
     constexpr static const char* name() \
     {\
@@ -160,7 +202,9 @@ struct type_variadic_p_##prop \
 }; \
 constexpr type_variadic_p_##prop prop{};
 
-#define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(prop) DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_FLAG(prop,nullptr,nullptr)
+#define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(prop) DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HF(prop,always_has_property,nullptr,nullptr)
+#define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(prop,has) DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HF(prop,has,nullptr,nullptr)
+#define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_FLAG(prop) DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HF(prop,always_has_property,flag_dscr,n_flag_dscr)
 
 //-------------------------------------------------------------
 

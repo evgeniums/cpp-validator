@@ -271,12 +271,22 @@ struct WithChild
 
     int child_word(int val, const std::string& word) const noexcept
     {
-        return val+word.size();
+        return val+static_cast<int>(word.size());
     }
 
     const std::map<int,std::string>& my_map(int index, int offset) const
     {
         return _m.at(index+offset);
+    }
+
+    int safe_child_word(int val, const std::string& word) const noexcept
+    {
+        return val+static_cast<int>(word.size());
+    }
+
+    bool has_safe_child_word(int val, const std::string& word) const noexcept
+    {
+        return val>10 && word.size()>=5;
     }
 
     std::map<
@@ -292,6 +302,9 @@ struct WithoutChild
 DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(child)
 DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(child_word)
 DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(my_map)
+
+DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(has_safe_child_word)
+DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(safe_child_word,has_safe_child_word)
 
 }
 
@@ -336,6 +349,36 @@ BOOST_AUTO_TEST_CASE(TestPropertyAlwaysExistArg2Nested)
         _[my_map][20][2][1000](eq,"hundred")
     );
     BOOST_CHECK(!v2.apply(o1));
+}
+
+BOOST_AUTO_TEST_CASE(TestPropertyWithHasArg2)
+{
+    WithChild o1;
+
+    auto v1=validator(
+        _[safe_child_word][20]["hello"](exists,true)
+    );
+    BOOST_CHECK(v1.apply(o1));
+
+    auto v2=validator(
+        _[safe_child_word][5]["hello"](exists,true)
+    );
+    BOOST_CHECK(!v2.apply(o1));
+
+    auto v3=validator(
+        _[safe_child_word][11]["hi"](exists,true)
+    );
+    BOOST_CHECK(!v3.apply(o1));
+
+    auto v4=validator(
+        _[safe_child_word][20]["hello"](eq,25)
+    );
+    BOOST_CHECK(v4.apply(o1));
+
+    auto v5=validator(
+        _[safe_child_word][20]["hello"](eq,20)
+    );
+    BOOST_CHECK(!v5.apply(o1));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
