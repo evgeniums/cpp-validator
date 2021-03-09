@@ -50,6 +50,50 @@ struct conditional_fold_t
         );
     }
 
+    template <typename PredicateT, typename StateT, typename HandlerT>
+    static auto each_with_state(const FoldableT& foldable, const PredicateT& pred, StateT&& state, const HandlerT& fn)
+    {
+        auto res=fn(state,hana::front(foldable));
+        if (!pred(res))
+        {
+            return res;
+        }
+        auto next=hana::drop_front(foldable);
+        return hana::eval_if(
+            hana::is_empty(next),
+            [&](auto&& _)
+            {
+                return _(res);
+            },
+            [&](auto&& _)
+            {
+                return conditional_fold_t<decltype(_(next))>::each_with_state(_(next),pred,_(res),fn);
+            }
+        );
+    }
+
+    template <typename PredicateT, typename StateT, typename RetT, typename HandlerT>
+    static auto each_with_state_and_ret(const FoldableT& foldable, const PredicateT& pred, StateT&& state, RetT&& ret, const HandlerT& fn)
+    {
+        auto res=fn(state,hana::front(foldable));
+        if (!pred(res))
+        {
+            return ret;
+        }
+        auto next=hana::drop_front(foldable);
+        return hana::eval_if(
+            hana::is_empty(next),
+            [&](auto&& _)
+            {
+                return _(res);
+            },
+            [&](auto&& _)
+            {
+                return conditional_fold_t<decltype(_(next))>::each_with_state_and_ret(_(next),pred,_(res),_(ret),fn);
+            }
+        );
+    }
+
     template <typename PrefixT, typename NextT, typename StateT, typename HandlerT, typename PredicateT>
     static auto prefix(PrefixT&& pfx, const NextT& foldable, const PredicateT& pred, StateT&& state, const HandlerT& fn)
     {
@@ -97,7 +141,7 @@ constexpr predicate_or_t predicate_or{};
 
 struct while_each_t
 {
-    template <typename FoldableT, typename HandlerT, typename PredicateT, typename InitT>
+    template <typename FoldableT, typename PredicateT, typename InitT, typename HandlerT>
     auto operator () (const FoldableT& foldable, const PredicateT& pred, InitT&& init, const HandlerT& fn) const -> decltype(auto)
     {
         return hana::eval_if(
@@ -113,6 +157,46 @@ struct while_each_t
                     return init;
                 }
                 return conditional_fold_t<FoldableT>::each(_(foldable),_(pred),_(fn));
+            }
+        );
+    }
+
+    template <typename FoldableT, typename PredicateT, typename InitT, typename StateT, typename HandlerT>
+    auto operator () (const FoldableT& foldable, const PredicateT& pred, InitT&& init, StateT&& state, const HandlerT& fn) const -> decltype(auto)
+    {
+        return hana::eval_if(
+            hana::is_empty(foldable),
+            [&](auto&&) -> decltype(auto)
+            {
+                return hana::id(std::forward<InitT>(init));
+            },
+            [&](auto&& _)
+            {
+                if (!pred(init))
+                {
+                    return init;
+                }
+                return conditional_fold_t<FoldableT>::each_with_state(_(foldable),_(pred),_(state),_(fn));
+            }
+        );
+    }
+
+    template <typename FoldableT, typename PredicateT, typename InitT, typename StateT, typename RetT, typename HandlerT>
+    auto operator () (const FoldableT& foldable, const PredicateT& pred, InitT&& init, StateT&& state, RetT&& ret, const HandlerT& fn) const -> decltype(auto)
+    {
+        return hana::eval_if(
+            hana::is_empty(foldable),
+            [&](auto&&) -> decltype(auto)
+            {
+                return hana::id(std::forward<InitT>(init));
+            },
+            [&](auto&& _)
+            {
+                if (!pred(_(init)))
+                {
+                    return _(ret);
+                }
+                return conditional_fold_t<FoldableT>::each_with_state_and_ret(_(foldable),_(pred),_(state),_(ret),_(fn));
             }
         );
     }

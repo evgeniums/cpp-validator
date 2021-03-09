@@ -7,6 +7,7 @@
 #include <dracosha/validator/utils/reference_wrapper.hpp>
 #include <dracosha/validator/utils/optional.hpp>
 #include <dracosha/validator/utils/class_method_args.hpp>
+#include <dracosha/validator/get_member.hpp>
 #include <dracosha/validator/check_exists.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
@@ -98,7 +99,6 @@ BOOST_AUTO_TEST_CASE(TestArgs)
     auto types4=class_method_args<decltype(&decltype(ts1)::func4)>::types();
     static_assert(hana::value(hana::size(types4))==4,"");
 
-    const TestStruct ts2;
     auto types4_1=class_method_args<decltype(&decltype(ts1)::func4)>::types();
     static_assert(hana::value(hana::size(types4_1))==4,"");
 
@@ -202,6 +202,20 @@ struct WithSetAt{
 
 }
 
+BOOST_AUTO_TEST_CASE(TestMemberValueType)
+{
+    std::map<std::string,std::set<std::string>> m1
+    {
+        {"key1",{"value1_1","value1_2"}},
+        {"key2",{"value2_1","value2_2"}}
+    };
+
+    using type=std::decay_t<decltype(get_member(m1,hana::make_tuple("key1","value1_1")))>;
+    static_assert(std::is_same<std::string,type>::value,"");
+
+    BOOST_CHECK(true);
+}
+
 BOOST_AUTO_TEST_CASE(TestCheckExistsWithOptional)
 {
     std::map<std::string,std::set<std::string>> m1
@@ -223,6 +237,8 @@ BOOST_AUTO_TEST_CASE(TestCheckExistsWithOptional)
     BOOST_CHECK(!check_exists(wat2,hana::make_tuple(1,50,std::string("value5"))));
     BOOST_CHECK(!check_exists(wat2,hana::make_tuple(1,20,std::string("value1"))));
     BOOST_CHECK(!check_exists(wat2,hana::make_tuple(20,50,std::string("value1"))));
+
+    BOOST_CHECK(!check_exists(m1,hana::make_tuple("key1",10,20)));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

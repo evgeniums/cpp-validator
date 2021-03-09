@@ -23,89 +23,18 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/get.hpp>
+#include <dracosha/validator/get_member.hpp>
+#include <dracosha/validator/check_member_path.hpp>
 #include <dracosha/validator/check_contains.hpp>
 #include <dracosha/validator/utils/hana_to_std_tuple.hpp>
 #include <dracosha/validator/utils/optional.hpp>
 #include <dracosha/validator/utils/reference_wrapper.hpp>
 #include <dracosha/validator/utils/conditional_fold.hpp>
+#include <dracosha/validator/utils/extract_object_wrapper.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
-
-#if 0
-#ifdef _MSC_VER
-// disable warning about taking address of temporary variable 
-// because take_address_of() takes address only of lvalue reference 
-// which is safe
-#pragma warning(disable:4172)
-#endif
-
-/**
-  @brief Extract member from object.
-  @param obj Object under test.
-  @param key Key for member lookup.
-  @return Operation result, see comments below.
-  <pre>
-    If member is found and is of lvalue reference type then address of that member will be returned.
-    If member is found and is not of lvalue reference type then address of stub object will be returned to avoid taking addresses of temporary objects.
-    If member is not found then nullptr will be returned.
-  </pre>
-*/
-struct get_member_ptr_t
-{
-    template <typename Tobj, typename Tkey>
-    constexpr auto operator () (Tobj&& obj, Tkey&& key) const
-    {
-        if (obj && check_contains(*obj,key))
-        {
-            return detail::take_address_of<decltype(get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key)))>
-                    (
-                            get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key))
-                        );
-        }
-        return decltype(
-                    detail::take_address_of<decltype(get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key)))>
-                                    (
-                                            get(std::forward<decltype(*obj)>(*obj),std::forward<decltype(key)>(key))
-                                        )
-                    )(nullptr);
-    }
-};
-/**
-  @brief Callable for extracting member from object.
-  */
-constexpr get_member_ptr_t get_member_ptr{};
-
-#ifdef _MSC_VER
-#pragma warning(default:4172)
-#endif
-
-/**
-  @brief Check if member at a given path exists in the object.
-  @param obj Object under validation.
-  @param path Member path as a tuple.
-  @return Validation status.
-
-  This operation is performed at runtime.
-*/
-template <typename Tobj, typename Tpath>
-auto check_exists(Tobj&& obj, Tpath&& path)
-{
-    return hana::if_(
-         hana_tuple_empty<Tpath>{},
-         [](auto&&, auto&&)
-         {
-            // empty path means object itself
-            return true;
-         },
-         [](auto&& obj, auto&& path)
-         {
-            return hana::fold(std::forward<decltype(path)>(path),&obj,get_member_ptr)!=nullptr;
-         }
-    )(std::forward<decltype(obj)>(obj),std::forward<decltype(path)>(path));
-}
-#endif
 
 struct try_get_member_t
 {
@@ -114,6 +43,7 @@ struct try_get_member_t
     {
         using next_type=decltype(get(extract_ref(*obj_wrapper),std::forward<decltype(key)>(key)));
 
+        // optional references must be wrapped with cref()
         return hana::if_(
             std::is_lvalue_reference<next_type>{},
             [](auto&& obj_wrapper, auto&& key)
@@ -151,15 +81,16 @@ constexpr try_get_member_t try_get_member{};
 
 /**
   @brief Check if member at a given path exists in the object.
-  @param obj Object under validation.
+  @param object Object under validation.
   @param path Member path as a tuple.
   @return Validation status.
 
   This operation is performed at runtime.
 */
 template <typename Tobj, typename Tpath>
-bool check_exists(Tobj&& obj, Tpath&& path)
+bool check_exists(Tobj&& object, Tpath&& path)
 {
+    auto&& obj=extract_object_wrapper(object);
     return hana::if_(
          hana_tuple_empty<Tpath>{},
          [](auto&&, auto&&)
@@ -169,11 +100,50 @@ bool check_exists(Tobj&& obj, Tpath&& path)
          },
          [](auto&& obj, auto&& path)
          {
-            auto wrap_obj=cref(std::forward<decltype(obj)>(obj));
-            using wrap_type=optional<decltype(wrap_obj)>;
-            return hana::fold(path,wrap_type{std::move(wrap_obj)},try_get_member);
+            return hana::if_(
+                check_member_path(obj,path),
+                [](auto&& obj, auto&& path)
+                {
+                    auto handler=[&](auto&& default_ret)
+                    {
+                        // iterate over each level in the path
+                        auto wrap_obj=cref(std::forward<decltype(obj)>(obj));
+                        using wrap_type=optional<decltype(wrap_obj)>;
+                        auto init=wrap_type{std::move(wrap_obj)};
+                        return while_each(
+                            path,
+                            [](auto&& res)
+                            {
+                                return res.has_value();
+                            },
+                            init,
+                            init,
+                            default_ret,
+                            try_get_member
+                        );
+                    };
+
+                    // optional references must be wrapped with cref()
+                    using value_type=decltype(get_member(obj,path));
+                    return hana::eval_if(
+                        std::is_lvalue_reference<value_type>{},
+                        [&](auto&& _)
+                        {
+                            return _(handler)(optional<decltype(cref(get_member(_(obj),_(path))))>{});
+                        },
+                        [&](auto&& _)
+                        {
+                            return _(handler)(optional<decltype(get_member(_(obj),_(path)))>{});
+                        }
+                    );
+                },
+                [](auto&&, auto&&)
+                {
+                    return optional<bool>{};
+                }
+            )(std::forward<decltype(obj)>(obj),std::forward<decltype(path)>(path));
          }
-    )(std::forward<decltype(obj)>(obj),std::forward<decltype(path)>(path)).has_value();
+    )(obj,std::forward<decltype(path)>(path)).has_value();
 }
 
 //-------------------------------------------------------------
