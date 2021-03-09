@@ -12,6 +12,7 @@
 #include <dracosha/validator/check_exists.hpp>
 #include <dracosha/validator/variadic_property.hpp>
 #include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/adapters/reporting_adapter.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -289,6 +290,11 @@ struct WithChild
         return val>10 && word.size()>=5;
     }
 
+    bool sum_gte_10(int a, int b) const noexcept
+    {
+        return (a+b)>=10;
+    }
+
     std::map<
         int,
         std::map<int,std::string>
@@ -305,6 +311,8 @@ DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(my_map)
 
 DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(has_safe_child_word)
 DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(safe_child_word,has_safe_child_word)
+
+DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_FLAG(sum_gte_10,"must be 10 and more","must be less than 10")
 
 }
 
@@ -400,6 +408,53 @@ BOOST_AUTO_TEST_CASE(TestPropertyNotation)
         child_word(20,"hello")(eq,30)
     );
     BOOST_CHECK(!v3.apply(o1));
+}
+
+BOOST_AUTO_TEST_CASE(TestFlag)
+{
+    //! @todo Maybe construct some other report with flags
+    //! For example: _property_name_ + "(args list)" + "flag description"
+    WithChild o1;
+    std::string rep;
+    auto ra1=make_reporting_adapter(o1,rep);
+
+    auto v1=validator(
+        sum_gte_10(5,7)(flag,true)
+    );
+    BOOST_CHECK(v1.apply(o1));
+
+    auto v2=validator(
+        sum_gte_10(2,7)(flag,true)
+    );
+    BOOST_CHECK(!v2.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,std::string("must be 10 and more"));
+    rep.clear();
+
+    auto v3=validator(
+        sum_gte_10(12,7)(flag,false)
+    );
+    BOOST_CHECK(!v3.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,std::string("must be less than 10"));
+    rep.clear();
+
+    auto v4=validator(
+        _[sum_gte_10][5][7](value(flag,true))
+    );
+    BOOST_CHECK(v4.apply(o1));
+
+    auto v5=validator(
+        _[sum_gte_10][2][7](value(flag,true))
+    );
+    BOOST_CHECK(!v5.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,std::string("element #7 of element #2 of sum_gte_10 must be true"));
+    rep.clear();
+
+    auto v6=validator(
+        _[sum_gte_10][12][7](value(flag,false))
+    );
+    BOOST_CHECK(!v6.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,std::string("element #7 of element #12 of sum_gte_10 must be false"));
+    rep.clear();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
