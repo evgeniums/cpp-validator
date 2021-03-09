@@ -30,7 +30,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 template <typename Tobj, typename Tpath>
-auto member_value_type(Tobj&& obj, Tpath&& path)
+constexpr auto member_value_type(Tobj&& obj, Tpath&& path)
 {
     auto path_c=hana::transform(path,extract_object_wrapper_type_c);
     auto obj_c=hana::type_c<decltype(obj)>;
@@ -47,7 +47,7 @@ auto member_value_type(Tobj&& obj, Tpath&& path)
   This operation is expected to be static and assumed to be performed at compile time.
 */
 template <typename Tobj, typename Tpath>
-auto check_member_path(Tobj&& obj, Tpath&& path)
+constexpr auto check_member_path(Tobj&& obj, Tpath&& path)
 {
     return !hana::is_nothing(member_value_type(obj,path));
 }

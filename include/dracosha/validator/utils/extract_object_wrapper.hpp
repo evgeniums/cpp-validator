@@ -78,7 +78,7 @@ constexpr auto object_wrapper_value(T&& val) -> decltype(auto)
 struct extract_object_wrapper_type_c_t
 {
     template <typename T>
-    auto operator ()(T) const
+    constexpr auto operator ()(T) const
     {
         return hana::type<typename extract_object_wrapper_t<T>::type>{};
     }

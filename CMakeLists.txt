@@ -58,7 +58,7 @@ SET (HEADERS
     include/dracosha/validator/range.hpp
     include/dracosha/validator/error.hpp
     include/dracosha/validator/member_path.hpp
-#    include/dracosha/validator/variadic_property.hpp
+    include/dracosha/validator/variadic_property.hpp
 
     include/dracosha/validator/aggregation/and.hpp
     include/dracosha/validator/aggregation/or.hpp

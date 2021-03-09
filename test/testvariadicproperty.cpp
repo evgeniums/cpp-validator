@@ -7,8 +7,11 @@
 #include <dracosha/validator/utils/reference_wrapper.hpp>
 #include <dracosha/validator/utils/optional.hpp>
 #include <dracosha/validator/utils/class_method_args.hpp>
+#include <dracosha/validator/check_member_path.hpp>
 #include <dracosha/validator/get_member.hpp>
 #include <dracosha/validator/check_exists.hpp>
+#include <dracosha/validator/variadic_property.hpp>
+#include <dracosha/validator/validator.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -239,6 +242,100 @@ BOOST_AUTO_TEST_CASE(TestCheckExistsWithOptional)
     BOOST_CHECK(!check_exists(wat2,hana::make_tuple(20,50,std::string("value1"))));
 
     BOOST_CHECK(!check_exists(m1,hana::make_tuple("key1",10,20)));
+}
+
+namespace {
+
+struct WithChild
+{
+    ~WithChild()
+    {
+    }
+
+    WithChild():_m
+         {
+            {
+                22,
+                {
+                    {100,std::string("hundred")},
+                    {1000,std::string("thousand")}
+                }
+            }
+         }
+    {}
+
+    int child(int val) const
+    {
+        return val+1;
+    }
+
+    int child_word(int val, const std::string& word) const noexcept
+    {
+        return val+word.size();
+    }
+
+    const std::map<int,std::string>& my_map(int index, int offset) const
+    {
+        return _m.at(index+offset);
+    }
+
+    std::map<
+        int,
+        std::map<int,std::string>
+    > _m;
+};
+
+struct WithoutChild
+{
+};
+
+DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(child)
+DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(child_word)
+DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(my_map)
+
+}
+
+BOOST_AUTO_TEST_CASE(TestPropertyAlwaysExistArg1)
+{
+    static_assert(has_property<WithChild,decltype(child)>(),"");
+    static_assert(!has_property<WithoutChild,decltype(child)>(),"");
+
+    WithChild o1;
+    static_assert(check_member_path(o1,hana::make_tuple(child)),"");
+    std::ignore=get_member(o1,hana::make_tuple(child));
+    static_assert(check_member_path(o1,hana::make_tuple(child,10)),"");
+    auto res1=get_member(o1,hana::make_tuple(child,10));
+    static_assert(std::is_same<decltype(res1),int>::value,"");
+    BOOST_CHECK_EQUAL(get_member(o1,hana::make_tuple(child,10)),11);
+
+    auto v1=validator(
+        _[child][20](eq,21)
+    );
+    BOOST_CHECK(v1.apply(o1));
+}
+
+BOOST_AUTO_TEST_CASE(TestPropertyAlwaysExistArg2)
+{
+    WithChild o1;
+
+    auto v1=validator(
+        _[child_word][20]["hello"](eq,25)
+    );
+    BOOST_CHECK(v1.apply(o1));
+}
+
+BOOST_AUTO_TEST_CASE(TestPropertyAlwaysExistArg2Nested)
+{
+    WithChild o1;
+
+    auto v1=validator(
+        _[my_map][20][2][1000](eq,"thousand")
+    );
+    BOOST_CHECK(v1.apply(o1));
+    auto v2=validator(
+        _[my_map][20][2][1000](eq,"hundred")
+    );
+    BOOST_CHECK(!v2.apply(o1));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

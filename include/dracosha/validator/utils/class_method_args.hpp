@@ -28,6 +28,10 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <class FnT>
 struct class_method_args
 {
+    constexpr static auto types()
+    {
+        return hana::tuple_t<>;
+    }
 };
 
 template <typename Ret, typename Cls, typename... Args>
