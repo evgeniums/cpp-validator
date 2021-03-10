@@ -20,11 +20,13 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_NESTED_MEMBER_NAME_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/utils/extract_object_wrapper.hpp>
 #include <dracosha/validator/member.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
 #include <dracosha/validator/reporting/phrase_grammar_cats.hpp>
 #include <dracosha/validator/reporting/single_member_name.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
+#include <dracosha/validator/reporting/reporting_member_skip.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -153,11 +155,25 @@ auto intermediate_member_names(const T& id, const TraitsT& traits, grammar_categ
         hana::tuple<>(),
         [&traits,&grammar_cats](auto&& prev_parts, auto&& current_key)
         {
-            auto&& cats=last_grammar_categories(prev_parts,grammar_cats);
-            return hana::concat(
-                        std::forward<decltype(prev_parts)>(prev_parts),
-                        member_name_with_separator(current_key,traits,cats)
-                   );
+            using key_type=typename extract_object_wrapper_t<decltype(current_key)>::type;
+            return hana::eval_if(
+                hana::or_(
+                    hana::is_a<key_type,reporting_member_skip>,
+                    std::is_base_of<reporting_member_skip,key_type>{}
+                ),
+                [&](auto&& _) -> decltype(auto)
+                {
+                    return hana::id(_(prev_parts));
+                },
+                [&](auto&& _)
+                {
+                    auto&& cats=last_grammar_categories(_(prev_parts),_(grammar_cats));
+                    return hana::concat(
+                                std::forward<decltype(_(prev_parts))>(_(prev_parts)),
+                                member_name_with_separator(_(current_key),_(traits),_(cats))
+                           );
+                }
+            );
         }
     );
 }

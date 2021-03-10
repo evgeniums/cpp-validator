@@ -49,7 +49,7 @@ struct type_p_value
         return "value";
     }
 
-    constexpr static const char* flag_str(bool)
+    constexpr static const char* flag_str(bool,bool=false)
     {
         return nullptr;
     }

@@ -427,14 +427,14 @@ BOOST_AUTO_TEST_CASE(TestFlag)
         sum_gte_10(2,7)(flag,true)
     );
     BOOST_CHECK(!v2.apply(ra1));
-    BOOST_CHECK_EQUAL(rep,std::string("must be 10 and more"));
+    BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(2,7) must be 10 and more"));
     rep.clear();
 
     auto v3=validator(
         sum_gte_10(12,7)(flag,false)
     );
     BOOST_CHECK(!v3.apply(ra1));
-    BOOST_CHECK_EQUAL(rep,std::string("must be less than 10"));
+    BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(12,7) must be less than 10"));
     rep.clear();
 
     auto v4=validator(
@@ -454,6 +454,38 @@ BOOST_AUTO_TEST_CASE(TestFlag)
     );
     BOOST_CHECK(!v6.apply(ra1));
     BOOST_CHECK_EQUAL(rep,std::string("element #7 of element #12 of sum_gte_10 must be false"));
+    rep.clear();
+
+    std::vector<WithChild> vec7;
+    vec7.resize(10);
+    auto ra7=make_reporting_adapter(vec7,rep);
+
+    auto v7=validator(
+        _[5](sum_gte_10(12,7)(flag,false))
+    );
+    BOOST_CHECK(!v7.apply(ra7));
+    BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(12,7) of element #5 must be less than 10"));
+    rep.clear();
+
+    auto v8=validator(
+        _[5](sum_gte_10(12,7)(eq,false))
+    );
+    BOOST_CHECK(!v8.apply(ra7));
+    BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(12,7) of element #5 must be equal to false"));
+    rep.clear();
+
+    auto v9=validator(
+        sum_gte_10(2,7)(flag(flag_set_unset),true)
+    );
+    BOOST_CHECK(!v9.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(2,7) must be set"));
+    rep.clear();
+
+    auto v10=validator(
+        _[5](sum_gte_10(12,7)(flag(flag_set_unset),false))
+    );
+    BOOST_CHECK(!v10.apply(ra7));
+    BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(12,7) of element #5 must be unset"));
     rep.clear();
 }
 

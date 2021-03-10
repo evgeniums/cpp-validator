@@ -58,14 +58,19 @@ struct can_single_member_name
  */
 template <typename T, typename TraitsT>
 struct can_single_member_name<T,TraitsT,
-            decltype((void)std::declval<TraitsT>()(std::declval<T>()))
+            std::enable_if_t<
+                std::is_same<
+                    decltype((void)std::declval<TraitsT>()(std::declval<T>())),
+                    void
+                >::value
+            >
         >
 {
     constexpr static const bool value=true;
 };
 
 /**
- * @brief Default helper for singe member name formatting when traits can not be used.
+ * @brief Default helper for single member name formatting when traits can not be used.
  *
  * Default helper converts ID to string, then translates it and after all decorates the result.
  */
@@ -79,7 +84,7 @@ struct single_member_name_t
 };
 
 /**
- * @brief Helper for singe member name formatting when traits can be used.
+ * @brief Helper for single member name formatting when traits can be used.
  *
  * ID is forwarded to traits, then the result goes to decorator.
  */
@@ -93,7 +98,7 @@ struct single_member_name_t<T,TraitsT,hana::when<can_single_member_name<typename
 };
 
 /**
- * @brief Helper for singe member name formatting when traits can not be used and id is of inegral type.
+ * @brief Helper for single member name formatting when traits can not be used and id is of integral type.
  *
  * Integral ID is interpreted as index and formatted like "element #id", then it is translated and after all the result is decorated.
  */

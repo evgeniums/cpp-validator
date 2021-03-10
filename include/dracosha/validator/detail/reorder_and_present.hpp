@@ -26,6 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/operators/flag.hpp>
 #include <dracosha/validator/operators/op_report_without_operand.hpp>
 #include <dracosha/validator/properties.hpp>
+#include <dracosha/validator/variadic_property.hpp>
 #include <dracosha/validator/reporting/strings.hpp>
 #include <dracosha/validator/reporting/member_operand.hpp>
 #include <dracosha/validator/reporting/member_names.hpp>
@@ -513,13 +514,31 @@ struct apply_reorder_present_4args_t<
             !std::decay_t<OpT>::prepend_property(prop),
             [&dst,&member,&formatters,&op,&prop,&b](auto&&)
             {
-                format_join(dst,
-                    hana::make_tuple(
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<1>)
-                    ),
-                    member,
-                    op.str(prop,b)
+                // member flag(prop,b)
+                hana::eval_if(
+                    !std::is_base_of<variadic_property_tag,std::decay_t<PropT>>::value,
+                    [&](auto &&)
+                    {
+                        format_join(dst,
+                            hana::make_tuple(
+                                hana::at(formatters,hana::size_c<0>),
+                                hana::at(formatters,hana::size_c<1>)
+                            ),
+                            member,
+                            op.str(prop,b)
+                        );
+                    },
+                    [&](auto &&)
+                    {
+                        format_join(dst,
+                            hana::make_tuple(
+                                hana::at(formatters,hana::size_c<0>),
+                                hana::at(formatters,hana::size_c<1>)
+                            ),
+                            make_member_property(member,prop),
+                            op.str(prop,b,true)
+                        );
+                    }
                 );
             },
             [&dst,&member,&formatters,&op,&prop,&b](auto&&)

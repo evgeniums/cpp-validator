@@ -132,6 +132,7 @@ SET (HEADERS
     include/dracosha/validator/reporting/prepare_operand_for_formatter.hpp
     include/dracosha/validator/reporting/format_bool_operand.hpp
     include/dracosha/validator/reporting/format_operand.hpp
+    include/dracosha/validator/reporting/reporting_member_skip.hpp
 
     include/dracosha/validator/reporting/locale/sample_locale.hpp
     include/dracosha/validator/reporting/locale/ru.hpp

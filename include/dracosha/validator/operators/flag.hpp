@@ -56,34 +56,33 @@ struct flag_t
     /**
      * @brief Get flag description if flag is used with a property and property is not a value.
      * @param prop Property.
-     * @param Operand.
+     * @param b Operand.
+     * @param of_member Property must use "property of member" order.
      * @return Flag description taken from the property if it has flag strings or default preset flag description otherwise.
      */
     template <typename PropT>
     std::string str(PropT&& prop,
                     const bool& b,
-                    std::enable_if_t<
-                            (hana::is_a<property_tag,PropT> && !std::is_same<std::decay_t<PropT>,type_p_value>::value),
-                            void*
-                        > = nullptr) const
+                    bool of_member=false
+            ) const
     {
-        return std::decay_t<PropT>::has_flag_str()?prop.flag_str(b):default_flag_preset(b);
-    }
-
-    /**
-     * @brief Get flag description if flag is used with either value property or no property.
-     * @param Operand.
-     * @return Flag description.
-     */
-    template <typename PropT>
-    std::string str(PropT&&,
-                    const bool& b,
-                    std::enable_if_t<
-                            (!hana::is_a<property_tag,PropT> || std::is_same<std::decay_t<PropT>,type_p_value>::value),
-                            void*
-                        > = nullptr) const
-    {
-        return default_flag_preset(b);
+        return hana::eval_if(
+            hana::and_(
+                hana::is_a<property_tag,PropT>,
+                hana::not_(std::is_same<std::decay_t<PropT>,type_p_value>{})
+            ),
+            [&](auto&& _)
+            {
+                return std::decay_t<PropT>::has_flag_str() ?
+                        _(prop).flag_str(_(b),_(of_member))
+                        :
+                        default_flag_preset(_(b));
+            },
+            [&](auto&& _)
+            {
+                return default_flag_preset(_(b));
+            }
+        );
     }
 
     /**
@@ -120,7 +119,7 @@ struct flag_op_with_preset : public flag_t
          * @return Preset flag description.
          */
         template <typename PropT>
-        std::string str(PropT&&,const bool& b) const
+        std::string str(PropT&&,const bool& b, bool =false) const
         {
             return _preset(b);
         }
@@ -161,7 +160,7 @@ struct flag_op_with_string : public flag_t
          * @return Explicit flag description.
          */
         template <typename PropT>
-        std::string str(PropT&&,const bool&) const
+        std::string str(PropT&&,const bool&, bool =false) const
         {
             return _string;
         }

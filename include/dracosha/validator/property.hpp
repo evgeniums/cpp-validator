@@ -117,7 +117,7 @@ auto property(Tv&& val, Tp&& prop) -> decltype(auto)
         {\
             return #prop; \
         }\
-        constexpr static const char* flag_str(bool b) \
+        constexpr static const char* flag_str(bool b, bool =false) \
         {\
             if (b) \
             { \

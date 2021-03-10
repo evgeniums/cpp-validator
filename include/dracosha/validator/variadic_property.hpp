@@ -24,6 +24,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/class_method_args.hpp>
 #include <dracosha/validator/property.hpp>
+#include <dracosha/validator/utils/to_string.hpp>
+#include <dracosha/validator/reporting/backend_formatter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -112,6 +114,8 @@ struct variadic_property_closure
     FnArgTypes _arg_types;
     FnHasT _fn_has;
 };
+
+struct variadic_property_tag{};
 
 #define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HF(prop,has_prop,flag_dscr,n_flag_dscr) \
 struct might_have_variadic_t_##prop \
@@ -204,7 +208,7 @@ struct type_variadic_p_##prop \
 }; \
 constexpr type_variadic_p_##prop prop{}; \
 template <typename StoredArgsT> \
-struct type_variadic_p_notation_##prop : public type_variadic_p_##prop \
+struct type_variadic_p_notation_##prop : public type_variadic_p_##prop, public variadic_property_tag \
 { \
     type_variadic_p_notation_##prop(StoredArgsT&& stored_args):_args(std::move(stored_args))\
     {}\
@@ -223,6 +227,30 @@ struct type_variadic_p_notation_##prop : public type_variadic_p_##prop \
     constexpr auto operator () (Args&&... args) const \
     {\
         return make_property_validator(*this,std::forward<Args>(args)...); \
+    }\
+    \
+    std::string name() const \
+    {\
+        std::string dst{#prop}; \
+        backend_formatter.append(dst,"("); \
+        backend_formatter.append_join(dst,",",hana::transform(_args,to_string)); \
+        backend_formatter.append(dst,")"); \
+        return dst; \
+    }\
+    std::string flag_str(bool b, bool member_of=false) const \
+    {\
+        auto str=flag_dscr; \
+        if (!b) \
+        { \
+            str=n_flag_dscr; \
+        } \
+        if (member_of) \
+        { \
+            return str; \
+        } \
+        std::string dst{name()}; \
+        backend_formatter.append(dst," ",str); \
+        return dst; \
     }\
     \
     StoredArgsT _args; \

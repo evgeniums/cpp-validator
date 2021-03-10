@@ -63,7 +63,7 @@ struct member_names
     }
 
     /**
-     * @brief Format object of member_ptoperty type.
+     * @brief Format object of member_property type.
      * @param member Pair of member and property.
      * @param grammar_cats Gramatical categories to use for translation.
      * @return Formatted name of the member's property.

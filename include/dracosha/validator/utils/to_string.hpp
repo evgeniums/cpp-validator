@@ -34,7 +34,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  *  @brief Convert to <?????> token if no other conversion is possible.
  */
 template <typename T, typename =hana::when<true>>
-struct to_string_t
+struct to_string_impl
 {
     template <typename T1>
     std::string operator () (T1&&) const
@@ -47,7 +47,7 @@ struct to_string_t
  *  @brief Convert to string if string is constructible of argument.
  */
 template <typename T>
-struct to_string_t<T,hana::when<
+struct to_string_impl<T,hana::when<
             std::is_constructible<std::string,T>::value
             &&
             !hana::is_a<property_tag,T>
@@ -64,11 +64,11 @@ struct to_string_t<T,hana::when<
  *  @brief Convert to string if argument is a property.
  */
 template <typename T>
-struct to_string_t<T,hana::when<hana::is_a<property_tag,T>>>
+struct to_string_impl<T,hana::when<hana::is_a<property_tag,T>>>
 {
-    std::string operator () (const T&) const
+    std::string operator () (const T& v) const
     {
-        return std::string(T::name());
+        return std::string(v.name());
     }
 };
 
@@ -76,7 +76,7 @@ struct to_string_t<T,hana::when<hana::is_a<property_tag,T>>>
  *  @brief Convert to string if argument is an iterator.
  */
 template <typename T>
-struct to_string_t<T,hana::when<hana::is_a<wrap_iterator_tag,T>>>
+struct to_string_impl<T,hana::when<hana::is_a<wrap_iterator_tag,T>>>
 {
     std::string operator () (const T& id) const
     {
@@ -106,7 +106,7 @@ struct can_to_string<T,
  *  @brief Convert to string if string can be constructible using sdt::to_string().
  */
 template <typename T>
-struct to_string_t<T,hana::when<can_to_string<T>::value>>
+struct to_string_impl<T,hana::when<can_to_string<T>::value>>
 {
     std::string operator () (const T& id) const
     {
@@ -118,18 +118,22 @@ struct to_string_t<T,hana::when<can_to_string<T>::value>>
  * @brief Template instance for converting variable to string.
  */
 template <typename T>
-constexpr to_string_t<T> to_string_inst{};
+constexpr to_string_impl<T> to_string_inst{};
 
 /**
  * @brief Convert argument to string.
  * @param v Argument
  * @return String
  */
-template <typename T>
-std::string to_string(const T& v)
+struct to_string_t
 {
-    return to_string_inst<std::decay_t<decltype(extract_object_wrapper(v))>>(extract_object_wrapper(v));
-}
+    template <typename T>
+    std::string operator () (const T& v) const
+    {
+        return to_string_inst<std::decay_t<decltype(extract_object_wrapper(v))>>(extract_object_wrapper(v));
+    }
+};
+constexpr to_string_t to_string{};
 
 //-------------------------------------------------------------
 
