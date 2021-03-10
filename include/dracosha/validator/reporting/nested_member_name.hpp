@@ -27,6 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/single_member_name.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
 #include <dracosha/validator/reporting/reporting_member_skip.hpp>
+#include <dracosha/validator/variadic_property.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -274,9 +275,21 @@ auto list_member_names(const T& id, const TraitsT& traits, grammar_categories gr
  * @return Formatted full member name.
  */
 template <typename T, typename TraitsT>
-auto join_member_names(const T& id, const TraitsT& traits, grammar_categories grammar_cats)
+auto join_member_names(T&& id, const TraitsT& traits, grammar_categories grammar_cats)
 {
-    auto parts=list_member_names(id,traits,grammar_cats);
+    auto&& member=hana::if_(
+        typename std::decay_t<T>::is_with_varg{},
+        [](auto&& id)
+        {
+            return inherit_member(compact_variadic_property(id.path()),id);
+        },
+        [](auto&& id) -> decltype(auto)
+        {
+            return hana::id(std::forward<decltype(id)>(id));
+        }
+    )(std::forward<T>(id));
+
+    auto parts=list_member_names(member,traits,grammar_cats);
     std::string dst;
     backend_formatter.append_join(
        dst,

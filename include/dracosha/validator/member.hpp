@@ -33,6 +33,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/extract_object_wrapper.hpp>
 #include <dracosha/validator/aggregation/element_aggregation.hpp>
 #include <dracosha/validator/aggregation/any.hpp>
+#include <dracosha/validator/variadic_arg.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -274,6 +275,16 @@ struct is_member_with_any
             );
 };
 
+template <typename ... PathT>
+struct is_member_with_varg
+{
+    constexpr static const auto value=hana::fold(
+                hana::tuple_t<PathT...>,
+                hana::false_{},
+                is_varg
+            );
+};
+
 }
 
 /**
@@ -294,6 +305,7 @@ class member
         using is_aggregated=decltype(detail::is_member_aggregated<ParentPathT...,type>::value);
         using is_with_any=decltype(detail::is_member_with_any<ParentPathT...,type>::value);
         using is_key_any=std::is_same<typename extract_object_wrapper_t<type>::type,std::decay_t<decltype(ANY)>>;
+        using is_with_varg=decltype(detail::is_member_with_varg<ParentPathT...,type>::value);
 
         constexpr static bool has_any() noexcept
         {
@@ -302,6 +314,10 @@ class member
         constexpr static bool key_is_any() noexcept
         {
             return is_key_any::value;
+        }
+        constexpr static bool has_varg() noexcept
+        {
+            return is_with_varg::value;
         }
 
         constexpr static const bool is_nested=sizeof...(ParentPathT)!=0;
@@ -409,6 +425,11 @@ class member
         auto key() const -> decltype(auto)
         {
             return extract_object_wrapper(hana::back(_path));
+        }
+
+        auto last_path_item() const -> decltype(auto)
+        {
+            return hana::back(_path);
         }
 
         /**

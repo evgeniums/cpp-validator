@@ -191,7 +191,7 @@ constexpr apply_ref_t apply_ref{};
 struct make_cref_tuple_t
 {
     template <typename ... Args>
-    constexpr auto operator() (Args&&... args) const -> decltype(auto)
+    constexpr auto operator() (Args&&... args) const
     {
         return hana::make_tuple(cref(std::forward<Args>(args))...);
     };
@@ -206,7 +206,7 @@ constexpr make_cref_tuple_t make_cref_tuple{};
 struct make_ref_tuple_t
 {
     template <typename ... Args>
-    constexpr auto operator () (Args&&... args) const -> decltype(auto)
+    constexpr auto operator () (Args&&... args) const
     {
         return hana::make_tuple(ref(std::forward<Args>(args))...);
     };

@@ -10,6 +10,7 @@
 #include <dracosha/validator/check_member_path.hpp>
 #include <dracosha/validator/get_member.hpp>
 #include <dracosha/validator/check_exists.hpp>
+#include <dracosha/validator/member.hpp>
 #include <dracosha/validator/variadic_property.hpp>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
@@ -431,7 +432,7 @@ BOOST_AUTO_TEST_CASE(TestReporting)
     BOOST_CHECK_EQUAL(rep,std::string("\"child_word(20,hello)\" must be equal to 30"));
     rep.clear();
 }
-#endif
+
 BOOST_AUTO_TEST_CASE(TestFlag)
 {
     WithChild o1;
@@ -514,5 +515,71 @@ BOOST_AUTO_TEST_CASE(TestFlag)
     BOOST_CHECK(!v10.apply(ra10));
     BOOST_CHECK_EQUAL(rep,std::string("\"sum_gte_10(12,7)\" of \"element #5\" must be unset"));
     rep.clear();
+
+    auto v11=validator(
+        _[5][sum_gte_10(12,7)](flag(flag_set_unset),false)
+    );
+    BOOST_CHECK(!v11.apply(ra7));
+    BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(12,7) of element #5 must be unset"));
+    rep.clear();
 }
+#endif
+
+BOOST_AUTO_TEST_CASE(TestCompactVariadicProperty)
+{
+    static_assert(decltype(is_varg(varg(7)))::value,"");
+
+    auto m1=_[sum_gte_10(12,7)];
+    BOOST_CHECK(sum_gte_10(12,7)==m1.key());
+    auto p1=m1.path();
+    auto m2=_[sum_gte_10][varg(12)][varg(7)];
+    static_assert(decltype(is_varg(m2.last_path_item()))::value,"");
+    auto p2=compact_variadic_property(m2.path());
+    auto&& aaa=sum_gte_10(12,7);
+    auto&& bbb=hana::back(p2);
+    static_assert(std::is_same<std::decay_t<decltype(aaa)>,std::decay_t<decltype(bbb)>>::value,"");
+    BOOST_CHECK(sum_gte_10(12,7)==hana::back(p2));
+    BOOST_CHECK(check_paths_equal(p1,p2));
+
+    auto m3=_["hello"][varg(12)];
+    auto p3=compact_variadic_property(m3.path());
+    BOOST_CHECK(check_paths_equal(p3,m3.path()));
+
+    auto m4=_[varg(12)];
+    auto p4=compact_variadic_property(m4.path());
+    BOOST_CHECK(check_paths_equal(p4,m4.path()));
+
+    using varg_type=decltype(varg(12));
+    static_assert(detail::is_member_with_varg<varg_type>::value,"");
+    static_assert(detail::is_member_with_varg<int,decltype(varg(12)),std::string>::value,"");
+
+    auto m5=_[5][sum_gte_10][varg(12)][varg(7)]["hello"];
+    static_assert(decltype(m5)::has_varg(),"");
+    auto p5=compact_variadic_property(m5.path());
+    auto m6=_[5][sum_gte_10(12,7)]["hello"];
+    static_assert(!decltype(m6)::has_varg(),"");
+    BOOST_CHECK(check_paths_equal(p5,m6.path()));
+
+    std::string rep;
+    std::vector<WithChild> vec7;
+    vec7.resize(10);
+    auto mn=make_decorated_member_names(make_default_member_names(),quotes_decorator);
+    auto reporter=make_reporter(rep,make_formatter(mn));
+    auto ra7=make_reporting_adapter(vec7,reporter);
+
+    auto v7=validator(
+        _[5][sum_gte_10][varg(12)][varg(7)](eq,false)
+    );
+    BOOST_CHECK(!v7.apply(ra7));
+    BOOST_CHECK_EQUAL(rep,std::string("\"sum_gte_10(12,7)\" of \"element #5\" must be equal to false"));
+    rep.clear();
+
+    auto v8=validator(
+        _[5][sum_gte_10(12,7)](eq,false)
+    );
+    BOOST_CHECK(!v8.apply(ra7));
+    BOOST_CHECK_EQUAL(rep,std::string("\"sum_gte_10(12,7)\" of \"element #5\" must be equal to false"));
+    rep.clear();
+}
+
 BOOST_AUTO_TEST_SUITE_END()

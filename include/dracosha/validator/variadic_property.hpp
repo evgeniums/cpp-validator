@@ -23,9 +23,12 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/class_method_args.hpp>
+#include <dracosha/validator/utils/object_wrapper.hpp>
+#include <dracosha/validator/utils/extract_object_wrapper.hpp>
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/utils/to_string.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
+#include <dracosha/validator/variadic_arg.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -116,6 +119,7 @@ struct variadic_property_closure
 };
 
 struct variadic_property_tag{};
+struct variadic_property_base_tag{};
 
 #define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HF(prop,has_prop,flag_dscr,n_flag_dscr) \
 struct might_have_variadic_t_##prop \
@@ -127,7 +131,7 @@ struct might_have_variadic_t_##prop \
     } \
 }; \
 constexpr might_have_variadic_t_##prop might_have_variadic_##prop{}; \
-struct type_variadic_p_##prop \
+struct type_variadic_p_##prop : public variadic_property_base_tag \
 { \
     using hana_tag=DRACOSHA_VALIDATOR_NAMESPACE::property_tag; \
     \
@@ -204,7 +208,7 @@ struct type_variadic_p_##prop \
     } \
     \
     template <typename ...Args> \
-    constexpr auto operator () (Args&&... args) const -> decltype(auto);\
+    auto operator () (Args&&... args) const;\
 }; \
 constexpr type_variadic_p_##prop prop{}; \
 template <typename StoredArgsT> \
@@ -254,10 +258,21 @@ struct type_variadic_p_notation_##prop : public type_variadic_p_##prop, public v
         return dst; \
     }\
     \
+    template <typename Arg> \
+    auto next(Arg&& arg) const \
+    { \
+        auto stored_args=hana::append(_args,std::forward<Arg>(arg)); \
+        return type_variadic_p_notation_##prop<decltype(stored_args)>{std::move(stored_args)}; \
+    } \
+    bool operator == (const type_variadic_p_notation_##prop& other) const noexcept \
+    { \
+        return hana::equal(_args,other._args);  \
+    } \
+    \
     StoredArgsT _args; \
 }; \
 template <typename ...Args> \
-constexpr auto type_variadic_p_##prop::operator () (Args&&... args) const -> decltype(auto) \
+auto type_variadic_p_##prop::operator () (Args&&... args) const \
 { \
     auto stored_args=hana::make_tuple(std::forward<Args>(args)...); \
     return type_variadic_p_notation_##prop<decltype(stored_args)>{std::move(stored_args)}; \
@@ -266,6 +281,77 @@ constexpr auto type_variadic_p_##prop::operator () (Args&&... args) const -> dec
 #define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(prop) DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HF(prop,always_has_property,nullptr,nullptr)
 #define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(prop,has) DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HF(prop,has,nullptr,nullptr)
 #define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_FLAG(prop,flag_dscr,n_flag_dscr) DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HF(prop,always_has_property,flag_dscr,n_flag_dscr)
+
+struct compact_variadic_property_t
+{
+    template <typename PathT>
+    auto operator () (PathT&& path) const -> decltype(auto)
+    {
+        return hana::fold(
+            path,
+            hana::tuple<>{},
+            [](auto&& accumulated, auto&& current_key)
+            {
+                // check if current key is variadic property
+                using type=std::decay_t<decltype(current_key)>;
+                return hana::eval_if(
+                    hana::and_(
+                        std::is_base_of<variadic_arg_tag,type>{},
+                        hana::not_(hana::is_empty(accumulated))
+                    ),
+                    [&](auto&& _)
+                    {
+                        // modify last element in path if current key is variadic property
+                        const auto& prev=hana::back(_(accumulated));
+                        using prev_type=typename extract_object_wrapper_t<decltype(prev)>::type;
+                        return hana::eval_if(
+                            std::is_base_of<variadic_property_base_tag,prev_type>{},
+                            [&](auto&& _)
+                            {
+                                const auto& p1=_(prev);
+                                using prev_type1=typename extract_object_wrapper_t<decltype(p1)>::type;
+                                return hana::eval_if(
+                                    std::is_base_of<variadic_property_tag,prev_type1>{},
+                                    [&](auto&& _)
+                                    {
+                                        // create next property notation appending current key
+                                        auto new_prev=_(prev).next(extract_object_wrapper(_(current_key)));
+                                        return hana::append(
+                                                        hana::drop_back(_(accumulated)),
+                                                        new_prev
+                                                    );
+                                    },
+                                    [&](auto&& _)
+                                    {
+                                        // create property notation with current key as the first argument
+                                        auto new_prev=_(prev)(extract_object_wrapper(_(current_key)));
+                                        return hana::append(
+                                                        hana::drop_back(_(accumulated)),
+                                                        new_prev
+                                                    );
+                                    }
+                                );
+                            },
+                            [&](auto&& _)
+                            {
+                                // varg must follow variadic property
+                                // if not then leave the key as is
+                                return hana::append(_(accumulated),_(current_key));
+                            }
+                        );
+                    },
+                    [&](auto&& _)
+                    {
+                        // leave the key as is if current key is not variadic property
+                        // or varg is the first key in the path
+                        return hana::append(_(accumulated),_(current_key));
+                    }
+                );
+            }
+        );
+    }
+};
+constexpr compact_variadic_property_t compact_variadic_property{};
 
 //-------------------------------------------------------------
 

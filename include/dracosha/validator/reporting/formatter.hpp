@@ -66,6 +66,23 @@ struct formatter
     StringsT _strings;
     OrderAndPresentationT _order_and_presentation;
 
+    template <typename MemberNamesT1, typename OperandsT1, typename StringsT1, typename OrderAndPresentationT1>
+    formatter(
+        MemberNamesT1&& member_names,
+        OperandsT1&& operands,
+        StringsT1&& strings,
+        OrderAndPresentationT1&& order_and_presentation
+    ) : _member_names(std::forward<MemberNamesT1>(member_names)),
+        _operands(std::forward<OperandsT1>(operands)),
+        _strings(std::forward<StringsT1>(strings)),
+        _order_and_presentation(std::forward<OrderAndPresentationT1>(order_and_presentation))
+    {}
+
+    auto formatters() const
+    {
+        return make_cref_tuple(_member_names,_strings,_operands);
+    }
+
     template <typename DstT, typename T2, typename OpT>
     void validate_operator(DstT& dst,const OpT& op, const T2& b) const
     {
@@ -79,7 +96,7 @@ struct formatter
     void validate_property(DstT& dst,const PropT& prop, const OpT& op, const T2& b) const
     {
         format(dst,
-               make_cref_tuple(_member_names,_strings,_operands),
+               formatters(),
                prop,op,prepare_operand_for_formatter(op,b)
                );
     }
@@ -88,7 +105,7 @@ struct formatter
     void validate(DstT& dst, const MemberT& member, const PropT& prop, const OpT& op, const T2& b) const
     {
         format(dst,
-               make_cref_tuple(_member_names,_member_names,_strings,_operands),
+               formatters(),
                member,prop,op,prepare_operand_for_formatter(op,b)
                );
     }
@@ -106,7 +123,7 @@ struct formatter
     void validate_with_other_member(DstT& dst, const MemberT& member, const PropT& prop, const OpT& op, const T2& b) const
     {
         format(dst,
-               make_cref_tuple(_member_names,_member_names,_strings,_member_names),
+               formatters(),
                member,prop,op,make_member_operand(b)
                );
     }
@@ -116,7 +133,7 @@ struct formatter
                                      std::enable_if_t<!hana::is_a<operand_tag,T2>,void*> =nullptr) const
     {
         format(dst,
-               make_cref_tuple(_member_names,_member_names,_strings,_strings),
+               make_cref_tuple(_member_names,_strings,_strings),
                member,prop,op,member_sample,string_master_sample
                );
     }
@@ -126,7 +143,7 @@ struct formatter
                                      std::enable_if_t<hana::is_a<operand_tag,T2>,void*> =nullptr) const
     {
         format(dst,
-               make_cref_tuple(_member_names,_member_names,_strings,_operands),
+               formatters(),
                member,prop,op,member_sample,b
                );
     }

@@ -65,6 +65,29 @@ void format_join(DstT& dst, FormatterTs&& formatters, Args&&... args)
 
 //-------------------------------------------------------------
 
+template <typename FormatterTs>
+auto arp_first_formatter(FormatterTs&& formatters) -> decltype(auto)
+{
+    return hana::at(formatters,hana::size_c<0>);
+}
+template <typename FormatterTs>
+auto arp_mn_formatter(FormatterTs&& formatters) -> decltype(auto)
+{
+    return arp_first_formatter(formatters);
+}
+template <typename FormatterTs>
+auto arp_strings_formatter(FormatterTs&& formatters) -> decltype(auto)
+{
+    return hana::at(formatters,hana::size_c<1>);
+}
+template <typename FormatterTs>
+auto arp_operands_formatter(FormatterTs&& formatters) -> decltype(auto)
+{
+    return hana::at(formatters,hana::size_c<2>);
+}
+
+//-------------------------------------------------------------
+
 /**
  * @brief Apply presentation and order of validation report for 1 argument, which must be an aggregation operator.
  */
@@ -147,7 +170,7 @@ struct apply_reorder_present_2args_t<
     {
         format_join(dst,
             hana::make_tuple(
-                hana::at(formatters,hana::size_c<0>)
+                arp_first_formatter(formatters)
             ),
             op.str(b)
         );
@@ -170,9 +193,9 @@ struct apply_reorder_present_2args_t<
     {
         format_join(dst,
             hana::make_tuple(
-                hana::at(formatters,hana::size_c<0>)
+                arp_first_formatter(formatters)
             ),
-            op.str(value,b,hana::at(formatters,hana::size_c<0>))
+            op.str(value,b,arp_first_formatter(formatters))
         );
     }
 };
@@ -198,8 +221,8 @@ struct apply_reorder_present_3args_t
                 // op b
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<1>),
-                        hana::at(formatters,hana::size_c<2>)
+                        arp_strings_formatter(formatters),
+                        arp_operands_formatter(formatters)
                     ),
                     op,
                     b
@@ -241,7 +264,7 @@ struct apply_reorder_present_3args_t<
                 // op b
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<1>)
+                        arp_strings_formatter(formatters)
                     ),
                     op.str(b)
                 );
@@ -251,8 +274,8 @@ struct apply_reorder_present_3args_t<
                 // prop of member op b
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<1>)
+                        arp_mn_formatter(formatters),
+                        arp_strings_formatter(formatters)
                     ),
                     prop,
                     op.str(b)
@@ -283,20 +306,20 @@ struct apply_reorder_present_3args_t<
             {
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<0>)
+                        arp_mn_formatter(formatters),
+                        arp_strings_formatter(formatters)
                     ),
                     prop,
-                    op.str(prop,b,hana::at(formatters,hana::size_c<0>))
+                    op.str(prop,b,arp_mn_formatter(formatters))
                 );
             },
             [&dst,&formatters,&op,&prop,&b](auto&&)
             {
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<0>)
+                        arp_strings_formatter(formatters)
                     ),
-                    op.str(prop,b,hana::at(formatters,hana::size_c<0>))
+                    op.str(prop,b,arp_mn_formatter(formatters))
                 );
             }
         );
@@ -325,8 +348,8 @@ struct apply_reorder_present_3args_t<
                 // op b
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<1>),
-                        hana::at(formatters,hana::size_c<0>)
+                        arp_strings_formatter(formatters),
+                        arp_mn_formatter(formatters)
                     ),
                     op,
                     b.get()
@@ -337,9 +360,9 @@ struct apply_reorder_present_3args_t<
                 // prop of member op b
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<1>),
-                        hana::at(formatters,hana::size_c<0>)
+                        arp_mn_formatter(formatters),
+                        arp_strings_formatter(formatters),
+                        arp_mn_formatter(formatters)
                     ),
                     prop,
                     op,
@@ -351,22 +374,6 @@ struct apply_reorder_present_3args_t<
 };
 
 //-------------------------------------------------------------
-
-template <typename FormatterTs>
-auto arp4_mn_formatter(FormatterTs&& formatters) -> decltype(auto)
-{
-    return hana::at(formatters,hana::size_c<0>);
-}
-template <typename FormatterTs>
-auto arp4_strings_formatter(FormatterTs&& formatters) -> decltype(auto)
-{
-    return hana::at(formatters,hana::size_c<2>);
-}
-template <typename FormatterTs>
-auto arp4_operands_formatter(FormatterTs&& formatters) -> decltype(auto)
-{
-    return hana::at(formatters,hana::size_c<3>);
-}
 
 /**
  * @brief Apply presentation and order of validation report for 4 arguments with member.
@@ -387,9 +394,9 @@ struct apply_reorder_present_4args_t
                 // member op b
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<2>),
-                        hana::at(formatters,hana::size_c<3>)
+                        arp_mn_formatter(formatters),
+                        arp_strings_formatter(formatters),
+                        arp_operands_formatter(formatters)
                     ),
                     member,
                     op,
@@ -401,9 +408,9 @@ struct apply_reorder_present_4args_t
                 // prop of member op b
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<2>),
-                        hana::at(formatters,hana::size_c<3>)
+                        arp_mn_formatter(formatters),
+                        arp_strings_formatter(formatters),
+                        arp_operands_formatter(formatters)
                     ),
                     make_member_property(member,prop),
                     op,
@@ -435,9 +442,9 @@ struct apply_reorder_present_4args_t<
                 // member op member_operand(b)
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<2>),
-                        hana::at(formatters,hana::size_c<0>)
+                        arp_mn_formatter(formatters),
+                        arp_strings_formatter(formatters),
+                        arp_mn_formatter(formatters)
                     ),
                     member,
                     op,
@@ -449,9 +456,9 @@ struct apply_reorder_present_4args_t<
                 // prop of member op prop of member_operand(b)
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<2>),
-                        hana::at(formatters,hana::size_c<0>)
+                        arp_mn_formatter(formatters),
+                        arp_strings_formatter(formatters),
+                        arp_mn_formatter(formatters)
                     ),
                     make_member_property(member,prop),
                     op,
@@ -486,8 +493,8 @@ struct apply_reorder_present_4args_t<
                 // member op b
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<2>)
+                        arp_mn_formatter(formatters),
+                        arp_strings_formatter(formatters)
                     ),
                     member,
                     op.str(b)
@@ -498,8 +505,8 @@ struct apply_reorder_present_4args_t<
                 // prop of member op b
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<2>)
+                        arp_mn_formatter(formatters),
+                        arp_strings_formatter(formatters)
                     ),
                     make_member_property(member,prop),
                     op.str(b)
@@ -537,22 +544,22 @@ struct apply_reorder_present_4args_t<
                     {
                         format_join(dst,
                             hana::make_tuple(
-                                arp4_mn_formatter(formatters),
-                                arp4_strings_formatter(formatters)
+                                arp_mn_formatter(formatters),
+                                arp_strings_formatter(formatters)
                             ),
                             member,
-                            op.str(prop,b,arp4_mn_formatter(formatters))
+                            op.str(prop,b,arp_mn_formatter(formatters))
                         );
                     },
                     [&](auto &&)
                     {
                         format_join(dst,
                             hana::make_tuple(
-                                arp4_mn_formatter(formatters),
-                                arp4_strings_formatter(formatters)
+                                arp_mn_formatter(formatters),
+                                arp_strings_formatter(formatters)
                             ),
                             make_member_property(member,prop),
-                            op.str(prop,b,arp4_mn_formatter(formatters),true)
+                            op.str(prop,b,arp_mn_formatter(formatters),true)
                         );
                     }
                 );
@@ -561,11 +568,11 @@ struct apply_reorder_present_4args_t<
             {
                 format_join(dst,
                     hana::make_tuple(
-                        arp4_mn_formatter(formatters),
-                        arp4_strings_formatter(formatters)
+                        arp_mn_formatter(formatters),
+                        arp_strings_formatter(formatters)
                     ),
                     make_member_property(member,prop),
-                    op.str(prop,b,arp4_mn_formatter(formatters))
+                    op.str(prop,b,arp_mn_formatter(formatters))
                 );
             }
         );
@@ -593,11 +600,11 @@ struct apply_reorder_present_5args_t
                 // member op member of sample
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<2>),
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<2>),
-                        hana::at(formatters,hana::size_c<3>)
+                        arp_mn_formatter(formatters),
+                        arp_strings_formatter(formatters),
+                        arp_mn_formatter(formatters),
+                        arp_strings_formatter(formatters),
+                        arp_operands_formatter(formatters)
                     ),
                     member,
                     op,
@@ -611,11 +618,11 @@ struct apply_reorder_present_5args_t
                 // prop of member op prop of member of sample
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<2>),
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<2>),
-                        hana::at(formatters,hana::size_c<3>)
+                        arp_mn_formatter(formatters),
+                        arp_strings_formatter(formatters),
+                        arp_mn_formatter(formatters),
+                        arp_strings_formatter(formatters),
+                        arp_operands_formatter(formatters)
                     ),
                     make_member_property(member,prop),
                     op,
