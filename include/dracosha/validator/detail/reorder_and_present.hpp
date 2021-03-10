@@ -172,7 +172,7 @@ struct apply_reorder_present_2args_t<
             hana::make_tuple(
                 hana::at(formatters,hana::size_c<0>)
             ),
-            op.str(value,b)
+            op.str(value,b,hana::at(formatters,hana::size_c<0>))
         );
     }
 };
@@ -287,7 +287,7 @@ struct apply_reorder_present_3args_t<
                         hana::at(formatters,hana::size_c<0>)
                     ),
                     prop,
-                    op.str(prop,b)
+                    op.str(prop,b,hana::at(formatters,hana::size_c<0>))
                 );
             },
             [&dst,&formatters,&op,&prop,&b](auto&&)
@@ -296,7 +296,7 @@ struct apply_reorder_present_3args_t<
                     hana::make_tuple(
                         hana::at(formatters,hana::size_c<0>)
                     ),
-                    op.str(prop,b)
+                    op.str(prop,b,hana::at(formatters,hana::size_c<0>))
                 );
             }
         );
@@ -351,6 +351,22 @@ struct apply_reorder_present_3args_t<
 };
 
 //-------------------------------------------------------------
+
+template <typename FormatterTs>
+auto arp4_mn_formatter(FormatterTs&& formatters) -> decltype(auto)
+{
+    return hana::at(formatters,hana::size_c<0>);
+}
+template <typename FormatterTs>
+auto arp4_strings_formatter(FormatterTs&& formatters) -> decltype(auto)
+{
+    return hana::at(formatters,hana::size_c<2>);
+}
+template <typename FormatterTs>
+auto arp4_operands_formatter(FormatterTs&& formatters) -> decltype(auto)
+{
+    return hana::at(formatters,hana::size_c<3>);
+}
 
 /**
  * @brief Apply presentation and order of validation report for 4 arguments with member.
@@ -521,22 +537,22 @@ struct apply_reorder_present_4args_t<
                     {
                         format_join(dst,
                             hana::make_tuple(
-                                hana::at(formatters,hana::size_c<0>),
-                                hana::at(formatters,hana::size_c<1>)
+                                arp4_mn_formatter(formatters),
+                                arp4_strings_formatter(formatters)
                             ),
                             member,
-                            op.str(prop,b)
+                            op.str(prop,b,arp4_mn_formatter(formatters))
                         );
                     },
                     [&](auto &&)
                     {
                         format_join(dst,
                             hana::make_tuple(
-                                hana::at(formatters,hana::size_c<0>),
-                                hana::at(formatters,hana::size_c<1>)
+                                arp4_mn_formatter(formatters),
+                                arp4_strings_formatter(formatters)
                             ),
                             make_member_property(member,prop),
-                            op.str(prop,b,true)
+                            op.str(prop,b,arp4_mn_formatter(formatters),true)
                         );
                     }
                 );
@@ -545,11 +561,11 @@ struct apply_reorder_present_4args_t<
             {
                 format_join(dst,
                     hana::make_tuple(
-                        hana::at(formatters,hana::size_c<0>),
-                        hana::at(formatters,hana::size_c<1>)
+                        arp4_mn_formatter(formatters),
+                        arp4_strings_formatter(formatters)
                     ),
                     make_member_property(member,prop),
-                    op.str(prop,b)
+                    op.str(prop,b,arp4_mn_formatter(formatters))
                 );
             }
         );

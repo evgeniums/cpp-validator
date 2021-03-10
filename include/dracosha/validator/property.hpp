@@ -117,7 +117,8 @@ auto property(Tv&& val, Tp&& prop) -> decltype(auto)
         {\
             return #prop; \
         }\
-        constexpr static const char* flag_str(bool b, bool =false) \
+        template <typename FormatterT> \
+        constexpr static const char* flag_str(bool b, const FormatterT&, bool =false) \
         {\
             if (b) \
             { \

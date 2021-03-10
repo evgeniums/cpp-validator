@@ -60,9 +60,10 @@ struct flag_t
      * @param of_member Property must use "property of member" order.
      * @return Flag description taken from the property if it has flag strings or default preset flag description otherwise.
      */
-    template <typename PropT>
+    template <typename PropT, typename FormatterT>
     std::string str(PropT&& prop,
                     const bool& b,
+                    const FormatterT& formatter,
                     bool of_member=false
             ) const
     {
@@ -74,7 +75,7 @@ struct flag_t
             [&](auto&& _)
             {
                 return std::decay_t<PropT>::has_flag_str() ?
-                        _(prop).flag_str(_(b),_(of_member))
+                        _(prop).flag_str(_(b),_(formatter),_(of_member))
                         :
                         default_flag_preset(_(b));
             },
@@ -118,8 +119,8 @@ struct flag_op_with_preset : public flag_t
          * @param b Operand.
          * @return Preset flag description.
          */
-        template <typename PropT>
-        std::string str(PropT&&,const bool& b, bool =false) const
+        template <typename PropT, typename FormatterT>
+        std::string str(PropT&&,const bool& b, const FormatterT&, bool =false) const
         {
             return _preset(b);
         }
@@ -159,8 +160,8 @@ struct flag_op_with_string : public flag_t
          * @brief Get flag description.
          * @return Explicit flag description.
          */
-        template <typename PropT>
-        std::string str(PropT&&,const bool&, bool =false) const
+        template <typename PropT, typename FormatterT>
+        std::string str(PropT&&,const bool&, const FormatterT&, bool =false) const
         {
             return _string;
         }

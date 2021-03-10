@@ -13,6 +13,7 @@
 #include <dracosha/validator/variadic_property.hpp>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
+#include <dracosha/validator/reporting/quotes_decorator.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -86,7 +87,7 @@ struct TestStruct
 }
 
 BOOST_AUTO_TEST_SUITE(TestVariadicProperty)
-
+#if 1
 BOOST_AUTO_TEST_CASE(TestArgs)
 {
     TestStruct ts1;
@@ -244,7 +245,7 @@ BOOST_AUTO_TEST_CASE(TestCheckExistsWithOptional)
 
     BOOST_CHECK(!check_exists(m1,hana::make_tuple("key1",10,20)));
 }
-
+#endif
 namespace {
 
 struct WithChild
@@ -315,7 +316,7 @@ DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(safe_child_word,has_safe_child_word)
 DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_FLAG(sum_gte_10,"must be 10 and more","must be less than 10")
 
 }
-
+#if 1
 BOOST_AUTO_TEST_CASE(TestPropertyAlwaysExistArg1)
 {
     static_assert(has_property<WithChild,decltype(child)>(),"");
@@ -410,10 +411,29 @@ BOOST_AUTO_TEST_CASE(TestPropertyNotation)
     BOOST_CHECK(!v3.apply(o1));
 }
 
+BOOST_AUTO_TEST_CASE(TestReporting)
+{
+    WithChild o1;
+    std::string rep;
+    auto ra1=make_reporting_adapter(o1,rep);
+
+    auto v1=validator(
+        child_word(20,"hello")(eq,30)
+    );
+    BOOST_CHECK(!v1.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,std::string("child_word(20,hello) must be equal to 30"));
+    rep.clear();
+
+    auto mn=make_decorated_member_names(make_default_member_names(),quotes_decorator);
+    auto reporter=make_reporter(rep,make_formatter(mn));
+    auto ra2=make_reporting_adapter(o1,reporter);
+    BOOST_CHECK(!v1.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,std::string("\"child_word(20,hello)\" must be equal to 30"));
+    rep.clear();
+}
+#endif
 BOOST_AUTO_TEST_CASE(TestFlag)
 {
-    //! @todo Maybe construct some other report with flags
-    //! For example: _property_name_ + "(args list)" + "flag description"
     WithChild o1;
     std::string rep;
     auto ra1=make_reporting_adapter(o1,rep);
@@ -487,6 +507,12 @@ BOOST_AUTO_TEST_CASE(TestFlag)
     BOOST_CHECK(!v10.apply(ra7));
     BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(12,7) of element #5 must be unset"));
     rep.clear();
-}
 
+    auto mn=make_decorated_member_names(make_default_member_names(),quotes_decorator);
+    auto reporter=make_reporter(rep,make_formatter(mn));
+    auto ra10=make_reporting_adapter(vec7,reporter);
+    BOOST_CHECK(!v10.apply(ra10));
+    BOOST_CHECK_EQUAL(rep,std::string("\"sum_gte_10(12,7)\" of \"element #5\" must be unset"));
+    rep.clear();
+}
 BOOST_AUTO_TEST_SUITE_END()

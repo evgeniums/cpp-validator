@@ -228,16 +228,17 @@ struct type_variadic_p_notation_##prop : public type_variadic_p_##prop, public v
     {\
         return make_property_validator(*this,std::forward<Args>(args)...); \
     }\
-    \
-    std::string name() const \
+    template <typename FormatterT> \
+    std::string name(const FormatterT& formatter) const \
     {\
-        std::string dst{#prop}; \
+        std::string dst{formatter(#prop,true)}; \
         backend_formatter.append(dst,"("); \
-        backend_formatter.append_join(dst,",",hana::transform(_args,to_string)); \
+        backend_formatter.append_join(dst,",",hana::transform(_args,formatter)); \
         backend_formatter.append(dst,")"); \
-        return dst; \
+        return formatter(dst,false,true); \
     }\
-    std::string flag_str(bool b, bool member_of=false) const \
+    template <typename FormatterT> \
+    std::string flag_str(bool b, const FormatterT& formatter, bool member_of=false) const \
     {\
         auto str=flag_dscr; \
         if (!b) \
@@ -248,7 +249,7 @@ struct type_variadic_p_notation_##prop : public type_variadic_p_##prop, public v
         { \
             return str; \
         } \
-        std::string dst{name()}; \
+        std::string dst{formatter.get()(*this)}; \
         backend_formatter.append(dst," ",str); \
         return dst; \
     }\

@@ -28,6 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/backend_formatter.hpp>
 #include <dracosha/validator/utils/to_string.hpp>
 #include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/variadic_property.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -79,7 +80,25 @@ struct single_member_name_t
 {
     auto operator() (const T& id, const TraitsT& traits, grammar_categories grammar_cats) const -> decltype(auto)
     {
-        return decorate(traits,translate(traits,to_string(id),grammar_cats));
+        return hana::eval_if(
+            std::is_base_of<variadic_property_tag,typename extract_object_wrapper_t<T>::type>{},
+            [&](auto&& _)
+            {
+                auto format=[&](auto&& v, bool with_cats=false, bool with_decorate=false)
+                {
+                    auto res=with_cats ?
+                                translate(_(traits),to_string(v),_(grammar_cats))
+                                :
+                                translate(_(traits),to_string(v));
+                    return with_decorate ? decorate(_(traits),res) : res;
+                };
+                return _(id).name(format);
+            },
+            [&](auto&& _)
+            {
+                return decorate(_(traits),translate(_(traits),to_string(_(id)),_(grammar_cats)));
+            }
+        );
     }
 };
 

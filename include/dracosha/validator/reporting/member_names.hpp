@@ -172,6 +172,11 @@ inline auto get_default_member_names()
     return default_member_names;
 }
 
+inline auto make_default_member_names()
+{
+    return make_member_names(default_member_names_traits_t{});
+}
+
 /**
  * @brief Traits with translator for member names formatter.
  */

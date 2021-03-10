@@ -49,7 +49,8 @@ struct type_p_value
         return "value";
     }
 
-    constexpr static const char* flag_str(bool,bool=false)
+    template <typename FormatterT>
+    constexpr static const char* flag_str(bool, const FormatterT&, bool =false)
     {
         return nullptr;
     }
