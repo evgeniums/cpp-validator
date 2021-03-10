@@ -26,11 +26,25 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-template <typename T>
-auto make_object_wrapper(T&& v)
+struct make_object_wrapper_t
 {
-    return object_wrapper<T>(std::forward<T>(v));
-}
+    template <typename T>
+    auto operator () (T&& v) const -> decltype(auto)
+    {
+        return hana::eval_if(
+            hana::is_a<object_wrapper_tag,T>,
+            [&](auto&& _) -> decltype(auto)
+            {
+                return hana::id(_(v));
+            },
+            [&](auto&& _)
+            {
+                return object_wrapper<T>(std::forward<T>(_(v)));
+            }
+        );
+    }
+};
+constexpr make_object_wrapper_t make_object_wrapper{};
 
 template <typename T>
 auto make_object_wrapper_ref(T&& v) -> decltype(auto)

@@ -224,7 +224,7 @@ struct type_variadic_p_notation_##prop : public type_variadic_p_##prop, public v
         { \
             return type_variadic_p_##prop::apply(std::forward<T>(v),std::forward<decltype(args)>(args)...); \
         }; \
-        return hana::unpack(_args,apply); \
+        return hana::unpack(hana::transform(_args,extract_object_wrapper),apply); \
     } \
     \
     template <typename ...Args> \
@@ -264,9 +264,10 @@ struct type_variadic_p_notation_##prop : public type_variadic_p_##prop, public v
         auto stored_args=hana::append(_args,std::forward<Arg>(arg)); \
         return type_variadic_p_notation_##prop<decltype(stored_args)>{std::move(stored_args)}; \
     } \
-    bool operator == (const type_variadic_p_notation_##prop& other) const noexcept \
+    template <typename T> \
+    bool operator == (const type_variadic_p_notation_##prop<T>& other) const noexcept \
     { \
-        return hana::equal(_args,other._args);  \
+        return check_paths_equal(_args,other._args);  \
     } \
     \
     StoredArgsT _args; \
@@ -274,7 +275,7 @@ struct type_variadic_p_notation_##prop : public type_variadic_p_##prop, public v
 template <typename ...Args> \
 auto type_variadic_p_##prop::operator () (Args&&... args) const \
 { \
-    auto stored_args=hana::make_tuple(std::forward<Args>(args)...); \
+    auto stored_args=hana::make_tuple(make_object_wrapper(std::forward<Args>(args))...); \
     return type_variadic_p_notation_##prop<decltype(stored_args)>{std::move(stored_args)}; \
 }
 
@@ -315,7 +316,7 @@ struct compact_variadic_property_t
                                     [&](auto&& _)
                                     {
                                         // create next property notation appending current key
-                                        auto new_prev=_(prev).next(extract_object_wrapper(_(current_key)));
+                                        auto new_prev=_(prev).next(_(current_key));
                                         return hana::append(
                                                         hana::drop_back(_(accumulated)),
                                                         new_prev
@@ -324,7 +325,7 @@ struct compact_variadic_property_t
                                     [&](auto&& _)
                                     {
                                         // create property notation with current key as the first argument
-                                        auto new_prev=_(prev)(extract_object_wrapper(_(current_key)));
+                                        auto new_prev=_(prev)(_(current_key));
                                         return hana::append(
                                                         hana::drop_back(_(accumulated)),
                                                         new_prev

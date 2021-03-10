@@ -41,23 +41,27 @@ struct extract_object_wrapper_t<T,
     using type=std::decay_t<typename std::decay_t<T>::type>;
 };
 
-template <typename T>
-constexpr auto extract_object_wrapper(T&& val) -> decltype(auto)
+struct extract_object_wrapper_impl
 {
-    return hana::if_(
-        hana::or_(
-                    hana::is_a<object_wrapper_tag,T>
-                   ),
-        [](auto&& val) -> decltype(auto)
-        {
-            return val.get();
-        },
-        [](auto&& val) -> decltype(auto)
-        {
-            return hana::id(std::forward<decltype(val)>(val));
-        }
-    )(std::forward<T>(val));
-}
+    template <typename T>
+    constexpr auto operator () (T&& val) const noexcept -> decltype(auto)
+    {
+        return hana::if_(
+            hana::or_(
+                        hana::is_a<object_wrapper_tag,T>
+                       ),
+            [](auto&& val) -> decltype(auto)
+            {
+                return val.get();
+            },
+            [](auto&& val) -> decltype(auto)
+            {
+                return hana::id(std::forward<decltype(val)>(val));
+            }
+        )(std::forward<T>(val));
+    }
+};
+constexpr extract_object_wrapper_impl extract_object_wrapper{};
 
 template <typename T>
 constexpr auto object_wrapper_value(T&& val) -> decltype(auto)

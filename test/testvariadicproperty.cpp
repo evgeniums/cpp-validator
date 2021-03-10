@@ -535,9 +535,6 @@ BOOST_AUTO_TEST_CASE(TestCompactVariadicProperty)
     auto m2=_[sum_gte_10][varg(12)][varg(7)];
     static_assert(decltype(is_varg(m2.last_path_item()))::value,"");
     auto p2=compact_variadic_property(m2.path());
-    auto&& aaa=sum_gte_10(12,7);
-    auto&& bbb=hana::back(p2);
-    static_assert(std::is_same<std::decay_t<decltype(aaa)>,std::decay_t<decltype(bbb)>>::value,"");
     BOOST_CHECK(sum_gte_10(12,7)==hana::back(p2));
     BOOST_CHECK(check_paths_equal(p1,p2));
 
