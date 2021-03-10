@@ -22,7 +22,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include <vector>
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/utils/adjust_storable_type.hpp>
 #include <dracosha/validator/utils/enable_to_string.hpp>
 #include <dracosha/validator/reporting/format_operand.hpp>
 

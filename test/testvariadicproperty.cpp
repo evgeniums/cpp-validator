@@ -395,7 +395,11 @@ BOOST_AUTO_TEST_CASE(TestPropertyNotation)
 {
     WithChild o1;
 
+    auto st1=make_storable_type("hello");
+    static_assert(std::is_same<decltype(st1),std::string>::value,"");
+
     auto p1=child_word(20,"hello");
+    static_assert(std::is_same<std::remove_reference_t<decltype(hana::back(p1._args))>,std::string>::value,"");
     BOOST_CHECK_EQUAL(p1.get(o1),25);
 
     auto v1=p1(eq,25);

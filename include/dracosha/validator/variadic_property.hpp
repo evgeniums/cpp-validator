@@ -261,7 +261,7 @@ struct type_variadic_p_notation_##prop : public type_variadic_p_##prop, public v
     template <typename Arg> \
     auto next(Arg&& arg) const \
     { \
-        auto stored_args=hana::append(_args,std::forward<Arg>(arg)); \
+        auto stored_args=hana::append(_args,make_storable_type(std::forward<Arg>(arg))); \
         return type_variadic_p_notation_##prop<decltype(stored_args)>{std::move(stored_args)}; \
     } \
     template <typename T> \
@@ -275,7 +275,7 @@ struct type_variadic_p_notation_##prop : public type_variadic_p_##prop, public v
 template <typename ...Args> \
 auto type_variadic_p_##prop::operator () (Args&&... args) const \
 { \
-    auto stored_args=hana::make_tuple(make_object_wrapper(std::forward<Args>(args))...); \
+    auto stored_args=hana::make_tuple(make_storable_type(std::forward<Args>(args))...); \
     return type_variadic_p_notation_##prop<decltype(stored_args)>{std::move(stored_args)}; \
 }
 

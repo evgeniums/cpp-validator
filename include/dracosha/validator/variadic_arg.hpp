@@ -21,6 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
+#include <dracosha/validator/utils/adjust_storable_type.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -39,7 +40,22 @@ struct varg_t
     template <typename T>
     auto operator() (T&& v) const
     {
-        return variadic_arg<T>(std::forward<T>(v));
+        using type=typename adjust_storable_type<T>::type;
+        return hana::if_(
+            hana::and_(
+                hana::not_(std::is_same<std::decay_t<T>,std::string>{}),
+                std::is_same<type,std::string>{}
+            ),
+            [](auto&& v)
+            {
+                // special case for const char* that should be explicitly converted to string
+                return variadic_arg<std::string>(std::string(std::forward<decltype(v)>(v)));
+            },
+            [](auto&& v)
+            {
+                return variadic_arg<T>(std::forward<decltype(v)>(v));
+            }
+        )(std::forward<T>(v));
     }
 };
 constexpr varg_t varg{};

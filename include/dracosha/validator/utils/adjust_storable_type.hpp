@@ -111,6 +111,16 @@ struct adjust_storable_type<T,
     using type=object_wrapper<T>;
 };
 
+struct make_storable_type_t
+{
+    template <typename T>
+    auto operator () (T&& v) const
+    {
+        return typename adjust_storable_type<T>::type{std::forward<T>(v)};
+    }
+};
+constexpr make_storable_type_t make_storable_type{};
+
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
 #endif // DRACOSHA_VALIDATOR_ADJUST_STORABLE_TYPE_HPP
