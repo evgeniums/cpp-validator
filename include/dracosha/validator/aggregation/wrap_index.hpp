@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <string>
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/utils/safe_compare.hpp>
 #include <dracosha/validator/variadic_arg.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -103,7 +104,34 @@ struct is_wrap_index_t
 };
 constexpr is_wrap_index_t is_wrap_index{};
 
+template <typename T, typename AggregationT>
+struct is_bool<wrap_index_t<T,AggregationT>> : public is_bool<T>
+{};
+
+template <typename T, typename AggregationT>
+struct is_string_view<wrap_index_t<T,AggregationT>> : public is_string_view<T>
+{};
+
+template <typename T, typename AggregationT>
+struct is_string<wrap_index_t<T,AggregationT>> : public is_string<T>
+{};
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
+
+namespace std {
+
+template <typename T, typename AggregationT>
+struct is_floating_point<DRACOSHA_VALIDATOR_NAMESPACE::wrap_index_t<T,AggregationT>> : public is_floating_point<T>
+{};
+
+template <typename T, typename AggregationT>
+struct is_signed<DRACOSHA_VALIDATOR_NAMESPACE::wrap_index_t<T,AggregationT>> : public is_signed<T>
+{};
+
+template <typename T, typename AggregationT>
+struct make_unsigned<DRACOSHA_VALIDATOR_NAMESPACE::wrap_index_t<T,AggregationT>> : public make_unsigned<T>
+{};
+
+}
 
 #endif // DRACOSHA_VALIDATOR_WRAP_INDEX_HPP

@@ -30,6 +30,23 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+template <typename T>
+struct is_bool : public std::is_same<T,bool>
+{
+};
+
+template <typename T>
+struct is_string_view : public std::is_same<T,string_view>
+{
+};
+
+template <typename T>
+struct is_string : public std::is_same<T,std::string>
+{
+};
+
+//-------------------------------------------------------------
+
 struct property_tag;
 
 /**
@@ -307,7 +324,7 @@ struct safe_compare<LeftT,RightT,
                             std::is_signed<LeftT>::value &&
                             !std::is_floating_point<LeftT>::value &&
                             std::is_unsigned<RightT>::value &&
-                            !std::is_same<RightT, bool>::value
+                            !is_bool<RightT>::value
                         >
                     >
 {
@@ -361,7 +378,7 @@ struct safe_compare<LeftT, RightT,
             std::is_unsigned<LeftT>::value &&
             std::is_signed<RightT>::value &&
             !std::is_floating_point<RightT>::value &&
-            !std::is_same<LeftT, bool>::value>
+            !is_bool<LeftT>::value>
     >
 {
     template <typename LeftT1, typename RightT1>
@@ -411,9 +428,9 @@ struct safe_compare<LeftT, RightT,
 template <typename LeftT,typename RightT>
 struct safe_compare<LeftT,RightT,
                     std::enable_if_t<
-                            std::is_same<RightT, bool>::value
+                            is_bool<RightT>::value
                             &&
-                            !std::is_same<LeftT, bool>::value
+                            !is_bool<LeftT>::value
                             &&
                             std::is_convertible<LeftT, bool>::value
                         >
@@ -458,9 +475,9 @@ struct safe_compare<LeftT,RightT,
 template <typename LeftT, typename RightT>
 struct safe_compare<LeftT, RightT,
         std::enable_if_t<
-                std::is_same<LeftT, bool>::value
+                is_bool<LeftT>::value
                 &&
-                !std::is_same<RightT, bool>::value
+                !is_bool<RightT>::value
                 &&
                 std::is_convertible<RightT, bool>::value
             >
@@ -505,9 +522,9 @@ struct safe_compare<LeftT, RightT,
 template <typename LeftT, typename RightT>
 struct safe_compare<LeftT, RightT,
         std::enable_if_t<
-            (std::is_same<LeftT,string_view>::value && std::is_same<RightT,std::string>::value)
+            (is_string_view<LeftT>::value && is_string<RightT>::value)
             ||
-            (std::is_same<LeftT,std::string>::value && std::is_same<RightT,string_view>::value)
+            (is_string<LeftT>::value && is_string_view<RightT>::value)
         >
     >
 {
