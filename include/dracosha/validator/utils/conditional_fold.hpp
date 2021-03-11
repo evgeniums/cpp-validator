@@ -20,6 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_CONDITIONAL_FOLD_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/ignore_compiler_warnings.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -72,6 +73,7 @@ struct conditional_fold_t
         );
     }
 
+DCS_IGNORE_MAYBE_UNINITIALIZED_BEGIN
     template <typename PredicateT, typename StateT, typename RetT, typename HandlerT>
     static auto each_with_state_and_ret(const FoldableT& foldable, const PredicateT& pred, StateT&& state, RetT&& ret, const HandlerT& fn)
     {
@@ -93,6 +95,7 @@ struct conditional_fold_t
             }
         );
     }
+DCS_IGNORE_MAYBE_UNINITIALIZED_END
 
     template <typename PrefixT, typename NextT, typename StateT, typename HandlerT, typename PredicateT>
     static auto prefix(PrefixT&& pfx, const NextT& foldable, const PredicateT& pred, StateT&& state, const HandlerT& fn)

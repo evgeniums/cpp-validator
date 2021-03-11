@@ -4,6 +4,7 @@ PROJECT(dracoshavalidator)
 SET (HEADERS
     include/dracosha/validator/version.hpp
     include/dracosha/validator/config.hpp
+    include/dracosha/validator/ignore_compiler_warnings.hpp
 
     include/dracosha/validator/status.hpp
 

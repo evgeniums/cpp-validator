@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <optional>
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/ignore_compiler_warnings.hpp>
 #include <dracosha/validator/get.hpp>
 #include <dracosha/validator/get_member.hpp>
 #include <dracosha/validator/check_member_path.hpp>
@@ -35,7 +36,7 @@ Distributed under the Boost Software License, Version 1.0.
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
-
+DCS_IGNORE_MAYBE_UNINITIALIZED_BEGIN
 struct try_get_member_t
 {
     template <typename Tobj, typename Tkey>
@@ -77,6 +78,8 @@ struct try_get_member_t
         )(std::forward<Tobj>(obj_wrapper),std::forward<Tkey>(key));
     }
 };
+DCS_IGNORE_MAYBE_UNINITIALIZED_END
+
 constexpr try_get_member_t try_get_member{};
 
 /**
