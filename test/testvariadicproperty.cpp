@@ -267,7 +267,7 @@ struct WithChild
          }
     {}
 
-    int child(int val) const
+    int child(int val) const noexcept
     {
         return val+1;
     }
@@ -297,6 +297,11 @@ struct WithChild
         return (a+b)>=10;
     }
 
+    int child_count() const noexcept
+    {
+        return 15;
+    }
+
     std::map<
         int,
         std::map<int,std::string>
@@ -315,6 +320,8 @@ DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(has_safe_child_word)
 DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(safe_child_word,has_safe_child_word)
 
 DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_FLAG(sum_gte_10,"must be 10 and more","must be less than 10")
+
+DRACOSHA_VALIDATOR_PROPERTY(child_count)
 
 }
 #if 1
@@ -527,7 +534,6 @@ BOOST_AUTO_TEST_CASE(TestFlag)
     BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(12,7) of element #5 must be unset"));
     rep.clear();
 }
-#endif
 
 BOOST_AUTO_TEST_CASE(TestCompactVariadicProperty)
 {
@@ -580,6 +586,110 @@ BOOST_AUTO_TEST_CASE(TestCompactVariadicProperty)
     );
     BOOST_CHECK(!v8.apply(ra7));
     BOOST_CHECK_EQUAL(rep,std::string("\"sum_gte_10(12,7)\" of \"element #5\" must be equal to false"));
+    rep.clear();
+}
+#endif
+
+BOOST_AUTO_TEST_CASE(TestAllAny)
+{
+    WithChild o1;
+
+    auto varg1=varg(ALL,10);
+    const auto& varg1_ref=varg1.get();
+    BOOST_CHECK_EQUAL(varg1_ref.max_arg,10);
+    BOOST_CHECK_EQUAL(varg1_ref.begin(o1),0);
+    BOOST_CHECK_EQUAL(varg1_ref.end(o1),10);
+    auto i1=varg1_ref.begin(o1);
+    varg1_ref.next(o1,i1);
+    BOOST_CHECK_EQUAL(i1,1);
+    BOOST_CHECK(varg1_ref.while_cond(o1,i1));
+    BOOST_CHECK(!varg1_ref.while_cond(o1,10));
+    BOOST_CHECK(!varg1_ref.while_cond(o1,11));
+
+    auto varg2=varg(ANY,child_count);
+    const auto& varg2_ref=varg2.get();
+    BOOST_CHECK_EQUAL(property(o1,varg2_ref.max_arg),15);
+    BOOST_CHECK_EQUAL(varg2_ref.begin(o1),0);
+    BOOST_CHECK_EQUAL(varg2_ref.end(o1),15);
+    auto i2=varg2_ref.begin(o1);
+    varg2_ref.next(o1,i2);
+    BOOST_CHECK_EQUAL(i2,1);
+    BOOST_CHECK(varg2_ref.while_cond(o1,i2));
+    BOOST_CHECK(varg2_ref.while_cond(o1,10));
+    BOOST_CHECK(!varg2_ref.while_cond(o1,15));
+    BOOST_CHECK(!varg2_ref.while_cond(o1,16));
+
+    auto m1=_[varg(ALL,child_count)];
+    static_assert(decltype(m1)::is_aggregated::value,"");
+
+    auto m2=_[child][varg(ALL,child_count)];
+    static_assert(decltype(m2)::is_aggregated::value,"");
+
+    auto v1=validator(
+        _[child][varg(ALL,child_count)](gte,1)
+    );
+    BOOST_CHECK(v1.apply(o1));
+    auto v2=validator(
+        _[child][varg(ALL,child_count)](gte,5)
+    );
+    BOOST_CHECK(!v2.apply(o1));
+
+    auto v3=validator(
+        _[child][varg(ANY,child_count)](gte,5)
+    );
+    BOOST_CHECK(v3.apply(o1));
+    auto v4=validator(
+        _[child][varg(ANY,child_count)](gte,100)
+    );
+    BOOST_CHECK(!v4.apply(o1));
+
+    auto v5=validator(
+        _[child][varg(ALL,15)](gte,1)
+    );
+    BOOST_CHECK(v5.apply(o1));
+    auto v6=validator(
+        _[child][varg(ALL,15)](gte,5)
+    );
+    BOOST_CHECK(!v6.apply(o1));
+
+    auto v7=validator(
+        _[child][varg(ANY,15)](gte,5)
+    );
+    BOOST_CHECK(v7.apply(o1));
+    auto v8=validator(
+        _[child][varg(ANY,15)](gte,100)
+    );
+    BOOST_CHECK(!v8.apply(o1));
+
+    std::vector<int> vec9{20,21,22,23,24,25};
+    auto v9=validator(
+        _[varg(ALL,6)](eq,22)
+    );
+    BOOST_CHECK(!v9.apply(vec9));
+    auto v10=validator(
+        _[varg(ANY,6)](eq,22)
+    );
+    BOOST_CHECK(v10.apply(vec9));
+    auto v11=validator(
+        _[varg(ANY,2)](eq,22)
+    );
+    BOOST_CHECK(!v11.apply(vec9));
+
+    auto a12=make_default_adapter(vec9);
+    a12.set_check_member_exists_before_validation(true);
+    auto v12=validator(
+        _[varg(ALL,10)](gte,20)
+    );
+    BOOST_CHECK(v12.apply(a12));
+
+    std::string rep;
+    auto a13=make_reporting_adapter(o1,rep);
+    BOOST_CHECK(!v2.apply(a13));
+    BOOST_CHECK_EQUAL(rep,std::string("each child must be greater than or equal to 5"));
+    rep.clear();
+
+    BOOST_CHECK(!v8.apply(a13));
+    BOOST_CHECK_EQUAL(rep,std::string("at least one child must be greater than or equal to 100"));
     rep.clear();
 }
 

@@ -33,6 +33,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/operand_formatter.hpp>
 #include <dracosha/validator/reporting/report_aggregation.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
+#include <dracosha/validator/reporting/format_join_grammar_cats.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -40,28 +41,6 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 namespace detail
 {
-
-template <typename DstT, typename FormatterTs, typename ... Args>
-void format_join(DstT& dst, FormatterTs&& formatters, Args&&... args)
-{
-    auto pairs=hana::zip(
-        std::forward<FormatterTs>(formatters),
-        make_cref_tuple(std::forward<Args>(args)...)
-    );
-    auto parts=hana::fold(
-        pairs,
-        hana::make_tuple(),
-        [](auto&& prev, auto&& current)
-        {
-            return hana::append(std::forward<decltype(prev)>(prev),apply_ref(hana::front(current),hana::back(current),last_grammar_categories(prev,0)));
-        }
-    );
-    backend_formatter.append_join(
-       dst,
-       " ",
-       parts
-    );
-}
 
 //-------------------------------------------------------------
 
@@ -146,7 +125,7 @@ struct apply_reorder_present_2args_t
                         const T2& b
                      ) const
     {
-        format_join(dst,
+        format_join_grammar_cats(dst,
             std::forward<FormatterTs>(formatters),
             op,
             b
@@ -168,7 +147,7 @@ struct apply_reorder_present_2args_t<
                         const OpT& op, const T2& b
                     ) const
     {
-        format_join(dst,
+        format_join_grammar_cats(dst,
             hana::make_tuple(
                 arp_first_formatter(formatters)
             ),
@@ -191,7 +170,7 @@ struct apply_reorder_present_2args_t<
                         const OpT& op, const T2& b
                     ) const
     {
-        format_join(dst,
+        format_join_grammar_cats(dst,
             hana::make_tuple(
                 arp_first_formatter(formatters)
             ),
@@ -219,7 +198,7 @@ struct apply_reorder_present_3args_t
             [&](auto)
             {
                 // op b
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_strings_formatter(formatters),
                         arp_operands_formatter(formatters)
@@ -231,7 +210,7 @@ struct apply_reorder_present_3args_t
             [&](auto)
             {
                 // prop of member op b
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     std::forward<FormatterTs>(formatters),
                     prop,
                     op,
@@ -262,7 +241,7 @@ struct apply_reorder_present_3args_t<
             [&](auto)
             {
                 // op b
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_strings_formatter(formatters)
                     ),
@@ -272,7 +251,7 @@ struct apply_reorder_present_3args_t<
             [&](auto)
             {
                 // prop of member op b
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
                         arp_strings_formatter(formatters)
@@ -304,7 +283,7 @@ struct apply_reorder_present_3args_t<
             std::decay_t<OpT>::prepend_property(prop),
             [&dst,&formatters,&op,&prop,&b](auto&&)
             {
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
                         arp_strings_formatter(formatters)
@@ -315,7 +294,7 @@ struct apply_reorder_present_3args_t<
             },
             [&dst,&formatters,&op,&prop,&b](auto&&)
             {
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_strings_formatter(formatters)
                     ),
@@ -346,7 +325,7 @@ struct apply_reorder_present_3args_t<
             [&](auto)
             {
                 // op b
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_strings_formatter(formatters),
                         arp_mn_formatter(formatters)
@@ -358,7 +337,7 @@ struct apply_reorder_present_3args_t<
             [&](auto)
             {
                 // prop of member op b
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
                         arp_strings_formatter(formatters),
@@ -392,7 +371,7 @@ struct apply_reorder_present_4args_t
             [&](auto)
             {
                 // member op b
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
                         arp_strings_formatter(formatters),
@@ -406,7 +385,7 @@ struct apply_reorder_present_4args_t
             [&](auto)
             {
                 // prop of member op b
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
                         arp_strings_formatter(formatters),
@@ -440,7 +419,7 @@ struct apply_reorder_present_4args_t<
             [&](auto)
             {
                 // member op member_operand(b)
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
                         arp_strings_formatter(formatters),
@@ -454,7 +433,7 @@ struct apply_reorder_present_4args_t<
             [&](auto)
             {
                 // prop of member op prop of member_operand(b)
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
                         arp_strings_formatter(formatters),
@@ -491,7 +470,7 @@ struct apply_reorder_present_4args_t<
             [&](auto)
             {
                 // member op b
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
                         arp_strings_formatter(formatters)
@@ -503,7 +482,7 @@ struct apply_reorder_present_4args_t<
             [&](auto)
             {
                 // prop of member op b
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
                         arp_strings_formatter(formatters)
@@ -542,7 +521,7 @@ struct apply_reorder_present_4args_t<
                     !std::is_base_of<variadic_property_tag,std::decay_t<PropT>>::value,
                     [&](auto &&)
                     {
-                        format_join(dst,
+                        format_join_grammar_cats(dst,
                             hana::make_tuple(
                                 arp_mn_formatter(formatters),
                                 arp_strings_formatter(formatters)
@@ -553,7 +532,7 @@ struct apply_reorder_present_4args_t<
                     },
                     [&](auto &&)
                     {
-                        format_join(dst,
+                        format_join_grammar_cats(dst,
                             hana::make_tuple(
                                 arp_mn_formatter(formatters),
                                 arp_strings_formatter(formatters)
@@ -566,7 +545,7 @@ struct apply_reorder_present_4args_t<
             },
             [&dst,&member,&formatters,&op,&prop,&b](auto&&)
             {
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
                         arp_strings_formatter(formatters)
@@ -598,7 +577,7 @@ struct apply_reorder_present_5args_t
             [&](auto)
             {
                 // member op member of sample
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
                         arp_strings_formatter(formatters),
@@ -616,7 +595,7 @@ struct apply_reorder_present_5args_t
             [&](auto)
             {
                 // prop of member op prop of member of sample
-                format_join(dst,
+                format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
                         arp_strings_formatter(formatters),
@@ -646,7 +625,7 @@ struct apply_reorder_present_t
     template <typename DstT, typename FormatterTs>
     void operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const
     {
-        format_join(dst,
+        format_join_grammar_cats(dst,
             std::forward<FormatterTs>(formatters),
             std::forward<Args>(args)...
         );

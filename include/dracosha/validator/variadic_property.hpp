@@ -28,7 +28,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/utils/to_string.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
+#include <dracosha/validator/reporting/format_join_grammar_cats.hpp>
 #include <dracosha/validator/variadic_arg.hpp>
+#include <dracosha/validator/aggregation/wrap_index.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -117,6 +119,35 @@ struct variadic_property_closure
     FnArgTypes _arg_types;
     FnHasT _fn_has;
 };
+
+template <typename PropT, typename FormatterT>
+std::string format_variadic_property(const PropT& prop, const FormatterT& formatter)
+{
+    const auto& arg=extract_object_wrapper(hana::front(prop.args()));
+    return hana::eval_if(
+        hana::and_(
+            hana::equal(hana::size(prop.args()),hana::size_c<1>),
+            is_wrap_index(arg)
+        ),
+        [&](auto&& _)
+        {
+            std::string dst;
+            format_join_grammar_cats(dst,
+                                     hana::make_tuple(_(formatter),_(formatter)),
+                                     _(arg).aggregation().base_phrase_str(),
+                                     _(prop).name());
+            return dst;
+        },
+        [&](auto&& _)
+        {
+            std::string dst{formatter(_(prop).name(),true)};
+            backend_formatter.append(dst,"(");
+            backend_formatter.append_join(dst,",",hana::transform(_(prop).args(),_(formatter)));
+            backend_formatter.append(dst,")");
+            return _(formatter)(dst,false,true);
+        }
+    );
+}
 
 struct variadic_property_tag{};
 struct variadic_property_base_tag{};
@@ -232,14 +263,18 @@ struct type_variadic_p_notation_##prop : public type_variadic_p_##prop, public v
     {\
         return make_property_validator(*this,std::forward<Args>(args)...); \
     }\
+    static const char* name()\
+    {\
+        return #prop; \
+    }\
+    auto args() const -> decltype(auto) \
+    {\
+        return _args; \
+    }\
     template <typename FormatterT> \
     std::string name(const FormatterT& formatter) const \
     {\
-        std::string dst{formatter(#prop,true)}; \
-        backend_formatter.append(dst,"("); \
-        backend_formatter.append_join(dst,",",hana::transform(_args,formatter)); \
-        backend_formatter.append(dst,")"); \
-        return formatter(dst,false,true); \
+        return format_variadic_property(*this,formatter); \
     }\
     template <typename FormatterT> \
     std::string flag_str(bool b, const FormatterT& formatter, bool member_of=false) const \

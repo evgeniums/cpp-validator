@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
 #include <dracosha/validator/utils/adjust_storable_type.hpp>
+#include <dracosha/validator/property.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -35,6 +36,62 @@ struct variadic_arg : public object_wrapper<T>,
 {
     using object_wrapper<T>::object_wrapper;
 };
+
+struct variadic_arg_aggregation_tag{};
+
+template <typename AggregationT, typename MaxArgT>
+struct variadic_arg_aggregation_impl
+{
+    template <typename T>
+    auto end(T&& v) const -> decltype(auto)
+    {
+        auto self=this;
+        return hana::eval_if(
+                    hana::is_a<property_tag,MaxArgT>,
+                    [&](auto&& _)
+                    {
+                        return property(_(v),_(self)->max_arg);
+                    },
+                    [&](auto&& _)
+                    {
+                        return _(self)->max_arg;
+                    }
+               );
+    }
+
+    template <typename T>
+    auto begin(T&& v) const -> decltype(auto)
+    {
+        // currently begin is always 0
+        // cast it to type of end
+        return static_cast<std::decay_t<decltype(end(std::forward<T>(v)))>>(0);
+    }
+
+    template <typename T, typename IndexT>
+    void next(T&&, IndexT& index) const
+    {
+        // currently just increment index
+        ++index;
+    }
+
+    template <typename T, typename IndexT>
+    bool while_cond(T&& v, const IndexT& index) const
+    {
+        return index<end(std::forward<T>(v));
+    }
+
+    AggregationT aggregation;
+    MaxArgT max_arg;
+};
+
+template <typename AggregationT, typename MaxArgT>
+struct variadic_arg_aggregation : public variadic_arg<variadic_arg_aggregation_impl<AggregationT,MaxArgT>>,
+                                  public variadic_arg_aggregation_tag
+{
+    using aggregation_type=std::decay_t<AggregationT>;
+    using variadic_arg<variadic_arg_aggregation_impl<AggregationT,MaxArgT>>::variadic_arg;
+};
+
 struct varg_t
 {
     template <typename T>
@@ -48,7 +105,6 @@ struct varg_t
             ),
             [](auto&& v)
             {
-                // special case for const char* that should be explicitly converted to string
                 return variadic_arg<std::string>(std::string(std::forward<decltype(v)>(v)));
             },
             [](auto&& v)
@@ -56,6 +112,13 @@ struct varg_t
                 return variadic_arg<T>(std::forward<decltype(v)>(v));
             }
         )(std::forward<T>(v));
+    }
+
+    template <typename AggregationT, typename MaxT>
+    auto operator() (AggregationT aggr, MaxT max_val) const
+    {
+        auto val=variadic_arg_aggregation_impl<AggregationT,MaxT>{std::move(aggr),std::move(max_val)};
+        return variadic_arg_aggregation<AggregationT,MaxT>{std::move(val)};
     }
 };
 constexpr varg_t varg{};

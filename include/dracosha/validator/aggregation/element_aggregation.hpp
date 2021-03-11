@@ -21,6 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/aggregation/aggregation.hpp>
+#include <dracosha/validator/variadic_arg.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -55,8 +56,15 @@ struct element_aggregation
 {
     using hana_tag=element_aggregation_tag;
 
-    template <typename PredicateT, typename EmptyFnT, typename StringT, typename PathT, typename AdapterT, typename HandlerT>
-    static status invoke(PredicateT&& pred, EmptyFnT&& empt, StringT&& str, PathT&& path, AdapterT&& adapter, HandlerT&& handler);
+    template <typename PredicateT, typename EmptyFnT, typename AggregationT,
+              typename PathT, typename AdapterT, typename HandlerT>
+    static status invoke(PredicateT&& pred, EmptyFnT&& empt, AggregationT&& aggr,
+                         PathT&& path, AdapterT&& adapter, HandlerT&& handler);
+
+    template <typename PredicateT, typename EmptyFnT, typename AggregationT,
+              typename PathT, typename AdapterT, typename HandlerT>
+    static status invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, AggregationT&& aggr,
+                         PathT&& path, AdapterT&& adapter, HandlerT&& handler);
 };
 
 template <typename ModifierT>
@@ -77,6 +85,8 @@ struct is_element_aggregation_t
             hana::bool_
             <
                 hana::is_a<element_aggregation_tag,type>
+                ||
+                std::is_base_of<variadic_arg_aggregation_tag,std::decay_t<type>>::value
             >{}
         );
     }

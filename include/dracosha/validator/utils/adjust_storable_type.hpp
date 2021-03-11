@@ -20,15 +20,17 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_ADJUST_STORABLE_TYPE_HPP
 
 #include <string>
-#include <type_traits>
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/property.hpp>
-#include <dracosha/validator/aggregation/element_aggregation.hpp>
-#include <dracosha/validator/aggregation/wrap_it.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+
+struct element_aggregation_tag;
+struct wrap_iterator_tag;
+struct operator_tag;
+struct property_tag;
+struct wrap_index_tag;
 
 //-------------------------------------------------------------
 
@@ -50,6 +52,8 @@ struct adjust_storable_type<T,
                                 !hana::is_a<element_aggregation_tag,T>
                                 &&
                                 !hana::is_a<wrap_iterator_tag,T>
+                                &&
+                                !hana::is_a<wrap_index_tag,T>
                                 &&
                                 !hana::is_a<operator_tag,T>
                                 &&
@@ -80,6 +84,8 @@ struct adjust_storable_type<T,
                             ||
                             hana::is_a<wrap_iterator_tag,T>
                             ||
+                            hana::is_a<wrap_index_tag,T>
+                            ||
                             hana::is_a<operator_tag,T>
                         >
                     >
@@ -103,6 +109,8 @@ struct adjust_storable_type<T,
                             !hana::is_a<object_wrapper_tag,T>
                             &&
                             !hana::is_a<wrap_iterator_tag,T>
+                            &&
+                            !hana::is_a<wrap_index_tag,T>
                             &&
                             !hana::is_a<operator_tag,T>
                         >

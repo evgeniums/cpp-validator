@@ -21,6 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/variadic_arg.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -50,7 +51,10 @@ template <typename T>
 auto make_object_wrapper_ref(T&& v) -> decltype(auto)
 {
     return hana::eval_if(
-        hana::is_a<object_wrapper_tag,T>,
+        hana::and_(
+            hana::is_a<object_wrapper_tag,T>,
+            hana::not_(std::is_base_of<variadic_arg_tag,std::decay_t<T>>{})
+        ),
         [&](auto&& _)
         {
             const auto& val=extract_object_wrapper(_(v));

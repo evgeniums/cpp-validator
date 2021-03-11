@@ -71,7 +71,7 @@ SET (HEADERS
     include/dracosha/validator/aggregation/element_aggregation.hpp
     include/dracosha/validator/aggregation/element_aggregation.ipp
     include/dracosha/validator/aggregation/wrap_it.hpp
-#    include/dracosha/validator/aggregation/wrap_index.hpp
+    include/dracosha/validator/aggregation/wrap_index.hpp
 
     include/dracosha/validator/operators/operator.hpp
     include/dracosha/validator/operators/exists.hpp
@@ -134,6 +134,7 @@ SET (HEADERS
     include/dracosha/validator/reporting/format_bool_operand.hpp
     include/dracosha/validator/reporting/format_operand.hpp
     include/dracosha/validator/reporting/reporting_member_skip.hpp
+    include/dracosha/validator/reporting/format_join_grammar_cats.hpp
 
     include/dracosha/validator/reporting/locale/sample_locale.hpp
     include/dracosha/validator/reporting/locale/ru.hpp

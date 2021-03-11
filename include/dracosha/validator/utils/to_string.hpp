@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/aggregation/wrap_it.hpp>
+#include <dracosha/validator/aggregation/wrap_index.hpp>
 #include <dracosha/validator/utils/extract_object_wrapper.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -76,7 +77,11 @@ struct to_string_impl<T,hana::when<hana::is_a<property_tag,T>>>
  *  @brief Convert to string if argument is an iterator.
  */
 template <typename T>
-struct to_string_impl<T,hana::when<hana::is_a<wrap_iterator_tag,T>>>
+struct to_string_impl<T,hana::when<
+            hana::is_a<wrap_iterator_tag,T>
+            ||
+            hana::is_a<wrap_index_tag,T>
+        >>
 {
     std::string operator () (const T& id) const
     {
@@ -106,7 +111,11 @@ struct can_to_string<T,
  *  @brief Convert to string if string can be constructible using sdt::to_string().
  */
 template <typename T>
-struct to_string_impl<T,hana::when<can_to_string<T>::value>>
+struct to_string_impl<T,hana::when<
+            can_to_string<T>::value
+            &&
+            !hana::is_a<wrap_index_tag,T>
+        >>
 {
     std::string operator () (const T& id) const
     {

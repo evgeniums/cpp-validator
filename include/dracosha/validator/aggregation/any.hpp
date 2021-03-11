@@ -59,6 +59,14 @@ struct string_any_t : public aggregate_op<string_any_t>,
     constexpr static const char* close_token="";
     constexpr static const char* conjunction_token="";
 
+    constexpr static const char* name="ANY";
+    constexpr static const char* base_phrase="at least one";
+
+    constexpr static const char* base_phrase_str()
+    {
+        return base_phrase;
+    }
+
     constexpr static const char* description="at least one element";
     constexpr static const char* iterator_description="at least one iterator";
     constexpr static const char* key_description="at least one key";
@@ -171,6 +179,42 @@ struct generate_paths_t<KeyT,hana::when<std::is_base_of<any_aggregation_t,std::d
     status operator () (PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
     {
         return element_aggregation::invoke(
+            [&adapter](status& ret)
+            {
+                if (check_strict_any<AdapterT>::skip(adapter))
+                {
+                    ret=status{status::code::ignore};
+                    return false;
+                }
+                return ret.value()!=status::code::success;
+            },
+            [](bool empty)
+            {
+                if (empty)
+                {
+                    return status(status::code::ignore);
+                }
+                return status(status::code::fail);
+            },
+            string_any,
+            std::forward<PathT>(path),
+            std::forward<AdapterT>(adapter),
+            std::forward<HandlerT>(handler)
+        );
+    }
+};
+
+template <typename KeyT>
+struct generate_paths_t<KeyT,hana::when<
+                    std::is_base_of<variadic_arg_aggregation_tag,KeyT>::value
+                    &&
+                    hana::is_a<any_tag,typename KeyT::aggregation_type::type>
+        >>
+{
+    template <typename PathT, typename AdapterT, typename HandlerT>
+    status operator () (PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
+    {
+        return element_aggregation::invoke_variadic(
             [&adapter](status& ret)
             {
                 if (check_strict_any<AdapterT>::skip(adapter))

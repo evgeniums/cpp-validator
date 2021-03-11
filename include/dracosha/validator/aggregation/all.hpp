@@ -27,6 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/make_validator.hpp>
 #include <dracosha/validator/aggregation/and.hpp>
 #include <dracosha/validator/filter_member.hpp>
+#include <dracosha/validator/variadic_arg.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -62,9 +63,18 @@ struct string_all_t : public aggregate_op<string_all_t>,
     constexpr static const char* close_token="";
     constexpr static const char* conjunction_token="";
 
+    constexpr static const char* name="ALL";
+
     constexpr static const char* description="each element";
     constexpr static const char* iterator_description="each iterator";
     constexpr static const char* key_description="each key";
+
+    constexpr static const char* base_phrase="each";
+
+    constexpr static const char* base_phrase_str()
+    {
+        return base_phrase;
+    }
 
     std::string operator() (const values_t&) const
     {
@@ -144,6 +154,34 @@ struct generate_paths_t<KeyT,hana::when<std::is_base_of<all_aggregation_t,std::d
     status operator () (PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
     {
         return element_aggregation::invoke(
+            [](status ret)
+            {
+                return ret==true;
+            },
+            [](bool empty)
+            {
+                std::ignore=empty;
+                return status(status::code::success);
+            },
+            string_all,
+            std::forward<PathT>(path),
+            std::forward<AdapterT>(adapter),
+            std::forward<HandlerT>(handler)
+        );
+    }
+};
+
+template <typename KeyT>
+struct generate_paths_t<KeyT,hana::when<
+                    std::is_base_of<variadic_arg_aggregation_tag,KeyT>::value
+                    &&
+                    hana::is_a<all_tag,typename KeyT::aggregation_type::type>
+        >>
+{
+    template <typename PathT, typename AdapterT, typename HandlerT>
+    status operator () (PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
+    {
+        return element_aggregation::invoke_variadic(
             [](status ret)
             {
                 return ret==true;
