@@ -209,7 +209,7 @@ struct apply_reorder_present_3args_t
             },
             [&](auto)
             {
-                // prop of member op b
+                // prop op b
                 format_join_grammar_cats(dst,
                     std::forward<FormatterTs>(formatters),
                     prop,
@@ -250,7 +250,7 @@ struct apply_reorder_present_3args_t<
             },
             [&](auto)
             {
-                // prop of member op b
+                // prop op.str(b)
                 format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
@@ -283,6 +283,7 @@ struct apply_reorder_present_3args_t<
             std::decay_t<OpT>::prepend_property(prop),
             [&dst,&formatters,&op,&prop,&b](auto&&)
             {
+                // prop op.str(b)
                 format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
@@ -294,6 +295,7 @@ struct apply_reorder_present_3args_t<
             },
             [&dst,&formatters,&op,&prop,&b](auto&&)
             {
+                // prop op.str(b)
                 format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_strings_formatter(formatters)
@@ -336,7 +338,7 @@ struct apply_reorder_present_3args_t<
             },
             [&](auto)
             {
-                // prop of member op b
+                // prop op b
                 format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
@@ -469,7 +471,7 @@ struct apply_reorder_present_4args_t<
             std::is_same<std::decay_t<PropT>,type_p_value>::value,
             [&](auto)
             {
-                // member op b
+                // member op.str(b)
                 format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
@@ -481,7 +483,7 @@ struct apply_reorder_present_4args_t<
             },
             [&](auto)
             {
-                // prop of member op b
+                // prop of member op.str(b)
                 format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),
@@ -516,7 +518,7 @@ struct apply_reorder_present_4args_t<
             !std::decay_t<OpT>::prepend_property(prop),
             [&dst,&member,&formatters,&op,&prop,&b](auto&&)
             {
-                // member flag(prop,b)
+                // member flag.str(prop,b)
                 hana::eval_if(
                     !std::is_base_of<variadic_property_tag,std::decay_t<PropT>>::value,
                     [&](auto &&)
@@ -532,6 +534,7 @@ struct apply_reorder_present_4args_t<
                     },
                     [&](auto &&)
                     {
+                        // prop of member flag.str(prop,b)
                         format_join_grammar_cats(dst,
                             hana::make_tuple(
                                 arp_mn_formatter(formatters),
@@ -545,6 +548,7 @@ struct apply_reorder_present_4args_t<
             },
             [&dst,&member,&formatters,&op,&prop,&b](auto&&)
             {
+                // prop of member flag.str(prop,b)
                 format_join_grammar_cats(dst,
                     hana::make_tuple(
                         arp_mn_formatter(formatters),

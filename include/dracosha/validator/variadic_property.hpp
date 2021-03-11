@@ -120,6 +120,8 @@ struct variadic_property_closure
     FnHasT _fn_has;
 };
 
+//! @todo Consider taking into account preceeding gramma categories and use
+//! two formatters: "member_names" for property name and "strings" for aggregation descriptions.
 template <typename PropT, typename FormatterT>
 std::string format_variadic_property(const PropT& prop, const FormatterT& formatter)
 {
