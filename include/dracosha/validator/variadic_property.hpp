@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/class_method_args.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
-#include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/utils/unwrap_object.hpp>
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/utils/to_string.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
@@ -125,7 +125,7 @@ struct variadic_property_closure
 template <typename PropT, typename FormatterT>
 std::string format_variadic_property(const PropT& prop, const FormatterT& formatter)
 {
-    const auto& arg=extract_object_wrapper(hana::front(prop.args()));
+    const auto& arg=unwrap_object(hana::front(prop.args()));
     return hana::eval_if(
         hana::and_(
             hana::equal(hana::size(prop.args()),hana::size_c<1>),
@@ -257,7 +257,7 @@ struct type_variadic_p_notation_##prop : public type_variadic_p_##prop, public v
         { \
             return type_variadic_p_##prop::apply(std::forward<T>(v),std::forward<decltype(args)>(args)...); \
         }; \
-        return hana::unpack(hana::transform(_args,extract_object_wrapper),apply); \
+        return hana::unpack(hana::transform(_args,unwrap_object),apply); \
     } \
     \
     template <typename ...Args> \
@@ -341,13 +341,13 @@ struct compact_variadic_property_t
                     {
                         // modify last element in path if current key is variadic property
                         const auto& prev=hana::back(_(accumulated));
-                        using prev_type=typename extract_object_wrapper_t<decltype(prev)>::type;
+                        using prev_type=unwrap_object_t<decltype(prev)>;
                         return hana::eval_if(
                             std::is_base_of<variadic_property_base_tag,prev_type>{},
                             [&](auto&& _)
                             {
                                 const auto& p1=_(prev);
-                                using prev_type1=typename extract_object_wrapper_t<decltype(p1)>::type;
+                                using prev_type1=unwrap_object_t<decltype(p1)>;
                                 return hana::eval_if(
                                     std::is_base_of<variadic_property_tag,prev_type1>{},
                                     [&](auto&& _)

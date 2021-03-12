@@ -21,7 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/check_member.hpp>
-#include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/utils/unwrap_object.hpp>
 #include <dracosha/validator/utils/safe_compare.hpp>
 #include <dracosha/validator/utils/conditional_fold.hpp>
 
@@ -32,7 +32,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename Tobj, typename Tpath>
 constexpr auto member_value_type(Tobj&& obj, Tpath&& path)
 {
-    auto path_c=hana::transform(path,extract_object_wrapper_type_c);
+    auto path_c=hana::transform(path,unwrap_object_type_c);
     auto obj_c=hana::type_c<decltype(obj)>;
 
     return hana::monadic_fold_left<hana::optional_tag>(path_c,obj_c,hana::sfinae(check_member));
@@ -72,8 +72,8 @@ constexpr path_types_equal_t path_types_equal{};
 template <typename T1, typename T2>
 auto check_path_types(const T1& path1,const T2& path2)
 {
-    auto path1_c=hana::transform(path1,extract_object_wrapper_type_c);
-    auto path2_c=hana::transform(path2,extract_object_wrapper_type_c);
+    auto path1_c=hana::transform(path1,unwrap_object_type_c);
+    auto path2_c=hana::transform(path2,unwrap_object_type_c);
 
     return hana::eval_if(
         hana::not_equal(hana::size(path1_c),hana::size(path2_c)),
@@ -128,7 +128,7 @@ bool check_paths_equal(const T1& path1, const T2& path2)
                                   true,
                                   [](auto&& pair)
                                   {
-                                    return safe_compare_equal(extract_object_wrapper(hana::front(pair)),extract_object_wrapper(hana::back(pair)));
+                                    return safe_compare_equal(unwrap_object(hana::front(pair)),unwrap_object(hana::back(pair)));
                                   }
                               );
         },

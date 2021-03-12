@@ -5,7 +5,7 @@
 
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
-#include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/utils/unwrap_object.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(TestIsAggregated)
                 prev,
                 hana::bool_
                 <
-                    hana::is_a<element_aggregation_tag,typename extract_object_wrapper_t<decltype(v)>::type>
+                    hana::is_a<element_aggregation_tag,unwrap_object_t<decltype(v)>>
                 >{}
             );
     });

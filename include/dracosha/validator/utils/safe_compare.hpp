@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/string_view.hpp>
-#include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/utils/unwrap_object.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -573,8 +573,8 @@ struct safe_compare<LeftT, RightT,
 template <typename LeftT, typename RightT>
 constexpr bool safe_compare_less(const LeftT& a, const RightT& b)
 {
-    return detail::safe_compare<typename extract_object_wrapper_t<LeftT>::type,typename extract_object_wrapper_t<RightT>::type>
-            ::less(extract_object_wrapper(a),extract_object_wrapper(b));
+    return detail::safe_compare<unwrap_object_t<LeftT>,unwrap_object_t<RightT>>
+            ::less(unwrap_object(a),unwrap_object(b));
 }
 
 /**
@@ -586,8 +586,8 @@ constexpr bool safe_compare_less(const LeftT& a, const RightT& b)
 template <typename LeftT, typename RightT>
 constexpr bool safe_compare_greater(const LeftT& a, const RightT& b)
 {
-    return detail::safe_compare<typename extract_object_wrapper_t<LeftT>::type,typename extract_object_wrapper_t<RightT>::type>
-            ::greater(extract_object_wrapper(a),extract_object_wrapper(b));
+    return detail::safe_compare<unwrap_object_t<LeftT>,unwrap_object_t<RightT>>
+            ::greater(unwrap_object(a),unwrap_object(b));
 }
 
 /**
@@ -599,8 +599,8 @@ constexpr bool safe_compare_greater(const LeftT& a, const RightT& b)
 template <typename LeftT, typename RightT>
 constexpr bool safe_compare_equal(const LeftT& a, const RightT& b)
 {
-    return detail::safe_compare<typename extract_object_wrapper_t<LeftT>::type,typename extract_object_wrapper_t<RightT>::type>
-            ::equal(extract_object_wrapper(a),extract_object_wrapper(b));
+    return detail::safe_compare<unwrap_object_t<LeftT>,unwrap_object_t<RightT>>
+            ::equal(unwrap_object(a),unwrap_object(b));
 }
 
 /**
@@ -612,8 +612,8 @@ constexpr bool safe_compare_equal(const LeftT& a, const RightT& b)
 template <typename LeftT, typename RightT>
 constexpr bool safe_compare_not_equal(const LeftT& a, const RightT& b)
 {
-    return detail::safe_compare<typename extract_object_wrapper_t<LeftT>::type,typename extract_object_wrapper_t<RightT>::type>
-            ::not_equal(extract_object_wrapper(a),extract_object_wrapper(b));
+    return detail::safe_compare<unwrap_object_t<LeftT>,unwrap_object_t<RightT>>
+            ::not_equal(unwrap_object(a),unwrap_object(b));
 }
 
 /**
@@ -625,8 +625,8 @@ constexpr bool safe_compare_not_equal(const LeftT& a, const RightT& b)
 template <typename LeftT, typename RightT>
 constexpr bool safe_compare_less_equal(const LeftT& a, const RightT& b)
 {
-    return detail::safe_compare<typename extract_object_wrapper_t<LeftT>::type,typename extract_object_wrapper_t<RightT>::type>
-            ::less(extract_object_wrapper(a),extract_object_wrapper(b));
+    return detail::safe_compare<unwrap_object_t<LeftT>,unwrap_object_t<RightT>>
+            ::less(unwrap_object(a),unwrap_object(b));
 }
 
 /**
@@ -638,8 +638,8 @@ constexpr bool safe_compare_less_equal(const LeftT& a, const RightT& b)
 template <typename LeftT, typename RightT>
 constexpr bool safe_compare_greater_equal(const LeftT& a, const RightT& b)
 {
-    return detail::safe_compare<typename extract_object_wrapper_t<LeftT>::type,typename extract_object_wrapper_t<RightT>::type>
-            ::greater_equal(extract_object_wrapper(a),extract_object_wrapper(b));
+    return detail::safe_compare<unwrap_object_t<LeftT>,unwrap_object_t<RightT>>
+            ::greater_equal(unwrap_object(a),unwrap_object(b));
 }
 
 //-------------------------------------------------------------

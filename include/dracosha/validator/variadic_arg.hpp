@@ -21,7 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
-#include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/utils/unwrap_object.hpp>
 #include <dracosha/validator/utils/adjust_storable_type.hpp>
 #include <dracosha/validator/property.hpp>
 
@@ -46,7 +46,7 @@ struct variadic_arg_aggregation_impl
     template <typename T>
     auto end(T&& v) const -> decltype(auto)
     {
-        auto&& arg=extract_object_wrapper(max_arg);
+        auto&& arg=unwrap_object(max_arg);
         return hana::eval_if(
                     hana::is_a<property_tag,decltype(arg)>,
                     [&](auto&& _)

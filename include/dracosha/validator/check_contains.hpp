@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/can_check_contains.hpp>
 #include <dracosha/validator/utils/safe_compare.hpp>
 #include <dracosha/validator/aggregation/wrap_it.hpp>
-#include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/utils/unwrap_object.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -63,7 +63,7 @@ struct check_contains_t
     constexpr bool operator () (
                                 const T1&,
                                 const T2&,
-                                std::enable_if_t<has_property<typename extract_object_wrapper_t<T1>::type,T2>(),
+                                std::enable_if_t<has_property<unwrap_object_t<T1>,T2>(),
                                                                     void*> =nullptr
                              ) const
     {
@@ -81,12 +81,12 @@ struct check_contains_t
                                 const T1& v,
                                 const T2& k,
                                 std::enable_if_t<
-                                    (!hana::is_a<wrap_iterator_tag,T2> && !has_property<typename extract_object_wrapper_t<T1>::type,T2>() && can_check_contains<typename extract_object_wrapper_t<T1>::type,T2>()),
+                                    (!hana::is_a<wrap_iterator_tag,T2> && !has_property<unwrap_object_t<T1>,T2>() && can_check_contains<unwrap_object_t<T1>,T2>()),
                                                                     void*> =nullptr
                              ) const
     {
-        const auto& a=extract_object_wrapper(v);
-        const auto& b=extract_object_wrapper(k);
+        const auto& a=unwrap_object(v);
+        const auto& b=unwrap_object(k);
         return hana::if_(detail::has_find_it(a,b),
             [](auto&& a1, auto&& b1) { return a1.find(b1)!=a1.end(); },
             hana::if_(detail::has_has(a,b),
@@ -112,7 +112,7 @@ struct check_contains_t
     constexpr bool operator () (
                                 const T1&,
                                 const T2&,
-                                std::enable_if_t<!can_check_contains<typename extract_object_wrapper_t<T1>::type,T2>(),
+                                std::enable_if_t<!can_check_contains<unwrap_object_t<T1>,T2>(),
                                                                     void*> =nullptr
                              ) const
     {

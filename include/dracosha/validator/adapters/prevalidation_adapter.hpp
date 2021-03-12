@@ -111,12 +111,12 @@ auto make_prevalidation_adapter(
                             =nullptr)
 {
     using key_type=decltype(member.key());
-    using value_type=typename extract_object_wrapper_t<T>::type;
+    using value_type=unwrap_object_t<T>;
 
     return hana::eval_if(
         hana::and_(
            hana::is_a<range_tag,value_type>,
-           !hana::is_a<element_aggregation_tag,typename extract_object_wrapper_t<key_type>::type>
+           !hana::is_a<element_aggregation_tag,unwrap_object_t<key_type>>
         ),
         [&](auto&&)
         {

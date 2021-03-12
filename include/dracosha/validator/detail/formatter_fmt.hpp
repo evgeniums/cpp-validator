@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/hana_to_std_tuple.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
-#include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/utils/unwrap_object.hpp>
 
 namespace fmt
 {
@@ -50,7 +50,7 @@ struct formatter<object_wrapper<T>>
 {
     template <typename T1, typename FormatContext>
     auto format(const T1& v, FormatContext& ctx) {
-        return format_to(ctx.out(),"{}",extract_object_wrapper(v));
+        return format_to(ctx.out(),"{}",unwrap_object(v));
     }
 };
 

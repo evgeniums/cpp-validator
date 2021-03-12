@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/properties/size.hpp>
 #include <dracosha/validator/aggregation/wrap_it.hpp>
-#include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/utils/unwrap_object.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -36,7 +36,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename T1, typename ArgT>
 struct can_check_contains_t
 {
-    using T2=typename extract_object_wrapper_t<ArgT>::type;
+    using T2=unwrap_object_t<ArgT>;
     constexpr static const bool value =
         hana::is_a<wrap_iterator_tag,T2>
         ||

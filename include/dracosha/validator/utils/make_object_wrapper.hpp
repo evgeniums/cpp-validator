@@ -20,7 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_MAKE_OBJECT_WRAPPER_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/utils/unwrap_object.hpp>
 #include <dracosha/validator/variadic_arg.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -57,7 +57,7 @@ auto make_object_wrapper_ref(T&& v) -> decltype(auto)
         ),
         [&](auto&& _)
         {
-            const auto& val=extract_object_wrapper(_(v));
+            const auto& val=unwrap_object(_(v));
             return object_wrapper<decltype(val)>(val);
         },
         [&](auto&& _) -> decltype(auto)

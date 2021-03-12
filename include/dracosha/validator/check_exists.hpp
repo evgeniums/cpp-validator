@@ -31,7 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/optional.hpp>
 #include <dracosha/validator/utils/reference_wrapper.hpp>
 #include <dracosha/validator/utils/conditional_fold.hpp>
-#include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/utils/unwrap_object.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -93,7 +93,7 @@ constexpr try_get_member_t try_get_member{};
 template <typename Tobj, typename Tpath>
 bool check_exists(Tobj&& object, Tpath&& path)
 {
-    auto&& obj=extract_object_wrapper(object);
+    auto&& obj=unwrap_object(object);
     return hana::if_(
          hana_tuple_empty<Tpath>{},
          [](auto&&, auto&&)

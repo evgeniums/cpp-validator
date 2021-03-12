@@ -620,7 +620,7 @@ BOOST_AUTO_TEST_CASE(TestAllAny)
 
     auto varg2=varg(ANY,child_count);
     const auto& varg2_ref=varg2.get();
-    BOOST_CHECK_EQUAL(property(o1,extract_object_wrapper(varg2_ref.max_arg)),15);
+    BOOST_CHECK_EQUAL(property(o1,unwrap_object(varg2_ref.max_arg)),15);
     BOOST_CHECK_EQUAL(varg2_ref.begin(o1),0);
     BOOST_CHECK_EQUAL(varg2_ref.end(o1),15);
     auto i2=varg2_ref.begin(o1);

@@ -68,7 +68,7 @@ class prevalidation_adapter_impl : public strict_any_tag
         {
             /*,
                                                 has_property_fn(obj,prop)*/
-            auto&& obj=extract_object_wrapper(extract(adpt.traits().get()));
+            auto&& obj=unwrap_object(extract(adpt.traits().get()));
             auto&& val=extract(std::forward<T2>(b));
             return hana::eval_if(
                 hana::is_a<range_tag,decltype(obj)>,

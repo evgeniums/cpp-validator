@@ -20,7 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_NESTED_MEMBER_NAME_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/utils/unwrap_object.hpp>
 #include <dracosha/validator/member.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
 #include <dracosha/validator/reporting/phrase_grammar_cats.hpp>
@@ -156,7 +156,7 @@ auto intermediate_member_names(const T& id, const TraitsT& traits, grammar_categ
         hana::tuple<>(),
         [&traits,&grammar_cats](auto&& prev_parts, auto&& current_key)
         {
-            using key_type=typename extract_object_wrapper_t<decltype(current_key)>::type;
+            using key_type=unwrap_object_t<decltype(current_key)>;
             return hana::eval_if(
                 hana::or_(
                     hana::is_a<key_type,reporting_member_skip>,

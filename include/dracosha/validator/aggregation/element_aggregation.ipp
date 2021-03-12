@@ -108,7 +108,7 @@ status element_aggregation::invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, 
         {
             auto upper_path=hana::drop_back(path);
             const auto& parent=get_member(_(obj),_(parent_compacted_path));
-            const auto& aggregation_varg=extract_object_wrapper(hana::back(_(path)));
+            const auto& aggregation_varg=unwrap_object(hana::back(_(path)));
 
             aggregate_report<AdapterT>::open(adapter,aggr,_(parent_compacted_path));
             bool empty=true;

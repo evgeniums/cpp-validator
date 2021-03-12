@@ -30,7 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/operators/flag.hpp>
 #include <dracosha/validator/make_validator.hpp>
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
-#include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/utils/unwrap_object.hpp>
 #include <dracosha/validator/aggregation/element_aggregation.hpp>
 #include <dracosha/validator/aggregation/any.hpp>
 #include <dracosha/validator/variadic_arg.hpp>
@@ -304,7 +304,7 @@ class member
 
         using is_aggregated=decltype(detail::is_member_aggregated<ParentPathT...,type>::value);
         using is_with_any=decltype(detail::is_member_with_any<ParentPathT...,type>::value);
-        using is_key_any=std::is_same<typename extract_object_wrapper_t<type>::type,std::decay_t<decltype(ANY)>>;
+        using is_key_any=std::is_same<unwrap_object_t<type>,std::decay_t<decltype(ANY)>>;
         using is_with_varg=decltype(detail::is_member_with_varg<ParentPathT...,type>::value);
 
         constexpr static bool has_any() noexcept
@@ -424,7 +424,7 @@ class member
          */
         auto key() const -> decltype(auto)
         {
-            return extract_object_wrapper(hana::back(_path));
+            return unwrap_object(hana::back(_path));
         }
 
         auto last_path_item() const -> decltype(auto)

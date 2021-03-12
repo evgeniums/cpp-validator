@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/concrete_phrase.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
 #include <dracosha/validator/utils/to_string.hpp>
-#include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/utils/unwrap_object.hpp>
 #include <dracosha/validator/variadic_property.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -81,7 +81,7 @@ struct single_member_name_t
     auto operator() (const T& id, const TraitsT& traits, grammar_categories grammar_cats) const -> decltype(auto)
     {
         return hana::eval_if(
-            std::is_base_of<variadic_property_tag,typename extract_object_wrapper_t<T>::type>{},
+            std::is_base_of<variadic_property_tag,unwrap_object_t<T>>{},
             [&](auto&& _)
             {
                 auto format=[&](auto&& v, bool with_cats=false, bool with_decorate=false)
@@ -108,11 +108,11 @@ struct single_member_name_t
  * ID is forwarded to traits, then the result goes to decorator.
  */
 template <typename T, typename TraitsT>
-struct single_member_name_t<T,TraitsT,hana::when<can_single_member_name<typename extract_object_wrapper_t<T>::type,TraitsT>::value>>
+struct single_member_name_t<T,TraitsT,hana::when<can_single_member_name<unwrap_object_t<T>,TraitsT>::value>>
 {
     auto operator() (const T& id, const TraitsT& traits, grammar_categories grammar_cats) const -> decltype(auto)
     {
-        return decorate(traits,translate(traits,traits(extract_object_wrapper(id)),grammar_cats));
+        return decorate(traits,translate(traits,traits(unwrap_object(id)),grammar_cats));
     }
 };
 
@@ -124,15 +124,15 @@ struct single_member_name_t<T,TraitsT,hana::when<can_single_member_name<typename
 template <typename T, typename TraitsT>
 struct single_member_name_t<T,TraitsT,
                                 hana::when<
-                                    !can_single_member_name<typename extract_object_wrapper_t<T>::type,TraitsT>::value
-                                    && std::is_integral<typename extract_object_wrapper_t<T>::type>::value
+                                    !can_single_member_name<unwrap_object_t<T>,TraitsT>::value
+                                    && std::is_integral<unwrap_object_t<T>>::value
                                 >
                             >
 {
     auto operator() (const T& id, const TraitsT& traits, grammar_categories grammar_cats) const
     {
         std::string dst;
-        backend_formatter.append(dst,translate(traits,std::string(string_element),grammar_cats),extract_object_wrapper(id));
+        backend_formatter.append(dst,translate(traits,std::string(string_element),grammar_cats),unwrap_object(id));
         return decorate(traits,dst);
     }
 };

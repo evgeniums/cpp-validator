@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/aggregation/wrap_it.hpp>
 #include <dracosha/validator/aggregation/wrap_index.hpp>
-#include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/utils/unwrap_object.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -139,7 +139,7 @@ struct to_string_t
     template <typename T>
     std::string operator () (const T& v) const
     {
-        return to_string_inst<std::decay_t<decltype(extract_object_wrapper(v))>>(extract_object_wrapper(v));
+        return to_string_inst<std::decay_t<decltype(unwrap_object(v))>>(unwrap_object(v));
     }
 };
 constexpr to_string_t to_string{};

@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/validate.hpp>
 #include <dracosha/validator/properties/size.hpp>
 #include <dracosha/validator/properties/empty.hpp>
-#include <dracosha/validator/utils/extract_object_wrapper.hpp>
+#include <dracosha/validator/utils/unwrap_object.hpp>
 #include <dracosha/validator/prevalidation/validate_empty.hpp>
 #include <dracosha/validator/prevalidation/validate_value.hpp>
 
@@ -69,10 +69,10 @@ void set_member(
         ValueT&& val
     )
 {
-    set_member_inst<std::decay_t<ObjectT>,typename extract_object_wrapper_t<MemberT>::type>
+    set_member_inst<std::decay_t<ObjectT>,unwrap_object_t<MemberT>>
             (
                 obj,
-                extract_object_wrapper(std::forward<MemberT>(member)),
+                unwrap_object(std::forward<MemberT>(member)),
                 std::forward<ValueT>(val)
              );
 }
