@@ -51,7 +51,7 @@ struct member_helper_1arg_t
 };
 
 /**
- * @brief Helper for member's callable operator with 1 argument when the argument is operator.
+ * @brief Helper for member's callable operator with 1 argument when the argument is validator.
  */
 template <typename T1>
 struct member_helper_1arg_t<T1,
