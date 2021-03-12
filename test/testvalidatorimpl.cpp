@@ -843,7 +843,6 @@ BOOST_AUTO_TEST_CASE(CheckWhileEachOrStatus)
 #endif
 BOOST_AUTO_TEST_SUITE_END()
 
-//! @todo Object wrapper for varg ALL/ANY parameters.
 //! @todo Optimize getting member from object by using pre-got parent object.
 //! @todo Implement validation of trees.
 //! @todo Implement validation of heterogeneous containers (tuples).

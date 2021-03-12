@@ -40,6 +40,8 @@ struct extract_object_wrapper_t<T,
 {
     using type=std::decay_t<typename std::decay_t<T>::type>;
 };
+template <typename T>
+using wrapped_t=typename extract_object_wrapper_t<T>::type;
 
 struct extract_object_wrapper_impl
 {

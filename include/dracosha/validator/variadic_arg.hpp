@@ -21,6 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
+#include <dracosha/validator/utils/extract_object_wrapper.hpp>
 #include <dracosha/validator/utils/adjust_storable_type.hpp>
 #include <dracosha/validator/property.hpp>
 
@@ -45,16 +46,16 @@ struct variadic_arg_aggregation_impl
     template <typename T>
     auto end(T&& v) const -> decltype(auto)
     {
-        auto self=this;
+        auto&& arg=extract_object_wrapper(max_arg);
         return hana::eval_if(
-                    hana::is_a<property_tag,MaxArgT>,
+                    hana::is_a<property_tag,decltype(arg)>,
                     [&](auto&& _)
                     {
-                        return property(_(v),_(self)->max_arg);
+                        return property(_(v),_(arg));
                     },
                     [&](auto&& _)
                     {
-                        return _(self)->max_arg;
+                        return _(arg);
                     }
                );
     }
@@ -115,10 +116,11 @@ struct varg_t
     }
 
     template <typename AggregationT, typename MaxT>
-    auto operator() (AggregationT aggr, MaxT max_val) const
+    auto operator() (AggregationT aggr, MaxT&& max_val) const
     {
-        auto val=variadic_arg_aggregation_impl<AggregationT,MaxT>{std::move(aggr),std::move(max_val)};
-        return variadic_arg_aggregation<AggregationT,MaxT>{std::move(val)};
+        auto wrapped_max_val=object_wrapper<MaxT>{std::forward<MaxT>(max_val)};
+        auto val=variadic_arg_aggregation_impl<AggregationT,decltype(wrapped_max_val)>{std::move(aggr),std::move(wrapped_max_val)};
+        return variadic_arg_aggregation<AggregationT,decltype(wrapped_max_val)>{std::move(val)};
     }
 };
 constexpr varg_t varg{};
