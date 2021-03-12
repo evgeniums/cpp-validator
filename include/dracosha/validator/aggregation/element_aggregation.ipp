@@ -125,9 +125,9 @@ status element_aggregation::invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, 
                 }
                 empty=false;
             }
-            auto ret=empt(empty);
-            aggregate_report<AdapterT>::close(adapter,ret);
-            return ret;
+            auto result=empt(empty);
+            aggregate_report<AdapterT>::close(adapter,result);
+            return result;
         },
         [](auto&&)
         {

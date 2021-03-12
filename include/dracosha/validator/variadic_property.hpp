@@ -54,7 +54,7 @@ struct variadic_property_closure
     {
         auto current_type=hana::at(
                         FnArgTypes{},
-                        hana::size(AccumulatedArgsT{})
+                        hana_tuple_size<AccumulatedArgsT>{}
                     );
         return std::is_convertible<T,typename decltype(current_type)::type>::value;
     }

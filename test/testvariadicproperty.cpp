@@ -302,6 +302,16 @@ struct WithChild
         return 15;
     }
 
+    int max_a() const noexcept
+    {
+        return 2;
+    }
+
+    int max_b() const noexcept
+    {
+        return 11;
+    }
+
     std::map<
         int,
         std::map<int,std::string>
@@ -322,6 +332,8 @@ DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(safe_child_word,has_safe_child_word)
 DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_FLAG(sum_gte_10,"must be 10 and more","must be less than 10")
 
 DRACOSHA_VALIDATOR_PROPERTY(child_count)
+DRACOSHA_VALIDATOR_PROPERTY(max_a)
+DRACOSHA_VALIDATOR_PROPERTY(max_b)
 
 }
 #if 1
@@ -690,6 +702,57 @@ BOOST_AUTO_TEST_CASE(TestAllAny)
 
     BOOST_CHECK(!v8.apply(a13));
     BOOST_CHECK_EQUAL(rep,std::string("at least one child must be greater than or equal to 100"));
+    rep.clear();
+}
+
+BOOST_AUTO_TEST_CASE(TestAllAnyMultiArg)
+{
+    WithChild o1;
+    std::string rep;
+    auto a1=make_reporting_adapter(o1,rep);
+
+    auto v1=_[sum_gte_10][varg(ALL,max_a)][varg(ALL,max_b)](eq,true);
+    BOOST_CHECK(!v1.apply(a1));
+    BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(ALL,ALL) must be equal to true"));
+    rep.clear();
+
+    auto v2=_[sum_gte_10][varg(ANY,max_a)][varg(ANY,max_b)](eq,true);
+    BOOST_CHECK(v2.apply(a1));
+
+    auto v3=_[sum_gte_10][varg(ANY,max_a)][varg(ALL,max_b)](eq,true);
+    BOOST_CHECK(!v3.apply(a1));
+    BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(ANY,ALL) must be equal to true"));
+    rep.clear();
+
+    auto v5=_[sum_gte_10][varg(ALL,max_a)][varg(ANY,max_b)](eq,true);
+    BOOST_CHECK(v5.apply(a1));
+    rep.clear();
+
+    auto v6=_[sum_gte_10][varg(ALL,max_a)][varg(ANY,9)](eq,true);
+    BOOST_CHECK(!v6.apply(a1));
+    BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(ALL,ANY) must be equal to true"));
+    rep.clear();
+
+    auto v7=_[sum_gte_10][varg(ANY,3)][varg(ANY,5)](eq,true);
+    BOOST_CHECK(!v7.apply(a1));
+    BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(ANY,ANY) must be equal to true"));
+    rep.clear();
+
+    auto v8=_[sum_gte_10][varg(ANY,3)][varg(3)](eq,true);
+    BOOST_CHECK(!v8.apply(a1));
+    BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(ANY,3) must be equal to true"));
+    rep.clear();
+
+    auto v9=_[sum_gte_10][varg(ALL,5)][varg(9)](eq,true);
+    BOOST_CHECK(!v9.apply(a1));
+    BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(ALL,9) must be equal to true"));
+    rep.clear();
+
+    auto v10=_[sum_gte_10][varg(ALL,5)][varg(10)](eq,true);
+    BOOST_CHECK(v10.apply(a1));
+    rep.clear();
+    auto v11=_[sum_gte_10][varg(ANY,5)][varg(6)](eq,true);
+    BOOST_CHECK(v11.apply(a1));
     rep.clear();
 }
 
