@@ -17,7 +17,7 @@ SET (HEADERS
     include/dracosha/validator/utils/string_view.hpp
     include/dracosha/validator/utils/object_wrapper.hpp
     include/dracosha/validator/utils/unwrap_object.hpp
-    include/dracosha/validator/utils/make_object_wrapper.hpp
+    include/dracosha/validator/utils/wrap_object.hpp
     include/dracosha/validator/utils/is_container.hpp
     include/dracosha/validator/utils/is_pair.hpp
     include/dracosha/validator/utils/get_it.hpp    
@@ -29,6 +29,7 @@ SET (HEADERS
     include/dracosha/validator/utils/to_string.hpp
     include/dracosha/validator/utils/class_method_args.hpp
     include/dracosha/validator/utils/optional.hpp
+    include/dracosha/validator/utils/copy.hpp
 
     include/dracosha/validator/adapter.hpp
     include/dracosha/validator/property.hpp

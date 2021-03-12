@@ -6,8 +6,9 @@
 
 #include <dracosha/validator/utils/make_types_tuple.hpp>
 #include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/utils/make_object_wrapper.hpp>
+#include <dracosha/validator/utils/wrap_object.hpp>
 #include <dracosha/validator/utils/conditional_fold.hpp>
+#include <dracosha/validator/utils/copy.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -129,7 +130,7 @@ BOOST_AUTO_TEST_CASE(CheckMakeMember)
 
     std::vector<int> vec1={1,2,3,4,5};
 
-    auto index=make_object_wrapper(1);
+    auto index=wrap_object(1);
     auto ok=can_check_contains<decltype(vec1),decltype(int())>();
     BOOST_CHECK(ok);
     BOOST_CHECK_EQUAL(vec1[index],2);
@@ -841,11 +842,41 @@ BOOST_AUTO_TEST_CASE(CheckWhileEachOrStatus)
 }
 
 #endif
+
+BOOST_AUTO_TEST_CASE(CheckNonCopyableOperand)
+{
+    TestRefStruct ts;
+    std::ignore=_["field1"](gte,ts);
+    std::ignore=_["field1"](gte,std::move(ts));
+
+    BOOST_CHECK(true);
+}
+
+BOOST_AUTO_TEST_CASE(CheckCopyMoveOperand)
+{
+    size_t val1=10;
+    size_t check_val1=20;
+    size_t val2=20;
+
+    auto v1=validator(gte,val1);
+    auto v2=validator(gte,copy(val1));
+    auto v3=validator(gte,std::move(val2));
+
+    BOOST_CHECK(v1.apply(check_val1));
+    BOOST_CHECK(v2.apply(check_val1));
+    BOOST_CHECK(v3.apply(check_val1));
+
+    val1=200;
+    val2=200;
+    BOOST_CHECK(!v1.apply(check_val1));
+    BOOST_CHECK(v2.apply(check_val1));
+    BOOST_CHECK(v3.apply(check_val1));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 //! @todo Optimize getting member from object by using pre-got parent object.
 //! @todo Implement validation of trees.
 //! @todo Implement validation of heterogeneous containers (tuples).
-//! @todo Ensure that operands are kept as wrapped objects.
 //! @todo Refactor formatting of variadic properties with taking into account preceeding grammar categories.
 //! @todo Refactor formatting of nested validators with hints.
