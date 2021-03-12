@@ -16,8 +16,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_MAKE_OBJECT_WRAPPER_HPP
-#define DRACOSHA_VALIDATOR_MAKE_OBJECT_WRAPPER_HPP
+#ifndef DRACOSHA_VALIDATOR_WRAP_OBJECT_HPP
+#define DRACOSHA_VALIDATOR_WRAP_OBJECT_HPP
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/unwrap_object.hpp>
@@ -27,7 +27,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-struct make_object_wrapper_t
+struct wrap_object_impl
 {
     template <typename T>
     auto operator () (T&& v) const -> decltype(auto)
@@ -45,10 +45,10 @@ struct make_object_wrapper_t
         );
     }
 };
-constexpr make_object_wrapper_t make_object_wrapper{};
+constexpr wrap_object_impl wrap_object{};
 
 template <typename T>
-auto make_object_wrapper_ref(T&& v) -> decltype(auto)
+auto wrap_object_ref(T&& v) -> decltype(auto)
 {
     return hana::eval_if(
         hana::and_(
@@ -71,4 +71,4 @@ auto make_object_wrapper_ref(T&& v) -> decltype(auto)
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_MAKE_OBJECT_WRAPPER_HPP
+#endif // DRACOSHA_VALIDATOR_WRAP_OBJECT_HPP

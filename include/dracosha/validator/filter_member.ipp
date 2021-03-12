@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/hana_to_std_tuple.hpp>
 #include <dracosha/validator/filter_member.hpp>
 #include <dracosha/validator/member.hpp>
-#include <dracosha/validator/utils/make_object_wrapper.hpp>
+#include <dracosha/validator/utils/wrap_object.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -46,7 +46,7 @@ status apply_generated_paths_t::operator () (PathT&& current_path, AdapterT&& ad
         },
         [&](auto&& _)
         {
-            auto&& key=make_object_wrapper_ref(hana::at(_(member).path(),hana::size(_(current_path))));
+            auto&& key=wrap_object_ref(hana::at(_(member).path(),hana::size(_(current_path))));
             return generate_paths<std::decay_t<decltype(key)>>(
                         hana::append(_(current_path),std::move(key)),
                         _(adapter),
