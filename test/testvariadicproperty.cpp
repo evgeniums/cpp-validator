@@ -414,7 +414,7 @@ BOOST_AUTO_TEST_CASE(TestPropertyNotation)
 {
     WithChild o1;
 
-    auto st1=make_storable_type("hello");
+    auto st1=adjust_storable("hello");
     static_assert(std::is_same<decltype(st1),std::string>::value,"");
 
     auto p1=child_word(20,"hello");

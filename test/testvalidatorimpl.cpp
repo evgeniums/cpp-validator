@@ -94,6 +94,28 @@ BOOST_AUTO_TEST_CASE(CheckFoldAnd)
     BOOST_CHECK(!hana::fuse(f6)(fnst));
 }
 
+BOOST_AUTO_TEST_CASE(CheckAdjustStorable)
+{
+    auto c1="hello";
+    static_assert(std::is_constructible<const char*,decltype(c1)>::value,"");
+    const auto& c2=c1;
+    static_assert(std::is_constructible<const char*,decltype(c2)>::value,"");
+    char c3[5];
+    static_assert(std::is_constructible<const char*,decltype(c3)>::value,"");
+    std::string s1{"Hi"};
+    static_assert(!std::is_constructible<const char*,decltype(s1)>::value,"");
+
+    auto st1=adjust_storable(s1);
+    static_assert(hana::is_a<object_wrapper_tag,decltype(st1)>,"");
+    static_assert(std::is_same<std::string,unwrap_object_t<decltype(st1)>>::value,"");
+
+    auto st2=adjust_storable("Hello");
+    static_assert(!hana::is_a<object_wrapper_tag,decltype(st2)>,"");
+    static_assert(std::is_same<std::string,unwrap_object_t<decltype(st2)>>::value,"");
+    BOOST_CHECK_EQUAL(unwrap_object(st1),std::string("Hi"));
+    BOOST_CHECK_EQUAL(unwrap_object(st2),std::string("Hello"));
+}
+
 BOOST_AUTO_TEST_CASE(CheckMakeMember)
 {
     std::ignore=make_plain_member(int(1));

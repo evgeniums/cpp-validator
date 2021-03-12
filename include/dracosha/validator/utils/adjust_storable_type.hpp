@@ -40,38 +40,19 @@ struct adjust_storable_type
 };
 
 /**
- * @brief Transform stringable type to std::string.
+ * @brief Convert const char* type to std::string.
  *
- * "Stringable type" means a type from which a std::string can be constructed.
  */
 template <typename T>
 struct adjust_storable_type<T,
-                        hana::when<
-                                !hana::is_a<property_tag,T>
-                                &&
-                                !hana::is_a<element_aggregation_tag,T>
-                                &&
-                                !hana::is_a<wrap_iterator_tag,T>
-                                &&
-                                !hana::is_a<wrap_index_tag,T>
-                                &&
-                                !hana::is_a<operator_tag,T>
-                                &&
-                                !hana::is_a<object_wrapper_tag,T>
-                                &&
-                                std::is_constructible<std::string,T>::value
-                                &&
-                                !std::is_same<std::string,std::decay_t<T>>::value
-                            >
+                        hana::when<std::is_constructible<const char*,T>::value>
                     >
 {
     using type=std::string;
 };
 
 /**
- * @brief Adjust non-stringable type.
- *
- * Decay to base type that can store a value as a tuple's element.
+ * @brief Adjust special types that must be stored as copies.
  */
 template <typename T>
 struct adjust_storable_type<T,
@@ -93,14 +74,13 @@ struct adjust_storable_type<T,
     using type=std::decay_t<T>;
 };
 
+/**
+ * @brief Adjust all the rest types that must be stored within object_wrapper.
+ */
 template <typename T>
 struct adjust_storable_type<T,
                         hana::when<
-                            (
-                            !std::is_constructible<std::string,T>::value
-                            ||
-                            std::is_same<std::string,std::decay_t<T>>::value
-                            )
+                            !std::is_constructible<const char*,T>::value
                             &&
                             !hana::is_a<property_tag,T>
                             &&
@@ -119,7 +99,10 @@ struct adjust_storable_type<T,
     using type=object_wrapper<T>;
 };
 
-struct make_storable_type_t
+/**
+ * @brief Make storable type from a variable.
+ */
+struct adjust_storable_t
 {
     template <typename T>
     auto operator () (T&& v) const
@@ -127,7 +110,7 @@ struct make_storable_type_t
         return typename adjust_storable_type<T>::type{std::forward<T>(v)};
     }
 };
-constexpr make_storable_type_t make_storable_type{};
+constexpr adjust_storable_t adjust_storable{};
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 

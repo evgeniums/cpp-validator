@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/dispatcher.hpp>
 #include <dracosha/validator/utils/wrap_object.hpp>
+#include <dracosha/validator/utils/adjust_storable_type.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -55,7 +56,8 @@ struct property_validator
 template <typename PropT, typename OpT, typename OperandT>
 constexpr auto make_property_validator(PropT&& prop, OpT&& op, OperandT&& operand)
 {
-    auto fn=hana::reverse_partial(dispatch,std::forward<PropT>(prop),std::forward<OpT>(op),wrap_object(std::forward<OperandT>(operand)));
+    auto fn=hana::reverse_partial(dispatch,std::forward<PropT>(prop),std::forward<OpT>(op),
+                                  adjust_storable(std::forward<OperandT>(operand)));
     return property_validator<decltype(fn),PropT>{std::move(fn)};
 }
 
