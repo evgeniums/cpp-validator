@@ -62,6 +62,7 @@ SET (HEADERS
     include/dracosha/validator/member_path.hpp
     include/dracosha/validator/variadic_property.hpp
     include/dracosha/validator/variadic_arg.hpp
+    include/dracosha/validator/embedded_object.hpp
 
     include/dracosha/validator/aggregation/and.hpp
     include/dracosha/validator/aggregation/or.hpp

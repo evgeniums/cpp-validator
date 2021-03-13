@@ -558,15 +558,15 @@ BOOST_AUTO_TEST_CASE(TestCompactVariadicProperty)
     static_assert(decltype(is_varg(m2.last_path_item()))::value,"");
     auto p2=compact_variadic_property(m2.path());
     BOOST_CHECK(sum_gte_10(12,7)==hana::back(p2));
-    BOOST_CHECK(check_paths_equal(p1,p2));
+    BOOST_CHECK(paths_equal(p1,p2));
 
     auto m3=_["hello"][varg(12)];
     auto p3=compact_variadic_property(m3.path());
-    BOOST_CHECK(check_paths_equal(p3,m3.path()));
+    BOOST_CHECK(paths_equal(p3,m3.path()));
 
     auto m4=_[varg(12)];
     auto p4=compact_variadic_property(m4.path());
-    BOOST_CHECK(check_paths_equal(p4,m4.path()));
+    BOOST_CHECK(paths_equal(p4,m4.path()));
 
     using varg_type=decltype(varg(12));
     static_assert(detail::is_member_with_varg<varg_type>::value,"");
@@ -577,7 +577,7 @@ BOOST_AUTO_TEST_CASE(TestCompactVariadicProperty)
     auto p5=compact_variadic_property(m5.path());
     auto m6=_[5][sum_gte_10(12,7)]["hello"];
     static_assert(!decltype(m6)::has_varg(),"");
-    BOOST_CHECK(check_paths_equal(p5,m6.path()));
+    BOOST_CHECK(paths_equal(p5,m6.path()));
 
     std::string rep;
     std::vector<WithChild> vec7;

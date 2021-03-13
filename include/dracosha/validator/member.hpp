@@ -386,7 +386,7 @@ class member
         template <typename T1>
         bool equals(const T1& other) const
         {
-            return check_paths_equal(_path,other.path());
+            return paths_equal(_path,other.path());
         }
 
         /**

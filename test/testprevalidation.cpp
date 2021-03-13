@@ -350,10 +350,10 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
     static_assert(hana::not_(hana::is_a<element_aggregation_tag,decltype(size)>),"");
 
     static_assert(
-            !decltype(check_member_path_types(_[std::string("A")],_[size]))::value,
+            !decltype(same_member_path_types(_[std::string("A")],_[size]))::value,
         "");
     static_assert(
-            decltype(check_member_path_types(member1[size],member2))::value,
+            decltype(same_member_path_types(member1[size],member2))::value,
         "");
 
     auto pa4=make_prevalidation_adapter(_["field1"]["field1_1"],range({10,11,12}),rep1);
@@ -468,7 +468,7 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
 
     auto eq1=path_types_equal(ANY,ALL);
     static_assert(decltype(eq1)::value,"");
-    auto eq2=check_member_path_types(_["field1"]["field1_1"][ANY],_["field1"]["field1_1"][ALL]);
+    auto eq2=same_member_path_types(_["field1"]["field1_1"][ANY],_["field1"]["field1_1"][ALL]);
     static_assert(decltype(eq2)::value,"");
 #if 1
     // validation with vector

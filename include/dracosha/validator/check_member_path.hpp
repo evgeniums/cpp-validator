@@ -70,7 +70,7 @@ struct path_types_equal_t
 constexpr path_types_equal_t path_types_equal{};
 
 template <typename T1, typename T2>
-auto check_path_types(const T1& path1,const T2& path2)
+auto same_path_types(const T1& path1,const T2& path2)
 {
     auto path1_c=hana::transform(path1,unwrap_object_type_c);
     auto path2_c=hana::transform(path2,unwrap_object_type_c);
@@ -109,16 +109,16 @@ auto check_path_types(const T1& path1,const T2& path2)
   * @return Result of check operation.
   */
 template <typename Tm1, typename Tm2>
-auto check_member_path_types(const Tm1& member1,const Tm2& member2)
+auto same_member_path_types(const Tm1& member1,const Tm2& member2)
 {
-    return check_path_types(member1.path(),member2.path());
+    return same_path_types(member1.path(),member2.path());
 }
 
 template <typename T1, typename T2>
-bool check_paths_equal(const T1& path1, const T2& path2)
+bool paths_equal(const T1& path1, const T2& path2)
 {
     return hana::eval_if(
-        check_path_types(path1,path2),
+        same_path_types(path1,path2),
         [&](auto&& _)
         {
             auto pairs=hana::zip(_(path1),_(path2));

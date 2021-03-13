@@ -227,7 +227,7 @@ class prevalidation_adapter_impl : public strict_any_tag
                             // check member path as is
                             return hana::eval_if(
                                 hana::and_(
-                                    check_member_path_types(self->check_member(),member)
+                                    same_member_path_types(self->check_member(),member)
                                 ),
                                 [&self,&member,&adpt,&prop,&op,&b](auto&&)
                                 {

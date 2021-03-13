@@ -304,7 +304,7 @@ struct type_variadic_p_notation_##prop : public type_variadic_p_##prop, public v
     template <typename T> \
     bool operator == (const type_variadic_p_notation_##prop<T>& other) const noexcept \
     { \
-        return check_paths_equal(_args,other._args);  \
+        return paths_equal(_args,other._args);  \
     } \
     \
     StoredArgsT _args; \

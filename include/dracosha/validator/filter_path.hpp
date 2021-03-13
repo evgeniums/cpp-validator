@@ -55,7 +55,7 @@ struct path_starts_with_t
             {
                 if (hana::equal(hana::size(path),hana::size(path2)))
                 {
-                    return result{check_paths_equal(path,path2),true};
+                    return result{paths_equal(path,path2),true};
                 }
                 return state;
             }
