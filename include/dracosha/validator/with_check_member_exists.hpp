@@ -108,7 +108,8 @@ struct with_check_member_exists
     bool check_path_exists(PathT&& path, T2&& b) const
     {
         const auto& obj=extract(_traits.get());
-        return hana::if_(is_member_path_valid(obj,path),
+        return hana::if_(
+            is_member_path_valid(obj,path),
             [&obj,&b](auto&& path)
             {
                 return exists(obj,std::forward<decltype(path)>(path))==b;
@@ -128,7 +129,7 @@ struct with_check_member_exists
     template <typename PathT>
     bool check_path_exists(const PathT& path) const
     {
-        if (!is_member_path_valid(extract(_traits.get()),path))
+        if (!hana::value(is_member_path_valid(extract(_traits.get()),path)))
         {
             return false;
         }

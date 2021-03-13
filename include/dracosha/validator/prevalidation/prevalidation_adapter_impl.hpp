@@ -296,8 +296,9 @@ class prevalidation_adapter_impl : public strict_any_tag
             const auto& obj=extract(adpt.traits().get());
             const auto& sample=extract(b)();
 
-            auto&& sample_might_have_path=is_member_path_valid(sample,check_member().path());
-            auto sample_has_path=hana::if_(sample_might_have_path,
+            auto sample_might_have_path=is_member_path_valid(sample,check_member().path());
+            auto sample_has_path=hana::if_(
+                sample_might_have_path,
                 [&sample](auto&& path)
                 {
                     return exists(sample,path);

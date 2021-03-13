@@ -128,7 +128,7 @@ struct embedded_object_has_path_impl
     {
         auto check_path_exists=[&adapter,this](auto&& obj, auto&& path)
         {
-            if (!is_member_path_valid(obj,path))
+            if (!hana::value(is_member_path_valid(obj,path)))
             {
                 return false;
             }

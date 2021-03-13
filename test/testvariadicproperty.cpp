@@ -343,9 +343,9 @@ BOOST_AUTO_TEST_CASE(TestPropertyAlwaysExistArg1)
     static_assert(!has_property<WithoutChild,decltype(child)>(),"");
 
     WithChild o1;
-    static_assert(is_member_path_valid(o1,hana::make_tuple(child)),"");
+    static_assert(hana::value(is_member_path_valid(o1,hana::make_tuple(child))),"");
     std::ignore=get_member(o1,hana::make_tuple(child));
-    static_assert(is_member_path_valid(o1,hana::make_tuple(child,10)),"");
+    static_assert(hana::value(is_member_path_valid(o1,hana::make_tuple(child,10))),"");
     auto res1=get_member(o1,hana::make_tuple(child,10));
     static_assert(std::is_same<decltype(res1),int>::value,"");
     BOOST_CHECK_EQUAL(get_member(o1,hana::make_tuple(child,10)),11);

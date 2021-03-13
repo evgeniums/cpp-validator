@@ -49,7 +49,10 @@ constexpr auto member_value_type(Tobj&& obj, Tpath&& path)
 template <typename Tobj, typename Tpath>
 constexpr auto is_member_path_valid(Tobj&& obj, Tpath&& path)
 {
-    return !hana::is_nothing(member_value_type(obj,path));
+    return hana::or_(
+                        hana::is_empty(path),
+                        hana::not_(hana::is_nothing(member_value_type(obj,path)))
+                    );
 }
 
 struct element_aggregation_tag;

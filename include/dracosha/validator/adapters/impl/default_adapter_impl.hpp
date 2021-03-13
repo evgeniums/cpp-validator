@@ -30,6 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/conditional_fold.hpp>
 #include <dracosha/validator/operators/exists.hpp>
 #include <dracosha/validator/embedded_object.hpp>
+#include <dracosha/validator/adapters/impl/intermediate_adapter_traits.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -212,19 +213,60 @@ struct default_adapter_impl
     template <typename PredicateT, typename AdapterT, typename OpsT, typename MemberT>
     static status validate_member_aggregation(const PredicateT& pred, AdapterT&& adapter, MemberT&& member, OpsT&& ops)
     {
-        // prepare new adapter with extracted object's member that must be validated
-        auto& tmp_adapter=adapter;
+//        const auto& original_obj=original_embedded_object(adapter);
+//        return hana::if_(
+//            is_member_path_valid(original_obj,member.path()),
+//            [&ops](const auto& adapter, const auto& member)
+//            {
+//                auto create=[&](auto&& traits)
+//                {
+//                    auto index=hana::minus(hana::size(member.path()),hana::size_c<1>);
+//                    return intermediate_adapter_traits<
+//                                std::decay_t<decltype(traits)>,
+//                                decltype(original_obj),
+//                                decltype(index)
+//                            >{
+//                        std::move(traits),
+//                        original_obj,
+//                        index
+//                    };
+//                };
+//                auto tmp_adapter=adapter.derive(create);
+
+
+//                return while_each(
+//                                      ops,
+//                                      pred,
+//                                      status(status::code::ignore),
+//                                      [&member,&tmp_adapter](auto&& op)
+//                                      {
+//                                        return status(
+//                                                    apply_member(
+//                                                        tmp_adapter,
+//                                                        std::forward<decltype(op)>(op),
+//                                                        member
+//                                                    )
+//                                                 );
+//                                      }
+//                                  );
+
+//            },
+//            [](const auto&,const auto&)
+//            {
+//                return status(status::code::ignore);
+//            }
+//        )(adapter,member);
 
         // invoke operations on new temporary adapter
         return while_each(
                               ops,
                               pred,
                               status(status::code::ignore),
-                              [&member,&tmp_adapter](auto&& op)
+                              [&member,&adapter](auto&& op)
                               {
                                 return status(
                                             apply_member(
-                                                tmp_adapter,
+                                                adapter,
                                                 std::forward<decltype(op)>(op),
                                                 std::forward<decltype(member)>(member)
                                             )
