@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/extract.hpp>
 #include <dracosha/validator/get_member.hpp>
+#include <dracosha/validator/adapters/impl/intermediate_adapter_traits.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -32,11 +33,21 @@ struct embedded_object_impl
     template <typename AdapterT>
     auto operator() (const AdapterT& adapter) const -> decltype(auto)
     {
-        return extract(adapter.traits().get());
+        using type=typename AdapterT::type;
+        return hana::eval_if(
+            std::is_base_of<intermediate_adapter_tag,type>{},
+            [&](auto&& _) -> decltype(auto)
+            {
+                return _(adapter).traits().value();
+            },
+            [&](auto&& _) -> decltype(auto)
+            {
+                return extract(_(adapter).traits().get());
+            }
+        );
     }
 };
 constexpr embedded_object_impl embedded_object;
-
 struct original_embedded_object_impl
 {
     template <typename AdapterT>
@@ -47,31 +58,136 @@ struct original_embedded_object_impl
 };
 constexpr original_embedded_object_impl original_embedded_object;
 
-struct embedded_object_has_path_impl
+//-------------------------------------------------------------
+
+struct embedded_object_path_suffix_impl
 {
     template <typename AdapterT, typename PathT>
-    auto operator() (const AdapterT& adapter, const PathT& path) const -> decltype(auto)
+    auto operator() (const AdapterT& adapter, PathT&& path) const -> decltype(auto)
     {
-        return adapter.traits().check_path_exists(path);
+        using type=typename AdapterT::type;
+        return hana::eval_if(
+            std::is_base_of<intermediate_adapter_tag,type>{},
+            [&](auto&& _)
+            {
+                return _(adapter).traits().path(_(path));
+            },
+            [&](auto&& _) -> decltype(auto)
+            {
+                return hana::id(std::forward<PathT>(_(path)));
+            }
+        );
     }
+};
+constexpr embedded_object_path_suffix_impl embedded_object_path_suffix{};
+
+//-------------------------------------------------------------
+
+struct embedded_object_has_path_impl
+{
+    template <typename AdapterT, typename PathT, typename T2>
+    bool operator() (const AdapterT& adapter, PathT&& path, T2&& b) const
+    {
+        auto check_path_exists=[&b](auto&& obj, auto&& path)
+        {
+            return hana::if_(
+                is_member_path_valid(obj,path),
+                [&b](auto&& obj, auto&& path)
+                {
+                    return exists(obj,std::forward<decltype(path)>(path))==b;
+                },
+                [&b](auto&&, auto&&)
+                {
+                    return b==false;
+                }
+            )(std::forward<decltype(obj)>(obj),std::forward<decltype(path)>(path));
+        };
+
+        using type=typename AdapterT::type;
+        return hana::eval_if(
+            std::is_base_of<intermediate_adapter_tag,type>{},
+            [&](auto&& _)
+            {
+                return check_path_exists(
+                                            _(adapter).traits().value(),
+                                            _(adapter).traits().path(_(path))
+                                        );
+            },
+            [&](auto&& _)
+            {
+                return check_path_exists(
+                            extract(_(adapter).traits().get()),
+                            _(path)
+                        );
+            }
+        );
+    }
+
+    template <typename AdapterT, typename PathT, typename ForceOriginalT>
+    bool invoke(const AdapterT& adapter, PathT&& path, ForceOriginalT) const
+    {
+        auto check_path_exists=[&adapter,this](auto&& obj, auto&& path)
+        {
+            if (!is_member_path_valid(obj,path))
+            {
+                return false;
+            }
+            if (adapter.traits().is_check_member_exists_before_validation())
+            {
+                return (*this)(adapter,path,true);
+            }
+            return true;
+        };
+
+        using type=typename AdapterT::type;
+        return hana::eval_if(
+            hana::and_(
+                        std::is_base_of<intermediate_adapter_tag,type>{},
+                        hana::not_(ForceOriginalT{})
+                      ),
+            [&](auto&& _)
+            {
+                return check_path_exists(
+                                            _(adapter).traits().value(),
+                                            _(adapter).traits().path(_(path))
+                                        );
+            },
+            [&](auto&& _)
+            {
+                return check_path_exists(
+                            extract(_(adapter).traits().get()),
+                            _(path)
+                        );
+            }
+        );
+    }
+
+    template <typename AdapterT, typename PathT>
+    bool operator() (const AdapterT& adapter, PathT&& path) const
+    {
+        return invoke(adapter,path,std::false_type{});
+    }
+
 };
 constexpr embedded_object_has_path_impl embedded_object_has_path;
 struct original_embedded_object_has_path_impl
 {
     template <typename AdapterT, typename PathT>
-    auto operator() (const AdapterT& adapter, const PathT& path) const -> decltype(auto)
+    bool operator() (const AdapterT& adapter, const PathT& path) const
     {
-        return adapter.traits().check_path_exists(path);
+        return embedded_object_has_path.invoke(adapter,path,std::true_type{});
     }
 };
 constexpr original_embedded_object_has_path_impl original_embedded_object_has_path;
 
+//-------------------------------------------------------------
+
 struct embedded_object_has_member_impl
 {
     template <typename AdapterT, typename MemberT>
-    auto operator() (const AdapterT& adapter, const MemberT& member) const -> decltype(auto)
+    bool operator() (const AdapterT& adapter, const MemberT& member) const
     {
-        return adapter.traits().check_member_exists(member);
+        return embedded_object_has_path(adapter,member.path());
     }
 };
 constexpr embedded_object_has_member_impl embedded_object_has_member;
@@ -79,19 +195,21 @@ constexpr embedded_object_has_member_impl embedded_object_has_member;
 struct original_embedded_object_has_member_impl
 {
     template <typename AdapterT, typename MemberT>
-    auto operator() (const AdapterT& adapter, const MemberT& member) const -> decltype(auto)
+    bool operator() (const AdapterT& adapter, const MemberT& member) const
     {
-        return adapter.traits().check_member_exists(member);
+        return original_embedded_object_has_path(adapter,member.path());
     }
 };
 constexpr original_embedded_object_has_member_impl original_embedded_object_has_member;
+
+//-------------------------------------------------------------
 
 struct embedded_object_member_impl
 {
     template <typename AdapterT, typename MemberT>
     auto operator() (const AdapterT& adapter, const MemberT& member) const -> decltype(auto)
     {
-        return get_member(embedded_object(adapter),member.path());
+        return get_member(embedded_object(adapter),embedded_object_path_suffix(adapter,member.path()));
     }
 };
 constexpr embedded_object_member_impl embedded_object_member;

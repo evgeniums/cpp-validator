@@ -71,7 +71,7 @@ struct default_adapter_impl
     static status validate_exists(AdapterT&& adapter, MemberT&& member, OpT&&, T2&& b, bool from_check_member=false)
     {
         std::ignore=from_check_member;
-        return adapter.check_path_exists(adapter,member.path(),b);
+        return embedded_object_has_path(adapter,member.path(),b);
     }
 
     /**
