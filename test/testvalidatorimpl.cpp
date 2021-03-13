@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(CheckMakeMember)
     BOOST_CHECK(ok);
     BOOST_CHECK_EQUAL(vec1[index],2);
     auto mv=make_member(std::make_tuple(3));
-    BOOST_CHECK(check_member_path(vec1,mv.path()));
+    BOOST_CHECK(is_member_path_valid(vec1,mv.path()));
 
     auto v2=m1(gte,5);
     BOOST_CHECK(v2.apply(vec1));

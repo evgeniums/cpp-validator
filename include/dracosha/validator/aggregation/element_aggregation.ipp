@@ -47,7 +47,7 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, Aggregati
         return adapter.traits().not_found_status();
     }
 
-    return hana::eval_if(check_member_path(obj,parent_path),
+    return hana::eval_if(is_member_path_valid(obj,parent_path),
         [&](auto&& _v)
         {
             const auto& parent_element=get_member(_v(obj),_v(parent_path));
@@ -103,7 +103,7 @@ status element_aggregation::invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, 
     }
 
     const auto& obj=extract(adapter.traits().get());
-    return hana::eval_if(check_member_path(obj,parent_compacted_path),
+    return hana::eval_if(is_member_path_valid(obj,parent_compacted_path),
         [&](auto&& _)
         {
             auto upper_path=hana::drop_back(path);

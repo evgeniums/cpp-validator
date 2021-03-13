@@ -47,7 +47,7 @@ constexpr auto member_value_type(Tobj&& obj, Tpath&& path)
   This operation is expected to be static and assumed to be performed at compile time.
 */
 template <typename Tobj, typename Tpath>
-constexpr auto check_member_path(Tobj&& obj, Tpath&& path)
+constexpr auto is_member_path_valid(Tobj&& obj, Tpath&& path)
 {
     return !hana::is_nothing(member_value_type(obj,path));
 }

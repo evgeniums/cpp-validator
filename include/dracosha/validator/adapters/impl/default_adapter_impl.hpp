@@ -89,13 +89,11 @@ struct default_adapter_impl
 
         const auto& original_obj=original_embedded_object(std::forward<AdapterT>(adapter));
         return hana::if_(
-            check_member_path(original_obj,member.path()),
+            is_member_path_valid(original_obj,member.path()),
             [&prop,&op,&b](const auto& adapter, const auto& member)
             {
-                auto&& val=embedded_object_member(adapter,member);
-                auto&& prpty=property(val,std::forward<PropT>(prop));
                 return op(
-                            prpty,
+                            property(embedded_object_member(adapter,member),std::forward<PropT>(prop)),
                             extract(std::forward<T2>(b))
                         );
             },
@@ -122,8 +120,8 @@ struct default_adapter_impl
         const auto& original_obj=original_embedded_object(adapter);
         return hana::if_(
             hana::and_(
-                check_member_path(original_obj,member.path()),
-                check_member_path(original_obj,b.path())
+                is_member_path_valid(original_obj,member.path()),
+                is_member_path_valid(original_obj,b.path())
             ),
             [&prop,&op](const auto& adapter, const auto& member, const auto& b)
             {
@@ -156,7 +154,7 @@ struct default_adapter_impl
         }
 
         const auto& sample=extract(b)();
-        auto sample_might_have_path=check_member_path(sample,member.path());
+        auto sample_might_have_path=is_member_path_valid(sample,member.path());
         auto sample_has_path=hana::if_(sample_might_have_path,
             [&sample](auto&& path)
             {
@@ -174,7 +172,7 @@ struct default_adapter_impl
         }
 
         const auto& original_obj=original_embedded_object(adapter);
-        auto obj_might_have_path=check_member_path(original_obj,member.path());
+        auto obj_might_have_path=is_member_path_valid(original_obj,member.path());
 
         return hana::if_(
             hana::and_(
@@ -253,7 +251,7 @@ struct default_adapter_impl
 
         const auto& original_obj=original_embedded_object(adapter);
         return hana::if_(
-            check_member_path(original_obj,member.path()),
+            is_member_path_valid(original_obj,member.path()),
             [&adapter,&member,&ops](auto&&)
             {
                 return validate_member_and(
@@ -292,7 +290,7 @@ struct default_adapter_impl
     {
         const auto& original_obj=original_embedded_object(adapter);
         return hana::if_(
-            check_member_path(original_obj,member.path()),
+            is_member_path_valid(original_obj,member.path()),
             [&adapter,&member,&ops](auto&&)
             {
                 return validate_member_or(
@@ -330,7 +328,7 @@ struct default_adapter_impl
 
         const auto& original_obj=original_embedded_object(adapter);
         return hana::if_(
-            check_member_path(original_obj,member.path()),
+            is_member_path_valid(original_obj,member.path()),
             [&adapter,&member,&op](auto&&)
             {
                 return status(!apply_member(std::forward<decltype(adapter)>(adapter),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));

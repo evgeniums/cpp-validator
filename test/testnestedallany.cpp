@@ -546,7 +546,7 @@ BOOST_AUTO_TEST_CASE(TestAllWithModifiers)
 
     static_assert(decltype(is_element_aggregation(hana::true_{},_[ALL(iterators)].key()))::value,"");
     static_assert(decltype(_[ALL(iterators)][second])::is_aggregated::value,"");
-    BOOST_CHECK(check_member_path(m1,_[ALL(iterators)].path()));
+    BOOST_CHECK(is_member_path_valid(m1,_[ALL(iterators)].path()));
 
     auto v3=validator(
         _[ALL(iterators)](second(gt,"value"))

@@ -104,7 +104,7 @@ bool check_exists(Tobj&& object, Tpath&& path)
          [](auto&& obj, auto&& path)
          {
             return hana::if_(
-                check_member_path(obj,path),
+                is_member_path_valid(obj,path),
                 [](auto&& obj, auto&& path)
                 {
                     auto handler=[&](auto&& default_ret)
