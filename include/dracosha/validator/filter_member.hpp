@@ -21,8 +21,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/filter_path.hpp>
+#include <dracosha/validator/embedded_object.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+
+//-------------------------------------------------------------
 
 template <typename KeyT, typename Enable=hana::when<true>>
 struct generate_paths_t
@@ -32,6 +35,8 @@ struct generate_paths_t
 };
 template <typename KeyT>
 constexpr generate_paths_t<KeyT> generate_paths{};
+
+//-------------------------------------------------------------
 
 struct apply_generated_paths_t
 {
@@ -43,6 +48,8 @@ struct apply_generated_paths_t
 };
 constexpr apply_generated_paths_t apply_generated_paths{};
 
+//-------------------------------------------------------------
+
 struct apply_member_path_t
 {
     template <typename PathT, typename FnT, typename AdapterT, typename MemberT>
@@ -50,6 +57,52 @@ struct apply_member_path_t
 };
 constexpr apply_member_path_t apply_member_path{};
 
+//-------------------------------------------------------------
+
+struct invoke_member_if_exists_impl
+{
+    template <typename FnT, typename AdapterT, typename MemberT>
+    status operator () (FnT&& fn, AdapterT&& adapter, MemberT&& member) const
+    {
+        auto invoke=[](auto&& fn, auto&& adapter, auto&& member)
+        {
+            return fn(std::forward<decltype(adapter)>(adapter),std::forward<decltype(member)>(member));
+        };
+
+        using type=typename std::decay_t<AdapterT>::type;
+        return hana::eval_if(
+            hana::or_(
+                typename type::filter_if_not_exists{}
+            ),
+            [&](auto&& _)
+            {
+                const auto& original_obj=original_embedded_object(_(adapter));
+                return hana::eval_if(
+                    is_member_path_valid(original_obj,_(member).path()),
+                    [&](auto&& _)
+                    {
+                        if (!embedded_object_has_member(_(adapter),_(member)))
+                        {
+                            return _(adapter).traits().not_found_status();
+                        }
+                        return status(_(invoke(_(fn),_(adapter),_(member))));
+                    },
+                    [&](auto&&)
+                    {
+                        return status(status::code::ignore);
+                    }
+                );
+            },
+            [&](auto&& _)
+            {
+                return status(_(invoke(_(fn),_(adapter),_(member))));
+            }
+        );
+    }
+};
+constexpr invoke_member_if_exists_impl invoke_member_if_exists{};
+
+//-------------------------------------------------------------
 
 template <typename AdapterT, typename MemberT, typename Enable=hana::when<true>>
 struct filter_member_invoker
@@ -60,9 +113,8 @@ struct filter_member_invoker
         if (filter_path(adapter,member.path()))
         {
             return status::code::ignore;
-        }
-        //! @todo Check if member exists.
-        return fn(std::forward<AdapterT1>(adapter),std::forward<MemberT1>(member));
+        }        
+        return invoke_member_if_exists(fn,adapter,member);
     }
 };
 
@@ -78,9 +130,15 @@ struct filter_member_invoker<AdapterT,MemberT,
     template <typename FnT, typename AdapterT1, typename MemberT1>
     static auto invoke(FnT&& fn, AdapterT1&& adapter, MemberT1&& member)
     {
-        return apply_member_path(hana::tuple<>{},std::forward<FnT>(fn),std::forward<AdapterT1>(adapter),std::forward<MemberT1>(member));
+        auto handler=[&fn](auto&& adapter, auto&& member)
+        {
+            return invoke_member_if_exists(fn,adapter,member);
+        };
+        return apply_member_path(hana::tuple<>{},handler,adapter,member);
     }
 };
+
+//-------------------------------------------------------------
 
 struct filter_member_t
 {
@@ -92,6 +150,8 @@ struct filter_member_t
     }
 };
 constexpr filter_member_t filter_member{};
+
+//-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 

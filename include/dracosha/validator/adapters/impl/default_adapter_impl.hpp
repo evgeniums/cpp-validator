@@ -77,55 +77,36 @@ struct default_adapter_impl
 
     /**
      * @brief Validate a member.
-     *
-     * If configured, the existence of the member can be checked before validation.
      */
     template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
     static status validate(AdapterT&& adapter, MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
     {
-        if (!embedded_object_has_member(adapter,member))
-        {
-            return adapter.traits().not_found_status();
-        }
-
-        const auto& original_obj=original_embedded_object(std::forward<AdapterT>(adapter));
-        return hana::if_(
-            is_member_path_valid(original_obj,member.path()),
-            [&prop,&op,&b](const auto& adapter, const auto& member)
-            {
-                return op(
-                            property(embedded_object_member(adapter,member),std::forward<PropT>(prop)),
-                            extract(std::forward<T2>(b))
-                        );
-            },
-            [](const auto&,const auto&)
-            {
-                return status(status::code::ignore);
-            }
-        )(adapter,member);
+        return op(
+                    property(embedded_object_member(adapter,member),std::forward<PropT>(prop)),
+                    extract(std::forward<T2>(b))
+                );
     }
 
     /**
      * @brief Validate a member using other member as sample.
      *
-     * If configured, the existance of the member can be checked before validation.
+     * If other member does not exist then check is ignored.
      */
     template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
     static status validate_with_other_member(AdapterT&& adapter, MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
     {
-        if (!embedded_object_has_member(adapter,member) || !original_embedded_object_has_member(adapter,b))
-        {
-            return adapter.traits().not_found_status();
-        }
-
         const auto& original_obj=original_embedded_object(adapter);
+        auto might_have_other_path=is_member_path_valid(original_obj,b.path());
         return hana::if_(
-            hana::and_(
-                is_member_path_valid(original_obj,member.path()),
-                is_member_path_valid(original_obj,b.path())
-            ),
-            [&prop,&op](const auto& adapter, const auto& member, const auto& b)
+            might_have_other_path,
+            [&original_obj,&prop,&op](const auto& adapter, const auto& member, const auto& b)
             {
+                if (!exists(original_obj,b.path()))
+                {
+                    // if other path does not exist then ignore check
+                    return status(status::code::ignore);
+                }
+
                 return status(
                         op(
                             property(embedded_object_member(adapter,member),prop),
@@ -143,45 +124,23 @@ struct default_adapter_impl
     /**
      * @brief Validate a member using member with the same path of sample object.
      *
-     * If configured, the existance of the member can be checked before validation.
      * If sample does not contain member then check is ignored.
      */
     template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
     static status validate_with_master_sample(AdapterT&& adapter, MemberT&& member, PropT&& prop, OpT&& op, T2&& b)
     {
-        if (!embedded_object_has_member(adapter,member))
-        {
-            return adapter.traits().not_found_status();
-        }
-
         const auto& sample=extract(b)();
         auto sample_might_have_path=is_member_path_valid(sample,member.path());
-        auto sample_has_path=hana::if_(sample_might_have_path,
-            [&sample](auto&& path)
-            {
-                return exists(sample,path);
-            },
-            [](auto&&)
-            {
-                return false;
-            }
-        )(member.path());
-        if (!sample_has_path)
-        {
-            // if sample does not have member then ignore check
-            return status(status::code::ignore);
-        }
-
-        const auto& original_obj=original_embedded_object(adapter);
-        auto obj_might_have_path=is_member_path_valid(original_obj,member.path());
-
         return hana::if_(
-            hana::and_(
-                obj_might_have_path,
-                sample_might_have_path
-            ),
+            sample_might_have_path,
             [&prop,&op,&sample](const auto& adapter, const auto& member)
             {
+                if (!exists(sample,member.path()))
+                {
+                    // if sample does not have member then ignore check
+                    return status(status::code::ignore);
+                }
+
                 return status(
                         op(
                             property(embedded_object_member(adapter,member),prop),
@@ -200,78 +159,14 @@ struct default_adapter_impl
     static status validate_aggregation(const PredicateT& pred, AdapterT&& adapter, OpsT&& ops)
     {
         return while_each(
-                              ops,
-                              pred,
-                              status(status::code::ignore),
-                              [&adapter](auto&& op)
-                              {
-                                return status(apply(std::forward<AdapterT>(adapter),std::forward<decltype(op)>(op)));
-                              }
-                          );
-    }
-
-    template <typename PredicateT, typename AdapterT, typename OpsT, typename MemberT>
-    static status validate_member_aggregation(const PredicateT& pred, AdapterT&& adapter, MemberT&& member, OpsT&& ops)
-    {
-        const auto& original_obj=original_embedded_object(adapter);
-        return hana::if_(
-            is_member_path_valid(original_obj,member.path()),
-            [&pred,&ops](const auto& adapter, const auto& member)
-            {
-                auto create=[&](auto traits)
-                {
-                    const auto& obj=embedded_object_member(adapter,member);
-                    auto path_prefix_length=hana::size(member.path());
-                    return intermediate_adapter_traits<
-                                std::decay_t<decltype(traits)>,
-                                decltype(obj),
-                                decltype(path_prefix_length)
-                            >{
-                        std::move(traits),
-                        obj,
-                        path_prefix_length
-                    };
-                };
-                auto tmp_adapter=adapter.clone(create);
-                return while_each(
-                                      ops,
-                                      pred,
-                                      status(status::code::ignore),
-                                      [&member,&tmp_adapter](auto&& op)
-                                      {
-                                        return status(
-                                                    apply_member(
-                                                        tmp_adapter,
-                                                        std::forward<decltype(op)>(op),
-                                                        member
-                                                    )
-                                                 );
-                                      }
-                                  );
-
-            },
-            [](const auto&,const auto&)
-            {
-                return status(status::code::ignore);
-            }
-        )(adapter,member);
-
-        // invoke operations on new temporary adapter
-//        return while_each(
-//                              ops,
-//                              pred,
-//                              status(status::code::ignore),
-//                              [&member,&adapter](auto&& op)
-//                              {
-//                                return status(
-//                                            apply_member(
-//                                                adapter,
-//                                                std::forward<decltype(op)>(op),
-//                                                std::forward<decltype(member)>(member)
-//                                            )
-//                                         );
-//                              }
-//                          );
+                  ops,
+                  pred,
+                  status(status::code::ignore),
+                  [&adapter](auto&& op)
+                  {
+                    return status(apply(std::forward<AdapterT>(adapter),std::forward<decltype(op)>(op)));
+                  }
+              );
     }
 
     /**
@@ -286,7 +181,12 @@ struct default_adapter_impl
     template <typename AdapterT, typename MemberT, typename OpsT>
     static status validate_member_and(AdapterT&& adapter, MemberT&& member, OpsT&& ops)
     {
-        return validate_member_aggregation(predicate_and,std::forward<AdapterT>(adapter),std::forward<MemberT>(member),std::forward<OpsT>(ops));
+        return adapter.traits().validate_member_aggregation(
+                    predicate_and,
+                    std::forward<AdapterT>(adapter),
+                    std::forward<MemberT>(member),
+                    std::forward<OpsT>(ops)
+               );
     }
 
     /**
@@ -295,27 +195,11 @@ struct default_adapter_impl
     template <typename AdapterT, typename MemberT, typename OpsT>
     static status validate_and(AdapterT&& adapter, MemberT&& member, OpsT&& ops)
     {
-        if (!embedded_object_has_member(adapter,member))
-        {
-            return adapter.traits().not_found_status();
-        }
-
-        const auto& original_obj=original_embedded_object(adapter);
-        return hana::if_(
-            is_member_path_valid(original_obj,member.path()),
-            [&adapter,&member,&ops](auto&&)
-            {
-                return validate_member_and(
-                            std::forward<decltype(adapter)>(adapter),
-                            std::forward<decltype(member)>(member),
-                            std::forward<decltype(ops)>(ops)
-                          );
-            },
-            [](auto&&)
-            {
-                return status(status::code::ignore);
-            }
-        )(member.path());
+        return validate_member_and(
+                    std::forward<decltype(adapter)>(adapter),
+                    std::forward<decltype(member)>(member),
+                    std::forward<decltype(ops)>(ops)
+                  );
     }
 
     /**
@@ -330,7 +214,7 @@ struct default_adapter_impl
     template <typename AdapterT, typename MemberT, typename OpsT>
     static status validate_member_or(AdapterT&& adapter, MemberT&& member, OpsT&& ops)
     {
-        return validate_member_aggregation(status_predicate_or,std::forward<AdapterT>(adapter),std::forward<MemberT>(member),std::forward<OpsT>(ops));
+        return adapter.traits().validate_member_aggregation(status_predicate_or,std::forward<AdapterT>(adapter),std::forward<MemberT>(member),std::forward<OpsT>(ops));
     }
 
     /**
@@ -339,22 +223,11 @@ struct default_adapter_impl
     template <typename AdapterT, typename MemberT, typename OpsT>
     static status validate_or(AdapterT&& adapter, MemberT&& member, OpsT&& ops)
     {
-        const auto& original_obj=original_embedded_object(adapter);
-        return hana::if_(
-            is_member_path_valid(original_obj,member.path()),
-            [&adapter,&member,&ops](auto&&)
-            {
-                return validate_member_or(
-                            std::forward<decltype(adapter)>(adapter),
-                            std::forward<decltype(member)>(member),
-                            std::forward<decltype(ops)>(ops)
-                          );
-            },
-            [](auto&&)
-            {
-                return status(status::code::ignore);
-            }
-        )(member.path());
+        return validate_member_or(
+                    std::forward<decltype(adapter)>(adapter),
+                    std::forward<decltype(member)>(member),
+                    std::forward<decltype(ops)>(ops)
+                  );
     }
 
     /**
@@ -372,27 +245,29 @@ struct default_adapter_impl
     template <typename AdapterT, typename MemberT, typename OpT>
     static status validate_not(AdapterT&& adapter, MemberT&& member, OpT&& op)
     {
-        if (!embedded_object_has_member(adapter,member))
-        {
-            return adapter.traits().not_found_status();
-        }
+        return status(!apply_member(std::forward<decltype(adapter)>(adapter),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
 
-        const auto& original_obj=original_embedded_object(adapter);
-        return hana::if_(
-            is_member_path_valid(original_obj,member.path()),
-            [&adapter,&member,&op](auto&&)
-            {
-                return status(!apply_member(std::forward<decltype(adapter)>(adapter),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
-            },
-            [&adapter,&member](auto&&)
-            {
-                if (adapter.traits().unknown_member_mode()==if_member_not_found::abort)
-                {
-                    return status(adapter.traits().validate_exists(adapter,member,exists,true));
-                }
-                return status(status::code::ignore);
-            }
-        )(member.path());
+//        if (!embedded_object_has_member(adapter,member))
+//        {
+//            return adapter.traits().not_found_status();
+//        }
+
+//        const auto& original_obj=original_embedded_object(adapter);
+//        return hana::if_(
+//            is_member_path_valid(original_obj,member.path()),
+//            [&adapter,&member,&op](auto&&)
+//            {
+//                return status(!apply_member(std::forward<decltype(adapter)>(adapter),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+//            },
+//            [&adapter,&member](auto&&)
+//            {
+//                if (adapter.traits().unknown_member_mode()==if_member_not_found::abort)
+//                {
+//                    return status(adapter.traits().validate_exists(adapter,member,exists,true));
+//                }
+//                return status(status::code::ignore);
+//            }
+//        )(member.path());
     }
 };
 

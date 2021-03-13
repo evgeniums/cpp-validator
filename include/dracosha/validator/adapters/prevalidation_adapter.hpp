@@ -48,6 +48,7 @@ class prevalidation_adapter_traits : public adapter_traits,
         using hana_tag=prevalidation_adapter_tag;
 
         using expand_aggregation_members=std::integral_constant<bool,false>;
+        using filter_if_not_exists=std::integral_constant<bool,false>;
 
         /**
          * @brief Constructor
@@ -67,6 +68,17 @@ class prevalidation_adapter_traits : public adapter_traits,
                     with_check_member_exists<prevalidation_adapter_traits<MemberT,T,ReporterT,WrappedT>>(*this)
         {
             this->set_check_member_exists_before_validation(true);
+        }
+
+        template <typename PredicateT, typename AdapterT, typename OpsT, typename MemberT1>
+        static status validate_member_aggregation(const PredicateT& pred, AdapterT&& adapter, MemberT1&& member, OpsT&& ops)
+        {
+            return prevalidation_adapter_impl<MemberT>::validate_member_aggregation(
+                            pred,
+                            std::forward<AdapterT>(adapter),
+                            std::forward<MemberT1>(member),
+                            std::forward<OpsT>(ops)
+                        );
         }
 };
 

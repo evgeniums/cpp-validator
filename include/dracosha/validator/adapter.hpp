@@ -23,6 +23,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/status.hpp>
 #include <dracosha/validator/detail/hint_helper.hpp>
 #include <dracosha/validator/check_member_exists_traits_proxy.hpp>
+#include <dracosha/validator/embedded_object.hpp>
+#include <dracosha/validator/apply.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -32,6 +34,42 @@ struct adapter_tag;
 struct adapter_traits
 {
     using expand_aggregation_members=std::integral_constant<bool,true>;
+    using filter_if_not_exists=std::integral_constant<bool,true>;
+
+    template <typename PredicateT, typename AdapterT, typename OpsT, typename MemberT>
+    static status validate_member_aggregation(const PredicateT& pred, AdapterT&& adapter, MemberT&& member, OpsT&& ops)
+    {
+        auto create=[&](auto traits)
+        {
+            const auto& obj=embedded_object_member(adapter,member);
+            auto path_prefix_length=hana::size(member.path());
+            return intermediate_adapter_traits<
+                        std::decay_t<decltype(traits)>,
+                        decltype(obj),
+                        decltype(path_prefix_length)
+                    >{
+                std::move(traits),
+                obj,
+                path_prefix_length
+            };
+        };
+        auto tmp_adapter=adapter.clone(create);
+        return while_each(
+                  ops,
+                  pred,
+                  status(status::code::ignore),
+                  [&member,&tmp_adapter](auto&& op)
+                  {
+                    return status(
+                                apply_member(
+                                    tmp_adapter,
+                                    std::forward<decltype(op)>(op),
+                                    member
+                                )
+                             );
+                  }
+              );
+    }
 };
 
 /**

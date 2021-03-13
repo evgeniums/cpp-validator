@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(CheckPrevalidationReport)
     BOOST_CHECK(!check_contains(20,10));
     BOOST_CHECK(!v2.apply(sa21));
 }
-
+#endif
 BOOST_AUTO_TEST_CASE(CheckAggregationPrevalidationReport)
 {
     auto v1=validator(
@@ -124,6 +124,8 @@ BOOST_AUTO_TEST_CASE(CheckAggregationPrevalidationReport)
     BOOST_CHECK(!v1.apply(sa2));
     BOOST_CHECK_EQUAL(rep1,"field10 must be greater than or equal to 10");
     rep1.clear();
+
+#if 1
 
     auto sa3=make_prevalidation_adapter(_["field10"],"1000",rep1);
     BOOST_CHECK(!v1.apply(sa3));
@@ -186,8 +188,9 @@ BOOST_AUTO_TEST_CASE(CheckAggregationPrevalidationReport)
     BOOST_CHECK(!v4.apply(sa12));
     BOOST_CHECK_EQUAL(rep1,"NOT field10 must be greater than or equal to value1");
     rep1.clear();
+#endif
 }
-
+#if 1
 BOOST_AUTO_TEST_CASE(CheckNestedPrevalidationReport)
 {
     std::vector<float> vec1;
@@ -287,13 +290,11 @@ BOOST_AUTO_TEST_CASE(CheckPropertyPrevalidation)
     BOOST_CHECK(v.apply(sa2));
     rep.clear();
 }
-#endif
 
 BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
 {
     std::string rep1;
 
-#if 1
     auto v0=validator(
                 _['a'](ALL(value(gte,9)))
             );
@@ -464,13 +465,12 @@ BOOST_AUTO_TEST_CASE(CheckSingleMemberAnyAllReport)
 
     static_assert(hana::is_a<element_aggregation_tag,decltype(ANY)>,"");
     static_assert(hana::is_a<element_aggregation_tag,decltype(ALL)>,"");
-#endif
 
     auto eq1=path_types_equal(ANY,ALL);
     static_assert(decltype(eq1)::value,"");
     auto eq2=same_member_path_types(_["field1"]["field1_1"][ANY],_["field1"]["field1_1"][ALL]);
     static_assert(decltype(eq2)::value,"");
-#if 1
+
     // validation with vector
     auto vec7=std::vector<int>{1,2,3,4};
     auto pa7=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any(range(vec7)),rep1);
@@ -573,8 +573,8 @@ BOOST_AUTO_TEST_CASE(CheckUpdateValidatedWithSample)
     set_validated(m7,_["field3"][0],"zzzzz",strict_any(v8),err);
     BOOST_CHECK(!err);
     BOOST_CHECK_EQUAL(m7["field3"][0],"zzzzz");
-#endif
-
 }
+
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()

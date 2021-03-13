@@ -32,6 +32,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/value_as_container.hpp>
 #include <dracosha/validator/prevalidation/strict_any.hpp>
 #include <dracosha/validator/range.hpp>
+#include <dracosha/validator/filter_member.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -66,8 +67,6 @@ class prevalidation_adapter_impl : public strict_any_tag
         template <typename AdapterT, typename T2, typename OpT, typename PropT>
         status validate_property(AdapterT&& adpt, PropT&& prop, OpT&& op, T2&& b, bool any=false) const
         {
-            /*,
-                                                has_property_fn(obj,prop)*/
             auto&& obj=unwrap_object(extract(adpt.traits().get()));
             auto&& val=extract(std::forward<T2>(b));
             return hana::eval_if(
@@ -180,7 +179,6 @@ class prevalidation_adapter_impl : public strict_any_tag
             }
 
             const auto& obj=extract(adpt.traits().get());
-
             return hana::if_(
                 hana::and_(
                     hana::is_a<value_as_container_tag,decltype(obj)>,
@@ -314,7 +312,8 @@ class prevalidation_adapter_impl : public strict_any_tag
                 return status(status::code::ignore);
             }
 
-            return hana::if_(sample_might_have_path,
+            return hana::if_(
+                sample_might_have_path,
                 [&obj,&prop,&op,&sample](auto&& path)
                 {
                     return status(op(
@@ -335,10 +334,30 @@ class prevalidation_adapter_impl : public strict_any_tag
             return default_adapter_impl::validate_and(std::forward<AdapterT>(adpt),std::forward<OpsT>(ops));
         }
 
-        template <typename AdapterT, typename MemberT, typename OpsT>
-        status validate_and(AdapterT&& adpt, MemberT&& member, OpsT&& ops) const
+        template <typename PredicateT, typename AdapterT, typename OpsT, typename MemberT>
+        static status validate_member_aggregation(const PredicateT& pred, AdapterT&& adapter, MemberT&& member, OpsT&& ops)
         {
-            return default_adapter_impl::validate_member_and(std::forward<AdapterT>(adpt),std::forward<MemberT>(member),std::forward<OpsT>(ops));
+            return while_each(
+                      ops,
+                      pred,
+                      status(status::code::ignore),
+                      [&member,&adapter](auto&& op)
+                      {
+                        return status(
+                                    apply_member(
+                                        adapter,
+                                        std::forward<decltype(op)>(op),
+                                        member
+                                    )
+                                 );
+                      }
+                  );
+        }
+
+        template <typename AdapterT, typename MemberT, typename OpsT>
+        status validate_and(AdapterT&& adapter, MemberT&& member, OpsT&& ops) const
+        {
+            return default_adapter_impl::validate_and(std::forward<AdapterT>(adapter),std::forward<MemberT>(member),std::forward<OpsT>(ops));
         }
 
         template <typename AdapterT, typename OpsT>
@@ -348,9 +367,9 @@ class prevalidation_adapter_impl : public strict_any_tag
         }
 
         template <typename AdapterT, typename MemberT, typename OpsT>
-        status validate_or(AdapterT&& adpt, MemberT&& member, OpsT&& ops) const
+        status validate_or(AdapterT&& adapter, MemberT&& member, OpsT&& ops) const
         {
-            return default_adapter_impl::validate_member_or(std::forward<AdapterT>(adpt),std::forward<MemberT>(member),std::forward<OpsT>(ops));
+            return default_adapter_impl::validate_or(std::forward<AdapterT>(adapter),std::forward<MemberT>(member),std::forward<OpsT>(ops));
         }
 
         template <typename AdapterT, typename OpT>
@@ -360,13 +379,13 @@ class prevalidation_adapter_impl : public strict_any_tag
         }
 
         template <typename AdapterT, typename MemberT, typename OpT>
-        status validate_not(AdapterT&& adpt, MemberT&& member, OpT&& op) const
+        status validate_not(AdapterT&& adapter, MemberT&& member, OpT&& op) const
         {
             if (filter_member_with_size(member))
             {
                 return status(status::code::ignore);
             }
-            return status(!apply_member(std::forward<decltype(adpt)>(adpt),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+            return status(!apply_member(adapter,std::forward<decltype(op)>(op),member));
         }
 
         void set_member_checked(bool enable) noexcept
