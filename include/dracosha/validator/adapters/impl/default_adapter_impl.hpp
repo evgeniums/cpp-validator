@@ -213,66 +213,65 @@ struct default_adapter_impl
     template <typename PredicateT, typename AdapterT, typename OpsT, typename MemberT>
     static status validate_member_aggregation(const PredicateT& pred, AdapterT&& adapter, MemberT&& member, OpsT&& ops)
     {
-//        const auto& original_obj=original_embedded_object(adapter);
-//        return hana::if_(
-//            is_member_path_valid(original_obj,member.path()),
-//            [&ops](const auto& adapter, const auto& member)
-//            {
-//                auto create=[&](auto&& traits)
-//                {
-//                    auto index=hana::minus(hana::size(member.path()),hana::size_c<1>);
-//                    return intermediate_adapter_traits<
-//                                std::decay_t<decltype(traits)>,
-//                                decltype(original_obj),
-//                                decltype(index)
-//                            >{
-//                        std::move(traits),
-//                        original_obj,
-//                        index
-//                    };
-//                };
-//                auto tmp_adapter=adapter.derive(create);
+        const auto& original_obj=original_embedded_object(adapter);
+        return hana::if_(
+            is_member_path_valid(original_obj,member.path()),
+            [&pred,&ops](const auto& adapter, const auto& member)
+            {
+                auto create=[&](auto traits)
+                {
+                    const auto& obj=embedded_object_member(adapter,member);
+                    auto path_prefix_length=hana::size(member.path());
+                    return intermediate_adapter_traits<
+                                std::decay_t<decltype(traits)>,
+                                decltype(obj),
+                                decltype(path_prefix_length)
+                            >{
+                        std::move(traits),
+                        obj,
+                        path_prefix_length
+                    };
+                };
+                auto tmp_adapter=adapter.clone(create);
+                return while_each(
+                                      ops,
+                                      pred,
+                                      status(status::code::ignore),
+                                      [&member,&tmp_adapter](auto&& op)
+                                      {
+                                        return status(
+                                                    apply_member(
+                                                        tmp_adapter,
+                                                        std::forward<decltype(op)>(op),
+                                                        member
+                                                    )
+                                                 );
+                                      }
+                                  );
 
-
-//                return while_each(
-//                                      ops,
-//                                      pred,
-//                                      status(status::code::ignore),
-//                                      [&member,&tmp_adapter](auto&& op)
-//                                      {
-//                                        return status(
-//                                                    apply_member(
-//                                                        tmp_adapter,
-//                                                        std::forward<decltype(op)>(op),
-//                                                        member
-//                                                    )
-//                                                 );
-//                                      }
-//                                  );
-
-//            },
-//            [](const auto&,const auto&)
-//            {
-//                return status(status::code::ignore);
-//            }
-//        )(adapter,member);
+            },
+            [](const auto&,const auto&)
+            {
+                return status(status::code::ignore);
+            }
+        )(adapter,member);
 
         // invoke operations on new temporary adapter
-        return while_each(
-                              ops,
-                              pred,
-                              status(status::code::ignore),
-                              [&member,&adapter](auto&& op)
-                              {
-                                return status(
-                                            apply_member(
-                                                adapter,
-                                                std::forward<decltype(op)>(op),
-                                                std::forward<decltype(member)>(member)
-                                            )
-                                         );
-                              }
-                          );
+//        return while_each(
+//                              ops,
+//                              pred,
+//                              status(status::code::ignore),
+//                              [&member,&adapter](auto&& op)
+//                              {
+//                                return status(
+//                                            apply_member(
+//                                                adapter,
+//                                                std::forward<decltype(op)>(op),
+//                                                std::forward<decltype(member)>(member)
+//                                            )
+//                                         );
+//                              }
+//                          );
     }
 
     /**

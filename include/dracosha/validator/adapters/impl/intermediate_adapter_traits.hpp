@@ -26,9 +26,20 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct intermediate_adapter_tag{};
 
-template <typename BaseTraitsT, typename IntermediateT, typename IndexT>
+template <typename T, typename Enable=hana::when<true>>
+struct base_intermediate_adapter_tag : public intermediate_adapter_tag
+{
+};
+template <typename T>
+struct base_intermediate_adapter_tag<T,
+            hana::when<!std::is_base_of<intermediate_adapter_tag,T>::value>
+        >
+{
+};
+
+template <typename BaseTraitsT, typename IntermediateT, typename PathPrefixLengthT>
 class intermediate_adapter_traits : public BaseTraitsT,
-                                    public intermediate_adapter_tag
+                                    public base_intermediate_adapter_tag<std::decay_t<BaseTraitsT>>
 {
     public:
 
@@ -36,11 +47,11 @@ class intermediate_adapter_traits : public BaseTraitsT,
         intermediate_adapter_traits(
                 BaseTraitsT1&& traits,
                 IntermediateT&& intermediate,
-                IndexT index
+                PathPrefixLengthT path_prefix_length
             )
             : BaseTraitsT(std::forward<BaseTraitsT1>(traits)),
               _intermediate(std::forward<IntermediateT>(intermediate)),
-              _index(index)
+              _path_prefix_length(path_prefix_length)
         {}
 
         auto value() const -> decltype(auto)
@@ -55,13 +66,13 @@ class intermediate_adapter_traits : public BaseTraitsT,
         template <typename OriginalPathT>
         auto path(const OriginalPathT& path) const
         {
-            return hana::drop_front(path,_index);
+            return hana::drop_front(path,_path_prefix_length);
         }
 
     private:
 
         object_wrapper<IntermediateT> _intermediate;
-        IndexT _index;
+        PathPrefixLengthT _path_prefix_length;
 };
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

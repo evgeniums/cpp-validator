@@ -14,6 +14,7 @@ using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestValidatorImpl)
 
+#if 1
 struct TestRefStruct
 {
     TestRefStruct()
@@ -181,8 +182,6 @@ BOOST_AUTO_TEST_CASE(CheckMakeMember)
     std::ignore=make_member(hana::tuple<>());
 #endif
 }
-
-#if 1
 
 BOOST_AUTO_TEST_CASE(CheckTupleConversions)
 {
@@ -393,7 +392,6 @@ BOOST_AUTO_TEST_CASE(CheckMapValidator)
             _["four"](value(gte,"four_val")),
             _["five"](value(gte,"five") ^AND^ size(gte,9))
             );
-
     BOOST_CHECK(v1.apply(m));
 
     std::map<std::string,std::string> m1;
@@ -402,7 +400,7 @@ BOOST_AUTO_TEST_CASE(CheckMapValidator)
     BOOST_CHECK(!v1.apply(m1));
 }
 
-BOOST_AUTO_TEST_CASE(CheckNestedValidator)
+BOOST_AUTO_TEST_CASE(CheckNestedMember)
 {
     auto v0=_["first_map"]["one_2"];
 
@@ -854,8 +852,6 @@ BOOST_AUTO_TEST_CASE(CheckWhileEachOrStatus)
     BOOST_CHECK(ok3==true);
 }
 
-#endif
-
 BOOST_AUTO_TEST_CASE(CheckNonCopyableOperand)
 {
     TestRefStruct ts;
@@ -884,6 +880,27 @@ BOOST_AUTO_TEST_CASE(CheckCopyMoveOperand)
     BOOST_CHECK(!v1.apply(check_val1));
     BOOST_CHECK(v2.apply(check_val1));
     BOOST_CHECK(v3.apply(check_val1));
+}
+#endif
+
+BOOST_AUTO_TEST_CASE(CheckMixedMemberAndOr)
+{
+    std::map<std::string,std::string> m1{
+        {"five","five_value"}
+    };
+    std::map<std::string,std::string> m2{
+        {"five","six_value"}
+    };
+
+    auto v1=validator(
+            _["five"](
+                        (value(gte,"five") ^AND^ size(gte,9))
+                        ^OR^
+                        (value(eq,"six_value") ^AND^ size(eq,9))
+                      )
+            );
+    BOOST_CHECK(v1.apply(m1));
+    BOOST_CHECK(v1.apply(m2));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

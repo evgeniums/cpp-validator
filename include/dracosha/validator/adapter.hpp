@@ -124,6 +124,13 @@ class adapter : public check_member_exists_traits_proxy<TraitsT>
             return adapter<std::decay_t<decltype(traits)>>{std::move(traits)};
         }
 
+        template <typename T>
+        auto clone(T&& creator) const
+        {
+            auto traits=creator(_traits);
+            return adapter<std::decay_t<decltype(traits)>>{std::move(traits)};
+        }
+
         template <typename AdapterT, typename T2, typename PathT>
         static bool check_path_exists(const AdapterT& adpt, PathT&& path, T2&& b)
         {
