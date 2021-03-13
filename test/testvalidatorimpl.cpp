@@ -139,9 +139,6 @@ BOOST_AUTO_TEST_CASE(CheckMakeMember)
     BOOST_CHECK(!m5.equals(m3_1));
     BOOST_CHECK(!m3_1.equals(m5));
 
-//    int abcd=m3.path();
-//    int abcd1=m3_1.path();
-
     BOOST_CHECK(hana::back(m3.path())==hana::back(m3_1.path()));
 
     std::ignore=make_member(std::make_tuple(value));
@@ -166,12 +163,6 @@ BOOST_AUTO_TEST_CASE(CheckMakeMember)
     auto m8=make_member(hana::make_tuple(std::string("hi")));
     auto m9=make_member(m7.path());
     auto m10=make_member(m8.path());
-
-//    TestStruct2 ts2;
-//    auto t2=hana::make_tuple(std::move(ts2));
-
-//    auto& ts3=hana::back(t2);
-//    auto t3=hana::append(hana::tuple<>(),ts3);
 
     BOOST_TEST_MESSAGE("Key as lvalue begin");
     TestStruct2 ts12{};
