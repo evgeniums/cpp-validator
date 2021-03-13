@@ -35,7 +35,6 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  */
 template <typename T>
 class default_adapter_traits :  public adapter_traits,
-                                public object_wrapper<T>,
                                 public with_check_member_exists<default_adapter_traits<T>>,
                                 public default_adapter_impl
 {
@@ -48,9 +47,23 @@ class default_adapter_traits :  public adapter_traits,
          */
         default_adapter_traits(
                     T&& obj
-                ) : object_wrapper<T>(std::forward<T>(obj)),
-                    with_check_member_exists<default_adapter_traits<T>>(*this)
+                ) : with_check_member_exists<default_adapter_traits<T>>(*this),
+                    _obj(std::forward<T>(obj))
         {}
+
+        auto get() const -> decltype(auto)
+        {
+            return _obj.get();
+        }
+
+        auto get() -> decltype(auto)
+        {
+            return _obj.get();
+        }
+
+    private:
+
+        object_wrapper<T> _obj;
 };
 
 /**

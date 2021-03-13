@@ -75,6 +75,7 @@ status apply_member_path_t::operator ()
                         hana::greater_equal(hana::size(generated_path),hana::size(member.path())),
                         [](auto&& generated_path, auto&& fn, auto&& adapter, auto&& member)
                         {
+                            //! @todo Check if member exists.
                             return status(fn(adapter,inherit_member(std::forward<decltype(generated_path)>(generated_path),std::forward<decltype(member)>(member))));
                         },
                         [](auto&& generated_path, auto&& fn, auto&& adapter, auto&& member)

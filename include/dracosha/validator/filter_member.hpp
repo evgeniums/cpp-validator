@@ -61,6 +61,7 @@ struct filter_member_invoker
         {
             return status::code::ignore;
         }
+        //! @todo Check if member exists.
         return fn(std::forward<AdapterT1>(adapter),std::forward<MemberT1>(member));
     }
 };

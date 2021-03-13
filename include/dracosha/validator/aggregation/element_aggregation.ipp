@@ -28,6 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/detail/aggregate_any.hpp>
 #include <dracosha/validator/aggregation/wrap_it.hpp>
 #include <dracosha/validator/aggregation/wrap_index.hpp>
+#include <dracosha/validator/embedded_object.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -38,19 +39,19 @@ template <typename PredicateT, typename EmptyFnT, typename AggregationT,
 status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, AggregationT&& aggr,
                      PathT&& path, AdapterT&& adapter, HandlerT&& handler)
 {
-    const auto& obj=extract(adapter.traits().get());
-    const auto parent_path=hana::drop_back(path);
-
     // invoke only if parent path is ok
-    if (!adapter.traits().check_path_exists(parent_path))
+    const auto parent_path=hana::drop_back(path);
+    if (!original_embedded_object_has_path(adapter,parent_path))
     {
         return adapter.traits().not_found_status();
     }
 
-    return hana::eval_if(is_member_path_valid(obj,parent_path),
+    const auto& original_obj=original_embedded_object(adapter);
+    return hana::eval_if(
+        is_member_path_valid(original_obj,parent_path),
         [&](auto&& _v)
         {
-            const auto& parent_element=get_member(_v(obj),_v(parent_path));
+            const auto& parent_element=get_member(_v(original_obj),_v(parent_path));
             using parent_type=std::decay_t<decltype(parent_element)>;
             return hana::eval_if(
                 is_container_t<parent_type>{},
@@ -96,18 +97,18 @@ status element_aggregation::invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, 
 {
     auto compacted_path=compact_variadic_property(path);
     auto parent_compacted_path=hana::drop_back(compacted_path);
-
-    if (!adapter.traits().check_path_exists(parent_compacted_path))
+    if (!original_embedded_object_has_path(adapter,parent_compacted_path))
     {
         return adapter.traits().not_found_status();
     }
 
-    const auto& obj=extract(adapter.traits().get());
-    return hana::eval_if(is_member_path_valid(obj,parent_compacted_path),
+    const auto& original_obj=original_embedded_object(adapter);
+    return hana::eval_if(
+        is_member_path_valid(original_obj,parent_compacted_path),
         [&](auto&& _)
         {
             auto upper_path=hana::drop_back(path);
-            const auto& parent=get_member(_(obj),_(parent_compacted_path));
+            const auto& parent=get_member(_(original_obj),_(parent_compacted_path));
             const auto& aggregation_varg=unwrap_object(hana::back(_(path)));
 
             aggregate_report<AdapterT>::open(adapter,aggr,_(parent_compacted_path));

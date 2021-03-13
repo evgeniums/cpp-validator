@@ -644,6 +644,7 @@ BOOST_AUTO_TEST_CASE(TestAllAny)
     auto v2=validator(
         _[child][varg(ALL,child_count)](gte,5)
     );
+#if 1
     BOOST_CHECK(!v2.apply(o1));
 
     auto v3=validator(
@@ -703,8 +704,9 @@ BOOST_AUTO_TEST_CASE(TestAllAny)
     BOOST_CHECK(!v8.apply(a13));
     BOOST_CHECK_EQUAL(rep,std::string("at least one child must be greater than or equal to 100"));
     rep.clear();
+#endif
 }
-
+#if 1
 BOOST_AUTO_TEST_CASE(TestAllAnyMultiArg)
 {
     WithChild o1;
@@ -755,5 +757,5 @@ BOOST_AUTO_TEST_CASE(TestAllAnyMultiArg)
     BOOST_CHECK(v11.apply(a1));
     rep.clear();
 }
-
+#endif
 BOOST_AUTO_TEST_SUITE_END()

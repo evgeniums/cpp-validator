@@ -212,13 +212,23 @@ struct default_adapter_impl
     template <typename PredicateT, typename AdapterT, typename OpsT, typename MemberT>
     static status validate_member_aggregation(const PredicateT& pred, AdapterT&& adapter, MemberT&& member, OpsT&& ops)
     {
+        // prepare new adapter with extracted object's member that must be validated
+        auto& tmp_adapter=adapter;
+
+        // invoke operations on new temporary adapter
         return while_each(
                               ops,
                               pred,
                               status(status::code::ignore),
-                              [&member,&adapter](auto&& op)
+                              [&member,&tmp_adapter](auto&& op)
                               {
-                                return status(apply_member(std::forward<decltype(adapter)>(adapter),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
+                                return status(
+                                            apply_member(
+                                                tmp_adapter,
+                                                std::forward<decltype(op)>(op),
+                                                std::forward<decltype(member)>(member)
+                                            )
+                                         );
                               }
                           );
     }

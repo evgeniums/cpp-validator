@@ -42,10 +42,29 @@ struct original_embedded_object_impl
     template <typename AdapterT>
     auto operator() (const AdapterT& adapter) const -> decltype(auto)
     {
-        return extract(unwrap_object(adapter.traits()));
+        return extract(adapter.traits().get());
     }
 };
 constexpr original_embedded_object_impl original_embedded_object;
+
+struct embedded_object_has_path_impl
+{
+    template <typename AdapterT, typename PathT>
+    auto operator() (const AdapterT& adapter, const PathT& path) const -> decltype(auto)
+    {
+        return adapter.traits().check_path_exists(path);
+    }
+};
+constexpr embedded_object_has_path_impl embedded_object_has_path;
+struct original_embedded_object_has_path_impl
+{
+    template <typename AdapterT, typename PathT>
+    auto operator() (const AdapterT& adapter, const PathT& path) const -> decltype(auto)
+    {
+        return adapter.traits().check_path_exists(path);
+    }
+};
+constexpr original_embedded_object_has_path_impl original_embedded_object_has_path;
 
 struct embedded_object_has_member_impl
 {
