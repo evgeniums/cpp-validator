@@ -63,6 +63,7 @@ BOOST_AUTO_TEST_CASE(CheckPlainPaths)
     BOOST_CHECK(v1.apply(a8));
 }
 #endif
+#if 1
 BOOST_AUTO_TEST_CASE(CheckPlainPathsReport)
 {
     auto v1=validator(
@@ -77,7 +78,6 @@ BOOST_AUTO_TEST_CASE(CheckPlainPathsReport)
     };
     std::string rep;
     auto a1=make_reporting_adapter(m1,rep);
-#if 1
 
     BOOST_CHECK(!v1.apply(a1));
     BOOST_CHECK_EQUAL(std::string("field3 must exist"),rep);
@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_CASE(CheckNestedPaths)
                 member_path_list(_["level2"][ALL])
             );
     BOOST_CHECK(v1.apply(a10));
+}
 #endif
 
-}
 BOOST_AUTO_TEST_SUITE_END()

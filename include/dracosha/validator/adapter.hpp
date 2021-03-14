@@ -156,7 +156,7 @@ class adapter : public check_member_exists_traits_proxy<TraitsT>
         }
 
         template <typename T>
-        auto derive(T&& creator)
+        auto derive(T&& creator) &&
         {
             auto&& traits=creator(std::move(_traits));
             return adapter<std::decay_t<decltype(traits)>>{std::move(traits)};

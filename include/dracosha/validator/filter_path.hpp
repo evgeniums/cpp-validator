@@ -168,33 +168,33 @@ constexpr filter_path_t filter_path{};
 template <typename AdapterT, typename PathsT>
 auto include_paths(AdapterT adapter, PathsT&& paths)
 {
-    auto create=[&](auto&& traits)
+    auto create=[&](auto traits)
     {
         return filter_path_traits<std::decay_t<decltype(traits)>,std::decay_t<PathsT>,std::tuple<>>{
             std::move(traits),
             std::forward<PathsT>(paths)
         };
     };
-    return adapter.derive(create);
+    return adapter.clone(create);
 }
 
 template <typename AdapterT, typename PathsT>
 auto exclude_paths(AdapterT adapter, PathsT&& paths)
 {
-    auto create=[&](auto&& traits)
+    auto create=[&](auto traits)
     {
         return filter_path_traits<std::decay_t<decltype(traits)>,std::tuple<>,std::decay_t<PathsT>>{
             std::move(traits),
             std::forward<PathsT>(paths)
         };
     };
-    return adapter.derive(create);
+    return adapter.clone(create);
 }
 
 template <typename AdapterT, typename InPathsT, typename ExPathsT>
 auto include_and_exclude_paths(AdapterT adapter, InPathsT&& in_paths, ExPathsT&& ex_paths)
 {
-    auto create=[&](auto&& traits)
+    auto create=[&](auto traits)
     {
         return filter_path_traits<std::decay_t<decltype(traits)>,std::decay_t<InPathsT>,std::decay_t<ExPathsT>>{
             std::move(traits),
@@ -202,7 +202,7 @@ auto include_and_exclude_paths(AdapterT adapter, InPathsT&& in_paths, ExPathsT&&
             std::forward<ExPathsT>(ex_paths)
         };
     };
-    return adapter.derive(create);
+    return adapter.clone(create);
 }
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
