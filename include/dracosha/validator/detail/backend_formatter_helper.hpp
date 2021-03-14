@@ -126,7 +126,7 @@ struct backend_formatter_helper<DstT,
 };
 
 /**
- * @brief Extract destination object for fomratting from argument.
+ * @brief Extract destination object for formatting from argument.
  * @param v Backend formatter.
  * @return Destination object for formatting.
  */
@@ -138,7 +138,7 @@ auto to_dst(T&& v,
 }
 
 /**
- * @brief Extract destination object for fomratting from argument.
+ * @brief Extract destination object for formatting from argument.
  * @param v Destination object for formatting.
  * @return Input destination object as is.
  */
