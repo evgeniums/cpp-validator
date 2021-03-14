@@ -26,6 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/base_validator.hpp>
 #include <dracosha/validator/operators/exists.hpp>
 #include <dracosha/validator/lazy.hpp>
+#include <dracosha/validator/utils/copy.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -37,13 +38,13 @@ struct property_validator_tag;
 /**
  * @brief Property validator functor.
  */
-template <typename HandlerT, typename PropT, typename CheckExistsT=hana::false_>
-struct property_validator : public base_validator<HandlerT,CheckExistsT>
+template <typename HandlerT, typename PropT, typename CheckExistsT=hana::false_, typename ExistsOperatorT=exists_t>
+struct property_validator : public base_validator<HandlerT,CheckExistsT,ExistsOperatorT>
 {
     using hana_tag=property_validator_tag;
     using property_type=PropT;
 
-    using base_validator<HandlerT,CheckExistsT>::base_validator;
+    using base_validator<HandlerT,CheckExistsT,ExistsOperatorT>::base_validator;
 };
 
 /**
@@ -54,32 +55,39 @@ struct property_validator : public base_validator<HandlerT,CheckExistsT>
 template <typename PropT, typename OpT, typename OperandT>
 constexpr auto make_property_validator(PropT&& prop, OpT&& op, OperandT&& operand)
 {
-    auto fn=hana::reverse_partial(dispatch,std::forward<PropT>(prop),std::forward<OpT>(op),
-                                  adjust_storable(std::forward<OperandT>(operand)));
-
     return hana::if_(
             hana::and_(
                 std::is_base_of<exists_tag,std::decay_t<OpT>>{}
             ),
-            [](auto&& prop, auto&& fn, auto&& operand)
+            [](auto&& prop, auto&& op, auto&& operand)
             {
                 static_assert(std::is_same<std::decay_t<decltype(prop)>,type_p_value>::value,"Operator \"exists\" can be used only with property \"value\"");
                 static_assert(!hana::is_a<lazy_tag,decltype(operand)>,"Operator \"exists\" can not be used with lazy operands");
                 static_assert(std::is_same<std::decay_t<decltype(operand)>,bool>::value,"Operator \"exists\" can be used only with boolean operands");
+
+                auto op1=copy(op);
+                auto operand1=copy(operand);
+                auto fn=hana::reverse_partial(dispatch,std::forward<decltype(prop)>(prop),std::forward<decltype(op)>(op),
+                                              adjust_storable(std::forward<decltype(operand)>(operand)));
+
                 return property_validator<
-                        std::decay_t<decltype(fn)>,
+                        decltype(fn),
                         PropT,
-                        hana::true_
-                    >(std::forward<decltype(fn)>(fn),operand);
+                        hana::true_,
+                        decltype(op1)
+                    >{std::move(fn),std::move(operand1),std::move(op1)};
             },
-            [](auto&&, auto&& fn, auto&&)
+            [](auto&& prop, auto&& op, auto&& operand)
             {
+                auto fn=hana::reverse_partial(dispatch,std::forward<decltype(prop)>(prop),std::forward<decltype(op)>(op),
+                                              adjust_storable(std::forward<decltype(operand)>(operand)));
+
                 return property_validator<
-                        std::decay_t<decltype(fn)>,
+                        decltype(fn),
                         PropT
-                    >{std::forward<decltype(fn)>(fn)};
+                    >{std::move(fn)};
             }
-    )(prop,std::move(fn),operand);
+    )(std::forward<PropT>(prop),std::forward<OpT>(op),std::forward<OperandT>(operand));
 }
 
 //-------------------------------------------------------------

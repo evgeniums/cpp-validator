@@ -21,19 +21,27 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/conditional_fold.hpp>
+#include <dracosha/validator/can_get.hpp>
+#include <dracosha/validator/operators/exists.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-template <typename HandlerT, typename WithCheckExistsT=hana::false_>
+struct exists_t;
+
+template <typename HandlerT, typename WithCheckExistsT=hana::false_, typename ExistsOperatorT=exists_t>
 struct base_validator
 {
     using with_check_exists=WithCheckExistsT;
 
-    base_validator(HandlerT fn, bool must_exist=false)
-        : fn(std::move(fn)),
-          check_exists_operand(must_exist)
+    base_validator(
+            HandlerT fn,
+            bool must_exist=false,
+            ExistsOperatorT exists_op=exists
+        ) : fn(std::move(fn)),
+            check_exists_operand(must_exist),
+            exists_operator(std::move(exists_op))
     {}
 
     template <typename ... Args>
@@ -43,7 +51,8 @@ struct base_validator
     }
 
     HandlerT fn;
-    bool check_exists_operand;
+    const bool check_exists_operand;
+    const ExistsOperatorT exists_operator;
 };
 
 struct is_validator_with_check_exists_single_impl
@@ -102,7 +111,7 @@ struct is_validator_with_check_exists_impl
 };
 constexpr is_validator_with_check_exists_impl is_validator_with_check_exists{};
 
-struct operand_of_check_exists_impl
+struct content_of_check_exists_impl
 {
     template <typename T>
     auto operator () (T&& xs) const
@@ -122,22 +131,23 @@ struct operand_of_check_exists_impl
                     hana::not_equal(first_v,hana::nothing),
                     [&](auto&& _)
                     {
-                        return _(first_v).value().check_exists_operand;
+                        const auto& val=_(first_v).value();
+                        return std::make_pair(val.check_exists_operand,val.exists_operator);
                     },
                     [](auto&&)
                     {
-                        return false;
+                        return std::make_pair(false,exists);
                     }
                 );
             },
             [](auto&& xs)
             {
-                return xs.check_exists_operand;
+                return std::make_pair(xs.check_exists_operand,xs.exists_operator);
             }
         )(std::forward<T>(xs));
     }
 };
-constexpr operand_of_check_exists_impl operand_of_check_exists{};
+constexpr content_of_check_exists_impl content_of_check_exists{};
 
 //-------------------------------------------------------------
 

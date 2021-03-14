@@ -905,7 +905,7 @@ BOOST_AUTO_TEST_CASE(CheckMixedMemberAndOr)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-//! @todo Optimize getting member from object by using pre-got parent object.
+//! @todo Optimize getting member from object by using pre-got parent object in element aggregation and nested validators.
 //! @todo Implement validation of trees.
 //! @todo Implement validation of heterogeneous containers (tuples).
 //! @todo Refactor formatting of variadic properties with taking into account preceeding grammar categories.

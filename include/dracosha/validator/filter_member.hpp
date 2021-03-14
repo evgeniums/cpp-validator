@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/filter_path.hpp>
 #include <dracosha/validator/embedded_object.hpp>
+#include <dracosha/validator/status.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -82,7 +83,7 @@ struct invoke_member_if_exists_impl
                     auto ret=traits_of(adapter).validate_exists(
                                         _(adapter),
                                         _(member),
-                                        exists,
+                                        _(fn).exists_operator,
                                         _(fn).check_exists_operand
                                     );
                     if (!ret)
@@ -102,7 +103,7 @@ struct invoke_member_if_exists_impl
                             traits_of(adapter).validate_exists(
                                                 _(adapter),
                                                 _(member),
-                                                exists,
+                                                _(fn).exists_operator,
                                                 true,
                                                 false,
                                                 true

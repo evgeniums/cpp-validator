@@ -19,14 +19,10 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_CHECK_CONTAINS_HPP
 #define DRACOSHA_VALIDATOR_CHECK_CONTAINS_HPP
 
-#include <type_traits>
-
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/property.hpp>
-#include <dracosha/validator/properties/size.hpp>
 #include <dracosha/validator/can_check_contains.hpp>
 #include <dracosha/validator/utils/safe_compare.hpp>
-#include <dracosha/validator/aggregation/wrap_it.hpp>
 #include <dracosha/validator/utils/unwrap_object.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN

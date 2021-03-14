@@ -77,7 +77,7 @@ class validator_with_hint_t : public ValidatorT
  * Validator holds the validating executer and invokes apply() method to perform validation
  * using embedded executor.
  */
-template <typename HandlerT>
+template <typename HandlerT, typename ExistsOperatorT=exists_t>
 class validator_t
 {
     public:
@@ -85,14 +85,19 @@ class validator_t
         using hana_tag=validator_tag;
         using with_check_exists=typename HandlerT::with_check_exists;
 
-        bool check_exists_operand;
+        const bool check_exists_operand;
+        const ExistsOperatorT& exists_operator;
 
         /**
          * @brief Construtor
          * @param fn Validation HandlerT that will be called to perform validating.
          */
-        validator_t(HandlerT fn, bool must_exist=false)
+        validator_t(HandlerT fn,
+                    bool must_exist=false,
+                    const ExistsOperatorT& exists_op=exists
+                    )
                 : check_exists_operand(must_exist),
+                  exists_operator(exists_op),
                   _fn(std::move(fn))
         {}
 
@@ -118,7 +123,12 @@ class validator_t
         template <typename T>
         auto hint(T&& h)
         {
-            return validator_with_hint_t<validator_t<HandlerT>,T>(std::forward<T>(h),std::move(_fn),check_exists_operand);
+            return validator_with_hint_t<validator_t<HandlerT,ExistsOperatorT>,T>(
+                        std::forward<T>(h),
+                        std::move(_fn),
+                        check_exists_operand,
+                        exists_operator
+                        );
         }
 
         /**
@@ -139,7 +149,7 @@ class validator_t
         HandlerT _fn;
 };
 
-template <typename MemberT, typename ValidatorT>
+template <typename MemberT, typename ValidatorT, typename ExistsOperatorT=exists_t>
 class validator_with_member_t
 {
     public:
@@ -147,10 +157,12 @@ class validator_with_member_t
         using hana_tag=validator_tag;
         using with_check_exists=hana::false_;
 
-        bool check_exists_operand;
+        const bool check_exists_operand;
+        const exists_t& exists_operator;
 
-        validator_with_member_t(MemberT member, ValidatorT v, bool =false)
+        validator_with_member_t(MemberT member, ValidatorT v, bool =false, const ExistsOperatorT& =exists)
             : check_exists_operand(false),
+              exists_operator(exists),
               _member(std::move(member)),
               _prepared_validator(std::move(v))
         {
@@ -187,10 +199,11 @@ class validator_with_member_t
         template <typename T>
         auto hint(T&& h)
         {
-            return validator_with_hint_t<validator_with_member_t<MemberT,ValidatorT>,T>(std::forward<T>(h),
+            return validator_with_hint_t<validator_with_member_t<MemberT,ValidatorT,ExistsOperatorT>,T>(std::forward<T>(h),
                                                                             std::move(_member),
                                                                             std::move(_prepared_validator),
-                                                                            check_exists_operand
+                                                                            check_exists_operand,
+                                                                            exists_operator
                                                                             );
         }
 

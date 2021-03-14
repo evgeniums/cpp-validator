@@ -19,8 +19,6 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_CHECK_EXISTS_HPP
 #define DRACOSHA_VALIDATOR_CHECK_EXISTS_HPP
 
-#include <optional>
-
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/ignore_compiler_warnings.hpp>
 #include <dracosha/validator/get.hpp>

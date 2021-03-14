@@ -116,10 +116,16 @@ struct make_aggregation_validator_impl
     auto operator() (HandlerT&& handler, Ts&& xs) const
     {
         auto fn=hana::reverse_partial(std::forward<HandlerT>(handler),xs);
-        return base_validator<decltype(fn),decltype(is_validator_with_check_exists(xs))>
+        auto params=content_of_check_exists(xs);
+        return base_validator<
+                decltype(fn),
+                decltype(is_validator_with_check_exists(xs)),
+                std::decay_t<decltype(params.second)>
+                >
             {
                 std::move(fn),
-                operand_of_check_exists(xs)
+                params.first,
+                params.second
             };
     }
 };

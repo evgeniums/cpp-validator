@@ -33,7 +33,15 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename T>
 auto make_validator(T fn)
 {
-    return validator_t<T>(std::move(fn),operand_of_check_exists(fn));
+    auto exists_params=content_of_check_exists(fn);
+    return validator_t<
+            T,
+            std::decay_t<decltype(exists_params.second)>
+      >(
+        std::move(fn),
+        exists_params.first,
+        exists_params.second
+       );
 }
 
 /**
@@ -43,11 +51,17 @@ auto make_validator(T fn)
 template <typename MemberT, typename ValidatorT>
 auto make_member_validator(MemberT member, ValidatorT&& v)
 {
-    return validator_with_member_t<std::decay_t<MemberT>,std::decay_t<ValidatorT>>(
-        std::forward<MemberT>(member),
-        std::forward<ValidatorT>(v),
-        operand_of_check_exists(v)
-    );
+    auto exists_params=content_of_check_exists(v);
+    return validator_with_member_t<
+            std::decay_t<MemberT>,
+            std::decay_t<ValidatorT>,
+            std::decay_t<decltype(exists_params.second)>
+        >(
+            std::forward<MemberT>(member),
+            std::forward<ValidatorT>(v),
+            exists_params.first,
+            exists_params.second
+        );
 }
 
 /**
@@ -57,7 +71,15 @@ auto make_member_validator(MemberT member, ValidatorT&& v)
 template <typename T>
 auto make_validator_on_heap(T fn)
 {
-    return new validator_t<decltype(fn)>(std::move(fn),operand_of_check_exists(fn));
+    auto exists_params=content_of_check_exists(fn);
+    return new validator_t<
+            decltype(fn),
+            std::decay_t<decltype(exists_params.second)>
+        >(
+            std::move(fn),
+            exists_params.first,
+            exists_params.second
+        );
 }
 
 //-------------------------------------------------------------

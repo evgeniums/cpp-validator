@@ -4,10 +4,12 @@
 #include <dracosha/validator/base_validator.hpp>
 #include <dracosha/validator/operators/exists.hpp>
 #include <dracosha/validator/properties/size.hpp>
+#include <dracosha/validator/adapters/reporting_adapter.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestOperatorExists)
+#if 1
 #if 1
 BOOST_AUTO_TEST_CASE(CheckWithCheckExists)
 {
@@ -291,6 +293,18 @@ BOOST_AUTO_TEST_CASE(CheckValidateAggregateExists)
     a2.set_unknown_member_mode(if_member_not_found::ignore);
     BOOST_CHECK(v3.apply(a2));
     BOOST_CHECK(v4.apply(a2));
+}
+#endif
+BOOST_AUTO_TEST_CASE(CheckReportHintOfExists)
+{
+    std::string rep;
+    auto v1=validator(
+        _[5](_(exists,"is expected to be present"), true)
+    );
+    std::vector<int> vec1{1,2,3,4};
+    auto ra1=make_reporting_adapter(vec1,rep);
+    BOOST_CHECK(!v1.apply(ra1));
+    BOOST_CHECK_EQUAL(rep,std::string("element #5 is expected to be present"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

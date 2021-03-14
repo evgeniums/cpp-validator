@@ -21,10 +21,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/detail/has_method.hpp>
-#include <dracosha/validator/property.hpp>
-#include <dracosha/validator/aggregation/wrap_it.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+
+struct property_tag;
+struct wrap_iterator_tag;
 
 //-------------------------------------------------------------
 
