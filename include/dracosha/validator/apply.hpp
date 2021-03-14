@@ -21,6 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/filter_member.hpp>
+#include <dracosha/validator/base_validator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -68,7 +69,11 @@ struct apply_member_t
             {
                 return x.apply(std::forward<decltype(args)>(args)...);
             };
-            return filter_member(fn,std::forward<decltype(a)>(a),std::forward<decltype(member)>(member));
+            auto validator=base_validator<decltype(fn),typename std::decay_t<decltype(x)>::with_check_exists>{
+                std::move(fn),
+                x.check_exists_operand
+            };
+            return filter_member(validator,std::forward<decltype(a)>(a),std::forward<decltype(member)>(member));
           },
           [&member](auto&& a, auto&& x) -> decltype(auto)
           {

@@ -104,6 +104,7 @@ BOOST_AUTO_TEST_CASE(CheckValidationExistsReport)
     BOOST_CHECK(v3.apply(ra1));
     rep1.clear();
 
+    //! @todo Propagate operator to check existence
     auto v4=validator(
                 _["field2"](_(exists,"should exist"),true)
             );

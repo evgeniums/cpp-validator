@@ -30,7 +30,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/conditional_fold.hpp>
 #include <dracosha/validator/operators/exists.hpp>
 #include <dracosha/validator/embedded_object.hpp>
-#include <dracosha/validator/adapters/impl/intermediate_adapter_traits.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -69,10 +68,14 @@ struct default_adapter_impl
      * @brief Check if member exists.
      */
     template <typename AdapterT, typename T2, typename OpT, typename MemberT>
-    static status validate_exists(AdapterT&& adapter, MemberT&& member, OpT&&, T2&& b, bool from_check_member=false)
+    static status validate_exists(AdapterT&& adapter, MemberT&& member, OpT&&, T2&& b, bool from_check_member=false, bool already_failed=false)
     {
         std::ignore=from_check_member;
-        return embedded_object_has_path(adapter,member.path(),b);
+        if (!already_failed)
+        {
+            return embedded_object_has_path(adapter,member.path(),b);
+        }
+        return status(status::code::fail);
     }
 
     /**
@@ -99,12 +102,12 @@ struct default_adapter_impl
         auto might_have_other_path=is_member_path_valid(original_obj,b.path());
         return hana::if_(
             might_have_other_path,
-            [&original_obj,&prop,&op](const auto& adapter, const auto& member, const auto& b)
+            [&original_obj,&prop,&op](auto&& adapter, const auto& member, const auto& b)
             {
                 if (!exists(original_obj,b.path()))
                 {
-                    // if other path does not exist then ignore check
-                    return status(status::code::ignore);
+                    // if other path does not exist then return "not found" status configured in adapter
+                    return adapter.not_found_status();
                 }
 
                 return status(
@@ -114,9 +117,10 @@ struct default_adapter_impl
                         )
                     );
             },
-            [](const auto&, const auto&, const auto&)
+            [](auto&& adapter, const auto&, const auto&)
             {
-                return status(status::code::ignore);
+                // if other path does not exist then return "not found" status configured in adapter
+                return adapter.not_found_status();
             }
         )(adapter,member,b);
     }

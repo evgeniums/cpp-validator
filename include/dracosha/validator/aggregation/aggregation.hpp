@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/status.hpp>
 #include <dracosha/validator/operators/operator.hpp>
+#include <dracosha/validator/base_validator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -108,6 +109,21 @@ struct aggregate_op
 {
     using hana_tag=aggregation_op_tag;
 };
+
+struct make_aggregation_validator_impl
+{
+    template <typename HandlerT, typename Ts>
+    auto operator() (HandlerT&& handler, Ts&& xs) const
+    {
+        auto fn=hana::reverse_partial(std::forward<HandlerT>(handler),xs);
+        return base_validator<decltype(fn),decltype(is_validator_with_check_exists(xs))>
+            {
+                std::move(fn),
+                operand_of_check_exists(xs)
+            };
+    }
+};
+constexpr make_aggregation_validator_impl make_aggregation_validator{};
 
 //-------------------------------------------------------------
 

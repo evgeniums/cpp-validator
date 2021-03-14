@@ -83,14 +83,18 @@ class validator_t
     public:
 
         using hana_tag=validator_tag;
+        using with_check_exists=typename HandlerT::with_check_exists;
+
+        bool check_exists_operand;
 
         /**
          * @brief Construtor
          * @param fn Validation HandlerT that will be called to perform validating.
          */
-        validator_t(HandlerT fn):_fn(std::move(fn))
-        {
-        }
+        validator_t(HandlerT fn, bool must_exist=false)
+                : check_exists_operand(must_exist),
+                  _fn(std::move(fn))
+        {}
 
         /**
          * @brief Invoke validating with supplied args.
@@ -114,7 +118,7 @@ class validator_t
         template <typename T>
         auto hint(T&& h)
         {
-            return validator_with_hint_t<validator_t<HandlerT>,T>(std::forward<T>(h),std::move(_fn));
+            return validator_with_hint_t<validator_t<HandlerT>,T>(std::forward<T>(h),std::move(_fn),check_exists_operand);
         }
 
         /**
@@ -141,9 +145,13 @@ class validator_with_member_t
     public:
 
         using hana_tag=validator_tag;
+        using with_check_exists=hana::false_;
 
-        validator_with_member_t(MemberT member, ValidatorT v)
-            : _member(std::move(member)),
+        bool check_exists_operand;
+
+        validator_with_member_t(MemberT member, ValidatorT v, bool =false)
+            : check_exists_operand(false),
+              _member(std::move(member)),
               _prepared_validator(std::move(v))
         {
         }
@@ -181,7 +189,8 @@ class validator_with_member_t
         {
             return validator_with_hint_t<validator_with_member_t<MemberT,ValidatorT>,T>(std::forward<T>(h),
                                                                             std::move(_member),
-                                                                            std::move(_prepared_validator)
+                                                                            std::move(_prepared_validator),
+                                                                            check_exists_operand
                                                                             );
         }
 

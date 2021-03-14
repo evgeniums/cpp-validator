@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/make_validator.hpp>
 #include <dracosha/validator/aggregation/and.hpp>
 #include <dracosha/validator/detail/logical_not.hpp>
+#include <dracosha/validator/base_validator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -46,7 +47,7 @@ struct not_t
     constexpr auto operator() (OpT&& op) const
     {
         return make_validator(
-                    hana::reverse_partial(
+                    make_aggregation_validator(
                         detail::logical_not,
                         std::forward<OpT>(op)
                     )

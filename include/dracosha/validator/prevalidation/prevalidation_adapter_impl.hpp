@@ -105,9 +105,10 @@ class prevalidation_adapter_impl : public strict_any_tag
         }
 
         template <typename AdapterT, typename T2, typename OpT, typename MemberT>
-        status validate_exists(AdapterT&& adpt, MemberT&& member, OpT&&, T2&& b, bool from_check_member=false) const
+        status validate_exists(AdapterT&& adpt, MemberT&& member, OpT&&, T2&& b, bool from_check_member=false, bool skip_check=false) const
         {
             std::ignore=from_check_member;
+            std::ignore=skip_check;
 
             // check [exists] suffix only
             return hana::if_(

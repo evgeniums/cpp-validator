@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/make_validator.hpp>
 #include <dracosha/validator/aggregation/aggregation.hpp>
 #include <dracosha/validator/detail/aggregate_and.hpp>
+#include <dracosha/validator/base_validator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -38,7 +39,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 DRACOSHA_VALIDATOR_INLINE_LAMBDA auto AND=hana::infix([](auto&& ...xs) -> decltype(auto)
 {
     return make_validator(
-                hana::reverse_partial(
+                make_aggregation_validator(
                     detail::aggregate_and,
                     hana::make_tuple(std::forward<decltype(xs)>(xs)...)
                 )
@@ -55,7 +56,7 @@ template <typename ... Args>
 auto AND_on_heap(Args&& ...xs) -> decltype(auto)
 {
     return make_validator_on_heap(
-                hana::reverse_partial(
+                make_aggregation_validator(
                     detail::aggregate_and,
                     hana::make_tuple(std::forward<decltype(xs)>(xs)...)
                 )

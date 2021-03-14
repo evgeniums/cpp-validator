@@ -28,10 +28,12 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+struct exists_tag{};
+
 /**
  * @brief Definition of operator "exists" for checking if member exists in object.
  */
-struct exists_t
+struct exists_t : public exists_tag
 {
     using hana_tag=operator_tag;
 
@@ -78,9 +80,12 @@ constexpr exists_t exists{};
 /**
  * @brief Wrapper of operator "exists" with explicit string description.
  */
-struct exists_op_with_string_t
+struct exists_op_with_string_t : public exists_tag
 {
     using hana_tag=operator_tag;
+
+    exists_op_with_string_t(std::string str):_description(std::move(str))
+    {}
 
     std::string str(const bool&) const
     {

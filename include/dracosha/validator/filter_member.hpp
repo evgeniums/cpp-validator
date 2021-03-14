@@ -71,20 +71,52 @@ struct invoke_member_if_exists_impl
 
         using type=typename std::decay_t<AdapterT>::type;
         return hana::eval_if(
-            hana::or_(
-                typename type::filter_if_not_exists{}
+            hana::and_(
+                typename type::filter_if_not_exists{},
+                hana::not_(intermediate_ignore_check_exist(adapter,member))
             ),
             [&](auto&& _)
             {
+                if (std::decay_t<FnT>::with_check_exists::value)
+                {
+                    auto ret=adapter.traits().validate_exists(
+                                        _(adapter),
+                                        _(member),
+                                        exists,
+                                        _(fn).check_exists_operand
+                                    );
+                    if (!ret)
+                    {
+                        return ret;
+                    }
+                }
+                else
+                {
+                    if (!embedded_object_has_member(_(adapter),_(member)))
+                    {
+                        auto not_found_status=_(adapter).traits().not_found_status();
+                        if (not_found_status.value()==status::code::fail)
+                        {
+                            // some adapters need to known that member not found
+                            // for example, reporting adapter need it to construct corresponding report
+                            adapter.traits().validate_exists(
+                                                _(adapter),
+                                                _(member),
+                                                exists,
+                                                true,
+                                                false,
+                                                true
+                                            );
+                        }
+                        return not_found_status;
+                    }
+                }
+
                 const auto& original_obj=original_embedded_object(_(adapter));
                 return hana::eval_if(
                     is_member_path_valid(original_obj,_(member).path()),
                     [&](auto&& _)
                     {
-                        if (!embedded_object_has_member(_(adapter),_(member)))
-                        {
-                            return _(adapter).traits().not_found_status();
-                        }
                         return status(_(invoke(_(fn),_(adapter),_(member))));
                     },
                     [&](auto&&)

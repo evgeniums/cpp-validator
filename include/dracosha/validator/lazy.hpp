@@ -26,11 +26,11 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 struct lazy_tag;
-template <typename T>
 
 /**
  * @brief Lazy invokation handler.
  */
+template <typename T>
 struct lazy_t
 {
     using hana_tag=lazy_tag;

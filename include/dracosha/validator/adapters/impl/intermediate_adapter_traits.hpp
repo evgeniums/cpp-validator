@@ -21,6 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
+#include <dracosha/validator/utils/hana_to_std_tuple.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -32,7 +33,7 @@ struct base_intermediate_adapter_tag : public intermediate_adapter_tag
 };
 template <typename T>
 struct base_intermediate_adapter_tag<T,
-            hana::when<!std::is_base_of<intermediate_adapter_tag,T>::value>
+            hana::when<std::is_base_of<intermediate_adapter_tag,T>::value>
         >
 {
 };
@@ -69,11 +70,57 @@ class intermediate_adapter_traits : public BaseTraitsT,
             return hana::drop_front(path,_path_prefix_length);
         }
 
+        template <typename PathSizeT>
+        constexpr static auto ignore_exists(PathSizeT)
+        {
+            return hana::less_equal(
+                        PathSizeT{},
+                        PathPrefixLengthT{}
+                    );
+        }
+
     private:
 
         object_wrapper<IntermediateT> _intermediate;
         PathPrefixLengthT _path_prefix_length;
 };
+
+struct intermediate_ignore_check_exist1_impl
+{
+    template <typename AdapterT, typename MemberT>
+    constexpr auto operator() (AdapterT&&, MemberT&&) const
+    {
+        using traits=typename std::decay_t<AdapterT>::type;
+        return traits::ignore_exists(
+                        hana::size_c<std::decay_t<MemberT>::path_depth()>
+                    );
+    }
+};
+constexpr intermediate_ignore_check_exist1_impl intermediate_ignore_check_exist1{};
+
+struct intermediate_ignore_check_exist2_impl
+{
+    template <typename AdapterT, typename MemberT>
+    constexpr auto operator() (AdapterT&&, MemberT&&) const
+    {
+        return hana::false_c;
+    }
+};
+constexpr intermediate_ignore_check_exist2_impl intermediate_ignore_check_exist2{};
+
+struct intermediate_ignore_check_exist_impl
+{
+    template <typename AdapterT, typename MemberT>
+    constexpr auto operator() (AdapterT&& adapter, MemberT&& member) const
+    {
+        return hana::if_(
+            std::is_base_of<intermediate_adapter_tag,typename std::decay_t<AdapterT>::type>{},
+            intermediate_ignore_check_exist1,
+            intermediate_ignore_check_exist2
+        )(adapter,member);
+    }
+};
+constexpr intermediate_ignore_check_exist_impl intermediate_ignore_check_exist{};
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 

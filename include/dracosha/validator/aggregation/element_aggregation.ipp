@@ -29,6 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/aggregation/wrap_it.hpp>
 #include <dracosha/validator/aggregation/wrap_index.hpp>
 #include <dracosha/validator/embedded_object.hpp>
+#include <dracosha/validator/base_validator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -151,7 +152,7 @@ constexpr auto all_t<ModifierT>::operator() (OpT&& op) const
         [](auto&& op)
         {
             return make_validator(
-                        hana::reverse_partial(
+                        make_aggregation_validator(
                             detail::aggregate_all,
                             std::forward<decltype(op)>(op)
                         )
@@ -173,7 +174,7 @@ constexpr auto any_t<ModifierT>::operator() (OpT&& op) const
         [](auto&& op)
         {
             return make_validator(
-                        hana::reverse_partial(
+                        make_aggregation_validator(
                             detail::aggregate_any,
                             std::forward<decltype(op)>(op)
                         )
