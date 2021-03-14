@@ -39,6 +39,7 @@ class reporting_adapter_impl : public reporting_adapter_tag
     public:
 
         using reporter_type=ReporterT;
+        using base_tag=reporting_adapter_tag;
 
         template <typename ...Args>
         reporting_adapter_impl(

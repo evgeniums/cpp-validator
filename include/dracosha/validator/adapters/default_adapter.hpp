@@ -40,6 +40,8 @@ class default_adapter_traits :  public adapter_traits,
 {
     public:
 
+        using base_tag=adapter_traits;
+
         /**
          * @brief Constructor.
          * @param adpt Adapter the traits is used in.

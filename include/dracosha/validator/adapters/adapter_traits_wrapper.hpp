@@ -28,10 +28,12 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct adapter_traits_wrapper_tag{};
 
 template <typename TraitsT>
-struct adapter_traits_wrapper : public adapter_traits_wrapper_tag
+struct adapter_traits_wrapper : public adapter_traits_wrapper_tag,
+                                public TraitsT::base_tag
 {
     using expand_aggregation_members=typename TraitsT::expand_aggregation_members;
     using filter_if_not_exists=typename TraitsT::filter_if_not_exists;
+    using base_tag=typename TraitsT::base_tag;
 
     adapter_traits_wrapper(TraitsT& traits) : _traits(traits)
     {}

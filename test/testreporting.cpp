@@ -396,12 +396,13 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAnyReport)
         {100,{100,200,300,400,500}}
     };
     auto ra3=make_reporting_adapter(m3,rep1);
+#if 1
     auto v6=validator(
                 ANY(size(gte,5) ^AND^ ANY(value(gte,1)))
             );
     BOOST_CHECK(v6.apply(ra3));
     rep1.clear();
-#if 1
+#endif
     auto v7=validator(
                 ANY(size(gte,5) ^AND^ ANY(value(gte,1000)))
             );
@@ -409,6 +410,7 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAnyReport)
     BOOST_CHECK_EQUAL(rep1,"at least one element of at least one element must be greater than or equal to 1000");
     rep1.clear();
 
+#if 1
     std::map<size_t,std::map<size_t,std::vector<size_t>>> m4={
         {5,
          {{10,{10,20,30,40,50}}}
