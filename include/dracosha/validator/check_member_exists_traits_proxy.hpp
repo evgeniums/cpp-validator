@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/status.hpp>
 #include <dracosha/validator/with_check_member_exists.hpp>
+#include <dracosha/validator/adapters/adapter_traits_wrapper.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -30,7 +31,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 /**
  * @brief Proxy class for adapters using traits that inherits with_check_member_exists.
  */
-template <typename TraitsT>
+template <typename AdapterT>
 class check_member_exists_traits_proxy
 {
     public:
@@ -39,7 +40,7 @@ class check_member_exists_traits_proxy
          * @brief Constructor.
          * @param adapter Adapter object.
          */
-        check_member_exists_traits_proxy() : _traits(nullptr)
+        check_member_exists_traits_proxy(AdapterT& adapter) : _adapter(adapter)
         {}
 
         /**
@@ -53,7 +54,7 @@ class check_member_exists_traits_proxy
          */
         void set_check_member_exists_before_validation(bool enable) noexcept
         {
-            _traits->set_check_member_exists_before_validation(enable);
+            traits_of(_adapter).set_check_member_exists_before_validation(enable);
         }
         /**
          * @brief Get flag of checking if member exists befor validation.
@@ -61,7 +62,7 @@ class check_member_exists_traits_proxy
          */
         bool is_check_member_exists_before_validation() const noexcept
         {
-            return _traits->is_check_member_exists_before_validation();
+            return traits_of(_adapter).is_check_member_exists_before_validation();
         }
 
         /**
@@ -70,7 +71,7 @@ class check_member_exists_traits_proxy
          */
         void set_unknown_member_mode(if_member_not_found mode) noexcept
         {
-            _traits->set_unknown_member_mode(mode);
+            traits_of(_adapter).set_unknown_member_mode(mode);
         }
 
         /**
@@ -79,7 +80,7 @@ class check_member_exists_traits_proxy
          */
         if_member_not_found unknown_member_mode() const noexcept
         {
-            return _traits->unknown_member_mode();
+            return traits_of(_adapter).unknown_member_mode();
         }
 
         /**
@@ -90,7 +91,7 @@ class check_member_exists_traits_proxy
         template <typename MemberT>
         bool check_member_exists(MemberT&& member) const
         {
-            return _traits->check_member_exists(std::forward<MemberT>(member));
+            return traits_of(_adapter).check_member_exists(std::forward<MemberT>(member));
         }
 
         /**
@@ -99,19 +100,12 @@ class check_member_exists_traits_proxy
          */
         status not_found_status() const
         {
-            return _traits->not_found_status();
-        }
-
-    protected:
-
-        void set_traits(TraitsT* traits)
-        {
-            _traits=traits;
+            return traits_of(_adapter).not_found_status();
         }
 
     private:
 
-        TraitsT* _traits;
+        AdapterT& _adapter;
 };
 
 //-------------------------------------------------------------

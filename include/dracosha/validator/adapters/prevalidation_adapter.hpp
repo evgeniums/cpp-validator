@@ -158,7 +158,7 @@ auto make_prevalidation_adapter(
                             =nullptr)
 {
     auto adapter=make_prevalidation_adapter(std::forward<MemberT>(member),val.to_wrapper(),std::forward<ReporterT>(reporter));
-    adapter.traits().next_adapter_impl().set_strict_any(true);
+    traits_of(adapter).next_adapter_impl().set_strict_any(true);
     return adapter;
 }
 

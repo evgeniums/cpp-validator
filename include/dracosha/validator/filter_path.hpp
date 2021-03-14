@@ -154,7 +154,7 @@ struct filter_path_t
             std::is_base_of<filter_path_tag,std::decay_t<type>>{},
             [&](auto&& _)
             {
-                return _(adapter).traits().filter(_(path));
+                return traits_of(_(adapter)).filter(_(path));
             },
             [&](auto&&)
             {

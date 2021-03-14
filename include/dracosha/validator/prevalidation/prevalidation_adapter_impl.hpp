@@ -67,7 +67,7 @@ class prevalidation_adapter_impl : public strict_any_tag
         template <typename AdapterT, typename T2, typename OpT, typename PropT>
         status validate_property(AdapterT&& adpt, PropT&& prop, OpT&& op, T2&& b, bool any=false) const
         {
-            auto&& obj=unwrap_object(extract(adpt.traits().get()));
+            auto&& obj=unwrap_object(extract(traits_of(adpt).get()));
             auto&& val=extract(std::forward<T2>(b));
             return hana::eval_if(
                 hana::is_a<range_tag,decltype(obj)>,
@@ -119,7 +119,7 @@ class prevalidation_adapter_impl : public strict_any_tag
                     {
                         return status(status::code::ignore);
                     }
-                    const auto& value=extract(adpt.traits().get());
+                    const auto& value=extract(traits_of(adpt).get());
                     return status(b==value);
                 },
                 [](auto&&...){return status::code::ignore;}
@@ -162,7 +162,7 @@ class prevalidation_adapter_impl : public strict_any_tag
                             return status(status::code::ignore);
                         }
                     }
-                    const auto& value=extract(_(adpt).traits().get());
+                    const auto& value=extract(traits_of(_(adpt)).get());
                     return status(_(op)(value,_(b)));
                 },
                 [](auto&&)
@@ -179,7 +179,7 @@ class prevalidation_adapter_impl : public strict_any_tag
                 return status(status::code::ignore);
             }
 
-            const auto& obj=extract(adpt.traits().get());
+            const auto& obj=extract(traits_of(adpt).get());
             return hana::if_(
                 hana::and_(
                     hana::is_a<value_as_container_tag,decltype(obj)>,
@@ -292,7 +292,7 @@ class prevalidation_adapter_impl : public strict_any_tag
                 return status(status::code::ignore);
             }
 
-            const auto& obj=extract(adpt.traits().get());
+            const auto& obj=extract(traits_of(adpt).get());
             const auto& sample=extract(b)();
 
             auto sample_might_have_path=is_member_path_valid(sample,check_member().path());

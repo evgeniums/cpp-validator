@@ -79,7 +79,7 @@ struct invoke_member_if_exists_impl
             {
                 if (std::decay_t<FnT>::with_check_exists::value)
                 {
-                    auto ret=adapter.traits().validate_exists(
+                    auto ret=traits_of(adapter).validate_exists(
                                         _(adapter),
                                         _(member),
                                         exists,
@@ -94,12 +94,12 @@ struct invoke_member_if_exists_impl
                 {
                     if (!embedded_object_has_member(_(adapter),_(member)))
                     {
-                        auto not_found_status=_(adapter).traits().not_found_status();
+                        auto not_found_status=traits_of(_(adapter)).not_found_status();
                         if (not_found_status.value()==status::code::fail)
                         {
                             // some adapters need to known that member not found
                             // for example, reporting adapter need it to construct corresponding report
-                            adapter.traits().validate_exists(
+                            traits_of(adapter).validate_exists(
                                                 _(adapter),
                                                 _(member),
                                                 exists,

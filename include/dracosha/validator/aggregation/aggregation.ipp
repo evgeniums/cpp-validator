@@ -51,7 +51,7 @@ struct aggregate_report<AdapterT,
     template <typename AdapterT1, typename AggregationT, typename PathT>
     static void open(AdapterT1&& adapter, AggregationT&& str, PathT&& path)
     {
-        auto& reporter=adapter.traits().reporter();
+        auto& reporter=traits_of(adapter).reporter();
         hana::eval_if(
             hana::is_empty(path),
             [&](auto&&)
@@ -68,7 +68,7 @@ struct aggregate_report<AdapterT,
     template <typename AdapterT1>
     static void close(AdapterT1&& adapter, status ret)
     {
-        adapter.traits().reporter().aggregate_close(ret);
+        traits_of(adapter).reporter().aggregate_close(ret);
     }
 };
 

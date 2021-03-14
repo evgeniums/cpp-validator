@@ -22,7 +22,7 @@ struct NonCopyable
 }
 
 BOOST_AUTO_TEST_SUITE(TestReporting)
-
+#if 1
 BOOST_AUTO_TEST_CASE(CheckReportingAdapter)
 {
     std::string report;
@@ -329,9 +329,12 @@ BOOST_AUTO_TEST_CASE(CheckSampleObjectReport)
             );
     BOOST_CHECK(v6.apply(ra5));
 }
-
+#endif
 BOOST_AUTO_TEST_CASE(CheckAggregationAnyReport)
 {
+    std::string rep1;
+
+#if 1
     std::map<std::string,std::map<size_t,std::string>> m1={
             {"field1",
              {
@@ -342,8 +345,6 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAnyReport)
              }
             }
         };
-
-    std::string rep1;
     auto ra1=make_reporting_adapter(m1,rep1);
 
     auto v1=validator(
@@ -388,7 +389,7 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAnyReport)
     BOOST_CHECK(!v5.apply(ra2));
     BOOST_CHECK_EQUAL(rep1,"at least one element must be greater than or equal to zzz OR size of at least one element must be equal to 100");
     rep1.clear();
-
+#endif
     std::map<size_t,std::vector<size_t>> m3={
         {1,{1,2,3,4,5}},
         {10,{10,20,30,40,50}},
@@ -400,7 +401,7 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAnyReport)
             );
     BOOST_CHECK(v6.apply(ra3));
     rep1.clear();
-
+#if 1
     auto v7=validator(
                 ANY(size(gte,5) ^AND^ ANY(value(gte,1000)))
             );
@@ -420,8 +421,9 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAnyReport)
     BOOST_CHECK(!v8.apply(ra4));
     BOOST_CHECK_EQUAL(rep1,"at least one element of at least one element of element #5 must be greater than or equal to 1000");
     rep1.clear();
+#endif
 }
-
+#if 1
 BOOST_AUTO_TEST_CASE(CheckAggregationAllReport)
 {
     std::map<std::string,std::map<size_t,std::string>> m1={
@@ -651,5 +653,5 @@ BOOST_AUTO_TEST_CASE(CheckContainsValidationReport)
     BOOST_CHECK_EQUAL(rep1,std::string("field1 must contain element #30"));
     rep1.clear();
 }
-
+#endif
 BOOST_AUTO_TEST_SUITE_END()

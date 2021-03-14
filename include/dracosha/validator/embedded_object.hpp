@@ -43,7 +43,7 @@ struct embedded_object_impl
             },
             [&](auto&& _) -> decltype(auto)
             {
-                return extract(_(adapter).traits().get());
+                return extract(traits_of(_(adapter)).get());
             }
         );
     }
@@ -54,7 +54,7 @@ struct original_embedded_object_impl
     template <typename AdapterT>
     auto operator() (const AdapterT& adapter) const -> decltype(auto)
     {
-        return extract(adapter.traits().get());
+        return extract(traits_of(adapter).get());
     }
 };
 constexpr original_embedded_object_impl original_embedded_object;
@@ -117,7 +117,7 @@ struct embedded_object_has_path_impl
             [&](auto&& _)
             {
                 return check_path_exists(
-                            extract(_(adapter).traits().get()),
+                            extract(traits_of(_(adapter)).get()),
                             _(path)
                         );
             }
@@ -133,7 +133,7 @@ struct embedded_object_has_path_impl
             {
                 return false;
             }
-            if (adapter.traits().is_check_member_exists_before_validation())
+            if (traits_of(adapter).is_check_member_exists_before_validation())
             {
                 return (*this)(adapter,path,true);
             }
@@ -156,7 +156,7 @@ struct embedded_object_has_path_impl
             [&](auto&& _)
             {
                 return check_path_exists(
-                            extract(_(adapter).traits().get()),
+                            extract(traits_of(_(adapter)).get()),
                             _(path)
                         );
             }

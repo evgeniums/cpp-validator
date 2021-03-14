@@ -107,7 +107,7 @@ struct default_adapter_impl
                 if (!exists(original_obj,b.path()))
                 {
                     // if other path does not exist then return "not found" status configured in adapter
-                    return adapter.not_found_status();
+                    return traits_of(adapter).not_found_status();
                 }
 
                 return status(
@@ -120,7 +120,7 @@ struct default_adapter_impl
             [](auto&& adapter, const auto&, const auto&)
             {
                 // if other path does not exist then return "not found" status configured in adapter
-                return adapter.not_found_status();
+                return traits_of(adapter).not_found_status();
             }
         )(adapter,member,b);
     }
@@ -185,7 +185,7 @@ struct default_adapter_impl
     template <typename AdapterT, typename MemberT, typename OpsT>
     static status validate_member_and(AdapterT&& adapter, MemberT&& member, OpsT&& ops)
     {
-        return adapter.traits().validate_member_aggregation(
+        return traits_of(adapter).validate_member_aggregation(
                     predicate_and,
                     std::forward<AdapterT>(adapter),
                     std::forward<MemberT>(member),
@@ -218,7 +218,7 @@ struct default_adapter_impl
     template <typename AdapterT, typename MemberT, typename OpsT>
     static status validate_member_or(AdapterT&& adapter, MemberT&& member, OpsT&& ops)
     {
-        return adapter.traits().validate_member_aggregation(status_predicate_or,std::forward<AdapterT>(adapter),std::forward<MemberT>(member),std::forward<OpsT>(ops));
+        return traits_of(adapter).validate_member_aggregation(status_predicate_or,std::forward<AdapterT>(adapter),std::forward<MemberT>(member),std::forward<OpsT>(ops));
     }
 
     /**
@@ -253,7 +253,7 @@ struct default_adapter_impl
 
 //        if (!embedded_object_has_member(adapter,member))
 //        {
-//            return adapter.traits().not_found_status();
+//            return traits_of(adapter).not_found_status();
 //        }
 
 //        const auto& original_obj=original_embedded_object(adapter);
@@ -265,9 +265,9 @@ struct default_adapter_impl
 //            },
 //            [&adapter,&member](auto&&)
 //            {
-//                if (adapter.traits().unknown_member_mode()==if_member_not_found::abort)
+//                if (traits_of(adapter).unknown_member_mode()==if_member_not_found::abort)
 //                {
-//                    return status(adapter.traits().validate_exists(adapter,member,exists,true));
+//                    return status(traits_of(adapter).validate_exists(adapter,member,exists,true));
 //                }
 //                return status(status::code::ignore);
 //            }

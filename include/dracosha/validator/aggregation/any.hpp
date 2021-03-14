@@ -168,7 +168,7 @@ struct check_strict_any<AdapterT,
     template <typename T>
     static bool skip(T&& adapter) noexcept
     {
-        return !adapter.traits().is_strict_any();
+        return !traits_of(adapter).is_strict_any();
     }
 };
 

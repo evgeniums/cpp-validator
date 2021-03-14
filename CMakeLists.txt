@@ -101,6 +101,7 @@ SET (HEADERS
     include/dracosha/validator/properties/pair.hpp
     include/dracosha/validator/properties.hpp
 
+    include/dracosha/validator/adapters/adapter_traits_wrapper.hpp
     include/dracosha/validator/adapters/prevalidation_adapter.hpp
     include/dracosha/validator/adapters/default_adapter.hpp
     include/dracosha/validator/adapters/reporting_adapter.hpp

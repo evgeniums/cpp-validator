@@ -22,25 +22,15 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
 #include <dracosha/validator/utils/hana_to_std_tuple.hpp>
+#include <dracosha/validator/adapters/adapter_traits_wrapper.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct intermediate_adapter_tag{};
 
-template <typename T, typename Enable=hana::when<true>>
-struct base_intermediate_adapter_tag : public intermediate_adapter_tag
-{
-};
-template <typename T>
-struct base_intermediate_adapter_tag<T,
-            hana::when<std::is_base_of<intermediate_adapter_tag,T>::value>
-        >
-{
-};
-
 template <typename BaseTraitsT, typename IntermediateT, typename PathPrefixLengthT>
-class intermediate_adapter_traits : public BaseTraitsT,
-                                    public base_intermediate_adapter_tag<std::decay_t<BaseTraitsT>>
+class intermediate_adapter_traits : public adapter_traits_wrapper<BaseTraitsT>,
+                                    public intermediate_adapter_tag
 {
     public:
 
@@ -50,7 +40,7 @@ class intermediate_adapter_traits : public BaseTraitsT,
                 IntermediateT&& intermediate,
                 PathPrefixLengthT path_prefix_length
             )
-            : BaseTraitsT(std::forward<BaseTraitsT1>(traits)),
+            : adapter_traits_wrapper<BaseTraitsT>(std::forward<BaseTraitsT1>(traits)),
               _intermediate(std::forward<IntermediateT>(intermediate)),
               _path_prefix_length(path_prefix_length)
         {}
