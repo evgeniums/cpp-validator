@@ -904,7 +904,10 @@ BOOST_AUTO_TEST_CASE(CheckMixedMemberAndOr)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+//! @todo Add translations for new strings: aggregations, heterogeneous size
 //! @todo Implement validation of trees.
-//! @todo Implement validation of heterogeneous containers (tuples).
 //! @todo Refactor formatting of variadic properties with taking into account preceeding grammar categories.
 //! @todo Refactor formatting of nested validators with hints.
+//! @todo Implement aggregation on heterogeneous containers.
+//! @todo Implement property like property_of(object).
+//! @todo Implement filtering with predicate in element aggregation.

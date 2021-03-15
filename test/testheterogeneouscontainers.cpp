@@ -6,6 +6,7 @@
 #include <dracosha/validator/utils/adjust_storable_type.hpp>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
+#include <dracosha/validator/properties/h_size.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -285,6 +286,72 @@ BOOST_AUTO_TEST_CASE(CheckPropertyNotationReport)
         auto o1=std::make_tuple("aaa",10,hana::make_tuple("hi",1),std::string("hello world"));
         check(o1);
     }
+}
+
+BOOST_AUTO_TEST_CASE(CheckHSize)
+{
+    auto check=[](const auto& obj)
+    {
+        std::string rep;
+        auto o1=make_reporting_adapter(obj,rep);
+
+        auto v1=validator(
+                _[two][h_size](eq,2)
+             );
+        BOOST_CHECK(v1.apply(o1));
+        auto v2=validator(
+                _[two][h_size](eq,3)
+             );
+        BOOST_CHECK(!v2.apply(o1));
+        BOOST_CHECK_EQUAL(rep,std::string("heterogeneous size of two must be equal to 3"));
+        rep.clear();
+        auto v3=validator(
+                _[two](h_size(eq,2))
+             );
+        BOOST_CHECK(v3.apply(o1));
+        auto v4=validator(
+                _[two](h_size(eq,3))
+             );
+        BOOST_CHECK(!v4.apply(o1));
+        BOOST_CHECK_EQUAL(rep,std::string("heterogeneous size of two must be equal to 3"));
+        rep.clear();
+    };
+
+    BOOST_TEST_CONTEXT("hana tuple")
+    {
+        auto o1=hana::make_tuple("aaa",10,hana::make_tuple("hi",1),std::string("hello world"));
+        check(o1);
+    }
+    BOOST_TEST_CONTEXT("std tuple")
+    {
+        auto o1=std::make_tuple("aaa",10,hana::make_tuple("hi",1),std::string("hello world"));
+        check(o1);
+    }
+
+    std::string rep;
+    std::string obj("hello");
+    auto o1=make_reporting_adapter(obj,rep);
+
+    auto v1=validator(
+            _[h_size](eq,0)
+         );
+    BOOST_CHECK(v1.apply(o1));
+    auto v2=validator(
+            _[h_size](eq,3)
+         );
+    BOOST_CHECK(!v2.apply(o1));
+    BOOST_CHECK_EQUAL(rep,std::string("heterogeneous size must be equal to 3"));
+    rep.clear();
+    auto v3=validator(
+            h_size(eq,0)
+         );
+    BOOST_CHECK(v3.apply(o1));
+    auto v4=validator(
+            h_size(eq,3)
+         );
+    BOOST_CHECK(!v4.apply(o1));
+    BOOST_CHECK_EQUAL(rep,std::string("heterogeneous size must be equal to 3"));
+    rep.clear();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/properties/length.hpp>
 #include <dracosha/validator/properties/empty.hpp>
 #include <dracosha/validator/properties/pair.hpp>
+#include <dracosha/validator/properties/h_size.hpp>
 
 #include <dracosha/validator/utils/enable_to_string.hpp>
 
