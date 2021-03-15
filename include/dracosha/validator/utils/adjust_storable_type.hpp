@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
+#include <dracosha/validator/heterogeneous_property.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -31,6 +32,29 @@ struct wrap_iterator_tag;
 struct operator_tag;
 struct property_tag;
 struct wrap_index_tag;
+
+template <typename T, typename Enable=hana::when<true>>
+struct is_constant_size_impl
+{
+    constexpr static const bool value=false;
+};
+template <typename T>
+struct is_constant_size_impl<T,
+            hana::when<
+                (
+                hana::is_a<hana::integral_constant_tag<size_t>,T>
+                ||
+                hana::is_a<hana::ext::std::integral_constant_tag<size_t>,T>
+                )
+            >
+        >
+{
+    constexpr static const bool value=true;
+};
+
+template <typename T>
+struct is_constant_size : public std::integral_constant<bool,is_constant_size_impl<T>::value>
+{};
 
 //-------------------------------------------------------------
 
@@ -49,6 +73,14 @@ struct adjust_storable_type<T,
                     >
 {
     using type=std::string;
+};
+
+template <typename T>
+struct adjust_storable_type<T,
+                        hana::when<is_constant_size<std::decay_t<T>>::value>
+                    >
+{
+    using type=heterogeneous_property_just_index_t<std::decay_t<T>::value>;
 };
 
 /**
@@ -93,6 +125,8 @@ struct adjust_storable_type<T,
                             !hana::is_a<wrap_index_tag,T>
                             &&
                             !hana::is_a<operator_tag,T>
+                            &&
+                            !is_constant_size<std::decay_t<T>>::value
                         >
                     >
 {

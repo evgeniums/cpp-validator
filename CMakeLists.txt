@@ -30,6 +30,7 @@ SET (HEADERS
     include/dracosha/validator/utils/class_method_args.hpp
     include/dracosha/validator/utils/optional.hpp
     include/dracosha/validator/utils/copy.hpp
+    include/dracosha/validator/utils/heterogeneous_size.hpp
 
     include/dracosha/validator/adapter.hpp
     include/dracosha/validator/property.hpp
@@ -64,6 +65,7 @@ SET (HEADERS
     include/dracosha/validator/variadic_arg.hpp
     include/dracosha/validator/embedded_object.hpp
     include/dracosha/validator/base_validator.hpp
+    include/dracosha/validator/heterogeneous_property.hpp
 
     include/dracosha/validator/aggregation/and.hpp
     include/dracosha/validator/aggregation/or.hpp

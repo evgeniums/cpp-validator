@@ -49,13 +49,13 @@ auto std_to_hana_tuple(Ts&& ts)
   @brief Get size of hana tuple.
   */
 template <typename Ts>
-using hana_tuple_size=std::integral_constant<size_t,std::tuple_size<decltype(hana_to_std_tuple(std::declval<std::decay_t<Ts>>()))>::value>;
+using hana_tuple_size=hana::size_t<std::tuple_size<decltype(hana_to_std_tuple(std::declval<std::decay_t<Ts>>()))>::value>;
 
 /**
   @brief Check if hana tuple is empty.
   */
 template <typename Ts>
-using hana_tuple_empty=std::integral_constant<bool,hana_tuple_size<Ts>::value==0>;
+using hana_tuple_empty=hana::bool_<hana_tuple_size<Ts>::value==0>;
 
 //-------------------------------------------------------------
 

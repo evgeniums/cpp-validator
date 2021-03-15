@@ -23,12 +23,41 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/detail/has_method.hpp>
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/utils/unwrap_object.hpp>
+#include <dracosha/validator/utils/hana_to_std_tuple.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct wrap_iterator_tag;
 
 //-------------------------------------------------------------
+
+namespace detail
+{
+
+template <typename T1, typename T2, typename = hana::when<true>>
+struct can_check_at_or_brackets_t
+{
+    constexpr static const bool value = (detail::has_at_c(hana::type_c<T1>, hana::type_c<T2>)
+                                ||
+                                detail::has_brackets_c(hana::type_c<T1>, hana::type_c<T2>))
+                                &&
+                                detail::has_size_c(hana::type_c<T1>);
+};
+
+template <typename T1, typename T2>
+struct can_check_at_or_brackets_t<T1,T2,
+            hana::when<
+                (hana::is_a<hana::tuple_tag,T1>
+                ||
+                 hana::is_a<hana::ext::std::tuple_tag,T1>
+                 )
+            >
+        >
+{
+    constexpr static const bool value = false;
+};
+
+}
 
 /**
  *  Helper for checking if object of type T1 can be queried if it contains a member accessible by key of type T2.
@@ -50,11 +79,7 @@ struct can_check_contains_t
         ||
         (hana::is_a<property_tag, T2> && has_property<T1, T2>())
         ||
-        (
-                (detail::has_at_c(hana::type_c<T1>, hana::type_c<T2>) || detail::has_brackets_c(hana::type_c<T1>, hana::type_c<T2>))
-                &&
-                detail::has_size_c(hana::type_c<T1>)
-         );
+        detail::can_check_at_or_brackets_t<T1,T2>::value;
 
     constexpr bool operator () () const
     {

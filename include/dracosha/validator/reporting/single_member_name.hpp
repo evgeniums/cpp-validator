@@ -29,6 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/to_string.hpp>
 #include <dracosha/validator/utils/unwrap_object.hpp>
 #include <dracosha/validator/variadic_property.hpp>
+#include <dracosha/validator/heterogeneous_property.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -125,7 +126,8 @@ template <typename T, typename TraitsT>
 struct single_member_name_t<T,TraitsT,
                                 hana::when<
                                     !can_single_member_name<unwrap_object_t<T>,TraitsT>::value
-                                    && std::is_integral<unwrap_object_t<T>>::value
+                                    &&
+                                    std::is_integral<unwrap_object_t<T>>::value
                                 >
                             >
 {
@@ -155,6 +157,22 @@ constexpr auto single_member_name(const T& id, const TraitsT& traits, grammar_ca
 {
     return single_member_name_inst<T,TraitsT>(id,traits,grammar_cats);
 }
+
+//! @todo Move it to separate file.
+template <typename T, typename TraitsT>
+struct single_member_name_t<T,TraitsT,
+                                hana::when<
+                                    !can_single_member_name<unwrap_object_t<T>,TraitsT>::value
+                                    &&
+                                    std::is_base_of<heterogeneous_property_just_index_tag,unwrap_object_t<T>>::value
+                                >
+                            >
+{
+    auto operator() (const T& id, const TraitsT& traits, grammar_categories grammar_cats) const
+    {
+        return single_member_name(id.name(),traits,grammar_cats);
+    }
+};
 
 //-------------------------------------------------------------
 
