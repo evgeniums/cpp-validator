@@ -25,6 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/adjust_storable_type.hpp>
 #include <dracosha/validator/utils/reference_wrapper.hpp>
 #include <dracosha/validator/adapters/default_adapter.hpp>
+#include <dracosha/validator/adapters/make_intermediate_adapter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -182,8 +183,10 @@ class validator_with_member_t
         template <typename AdapterT, typename SuperMemberT>
         auto apply(AdapterT&& adpt, SuperMemberT&& super) const
         {
+            auto&& adapter=ensure_adapter(std::forward<AdapterT>(adpt));
+            auto tmp_adapter=make_intermediate_adapter(adapter,path_of(super));
             return apply_member(
-                        ensure_adapter(std::forward<AdapterT>(adpt)),
+                        tmp_adapter,
                         _prepared_validator,
                         prepend_super_member(std::forward<SuperMemberT>(super),_member)
                     );

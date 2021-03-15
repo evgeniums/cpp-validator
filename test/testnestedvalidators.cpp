@@ -10,12 +10,12 @@ using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestNestedValidators)
 
+#if 1
 BOOST_AUTO_TEST_CASE(TestWithoutMember)
 {
     auto v1=validator(
         _["field1"](exists,true)
     );
-
     auto v2=validator(
         v1
     );
@@ -24,6 +24,7 @@ BOOST_AUTO_TEST_CASE(TestWithoutMember)
         {"field1",{"value1"}}
     };
     BOOST_CHECK(v2.apply(m1));
+
     std::map<std::string,std::set<std::string>> m2{
         {"field2",{"value2"}}
     };
@@ -36,6 +37,7 @@ BOOST_AUTO_TEST_CASE(TestWithoutMember)
     BOOST_CHECK(v4.apply(m1));
     BOOST_CHECK(!v4.apply(m2));
 }
+#endif
 
 BOOST_AUTO_TEST_CASE(TestMember)
 {
@@ -58,6 +60,33 @@ BOOST_AUTO_TEST_CASE(TestMember)
         _["level1"](v3)
     );
     BOOST_CHECK(!v4.apply(m1));
+}
+
+#if 1
+
+BOOST_AUTO_TEST_CASE(TestMemberAggregation)
+{
+    auto v1=validator(
+        _["level2"](value(exists,true) ^AND^ size(gte,3))
+    );
+    auto v2=validator(
+        _["level1"](v1)
+    );
+    std::map<std::string,std::set<std::string>> m1{
+        {"level1",{"level2"}}
+    };
+    BOOST_CHECK(v2.apply(m1));
+
+    auto v3=validator(
+        _["level1"](size(eq,1) ^AND^ v1)
+    );
+    BOOST_CHECK(v3.apply(m1));
+
+    std::map<std::string,std::set<std::string>> m2{
+        {"level1",{"level2_1"}}
+    };
+    BOOST_CHECK(!v2.apply(m2));
+    BOOST_CHECK(!v3.apply(m2));
 }
 
 BOOST_AUTO_TEST_CASE(TestMemberWithReport)
@@ -96,7 +125,7 @@ BOOST_AUTO_TEST_CASE(TestMemberWithReport)
         _["level1"]("name1")(v5)
     );
     BOOST_CHECK(!v6.apply(a1));
-    BOOST_CHECK_EQUAL(rep,std::string("level2 of level1 must not exist"));
+    BOOST_CHECK_EQUAL(rep,std::string("name2 of name1 must not exist"));
     rep.clear();
 #endif
 }
@@ -144,5 +173,5 @@ BOOST_AUTO_TEST_CASE(TestAggregationWithReport)
     BOOST_CHECK_EQUAL(rep,std::string("each element of level1 must be equal to level2"));
     rep.clear();
 }
-
+#endif
 BOOST_AUTO_TEST_SUITE_END()

@@ -40,35 +40,6 @@ struct adapter_traits
     template <typename PredicateT, typename AdapterT, typename OpsT, typename MemberT>
     static status validate_member_aggregation(const PredicateT& pred, AdapterT&& adapter, MemberT&& member, OpsT&& ops)
     {
-#if 0
-        auto create=[&](auto&& current_traits)
-        {
-            auto&& traits=hana::if_(
-                std::is_base_of<adapter_traits_wrapper_tag,std::decay_t<decltype(current_traits)>>{},
-                [](auto&& current_traits) -> decltype(auto)
-                {
-                    return current_traits.wrapped();
-                },
-                [](auto&& current_traits) -> decltype(auto)
-                {
-                    return hana::id(std::forward<decltype(current_traits)>(current_traits));
-                }
-            )(std::forward<decltype(current_traits)>(current_traits));
-
-            auto&& obj=embedded_object_member(adapter,member);
-            auto path_prefix_length=hana::size(member.path());
-            return intermediate_adapter_traits<
-                        std::decay_t<decltype(traits)>,
-                        decltype(obj),
-                        decltype(path_prefix_length)
-                    >{
-                        traits,
-                        obj,
-                        path_prefix_length
-                     };
-        };
-        auto tmp_adapter=adapter.clone(create);
-#endif
         auto tmp_adapter=make_intermediate_adapter(adapter,member.path());
         return while_each(
                   ops,

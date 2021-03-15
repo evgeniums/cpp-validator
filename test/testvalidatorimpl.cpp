@@ -174,10 +174,9 @@ BOOST_AUTO_TEST_CASE(CheckMakeMember)
 
     BOOST_TEST_MESSAGE("Key as rvalue begin");
     auto m14=_[TestStruct2{}][10];
-//    auto m15=m14.parent();
     BOOST_TEST_MESSAGE("Key as rvalue end");
 
-#if 0
+#ifdef _DRACOSHA_ALWAYS_UNDEF
     // must fail
     std::ignore=make_member(hana::tuple<>());
 #endif
@@ -905,7 +904,6 @@ BOOST_AUTO_TEST_CASE(CheckMixedMemberAndOr)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-//! @todo Optimize getting member from object by using pre-got parent object in element aggregation and nested validators.
 //! @todo Implement validation of trees.
 //! @todo Implement validation of heterogeneous containers (tuples).
 //! @todo Refactor formatting of variadic properties with taking into account preceeding grammar categories.

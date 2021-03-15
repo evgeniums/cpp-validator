@@ -62,16 +62,23 @@ struct apply_member_t
     template <typename Ta, typename Tv, typename Tm>
     constexpr auto operator () (Ta&& a, Tv&& v, Tm&& member) const -> decltype(auto)
     {
-        return hana::if_(hana::is_a<validator_tag,decltype(v)>,
+        return hana::if_(
+          hana::is_a<validator_tag,decltype(v)>,
           [&member](auto&& a, auto&& x) -> decltype(auto)
           {
             auto fn=[&x](auto&&... args) -> decltype(auto)
             {
                 return x.apply(std::forward<decltype(args)>(args)...);
             };
-            auto validator=base_validator<decltype(fn),typename std::decay_t<decltype(x)>::with_check_exists>{
+            using x_type=std::decay_t<decltype(x)>;
+            auto validator=base_validator<
+                            decltype(fn),
+                            typename x_type::with_check_exists,
+                            std::decay_t<decltype(x.exists_operator)>
+                        >{
                 std::move(fn),
-                x.check_exists_operand
+                x.check_exists_operand,
+                x.exists_operator
             };
             return filter_member(validator,std::forward<decltype(a)>(a),std::forward<decltype(member)>(member));
           },

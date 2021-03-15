@@ -250,28 +250,6 @@ struct default_adapter_impl
     static status validate_not(AdapterT&& adapter, MemberT&& member, OpT&& op)
     {
         return status(!apply_member(std::forward<decltype(adapter)>(adapter),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
-
-//        if (!embedded_object_has_member(adapter,member))
-//        {
-//            return traits_of(adapter).not_found_status();
-//        }
-
-//        const auto& original_obj=original_embedded_object(adapter);
-//        return hana::if_(
-//            is_member_path_valid(original_obj,member.path()),
-//            [&adapter,&member,&op](auto&&)
-//            {
-//                return status(!apply_member(std::forward<decltype(adapter)>(adapter),std::forward<decltype(op)>(op),std::forward<decltype(member)>(member)));
-//            },
-//            [&adapter,&member](auto&&)
-//            {
-//                if (traits_of(adapter).unknown_member_mode()==if_member_not_found::abort)
-//                {
-//                    return status(traits_of(adapter).validate_exists(adapter,member,exists,true));
-//                }
-//                return status(status::code::ignore);
-//            }
-//        )(member.path());
     }
 };
 
