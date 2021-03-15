@@ -113,9 +113,8 @@ struct invoke_member_if_exists_impl
                     }
                 }
 
-                const auto& original_obj=original_embedded_object(_(adapter));
                 return hana::eval_if(
-                    is_member_path_valid(original_obj,_(member).path()),
+                    is_embedded_object_path_valid(_(adapter),_(member).path()),
                     [&](auto&& _)
                     {
                         return status(_(invoke(_(fn),_(adapter),_(member))));

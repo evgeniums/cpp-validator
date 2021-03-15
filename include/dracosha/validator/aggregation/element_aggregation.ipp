@@ -48,9 +48,8 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, Aggregati
         return traits_of(adapter).not_found_status();
     }
 
-    const auto& original_obj=original_embedded_object(adapter);
     return hana::eval_if(
-        is_member_path_valid(original_obj,parent_path),
+        is_embedded_object_path_valid(adapter,parent_path),
         [&](auto&& _)
         {
             auto&& parent_element=embedded_object_member(_(adapter),_(parent_path));
@@ -106,9 +105,8 @@ status element_aggregation::invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, 
         return traits_of(adapter).not_found_status();
     }
 
-    const auto& original_obj=original_embedded_object(adapter);
     return hana::eval_if(
-        is_member_path_valid(original_obj,parent_compacted_path),
+        is_embedded_object_path_valid(adapter,parent_compacted_path),
         [&](auto&& _)
         {
             auto upper_path=hana::drop_back(_(path));

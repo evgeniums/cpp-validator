@@ -85,6 +85,21 @@ constexpr embedded_object_path_suffix_impl embedded_object_path_suffix{};
 
 //-------------------------------------------------------------
 
+struct is_embedded_object_path_valid_impl
+{
+    template <typename Tadapter, typename Tpath>
+    constexpr auto operator () (Tadapter&& adapter, Tpath&& path) const
+    {
+        return hana::or_(
+                            hana::is_empty(embedded_object_path_suffix(adapter,path)),
+                            hana::not_(hana::is_nothing(member_value_type(embedded_object(adapter),embedded_object_path_suffix(adapter,path))))
+                        );
+    }
+};
+constexpr is_embedded_object_path_valid_impl is_embedded_object_path_valid{};
+
+//-------------------------------------------------------------
+
 struct embedded_object_has_path_impl
 {
     template <typename AdapterT, typename PathT, typename T2>
