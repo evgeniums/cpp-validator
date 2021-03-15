@@ -101,7 +101,7 @@ status element_aggregation::invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, 
 {
     auto compacted_path=compact_variadic_property(path);
     auto parent_compacted_path=hana::drop_back(compacted_path);
-    if (!original_embedded_object_has_path(adapter,parent_compacted_path))
+    if (!embedded_object_has_path(adapter,parent_compacted_path))
     {
         return traits_of(adapter).not_found_status();
     }
@@ -111,29 +111,29 @@ status element_aggregation::invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, 
         is_member_path_valid(original_obj,parent_compacted_path),
         [&](auto&& _)
         {
-            auto upper_path=hana::drop_back(path);
-            const auto& parent=get_member(_(original_obj),_(parent_compacted_path));
+            auto upper_path=hana::drop_back(_(path));
+            auto&& parent=embedded_object_member(_(adapter),_(parent_compacted_path));
             const auto& aggregation_varg=unwrap_object(hana::back(_(path)));
 
-            auto& tmp_adapter=adapter;
+            auto tmp_adapter=make_intermediate_adapter(_(adapter),_(parent_compacted_path));
 
-            aggregate_report<AdapterT>::open(adapter,aggr,_(parent_compacted_path));
+            aggregate_report<AdapterT>::open(_(adapter),_(aggr),_(parent_compacted_path));
             bool empty=true;
             for (auto it=aggregation_varg.begin(parent);
                  aggregation_varg.while_cond(parent,it);
                  aggregation_varg.next(parent,it)
                 )
             {
-                status ret=_(handler)(tmp_adapter,hana::append(upper_path,varg(wrap_index(it,aggr))));
+                status ret=_(handler)(tmp_adapter,hana::append(upper_path,varg(wrap_index(it,_(aggr)))));
                 if (!pred(ret))
                 {
-                    aggregate_report<AdapterT>::close(adapter,ret);
+                    aggregate_report<AdapterT>::close(_(adapter),ret);
                     return ret;
                 }
                 empty=false;
             }
             auto result=empt(empty);
-            aggregate_report<AdapterT>::close(adapter,result);
+            aggregate_report<AdapterT>::close(_(adapter),result);
             return result;
         },
         [](auto&&)
