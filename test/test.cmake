@@ -3,6 +3,7 @@ SET (VALIDATOR_TEST_SOURCES
     ${VALIDATOR_TEST_SRC}/testvalidatorimpl.cpp
     ${VALIDATOR_TEST_SRC}/testreporter.cpp
     ${VALIDATOR_TEST_SRC}/testreporting.cpp
+    ${VALIDATOR_TEST_SRC}/testallanyreport.cpp
     ${VALIDATOR_TEST_SRC}/testreportinghints.cpp
     ${VALIDATOR_TEST_SRC}/testnomemberreporting.cpp
     ${VALIDATOR_TEST_SRC}/testtranslator.cpp
