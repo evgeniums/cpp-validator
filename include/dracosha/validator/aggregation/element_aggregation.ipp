@@ -30,6 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/aggregation/wrap_index.hpp>
 #include <dracosha/validator/embedded_object.hpp>
 #include <dracosha/validator/base_validator.hpp>
+#include <dracosha/validator/adapters/make_intermediate_adapter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -42,7 +43,7 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, Aggregati
 {
     // invoke only if parent path is ok
     const auto parent_path=hana::drop_back(path);
-    if (!original_embedded_object_has_path(adapter,parent_path))
+    if (!embedded_object_has_path(adapter,parent_path))
     {
         return traits_of(adapter).not_found_status();
     }
@@ -50,9 +51,9 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, Aggregati
     const auto& original_obj=original_embedded_object(adapter);
     return hana::eval_if(
         is_member_path_valid(original_obj,parent_path),
-        [&](auto&& _v)
+        [&](auto&& _)
         {
-            const auto& parent_element=get_member(_v(original_obj),_v(parent_path));
+            auto&& parent_element=embedded_object_member(_(adapter),_(parent_path));
             using parent_type=std::decay_t<decltype(parent_element)>;
             return hana::eval_if(
                 is_container_t<parent_type>{},
@@ -61,22 +62,22 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, Aggregati
                     // agrregation can be invoked only on container types
                     const auto& el_aggregation=hana::back(path);
 
-                    auto& tmp_adapter=adapter;
+                    auto tmp_adapter=make_intermediate_adapter(_(adapter),_(parent_path));
 
-                    aggregate_report<AdapterT>::open(adapter,aggr,parent_path);
+                    aggregate_report<AdapterT>::open(_(adapter),_(aggr),_(parent_path));
                     bool empty=true;
                     for (auto it=_(parent_element).begin();it!=_(parent_element).end();++it)
                     {
-                        status ret=_(handler)(tmp_adapter,hana::append(parent_path,wrap_it(it,aggr,el_aggregation.modifier)));
+                        status ret=_(handler)(tmp_adapter,hana::append(_(parent_path),wrap_it(it,_(aggr),el_aggregation.modifier)));
                         if (!pred(ret))
                         {
-                            aggregate_report<AdapterT>::close(adapter,ret);
+                            aggregate_report<AdapterT>::close(_(adapter),ret);
                             return ret;
                         }
                         empty=false;
                     }
                     auto ret=empt(empty);
-                    aggregate_report<AdapterT>::close(adapter,ret);
+                    aggregate_report<AdapterT>::close(_(adapter),ret);
                     return ret;
                 },
                 [&](auto&& _)
