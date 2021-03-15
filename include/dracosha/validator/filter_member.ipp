@@ -30,9 +30,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 template <typename KeyT, typename Enable>
 template <typename PathT, typename AdapterT, typename HandlerT>
-status generate_paths_t<KeyT,Enable>::operator() (PathT&& path, AdapterT&&, HandlerT&& handler) const
+status generate_paths_t<KeyT,Enable>::operator() (PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
 {
-    return handler(std::forward<PathT>(path));
+    return handler(std::forward<AdapterT>(adapter),std::forward<PathT>(path));
 }
 
 template <typename PathT, typename AdapterT, typename MemberT, typename HandlerT>
@@ -64,7 +64,7 @@ status apply_member_path_t::operator ()
                 std::forward<PathT>(current_path),
                 std::forward<AdapterT>(adapter),
                 std::forward<MemberT>(member),
-                [&fn,&adapter,&member](auto&& generated_path)
+                [&fn,&member](auto&& adapter, auto&& generated_path)
                 {
                     if (filter_path(adapter,generated_path))
                     {
@@ -76,7 +76,7 @@ status apply_member_path_t::operator ()
                         [](auto&& generated_path, auto&& fn, auto&& adapter, auto&& member)
                         {
                             //! @todo Check if member exists.
-                            return status(fn(adapter,inherit_member(std::forward<decltype(generated_path)>(generated_path),std::forward<decltype(member)>(member))));
+                            return status(fn(std::forward<decltype(adapter)>(adapter),inherit_member(std::forward<decltype(generated_path)>(generated_path),std::forward<decltype(member)>(member))));
                         },
                         [](auto&& generated_path, auto&& fn, auto&& adapter, auto&& member)
                         {

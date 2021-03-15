@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/check_member_exists_traits_proxy.hpp>
 #include <dracosha/validator/embedded_object.hpp>
 #include <dracosha/validator/apply.hpp>
-#include <dracosha/validator/adapters/adapter_traits_wrapper.hpp>
+#include <dracosha/validator/adapters/make_intermediate_adapter.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -40,6 +40,7 @@ struct adapter_traits
     template <typename PredicateT, typename AdapterT, typename OpsT, typename MemberT>
     static status validate_member_aggregation(const PredicateT& pred, AdapterT&& adapter, MemberT&& member, OpsT&& ops)
     {
+#if 0
         auto create=[&](auto&& current_traits)
         {
             auto&& traits=hana::if_(
@@ -67,6 +68,8 @@ struct adapter_traits
                      };
         };
         auto tmp_adapter=adapter.clone(create);
+#endif
+        auto tmp_adapter=make_intermediate_adapter(adapter,member.path());
         return while_each(
                   ops,
                   pred,

@@ -26,6 +26,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
+//-------------------------------------------------------------
+
 struct intermediate_adapter_tag{};
 
 template <typename BaseTraitsT, typename IntermediateT, typename PathPrefixLengthT>
@@ -75,6 +77,8 @@ class intermediate_adapter_traits : public adapter_traits_wrapper<BaseTraitsT>,
         PathPrefixLengthT _path_prefix_length;
 };
 
+//-------------------------------------------------------------
+
 struct intermediate_ignore_check_exist1_impl
 {
     template <typename AdapterT, typename MemberT>
@@ -111,6 +115,8 @@ struct intermediate_ignore_check_exist_impl
     }
 };
 constexpr intermediate_ignore_check_exist_impl intermediate_ignore_check_exist{};
+
+//-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 

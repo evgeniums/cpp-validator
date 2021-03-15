@@ -107,6 +107,7 @@ SET (HEADERS
     include/dracosha/validator/adapters/reporting_adapter.hpp
     include/dracosha/validator/adapters/impl/default_adapter_impl.hpp
     include/dracosha/validator/adapters/impl/intermediate_adapter_traits.hpp
+    include/dracosha/validator/adapters/make_intermediate_adapter.hpp
 
     include/dracosha/validator/reporting/reporting_adapter_impl.hpp
     include/dracosha/validator/reporting/reporter.hpp

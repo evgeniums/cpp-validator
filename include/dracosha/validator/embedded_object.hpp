@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/get_member.hpp>
 #include <dracosha/validator/operators/exists.hpp>
 #include <dracosha/validator/adapters/impl/intermediate_adapter_traits.hpp>
+#include <dracosha/validator/member_path.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -210,7 +211,7 @@ struct embedded_object_member_impl
     template <typename AdapterT, typename MemberT>
     auto operator() (const AdapterT& adapter, const MemberT& member) const -> decltype(auto)
     {
-        return get_member(embedded_object(adapter),embedded_object_path_suffix(adapter,member.path()));
+        return get_member(embedded_object(adapter),embedded_object_path_suffix(adapter,path_of(member)));
     }
 };
 constexpr embedded_object_member_impl embedded_object_member;

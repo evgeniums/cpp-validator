@@ -61,11 +61,13 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, Aggregati
                     // agrregation can be invoked only on container types
                     const auto& el_aggregation=hana::back(path);
 
+                    auto& tmp_adapter=adapter;
+
                     aggregate_report<AdapterT>::open(adapter,aggr,parent_path);
                     bool empty=true;
                     for (auto it=_(parent_element).begin();it!=_(parent_element).end();++it)
                     {
-                        status ret=_(handler)(hana::append(parent_path,wrap_it(it,aggr,el_aggregation.modifier)));
+                        status ret=_(handler)(tmp_adapter,hana::append(parent_path,wrap_it(it,aggr,el_aggregation.modifier)));
                         if (!pred(ret))
                         {
                             aggregate_report<AdapterT>::close(adapter,ret);
@@ -80,7 +82,7 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, Aggregati
                 [&](auto&& _)
                 {
                     // skip aggregation if not a container type
-                    return _(handler)(std::forward<decltype(path)>(path));
+                    return _(handler)(_(adapter),std::forward<decltype(path)>(path));
                 }
             );
         },
@@ -112,6 +114,8 @@ status element_aggregation::invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, 
             const auto& parent=get_member(_(original_obj),_(parent_compacted_path));
             const auto& aggregation_varg=unwrap_object(hana::back(_(path)));
 
+            auto& tmp_adapter=adapter;
+
             aggregate_report<AdapterT>::open(adapter,aggr,_(parent_compacted_path));
             bool empty=true;
             for (auto it=aggregation_varg.begin(parent);
@@ -119,7 +123,7 @@ status element_aggregation::invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, 
                  aggregation_varg.next(parent,it)
                 )
             {
-                status ret=_(handler)(hana::append(upper_path,varg(wrap_index(it,aggr))));
+                status ret=_(handler)(tmp_adapter,hana::append(upper_path,varg(wrap_index(it,aggr))));
                 if (!pred(ret))
                 {
                     aggregate_report<AdapterT>::close(adapter,ret);

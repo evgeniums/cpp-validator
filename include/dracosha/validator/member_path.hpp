@@ -33,11 +33,11 @@ struct member_tag;
 struct member_path_t
 {
     template <typename MemberT>
-    auto operator () (const MemberT& member) const
+    auto operator () (const MemberT& member) const -> decltype(auto)
     {
         return hana::eval_if(
             hana::is_a<member_tag,MemberT>,
-            [&](auto&& _)
+            [&](auto&& _) -> decltype(auto)
             {
                 return _(member).path();
             },
@@ -49,6 +49,28 @@ struct member_path_t
     }
 };
 constexpr member_path_t member_path{};
+
+struct path_of_impl
+{
+    template <typename ArgT>
+    auto operator () (ArgT&& arg) const -> decltype(auto)
+    {
+        return hana::if_(
+            hana::is_a<hana::tuple_tag,ArgT>,
+            [](auto&& path) -> decltype(auto)
+            {
+                // arg is a path (aka hana::tuple)
+                return hana::id(std::forward<decltype(path)>(path));
+            },
+            [](auto&& member) -> decltype(auto)
+            {
+                // arg is a member
+                return member.path();
+            }
+        )(std::forward<ArgT>(arg));
+    }
+};
+constexpr path_of_impl path_of{};
 
 struct member_path_list_t
 {
