@@ -11,7 +11,7 @@ Distributed under the Boost Software License, Version 1.0.
 /** @file validator/heterogeneous_property.hpp
 *
 * Defines classes to work with heterogeneous properties.
-* Heterogeneous property corrspond to tuple's element or similar object field
+* Heterogeneous property corresponds to tuple's element or similar object field
 * whose index is known at compilation time.
 */
 
@@ -188,7 +188,7 @@ struct heterogeneous_property_const_config_t
 
     constexpr static bool has_flag_str()
     {
-        return nullptr;
+        return false;
     }
 };
 
