@@ -169,7 +169,19 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
                                  > =nullptr
                                 )
     {
-        return traits_of(a).validate_exists(a,std::forward<MemberT>(member),std::forward<OpT>(op),unwrap_object(std::forward<T2>(b)));
+        using type=typename std::decay_t<T1>::type;
+        return hana::if_(
+            typename type::filter_if_not_exists{},
+            [](auto&& ...)
+            {
+                // existence is checked in invoke_member_if_exists() when filtering member
+                return status::code::ignore;
+            },
+            [](auto&& a, auto&& member, auto&& op, auto&& b)
+            {
+                return traits_of(a).validate_exists(a,std::forward<decltype(member)>(member),std::forward<decltype(op)>(op),unwrap_object(std::forward<decltype(b)>(b)));
+            }
+        )(std::forward<T1>(a),std::forward<MemberT>(member),std::forward<OpT>(op),unwrap_object(std::forward<T2>(b)));
     }
 
     /**
