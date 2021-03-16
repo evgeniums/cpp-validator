@@ -37,7 +37,7 @@ namespace detail
 struct heterogeneous_property_index_impl
 {
     template <typename T>
-    constexpr operator() (T&& prop) const
+    constexpr auto operator() (T&& prop) const
     {
         return typename std::decay_t<decltype(prop)>::index{};
     }
