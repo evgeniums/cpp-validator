@@ -8,14 +8,20 @@ using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestValueTransformer)
 
-BOOST_AUTO_TEST_CASE(CheckTransformer)
+namespace
 {
-    auto h1=[](auto&& val,
-                std::enable_if_t<!std::is_integral<std::decay_t<decltype(val)>>::value,void*> =nullptr
-            )
+    size_t h1(const std::string& val) noexcept
     {
         return val.size();
-    };
+    }
+    bool h2(const std::string& val) noexcept
+    {
+        return val.empty();
+    }
+}
+
+BOOST_AUTO_TEST_CASE(CheckTransformer)
+{
     auto t1=make_value_transformer(h1,"value size");
 
     static_assert(decltype(t1)::has<std::string>(),"");
@@ -30,15 +36,9 @@ BOOST_AUTO_TEST_CASE(CheckTransformer)
 
 BOOST_AUTO_TEST_CASE(CheckValidateTransformer)
 {
-    auto h1=[](auto&& val,
-                std::enable_if_t<!std::is_integral<std::decay_t<decltype(val)>>::value,void*> =nullptr
-            )
-    {
-        return val.size();
-    };
     auto t1=make_value_transformer(h1,"value size");
 
-    auto check=[&h1](auto&& v1, auto property_notation)
+    auto check=[](auto&& v1, auto property_notation)
     {
         std::string s1("Hello world");
         BOOST_CHECK(v1.apply(s1));
@@ -83,15 +83,9 @@ BOOST_AUTO_TEST_CASE(CheckValidateTransformer)
 
 BOOST_AUTO_TEST_CASE(CheckValidateTransformerReport)
 {
-    auto h1=[](auto&& val,
-                std::enable_if_t<!std::is_integral<std::decay_t<decltype(val)>>::value,void*> =nullptr
-            )
-    {
-        return val.size();
-    };
     auto t1=make_value_transformer(h1,"value size");
 
-    auto check=[&h1](auto&& v1, auto property_notation)
+    auto check=[](auto&& v1, auto property_notation)
     {
         std::string rep;
         std::string s2("Hi");
@@ -136,15 +130,9 @@ BOOST_AUTO_TEST_CASE(CheckValidateTransformerReport)
 
 BOOST_AUTO_TEST_CASE(CheckValidateTransformerFlag)
 {
-    auto h1=[](auto&& val,
-                std::enable_if_t<!std::is_integral<std::decay_t<decltype(val)>>::value,void*> =nullptr
-            )
-    {
-        return val.empty();
-    };
-    auto t1=make_value_transformer(h1,"content","must be empty","must not be empty");
+    auto t1=make_value_transformer(h2,"content","must be empty","must not be empty");
 
-    auto check1=[&h1](auto&& v1)
+    auto check1=[](auto&& v1)
     {
         std::string rep;
         std::string s2("Hi");
@@ -152,7 +140,7 @@ BOOST_AUTO_TEST_CASE(CheckValidateTransformerFlag)
         BOOST_CHECK(!v1.apply(a2));
         BOOST_CHECK_EQUAL(rep,std::string("must be empty"));
     };
-    auto check2=[&h1](auto&& v1)
+    auto check2=[](auto&& v1)
     {
         std::string rep;
         std::string s2;
