@@ -66,6 +66,7 @@ SET (HEADERS
     include/dracosha/validator/embedded_object.hpp
     include/dracosha/validator/base_validator.hpp
     include/dracosha/validator/heterogeneous_property.hpp
+    include/dracosha/validator/value_transformer.hpp
 
     include/dracosha/validator/aggregation/and.hpp
     include/dracosha/validator/aggregation/or.hpp

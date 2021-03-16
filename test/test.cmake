@@ -31,6 +31,7 @@ SET (VALIDATOR_TEST_SOURCES
     ${VALIDATOR_TEST_SRC}/testvariadicproperty.cpp
     ${VALIDATOR_TEST_SRC}/testoperatorexists.cpp
     ${VALIDATOR_TEST_SRC}/testheterogeneouscontainers.cpp
+    ${VALIDATOR_TEST_SRC}/testvaluetransformer.cpp
 )
 
 TARGET_SOURCES(${PROJECT_NAME} PUBLIC ${VALIDATOR_TEST_SOURCES})
