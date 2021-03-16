@@ -80,6 +80,7 @@ SET (HEADERS
     include/dracosha/validator/aggregation/element_aggregation.ipp
     include/dracosha/validator/aggregation/wrap_it.hpp
     include/dracosha/validator/aggregation/wrap_index.hpp
+    include/dracosha/validator/aggregation/wrap_heterogeneous_index.hpp
 
     include/dracosha/validator/operators/operator.hpp
     include/dracosha/validator/operators/exists.hpp

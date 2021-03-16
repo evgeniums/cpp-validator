@@ -51,6 +51,18 @@ constexpr heterogeneous_size_impl heterogeneous_size{};
 
 //-------------------------------------------------------------
 
+struct is_heterogeneous_container_impl
+{
+    template <typename T>
+    constexpr auto operator () (T&& v) const
+    {
+        return hana::not_equal(heterogeneous_size(v),hana::size_c<0>);
+    }
+};
+constexpr is_heterogeneous_container_impl is_heterogeneous_container{};
+
+//-------------------------------------------------------------
+
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
 #endif // DRACOSHA_VALIDATOR_HETEROGENEOUS_SIZE_HPP

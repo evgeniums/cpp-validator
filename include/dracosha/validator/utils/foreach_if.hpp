@@ -33,13 +33,14 @@ struct foreach_if_impl
     template <typename T, typename HandlerT, typename PredicateT>
     static auto each(const T& obj, const PredicateT& pred, const HandlerT& fn)
     {
-        auto&& val=get_heterogeneous_property(obj,IndexT{});
-        auto res=fn(val);
+        auto index=IndexT{};
+        auto&& val=get_heterogeneous_property(obj,index);
+        auto res=fn(val,index);
         if (!pred(res))
         {
             return res;
         }
-        auto next_index=hana::plus(IndexT{},hana::size_c<1>);
+        auto next_index=hana::plus(index,hana::size_c<1>);
         return hana::eval_if(
             hana::greater_equal(next_index,heterogeneous_size(obj)),
             [&](auto&& _)
@@ -61,14 +62,14 @@ struct foreach_if_t
     auto operator () (const T& obj, const PredicateT& pred, InitT&& init, const HandlerT& fn) const
     {
         return hana::eval_if(
-            hana::equal(heterogeneous_size(obj),hana::size_c<0>),
-            [&](auto&& _)
-            {
-                return _(init);
-            },
+            is_heterogeneous_container(obj),
             [&](auto&& _)
             {
                 return foreach_if_impl<hana::size_t<0>>::each(_(obj),_(pred),_(fn));
+            },
+            [&](auto&& _)
+            {
+                return _(init);
             }
         );
     }

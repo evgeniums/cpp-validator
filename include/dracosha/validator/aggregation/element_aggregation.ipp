@@ -31,6 +31,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/embedded_object.hpp>
 #include <dracosha/validator/base_validator.hpp>
 #include <dracosha/validator/adapters/make_intermediate_adapter.hpp>
+#include <dracosha/validator/utils/heterogeneous_size.hpp>
+#include <dracosha/validator/utils/foreach_if.hpp>
+#include <dracosha/validator/aggregation/wrap_heterogeneous_index.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -58,7 +61,7 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, Aggregati
                 is_container_t<parent_type>{},
                 [&](auto&& _)
                 {
-                    // agrregation can be invoked only on container types
+                    // agrregation can be invoked on container types
                     const auto& el_aggregation=hana::back(path);
 
                     auto tmp_adapter=make_intermediate_adapter(_(adapter),_(parent_path));
@@ -79,10 +82,32 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, Aggregati
                     aggregate_report<AdapterT>::close(_(adapter),ret);
                     return ret;
                 },
-                [&](auto&& _)
+                [&](auto&&)
                 {
-                    // skip aggregation if not a container type
-                    return _(handler)(_(adapter),std::forward<decltype(path)>(path));
+                    return hana::eval_if(
+                        is_heterogeneous_container(parent_element),
+                        [&](auto&& _)
+                        {
+                            // agrregation can be invoked on heterogeneous container types
+                            auto tmp_adapter=make_intermediate_adapter(_(adapter),_(parent_path));
+                            aggregate_report<AdapterT>::open(_(adapter),_(aggr),_(parent_path));
+                            auto ret=foreach_if(
+                                            parent_element,
+                                            pred,
+                                            [&](auto&&, auto&& index)
+                                            {
+                                                return _(handler)(tmp_adapter,hana::append(_(parent_path),wrap_heterogeneous_index(index,_(aggr))));
+                                            }
+                                        );
+                            aggregate_report<AdapterT>::close(_(adapter),ret);
+                            return ret;
+                        },
+                        [&](auto&& _)
+                        {
+                            // skip aggregation if not a container type
+                            return _(handler)(_(adapter),std::forward<decltype(path)>(path));
+                        }
+                    );
                 }
             );
         },

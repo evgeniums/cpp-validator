@@ -358,7 +358,7 @@ BOOST_AUTO_TEST_CASE(CheckHSize)
 
 BOOST_AUTO_TEST_CASE(CheckForeach)
 {
-    auto fn1=[](auto&& val)
+    auto fn1=[](auto&& val, auto&&)
     {
        return val.size()>=3;
     };
@@ -372,6 +372,34 @@ BOOST_AUTO_TEST_CASE(CheckForeach)
     BOOST_CHECK(!res2);
     auto res3=foreach_if(c2,predicate_or,fn1);
     BOOST_CHECK(res3);
+}
+
+BOOST_AUTO_TEST_CASE(CheckHeterogeneousAllAny)
+{
+    auto v1=validator(
+                _[ALL](size(gte,3))
+            );
+    auto v2=validator(
+                _[ANY](size(gte,3))
+            );
+    auto c1=hana::make_tuple(std::string("one"),std::string("two"),string_view("three"));
+    BOOST_CHECK(v1.apply(c1));
+    BOOST_CHECK(v2.apply(c1));
+    auto c2=hana::make_tuple(std::string("hi"),std::string("hey"),string_view(""));
+    BOOST_CHECK(!v1.apply(c2));
+    BOOST_CHECK(v2.apply(c2));
+    auto c3=hana::make_tuple(std::string("hi"),std::string("ho"),string_view(""));
+    BOOST_CHECK(!v1.apply(c3));
+    BOOST_CHECK(!v2.apply(c3));
+
+    std::string rep;
+    auto ra3=make_reporting_adapter(c3,rep);
+    BOOST_CHECK(!v1.apply(ra3));
+    BOOST_CHECK_EQUAL(rep,std::string("size of each element must be greater than or equal to 3"));
+    rep.clear();
+    BOOST_CHECK(!v2.apply(ra3));
+    BOOST_CHECK_EQUAL(rep,std::string("size of at least one element must be greater than or equal to 3"));
+    rep.clear();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
