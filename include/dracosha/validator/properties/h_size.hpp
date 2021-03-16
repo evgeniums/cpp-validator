@@ -20,7 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_H_SIZE_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/property.hpp>
+#include <dracosha/validator/basic_property.hpp>
 #include <dracosha/validator/property_validator.hpp>
 #include <dracosha/validator/utils/heterogeneous_size.hpp>
 
@@ -29,10 +29,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 /**
  * @brief Property for getting size of heterogeneous containers such as tuple size.
  */
-struct type_h_size
+struct type_h_size : public basic_property
 {
-    using hana_tag=property_tag;
-
     template <typename T>
     constexpr static size_t get(T&& v)
     {

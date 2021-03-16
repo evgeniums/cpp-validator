@@ -21,13 +21,13 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_HETEROGENEOUS_PROPERTY_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/basic_property.hpp>
 #include <dracosha/validator/utils/heterogeneous_size.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-struct property_tag;
 struct heterogeneous_property_tag{};
 
 //-------------------------------------------------------------
@@ -101,9 +101,9 @@ constexpr get_heterogeneous_property_impl get_heterogeneous_property{};
 //-------------------------------------------------------------
 
 template <size_t Index>
-struct heterogeneous_property_t : public heterogeneous_property_tag
+struct heterogeneous_property_t : public heterogeneous_property_tag,
+                                  public basic_property
 {
-    using hana_tag=property_tag;
     using index=hana::size_t<Index>;
 
     heterogeneous_property_t()=default;
@@ -238,7 +238,7 @@ struct heterogeneous_property_just_index_t : public heterogeneous_property_with_
     template <typename ...Args> \
     constexpr auto type_p_##prop::operator () (Args&&... args) const -> decltype(auto) \
     { \
-        return make_property_validator(prop,std::forward<Args>(args)...); \
+        return DRACOSHA_VALIDATOR_NAMESPACE::make_property_validator(prop,std::forward<Args>(args)...); \
     }
 
 #define DRACOSHA_VALIDATOR_HETEROGENEOUS_PROPERTY(prop,index) DRACOSHA_VALIDATOR_HETEROGENEOUS_PROPERTY_FLAG(prop,index,nullptr,nullptr)

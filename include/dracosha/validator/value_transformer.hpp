@@ -19,9 +19,10 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_VALUE_TRANSFORMER_HPP
 #define DRACOSHA_VALIDATOR_VALUE_TRANSFORMER_HPP
 
+#include <string>
+
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/property.hpp>
-#include <dracosha/validator/property_validator.hpp>
+#include <dracosha/validator/basic_property.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -50,14 +51,24 @@ struct is_transformer_invokable<T,HandlerT,
 }
 
 template <typename HandlerT, typename HasFlagT=hana::false_>
-struct value_transformer_t
+struct value_transformer_t : public basic_property
 {
-    using hana_tag=property_tag;
-
     HandlerT _handler;
     std::string _name;
     std::string _flag_str;
     std::string _n_flag_str;
+
+    template <typename HandlerT1>
+    value_transformer_t(
+            HandlerT1&& handler,
+            std::string name,
+            std::string flag_str,
+            std::string n_flag_str
+        ) : _handler(std::forward<HandlerT1>(handler)),
+            _name(std::move(name)),
+            _flag_str(std::move(flag_str)),
+            _n_flag_str(std::move(n_flag_str))
+    {}
 
     template <typename T>
     auto get(T&& v) const -> decltype(auto)

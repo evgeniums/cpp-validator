@@ -19,14 +19,12 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HPP
 #define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HPP
 
-#include <type_traits>
-
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/class_method_args.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
 #include <dracosha/validator/utils/unwrap_object.hpp>
-#include <dracosha/validator/property.hpp>
-#include <dracosha/validator/utils/to_string.hpp>
+#include <dracosha/validator/basic_property.hpp>
+#include <dracosha/validator/property_validator.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
 #include <dracosha/validator/reporting/format_join_grammar_cats.hpp>
 #include <dracosha/validator/variadic_arg.hpp>
@@ -164,10 +162,8 @@ struct might_have_variadic_t_##prop \
     } \
 }; \
 constexpr might_have_variadic_t_##prop might_have_variadic_##prop{}; \
-struct type_variadic_p_##prop : public variadic_property_base_tag \
+struct type_variadic_p_##prop : public DRACOSHA_VALIDATOR_NAMESPACE::variadic_property_base_tag, public DRACOSHA_VALIDATOR_NAMESPACE::basic_property \
 { \
-    using hana_tag=DRACOSHA_VALIDATOR_NAMESPACE::property_tag; \
-    \
     template <typename T, typename ... Args> \
     static auto apply(T&& v, Args&&... args) -> decltype(auto) \
     { \

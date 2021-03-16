@@ -11,6 +11,7 @@ SET (HEADERS
     include/dracosha/validator/utils/hana_to_std_tuple.hpp
     include/dracosha/validator/utils/safe_compare.hpp
     include/dracosha/validator/utils/adjust_storable_type.hpp
+    include/dracosha/validator/utils/adjust_storable_ignore.hpp
     include/dracosha/validator/utils/enable_to_string.hpp
     include/dracosha/validator/utils/make_types_tuple.hpp
     include/dracosha/validator/utils/reference_wrapper.hpp
@@ -35,6 +36,7 @@ SET (HEADERS
 
     include/dracosha/validator/adapter.hpp
     include/dracosha/validator/property.hpp
+    include/dracosha/validator/basic_property.hpp
     include/dracosha/validator/can_get.hpp
     include/dracosha/validator/get.hpp
     include/dracosha/validator/can_check_contains.hpp
@@ -81,6 +83,7 @@ SET (HEADERS
     include/dracosha/validator/aggregation/wrap_it.hpp
     include/dracosha/validator/aggregation/wrap_index.hpp
     include/dracosha/validator/aggregation/wrap_heterogeneous_index.hpp
+#    include/dracosha/validator/aggregation/tree.hpp
 
     include/dracosha/validator/operators/operator.hpp
     include/dracosha/validator/operators/exists.hpp

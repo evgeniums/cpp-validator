@@ -25,6 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/string_view.hpp>
 #include <dracosha/validator/utils/unwrap_object.hpp>
+#include <dracosha/validator/basic_property.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -46,8 +47,6 @@ struct is_string : public std::is_same<T,std::string>
 };
 
 //-------------------------------------------------------------
-
-struct property_tag;
 
 /**
  * @brief Safe equal to if operation is not possible.

@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/get_it.hpp>
 #include <dracosha/validator/aggregation/element_aggregation.hpp>
+#include <dracosha/validator/utils/adjust_storable_type.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -33,7 +34,8 @@ struct wrap_iterator_tag;
  * @brief Wrapper of container's iterator paired with explicit name or description.
  */
 template <typename T, typename AggregationT, typename ModifierT>
-struct wrap_it_t : public AggregationT::type
+struct wrap_it_t : public AggregationT::type,
+                   public adjust_storable_ignore
 {
     using hana_tag=wrap_iterator_tag;
 

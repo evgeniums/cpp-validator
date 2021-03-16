@@ -20,6 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_ELEMENT_AGGREGATION_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/utils/adjust_storable_ignore.hpp>
 #include <dracosha/validator/aggregation/aggregation.hpp>
 #include <dracosha/validator/variadic_arg.hpp>
 
@@ -52,7 +53,7 @@ struct element_aggregation_tag
     }
 };
 
-struct element_aggregation
+struct element_aggregation : public adjust_storable_ignore
 {
     using hana_tag=element_aggregation_tag;
 

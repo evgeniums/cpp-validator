@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <string>
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/enable_to_string.hpp>
+#include <dracosha/validator/utils/adjust_storable_type.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -46,7 +47,8 @@ struct operator_tag
  * @brief Base operator class.
  */
 template <typename DerivedT>
-struct op : public enable_to_string<DerivedT>
+struct op : public enable_to_string<DerivedT>,
+            public adjust_storable_ignore
 {
     using hana_tag=operator_tag;
 

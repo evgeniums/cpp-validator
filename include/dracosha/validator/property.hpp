@@ -23,8 +23,10 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_PROPERTY_HPP
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/utils/adjust_storable_ignore.hpp>
 #include <dracosha/validator/detail/has_method.hpp>
 #include <dracosha/validator/detail/has_property.hpp>
+#include <dracosha/validator/basic_property.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -91,9 +93,8 @@ auto property(Tv&& val, Tp&& prop) -> decltype(auto)
                                                                         (void)hana::traits::declval(v).prop \
                                                                     ) \
                                                                 {}); \
-    struct type_p_##prop \
+    struct type_p_##prop : public DRACOSHA_VALIDATOR_NAMESPACE::basic_property \
     { \
-        using hana_tag=DRACOSHA_VALIDATOR_NAMESPACE::property_tag; \
         template <typename T> \
         constexpr static auto get(T&& v) -> decltype(auto) \
         { \

@@ -29,6 +29,31 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 template <typename T, typename Enable=hana::when<true>>
+struct is_constant_size_impl
+{
+    constexpr static const bool value=false;
+};
+template <typename T>
+struct is_constant_size_impl<T,
+            hana::when<
+                (
+                hana::is_a<hana::integral_constant_tag<size_t>,T>
+                ||
+                hana::is_a<hana::ext::std::integral_constant_tag<size_t>,T>
+                )
+            >
+        >
+{
+    constexpr static const bool value=true;
+};
+
+template <typename T>
+struct is_constant_size : public std::integral_constant<bool,is_constant_size_impl<T>::value>
+{};
+
+//-------------------------------------------------------------
+
+template <typename T, typename Enable=hana::when<true>>
 struct heterogeneous_size_t : public hana::size_t<0>
 {
 };

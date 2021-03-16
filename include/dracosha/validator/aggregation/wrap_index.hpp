@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/safe_compare.hpp>
 #include <dracosha/validator/variadic_arg.hpp>
+#include <dracosha/validator/utils/adjust_storable_type.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -33,7 +34,8 @@ struct wrap_index_tag;
  * @brief Wrapper of index for variadic properties.
  */
 template <typename T, typename AggregationT>
-struct wrap_index_t : public AggregationT::type
+struct wrap_index_t : public AggregationT::type,
+                      public adjust_storable_ignore
 {
     using hana_tag=wrap_index_tag;
 

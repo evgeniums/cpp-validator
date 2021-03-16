@@ -22,39 +22,12 @@ Distributed under the Boost Software License, Version 1.0.
 #include <string>
 
 #include <dracosha/validator/config.hpp>
+#include <dracosha/validator/utils/adjust_storable_ignore.hpp>
 #include <dracosha/validator/utils/object_wrapper.hpp>
+#include <dracosha/validator/utils/heterogeneous_size.hpp>
 #include <dracosha/validator/heterogeneous_property.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
-
-struct element_aggregation_tag;
-struct wrap_iterator_tag;
-struct operator_tag;
-struct property_tag;
-struct wrap_index_tag;
-
-template <typename T, typename Enable=hana::when<true>>
-struct is_constant_size_impl
-{
-    constexpr static const bool value=false;
-};
-template <typename T>
-struct is_constant_size_impl<T,
-            hana::when<
-                (
-                hana::is_a<hana::integral_constant_tag<size_t>,T>
-                ||
-                hana::is_a<hana::ext::std::integral_constant_tag<size_t>,T>
-                )
-            >
-        >
-{
-    constexpr static const bool value=true;
-};
-
-template <typename T>
-struct is_constant_size : public std::integral_constant<bool,is_constant_size_impl<T>::value>
-{};
 
 //-------------------------------------------------------------
 
@@ -89,17 +62,7 @@ struct adjust_storable_type<T,
 template <typename T>
 struct adjust_storable_type<T,
                         hana::when<
-                            hana::is_a<property_tag,T>
-                            ||
-                            hana::is_a<element_aggregation_tag,T>
-                            ||
-                            hana::is_a<object_wrapper_tag,T>
-                            ||
-                            hana::is_a<wrap_iterator_tag,T>
-                            ||
-                            hana::is_a<wrap_index_tag,T>
-                            ||
-                            hana::is_a<operator_tag,T>
+                            std::is_base_of<adjust_storable_ignore,std::decay_t<T>>::value
                         >
                     >
 {
@@ -112,19 +75,9 @@ struct adjust_storable_type<T,
 template <typename T>
 struct adjust_storable_type<T,
                         hana::when<
+                            !std::is_base_of<adjust_storable_ignore,std::decay_t<T>>::value
+                            &&
                             !std::is_constructible<const char*,T>::value
-                            &&
-                            !hana::is_a<property_tag,T>
-                            &&
-                            !hana::is_a<element_aggregation_tag,T>
-                            &&
-                            !hana::is_a<object_wrapper_tag,T>
-                            &&
-                            !hana::is_a<wrap_iterator_tag,T>
-                            &&
-                            !hana::is_a<wrap_index_tag,T>
-                            &&
-                            !hana::is_a<operator_tag,T>
                             &&
                             !is_constant_size<std::decay_t<T>>::value
                         >

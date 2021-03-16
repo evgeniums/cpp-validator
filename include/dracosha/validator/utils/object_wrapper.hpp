@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/safe_compare.hpp>
 #include <dracosha/validator/utils/string_view.hpp>
+#include <dracosha/validator/utils/adjust_storable_ignore.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -59,7 +60,8 @@ struct object_wrapper_base{};
  */
 template <typename T>
 class object_wrapper : public adjust_view_ignore,
-                       public object_wrapper_base
+                       public object_wrapper_base,
+                       public adjust_storable_ignore
 {
     public:
 

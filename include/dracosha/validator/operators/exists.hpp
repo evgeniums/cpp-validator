@@ -33,7 +33,8 @@ struct exists_tag{};
 /**
  * @brief Definition of operator "exists" for checking if member exists in object.
  */
-struct exists_t : public exists_tag
+struct exists_t : public exists_tag,
+                  public adjust_storable_ignore
 {
     using hana_tag=operator_tag;
 
@@ -80,7 +81,8 @@ constexpr exists_t exists{};
 /**
  * @brief Wrapper of operator "exists" with explicit string description.
  */
-struct exists_op_with_string_t : public exists_tag
+struct exists_op_with_string_t : public exists_tag,
+                                 public adjust_storable_ignore
 {
     using hana_tag=operator_tag;
 

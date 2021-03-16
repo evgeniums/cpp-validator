@@ -20,7 +20,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define DRACOSHA_VALIDATOR_VALUE_HPP
 
 #include <dracosha/validator/config.hpp>
-#include <dracosha/validator/property.hpp>
+#include <dracosha/validator/basic_property.hpp>
 #include <dracosha/validator/property_validator.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
@@ -28,9 +28,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 /**
  * @brief Proxy wrapper that is used to get the object itself via property interface.
  */
-struct type_p_value
+struct type_p_value : public basic_property
 {
-    using hana_tag=property_tag;
     template <typename T>
     constexpr static T get(T&& v)
     {

@@ -30,7 +30,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 /**
  * @brief Base class for operators that swallow operands in reports.
  */
-struct op_report_without_operand_t
+struct op_report_without_operand_t : public adjust_storable_ignore
 {
     using hana_tag=operator_tag;
 };

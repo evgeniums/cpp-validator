@@ -37,7 +37,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  * Base flag operator tries to use flag description defined in the property.
  * If that is not applicable then the default preset flag description is used.
  */
-struct flag_t
+struct flag_t : public adjust_storable_ignore
 {
     using hana_tag=operator_tag;
 
