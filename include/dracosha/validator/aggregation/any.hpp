@@ -62,14 +62,26 @@ struct string_any_t : public aggregate_op<string_any_t>,
     constexpr static const char* name="ANY";
     constexpr static const char* base_phrase="at least one";
 
+    constexpr static const char* description="at least one element";
+    constexpr static const char* iterator_description="at least one iterator";
+    constexpr static const char* key_description="at least one key";
+
+    constexpr static const char* name_str()
+    {
+        return name;
+    }
     constexpr static const char* base_phrase_str()
     {
         return base_phrase;
     }
-
-    constexpr static const char* description="at least one element";
-    constexpr static const char* iterator_description="at least one iterator";
-    constexpr static const char* key_description="at least one key";
+    constexpr static const char* iterator_description_str()
+    {
+        return iterator_description;
+    }
+    constexpr static const char* key_description_str()
+    {
+        return key_description;
+    }
 
     std::string operator() (const values_t&) const
     {

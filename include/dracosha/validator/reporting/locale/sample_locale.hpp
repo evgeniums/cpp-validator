@@ -123,6 +123,14 @@ inline const phrase_translator& validator_translator_sample()
         m[string_element]="element #"; // "element #"
         m[string_any]="at least one element"; // "at least one element"
         m[string_all]="each element"; // "each element"
+        m[string_all.base_phrase_str()]="each"; // "each"
+        m[string_all.iterator_description_str()]="each iterator"; // "each iterator"
+        m[string_all.key_description_str()]="each key"; // "each key"
+        m[string_all.name_str()]="ALL"; // "ALL"
+        m[string_any.base_phrase_str()]="at least one"; // "at least one"
+        m[string_any.iterator_description_str()]="at least one iterator"; // "at least one iterator"
+        m[string_any.key_description_str()]="at least one key"; // "at least one key"
+        m[string_any.name_str()]="ANY"; // "ANY"
 
         // flag descriptions
         m[flag_true_false.str()]="must be true"; // "must be true"
@@ -141,6 +149,7 @@ inline const phrase_translator& validator_translator_sample()
         m[empty.name()]="empty"; // "empty"
         m[size.name()]="size"; // "size"
         m[length.name()]="length"; // "length"
+        m[h_size.name()]="heterogeneous size"; // "heterogeneous size"
 
         // existance
         m[string_exists]="must exist"; // "must exist"

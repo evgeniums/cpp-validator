@@ -120,6 +120,50 @@ inline const phrase_translator& validator_translator_ru()
                             {"каждого элемента",grammar_ru::roditelny_padezh}
                       }; // "each element"
 
+        m[string_all.base_phrase_str()]={
+                            {"каждый"},
+                            {"каждого",grammar_ru::roditelny_padezh},
+                            {"каждая",grammar_ru::zhensky_rod},
+                            {"каждой",grammar_ru::zhensky_rod,grammar_ru::roditelny_padezh},
+                            {"каждое",grammar_ru::sredny_rod},
+                            {"каждого",grammar_ru::sredny_rod,grammar_ru::roditelny_padezh},
+                            {"каждые",grammar_ru::mn_chislo},
+                            {"каждых",grammar_ru::mn_chislo,grammar_ru::roditelny_padezh}
+                      }; // "each"
+        m[string_all.iterator_description_str()]={
+                            {"каждый итератор"},
+                            {"каждого итератора",grammar_ru::roditelny_padezh}
+                      }; // "each iterator"
+        m[string_all.key_description_str()]={
+                            {"каждый ключ"},
+                            {"каждого ключа",grammar_ru::roditelny_padezh}
+                      }; // "each iterator"
+        m[string_all.name_str()]={
+                            {"ВСЕ"}
+                      }; // "ALL"
+
+        m[string_any.base_phrase_str()]={
+                            {"хотя бы один"},
+                            {"хотя бы одного",grammar_ru::roditelny_padezh},
+                            {"хотя бы одна",grammar_ru::zhensky_rod},
+                            {"хотя бы одной",grammar_ru::zhensky_rod,grammar_ru::roditelny_padezh},
+                            {"хотя бы одно",grammar_ru::sredny_rod},
+                            {"хотя бы одного",grammar_ru::sredny_rod,grammar_ru::roditelny_padezh},
+                            {"хотя бы одни",grammar_ru::mn_chislo},
+                            {"хотя бы одних",grammar_ru::mn_chislo,grammar_ru::roditelny_padezh}
+                      }; // "at least one"
+        m[string_any.iterator_description_str()]={
+                            {"хотя бы один итератор"},
+                            {"хотя бы одного итератора",grammar_ru::roditelny_padezh}
+                      }; // "at least one iterator"
+        m[string_any.key_description_str()]={
+                            {"хотя бы один ключ"},
+                            {"хотя бы одного ключа",grammar_ru::roditelny_padezh}
+                      }; // "at least one key"
+        m[string_any.name_str()]={
+                            {"ЛЮБОЙ"}
+                      }; // "ANY"
+
         // flag descriptions
         m[flag_true_false.str()]={
                                     {"должен быть истинным"},
@@ -198,6 +242,10 @@ inline const phrase_translator& validator_translator_ru()
                         {{"длина",grammar_ru::zhensky_rod},grammar_ru::sredny_rod},
                         {{"длины",grammar_ru::zhensky_rod},grammar_ru::sredny_rod,grammar_ru::roditelny_padezh}
                     }; // "length"
+        m[h_size.name()]={
+                        {"гетерогенный размер"},
+                        {"гетерогенного размера",grammar_ru::roditelny_padezh}
+                    };// "heterogeneous size"
 
         // existance
         m[string_exists]={

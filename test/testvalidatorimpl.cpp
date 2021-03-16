@@ -904,7 +904,6 @@ BOOST_AUTO_TEST_CASE(CheckMixedMemberAndOr)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-//! @todo Add translations for new strings: aggregations, heterogeneous size
 //! @todo Implement validation of trees.
 //! @todo Refactor formatting of variadic properties with taking into account preceeding grammar categories.
 //! @todo Refactor formatting of nested validators with hints.

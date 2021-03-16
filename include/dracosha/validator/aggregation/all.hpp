@@ -71,9 +71,21 @@ struct string_all_t : public aggregate_op<string_all_t>,
 
     constexpr static const char* base_phrase="each";
 
+    constexpr static const char* name_str()
+    {
+        return name;
+    }
     constexpr static const char* base_phrase_str()
     {
         return base_phrase;
+    }
+    constexpr static const char* iterator_description_str()
+    {
+        return iterator_description;
+    }
+    constexpr static const char* key_description_str()
+    {
+        return key_description;
     }
 
     std::string operator() (const values_t&) const
