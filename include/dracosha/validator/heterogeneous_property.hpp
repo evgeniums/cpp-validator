@@ -32,22 +32,29 @@ struct heterogeneous_property_tag{};
 
 //-------------------------------------------------------------
 
+namespace detail
+{
+struct heterogeneous_property_index_impl
+{
+    template <typename T>
+    constexpr operator() (T&& prop) const
+    {
+        return typename std::decay_t<decltype(prop)>::index{};
+    }
+};
+constexpr heterogeneous_property_index_impl heterogeneous_property_index{};
+}
+
 template <typename PropertyT, typename Enable=hana::when<true>>
 struct heterogeneous_property_index_t
 {
     template <typename PropertyT1>
-    auto operator () (PropertyT1&& prop) const -> decltype(auto)
+    constexpr auto operator () (PropertyT1&& prop) const -> decltype(auto)
     {
         return hana::if_(
             std::is_base_of<heterogeneous_property_tag,std::decay_t<PropertyT1>>{},
-            [](auto&& prop)
-            {
-                return typename std::decay_t<decltype(prop)>::index{};
-            },
-            [](auto&& prop) -> decltype(auto)
-            {
-                return hana::id(std::forward<decltype(prop)>(prop));
-            }
+            detail::heterogeneous_property_index,
+            hana::id
         )(std::forward<PropertyT1>(prop));
     }
 };
@@ -57,7 +64,7 @@ constexpr heterogeneous_property_index_t<PropertyT> heterogeneous_property_index
 struct heterogeneous_property_index_impl
 {
     template <typename PropertyT>
-    auto operator () (PropertyT&& prop) const -> decltype(auto)
+    constexpr auto operator () (PropertyT&& prop) const -> decltype(auto)
     {
         return heterogeneous_property_index_inst<std::decay_t<PropertyT>>(std::forward<PropertyT>(prop));
     }
@@ -70,7 +77,7 @@ template <typename T, typename PropertyT, typename Enable=hana::when<true>>
 struct get_heterogeneous_property_t
 {
     template <typename T1, typename PropertyT1>
-    auto operator () (T1&& obj, PropertyT1&& prop) const -> decltype(auto)
+    constexpr auto operator () (T1&& obj, PropertyT1&& prop) const -> decltype(auto)
     {
         return hana::at(obj,heterogeneous_property_index(prop));
     }
@@ -81,7 +88,7 @@ constexpr get_heterogeneous_property_t<T,PropertyT> get_heterogeneous_property_i
 struct get_heterogeneous_property_impl
 {
     template <typename T, typename PropertyT>
-    auto operator () (T&& obj, PropertyT&& prop) const -> decltype(auto)
+    constexpr auto operator () (T&& obj, PropertyT&& prop) const -> decltype(auto)
     {
         return get_heterogeneous_property_inst<std::decay_t<T>,std::decay_t<PropertyT>>(
                     std::forward<T>(obj),

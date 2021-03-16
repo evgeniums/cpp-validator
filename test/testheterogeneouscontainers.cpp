@@ -7,6 +7,8 @@
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
 #include <dracosha/validator/properties/h_size.hpp>
+#include <dracosha/validator/utils/foreach_if.hpp>
+#include <dracosha/validator/utils/conditional_fold.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -352,6 +354,24 @@ BOOST_AUTO_TEST_CASE(CheckHSize)
     BOOST_CHECK(!v4.apply(o1));
     BOOST_CHECK_EQUAL(rep,std::string("heterogeneous size must be equal to 3"));
     rep.clear();
+}
+
+BOOST_AUTO_TEST_CASE(CheckForeach)
+{
+    auto fn1=[](auto&& val)
+    {
+       return val.size()>=3;
+    };
+
+    auto c1=hana::make_tuple(std::string("one"),std::string("two"),string_view("three"));
+    auto res1=foreach_if(c1,predicate_and,fn1);
+    BOOST_CHECK(res1);
+
+    auto c2=hana::make_tuple(std::string("hi"),std::string("hey"),string_view(""));
+    auto res2=foreach_if(c2,predicate_and,fn1);
+    BOOST_CHECK(!res2);
+    auto res3=foreach_if(c2,predicate_or,fn1);
+    BOOST_CHECK(res3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
