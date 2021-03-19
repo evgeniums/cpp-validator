@@ -36,17 +36,17 @@ class intermediate_adapter_traits : public adapter_traits_wrapper<BaseTraitsT>,
 {
     public:
 
-        using path_prefix_length=PathPrefixLengthT;
+        using path_prefix_length=std::decay_t<PathPrefixLengthT>;
 
         template <typename BaseTraitsT1>
         intermediate_adapter_traits(
                 BaseTraitsT1&& traits,
                 IntermediateT&& intermediate,
-                PathPrefixLengthT path_prefix_length
+                PathPrefixLengthT path_prefix_size
             )
             : adapter_traits_wrapper<BaseTraitsT>(std::forward<BaseTraitsT1>(traits)),
               _intermediate(std::forward<IntermediateT>(intermediate)),
-              _path_prefix_length(path_prefix_length)
+              _path_prefix_length(path_prefix_size)
         {}
 
         auto value() const -> decltype(auto)
@@ -69,7 +69,7 @@ class intermediate_adapter_traits : public adapter_traits_wrapper<BaseTraitsT>,
         {
             return hana::less_equal(
                         PathSizeT{},
-                        PathPrefixLengthT{}
+                        path_prefix_length{}
                     );
         }
 
