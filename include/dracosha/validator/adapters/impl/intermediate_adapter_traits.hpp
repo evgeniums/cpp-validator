@@ -36,6 +36,8 @@ class intermediate_adapter_traits : public adapter_traits_wrapper<BaseTraitsT>,
 {
     public:
 
+        using path_prefix_length=PathPrefixLengthT;
+
         template <typename BaseTraitsT1>
         intermediate_adapter_traits(
                 BaseTraitsT1&& traits,

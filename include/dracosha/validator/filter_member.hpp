@@ -31,8 +31,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename KeyT, typename Enable=hana::when<true>>
 struct generate_paths_t
 {
-    template <typename PathT, typename AdapterT, typename HandlerT>
-    status operator () (PathT&& path, AdapterT&&, HandlerT&& handler) const;
+    template <typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
+    status operator () (UsedPathSizeT&& used_path_size, PathT&& path, AdapterT&&, HandlerT&& handler) const;
 };
 template <typename KeyT>
 constexpr generate_paths_t<KeyT> generate_paths{};
@@ -41,9 +41,10 @@ constexpr generate_paths_t<KeyT> generate_paths{};
 
 struct apply_generated_paths_t
 {
-    template <typename PathT, typename AdapterT, typename MemberT, typename HandlerT>
-    status operator () (PathT&& current_path, AdapterT&&, MemberT&& member, HandlerT&& handler) const;
+    template <typename UsedPathSizeT, typename PathT, typename AdapterT, typename MemberT, typename HandlerT>
+    status operator () (UsedPathSizeT&& used_path_size, PathT&& current_path, AdapterT&&, MemberT&& member, HandlerT&& handler) const;
 
+    //! @todo Remove gen().
     template <typename PathT, typename AdapterT, typename HandlerT>
     static status gen(PathT&& path, AdapterT&&, HandlerT&& handler);
 };
@@ -53,8 +54,8 @@ constexpr apply_generated_paths_t apply_generated_paths{};
 
 struct apply_member_path_t
 {
-    template <typename PathT, typename FnT, typename AdapterT, typename MemberT>
-    status operator () (PathT&& current_path, FnT&& fn, AdapterT&& adapter, MemberT&& member) const;
+    template <typename UsedPathSizeT, typename PathT, typename FnT, typename AdapterT, typename MemberT>
+    status operator () (UsedPathSizeT&& used_path_size, PathT&& current_path, FnT&& fn, AdapterT&& adapter, MemberT&& member) const;
 };
 constexpr apply_member_path_t apply_member_path{};
 
@@ -98,7 +99,7 @@ struct invoke_member_if_exists_impl
                         auto not_found_status=traits_of(_(adapter)).not_found_status();
                         if (not_found_status.value()==status::code::fail)
                         {
-                            // some adapters need to known that member not found
+                            // some adapters need to know that member is not found
                             // for example, reporting adapter need it to construct corresponding report
                             traits_of(adapter).validate_exists(
                                                 _(adapter),
@@ -166,7 +167,7 @@ struct filter_member_invoker<AdapterT,MemberT,
         {
             return invoke_member_if_exists(fn,adapter,member);
         };
-        return apply_member_path(hana::tuple<>{},handler,adapter,member);
+        return apply_member_path(hana::size_c<0>,hana::tuple<>{},handler,adapter,member);
     }
 };
 

@@ -65,6 +65,7 @@ struct string_any_t : public aggregate_op<string_any_t>,
     constexpr static const char* description="at least one element";
     constexpr static const char* iterator_description="at least one iterator";
     constexpr static const char* key_description="at least one key";
+    constexpr static const char* tree_description="at least one tree node";
 
     constexpr static const char* name_str()
     {
@@ -82,6 +83,10 @@ struct string_any_t : public aggregate_op<string_any_t>,
     {
         return key_description;
     }
+    constexpr static const char* tree_decription_str()
+    {
+        return tree_description;
+    }
 
     std::string operator() (const values_t&) const
     {
@@ -95,13 +100,40 @@ struct string_any_t : public aggregate_op<string_any_t>,
     {
         return key_description;
     }
-
+    std::string operator() (const tree_modifier_t&) const
+    {
+        return tree_description;
+    }
 };
 
 /**
   @brief Instance of string description helper for operator ANY.
 */
 constexpr string_any_t string_any{};
+
+//-------------------------------------------------------------
+
+template <typename AdapterT, typename = hana::when<true>>
+struct check_strict_any
+{
+    template <typename T>
+    static constexpr bool skip(T&&) noexcept
+    {
+        return false;
+    }
+};
+template <typename AdapterT>
+struct check_strict_any<AdapterT,
+        hana::when<
+            std::is_base_of<strict_any_tag,typename std::decay_t<AdapterT>::type>::value
+        >>
+{
+    template <typename T>
+    static bool skip(T&& adapter) noexcept
+    {
+        return !traits_of(adapter).is_strict_any();
+    }
+};
 
 //-------------------------------------------------------------
 struct any_aggregation_t{};
@@ -127,6 +159,36 @@ struct any_t : public element_aggregation_with_modifier<ModifierT>,
 
     template <typename OpT>
     constexpr auto operator() (OpT&& op) const;
+
+    constexpr static auto string() -> decltype(auto)
+    {
+        return string_any;
+    }
+
+    static auto predicate()
+    {
+        return [](auto&& adapter, status& ret)
+        {
+            if (check_strict_any<std::decay_t<decltype(adapter)>>::skip(adapter))
+            {
+                ret=status{status::code::ignore};
+                return false;
+            }
+            return ret.value()!=status::code::success;
+        };
+    }
+
+    static auto post_empty_handler()
+    {
+        return [](bool empty)
+        {
+            if (empty)
+            {
+                return status(status::code::ignore);
+            }
+            return status(status::code::fail);
+        };
+    }
 
     /**
      * @brief Create validator form operator and operand.
@@ -162,33 +224,11 @@ constexpr any_t<decltype(values)> ANY{};
 
 //-------------------------------------------------------------
 
-template <typename AdapterT, typename = hana::when<true>>
-struct check_strict_any
-{
-    template <typename T>
-    static constexpr bool skip(T&&) noexcept
-    {
-        return false;
-    }
-};
-template <typename AdapterT>
-struct check_strict_any<AdapterT,
-        hana::when<
-            std::is_base_of<strict_any_tag,typename std::decay_t<AdapterT>::type>::value
-        >>
-{
-    template <typename T>
-    static bool skip(T&& adapter) noexcept
-    {
-        return !traits_of(adapter).is_strict_any();
-    }
-};
-
 template <typename KeyT>
 struct generate_paths_t<KeyT,hana::when<std::is_base_of<any_aggregation_t,std::decay_t<KeyT>>::value>>
 {
-    template <typename PathT, typename AdapterT, typename HandlerT>
-    status operator () (PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
+    template <typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
+    status operator () (UsedPathSizeT&& used_path_size, PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
     {
         return element_aggregation::invoke(
             [&adapter](status& ret)
@@ -209,6 +249,7 @@ struct generate_paths_t<KeyT,hana::when<std::is_base_of<any_aggregation_t,std::d
                 return status(status::code::fail);
             },
             string_any,
+            std::forward<UsedPathSizeT>(used_path_size),
             std::forward<PathT>(path),
             std::forward<AdapterT>(adapter),
             std::forward<HandlerT>(handler)
@@ -223,8 +264,8 @@ struct generate_paths_t<KeyT,hana::when<
                     hana::is_a<any_tag,typename KeyT::aggregation_type::type>
         >>
 {
-    template <typename PathT, typename AdapterT, typename HandlerT>
-    status operator () (PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
+    template <typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
+    status operator () (UsedPathSizeT&& used_path_size, PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
     {
         return element_aggregation::invoke_variadic(
             [&adapter](status& ret)
@@ -245,6 +286,7 @@ struct generate_paths_t<KeyT,hana::when<
                 return status(status::code::fail);
             },
             string_any,
+            std::forward<UsedPathSizeT>(used_path_size),
             std::forward<PathT>(path),
             std::forward<AdapterT>(adapter),
             std::forward<HandlerT>(handler)

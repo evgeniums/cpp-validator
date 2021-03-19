@@ -76,9 +76,18 @@ class status
             return _code;
         }
 
-        void reset(code value=code::success)
+        void reset(code value=code::success) noexcept
         {
             _code=value;
+        }
+
+        bool operator == (const code& val) const noexcept
+        {
+            return val==_code;
+        }
+        bool operator != (const code& val) const noexcept
+        {
+            return val!=_code;
         }
 
     private:

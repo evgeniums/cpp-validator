@@ -68,6 +68,7 @@ struct string_all_t : public aggregate_op<string_all_t>,
     constexpr static const char* description="each element";
     constexpr static const char* iterator_description="each iterator";
     constexpr static const char* key_description="each key";
+    constexpr static const char* tree_description="each tree node";
 
     constexpr static const char* base_phrase="each";
 
@@ -87,6 +88,10 @@ struct string_all_t : public aggregate_op<string_all_t>,
     {
         return key_description;
     }
+    constexpr static const char* tree_decription_str()
+    {
+        return tree_description;
+    }
 
     std::string operator() (const values_t&) const
     {
@@ -99,6 +104,10 @@ struct string_all_t : public aggregate_op<string_all_t>,
     std::string operator() (const keys_t&) const
     {
         return key_description;
+    }
+    std::string operator() (const tree_modifier_t&) const
+    {
+        return tree_description;
     }
 };
 
@@ -147,6 +156,28 @@ struct all_t : public element_aggregation_with_modifier<ModifierT>,
         return (*this)(value(std::forward<OpT>(op),std::forward<T>(b)));
     }
 
+    constexpr static auto string() -> decltype(auto)
+    {
+        return string_all;
+    }
+
+    static auto predicate()
+    {
+        return [](auto&&, status& ret)
+        {
+            return ret==true;
+        };
+    }
+
+    static auto post_empty_handler()
+    {
+        return [](bool empty)
+        {
+            std::ignore=empty;
+            return status(status::code::success);
+        };
+    }
+
     template <typename T>
     constexpr friend bool operator == (const T&, const all_t<ModifierT>&) noexcept
     {
@@ -162,8 +193,8 @@ struct all_t : public element_aggregation_with_modifier<ModifierT>,
 template <typename KeyT>
 struct generate_paths_t<KeyT,hana::when<std::is_base_of<all_aggregation_t,std::decay_t<KeyT>>::value>>
 {
-    template <typename PathT, typename AdapterT, typename HandlerT>
-    status operator () (PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
+    template <typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
+    status operator () (UsedPathSizeT&& used_path_size, PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
     {
         return element_aggregation::invoke(
             [](status ret)
@@ -176,6 +207,7 @@ struct generate_paths_t<KeyT,hana::when<std::is_base_of<all_aggregation_t,std::d
                 return status(status::code::success);
             },
             string_all,
+            std::forward<UsedPathSizeT>(used_path_size),
             std::forward<PathT>(path),
             std::forward<AdapterT>(adapter),
             std::forward<HandlerT>(handler)
@@ -190,8 +222,8 @@ struct generate_paths_t<KeyT,hana::when<
                     hana::is_a<all_tag,typename KeyT::aggregation_type::type>
         >>
 {
-    template <typename PathT, typename AdapterT, typename HandlerT>
-    status operator () (PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
+    template <typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
+    status operator () (UsedPathSizeT&& used_path_size, PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
     {
         return element_aggregation::invoke_variadic(
             [](status ret)
@@ -204,6 +236,7 @@ struct generate_paths_t<KeyT,hana::when<
                 return status(status::code::success);
             },
             string_all,
+            std::forward<UsedPathSizeT>(used_path_size),
             std::forward<PathT>(path),
             std::forward<AdapterT>(adapter),
             std::forward<HandlerT>(handler)

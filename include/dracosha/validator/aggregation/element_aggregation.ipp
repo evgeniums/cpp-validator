@@ -40,9 +40,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 //-------------------------------------------------------------
 
 template <typename PredicateT, typename EmptyFnT, typename AggregationT,
-          typename PathT, typename AdapterT, typename HandlerT>
+          typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
 status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, AggregationT&& aggr,
-                     PathT&& path, AdapterT&& adapter, HandlerT&& handler)
+                     UsedPathSizeT&& used_path_size, PathT&& path, AdapterT&& adapter, HandlerT&& handler)
 {
     // invoke only if parent path is ok
     const auto parent_path=hana::drop_back(path);
@@ -70,7 +70,7 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, Aggregati
                     bool empty=true;
                     for (auto it=_(parent_element).begin();it!=_(parent_element).end();++it)
                     {
-                        status ret=_(handler)(tmp_adapter,hana::append(_(parent_path),wrap_it(it,_(aggr),el_aggregation.modifier)));
+                        status ret=_(handler)(tmp_adapter,hana::append(_(parent_path),wrap_it(it,_(aggr),el_aggregation.modifier)),_(used_path_size));
                         if (!pred(ret))
                         {
                             aggregate_report<AdapterT>::close(_(adapter),ret);
@@ -96,7 +96,7 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, Aggregati
                                             pred,
                                             [&](auto&&, auto&& index)
                                             {
-                                                return _(handler)(tmp_adapter,hana::append(_(parent_path),wrap_heterogeneous_index(index,_(aggr))));
+                                                return _(handler)(tmp_adapter,hana::append(_(parent_path),wrap_heterogeneous_index(index,_(aggr))),_(used_path_size));
                                             }
                                         );
                             aggregate_report<AdapterT>::close(_(adapter),ret);
@@ -105,7 +105,7 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, Aggregati
                         [&](auto&& _)
                         {
                             // skip aggregation if not a container type
-                            return _(handler)(_(adapter),std::forward<decltype(path)>(path));
+                            return _(handler)(_(adapter),std::forward<decltype(path)>(path),hana::plus(_(used_path_size),hana::size_c<1>));
                         }
                     );
                 }
@@ -119,9 +119,9 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, Aggregati
 }
 
 template <typename PredicateT, typename EmptyFnT, typename AggregationT,
-          typename PathT, typename AdapterT, typename HandlerT>
+          typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
 status element_aggregation::invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, AggregationT&& aggr,
-                     PathT&& path, AdapterT&& adapter, HandlerT&& handler)
+                     UsedPathSizeT&& used_path_size, PathT&& path, AdapterT&& adapter, HandlerT&& handler)
 {
     auto compacted_path=compact_variadic_property(path);
     auto parent_compacted_path=hana::drop_back(compacted_path);
@@ -147,7 +147,7 @@ status element_aggregation::invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, 
                  aggregation_varg.next(parent,it)
                 )
             {
-                status ret=_(handler)(tmp_adapter,hana::append(upper_path,varg(wrap_index(it,_(aggr)))));
+                status ret=_(handler)(tmp_adapter,hana::append(upper_path,varg(wrap_index(it,_(aggr)))),_(used_path_size));
                 if (!pred(ret))
                 {
                     aggregate_report<AdapterT>::close(_(adapter),ret);
@@ -165,7 +165,6 @@ status element_aggregation::invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, 
         }
     );
 }
-
 
 template <typename ModifierT>
 template <typename OpT>

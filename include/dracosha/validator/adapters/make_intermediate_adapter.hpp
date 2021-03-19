@@ -29,8 +29,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct make_intermediate_adapter_impl
 {
-    template <typename AdapterT, typename PathT>
-    auto operator () (AdapterT&& adapter, PathT&& path) const
+    template <typename AdapterT, typename PathT, typename PathPrefixSizeT=std::decay_t<decltype(hana::size(std::declval<PathT>()))>>
+    auto operator () (AdapterT&& adapter, PathT&& path, PathPrefixSizeT path_prefix_length=PathPrefixSizeT{}) const
     {
         auto create=[&](auto&& current_traits)
         {
@@ -47,7 +47,6 @@ struct make_intermediate_adapter_impl
             )(std::forward<decltype(current_traits)>(current_traits));
 
             auto&& obj=embedded_object_member(adapter,path);
-            auto path_prefix_length=hana::size(path);
             return intermediate_adapter_traits<
                         std::decay_t<decltype(traits)>,
                         decltype(obj),
@@ -62,6 +61,38 @@ struct make_intermediate_adapter_impl
     }
 };
 constexpr make_intermediate_adapter_impl make_intermediate_adapter{};
+
+//-------------------------------------------------------------
+
+struct clone_intermediate_adapter_impl
+{
+    template <typename AdapterT, typename NewValueT, typename PathPrefixSizeT>
+    auto operator () (AdapterT&& adapter, NewValueT&& new_value, PathPrefixSizeT path_prefix_size) const
+    {
+        auto create=[&](auto&& current_traits)
+        {
+            auto&& traits=current_traits.wrapped();
+            return intermediate_adapter_traits<
+                        std::decay_t<decltype(traits)>,
+                        NewValueT,
+                        PathPrefixSizeT
+                    >{
+                        traits,
+                        std::forward<NewValueT>(new_value),
+                        path_prefix_size
+                     };
+        };
+        return adapter.clone(create);
+    }
+
+    template <typename AdapterT, typename NewValueT>
+    auto operator () (AdapterT&& adapter, NewValueT&& new_value) const
+    {
+        using path_prefix_length=typename std::decay_t<AdapterT>::type::path_prefix_length;
+        return (*this)(std::forward<AdapterT>(adapter),std::forward<NewValueT>(new_value),path_prefix_length{});
+    }
+};
+constexpr clone_intermediate_adapter_impl clone_intermediate_adapter{};
 
 //-------------------------------------------------------------
 

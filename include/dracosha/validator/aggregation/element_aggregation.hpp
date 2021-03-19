@@ -28,6 +28,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+struct tree_tag;
+
 struct element_aggregation_tag
 {
     template <typename T>
@@ -58,14 +60,14 @@ struct element_aggregation : public adjust_storable_ignore
     using hana_tag=element_aggregation_tag;
 
     template <typename PredicateT, typename EmptyFnT, typename AggregationT,
-              typename PathT, typename AdapterT, typename HandlerT>
+              typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
     static status invoke(PredicateT&& pred, EmptyFnT&& empt, AggregationT&& aggr,
-                         PathT&& path, AdapterT&& adapter, HandlerT&& handler);
+                         UsedPathSizeT&& used_path_size, PathT&& path, AdapterT&& adapter, HandlerT&& handler);
 
     template <typename PredicateT, typename EmptyFnT, typename AggregationT,
-              typename PathT, typename AdapterT, typename HandlerT>
+              typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
     static status invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, AggregationT&& aggr,
-                         PathT&& path, AdapterT&& adapter, HandlerT&& handler);
+                         UsedPathSizeT&& used_path_size, PathT&& path, AdapterT&& adapter, HandlerT&& handler);
 };
 
 template <typename ModifierT>
@@ -86,6 +88,8 @@ struct is_element_aggregation_t
             hana::bool_
             <
                 hana::is_a<element_aggregation_tag,type>
+                ||
+                hana::is_a<tree_tag,type>
                 ||
                 std::is_base_of<variadic_arg_aggregation_tag,std::decay_t<type>>::value
             >{}
@@ -130,6 +134,16 @@ constexpr iterators_t iterators{};
 constexpr const iterators_t& iterators_t::instance()
 {
     return iterators;
+}
+
+struct tree_modifier_t : public element_aggregation_modifier<tree_modifier_t>
+{
+    constexpr static const tree_modifier_t& instance();
+};
+constexpr tree_modifier_t tree_modifier{};
+constexpr const tree_modifier_t& tree_modifier_t::instance()
+{
+    return tree_modifier;
 }
 
 //-------------------------------------------------------------
