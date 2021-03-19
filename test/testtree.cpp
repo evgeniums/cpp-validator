@@ -209,4 +209,21 @@ BOOST_AUTO_TEST_CASE(CheckNestedTreeAny)
     BOOST_CHECK_EQUAL(rep,std::string("name of at least one tree node of field1 must be greater than or equal to Node"));
 }
 
+BOOST_AUTO_TEST_CASE(CheckInvalidPath)
+{
+    auto v0=validator(
+            _["field1"][name](gte,"Node")
+         );
+
+    auto v1=validator(
+            _["field1"][tree(ANY,child,child_count)][name](gte,"Node")
+         );
+
+    auto s1=std::string("hello");
+
+    // ignore invalid paths
+    BOOST_CHECK(v0.apply(s1));
+    BOOST_CHECK(v1.apply(s1));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

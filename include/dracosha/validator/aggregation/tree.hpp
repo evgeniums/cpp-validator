@@ -21,10 +21,10 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/adjust_storable_ignore.hpp>
-#include <dracosha/validator/filter_member.hpp>
 #include <dracosha/validator/get_member.hpp>
-#include <dracosha/validator/utils/enable_to_string.hpp>
-#include <dracosha/validator/aggregation/element_aggregation.hpp>
+#include <dracosha/validator/variadic_arg.hpp>
+#include <dracosha/validator/adapters/make_intermediate_adapter.hpp>
+#include <dracosha/validator/aggregation/aggregation.ipp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -122,39 +122,58 @@ struct generate_paths_t<KeyT,hana::when<hana::is_a<tree_tag,KeyT>>>
     {
         auto upper_path=hana::drop_back(path);
         auto&& tree_key=hana::back(path);
-        auto pred=hana::partial(tree_key.aggregation.predicate(),adapter);
 
-        const auto& reporting_path=path;
+        auto possible_path=hana::concat(upper_path,hana::make_tuple(tree_key.property,varg(0)));
 
-        // handle top node
-        auto tmp_adapter=make_intermediate_adapter(adapter,upper_path,used_path_size);
-        auto&& begin_node=embedded_object_member(tmp_adapter,upper_path);
-        auto next_adapter=clone_intermediate_adapter(tmp_adapter,begin_node,hana::size(reporting_path));
-        status ret=handler(next_adapter,reporting_path,used_path_size);
-        if (!pred(ret))
-        {
-            return ret;
-        }
+        return hana::if_(
+            is_embedded_object_path_valid(adapter,possible_path),
+            [](auto&& used_path_size, auto&& path, auto&& adapter, auto&& handler,
+               auto&& upper_path, auto&& tree_key)
+            {
+                auto pred=hana::partial(tree_key.aggregation.predicate(),adapter);
 
-        // iterate over children nodes
-        aggregate_report<AdapterT>::open(next_adapter,tree_key.aggregation.string(),upper_path);
-        auto aggregation_varg=varg(tree_key.aggregation,tree_key.max_arg);
-        auto result=each_tree_node(
-                        tree_key,
-                        next_adapter,
-                        pred,
-                        handler,
-                        used_path_size,
-                        reporting_path,
-                        begin_node,
-                        aggregation_varg.get()
-                    );
-        if (result==status::code::ignore)
-        {
-            result=ret;
-        }
-        aggregate_report<AdapterT>::close(adapter,result);
-        return result;
+                // handle top node
+                auto tmp_adapter=make_intermediate_adapter(adapter,upper_path,used_path_size);
+                auto&& begin_node=embedded_object_member(tmp_adapter,upper_path);
+                auto next_adapter=clone_intermediate_adapter(tmp_adapter,begin_node,hana::size(path));
+                status ret=handler(next_adapter,path,used_path_size);
+                if (!pred(ret))
+                {
+                    return ret;
+                }
+
+                // iterate over children nodes
+                aggregate_report<AdapterT>::open(next_adapter,tree_key.aggregation.string(),upper_path);
+                auto aggregation_varg=varg(tree_key.aggregation,tree_key.max_arg);
+                auto result=each_tree_node(
+                                tree_key,
+                                next_adapter,
+                                pred,
+                                handler,
+                                used_path_size,
+                                path,
+                                begin_node,
+                                aggregation_varg.get()
+                            );
+                if (result==status::code::ignore)
+                {
+                    result=ret;
+                }
+                aggregate_report<AdapterT>::close(adapter,result);
+                return result;
+            },
+            [](auto&& ...)
+            {
+                return status{status::code::ignore};
+            }
+        )(
+            std::forward<UsedPathSizeT>(used_path_size),
+            std::forward<PathT>(path),
+            std::forward<AdapterT>(adapter),
+            std::forward<HandlerT>(handler),
+            upper_path,
+            tree_key
+         );
     }
 };
 
