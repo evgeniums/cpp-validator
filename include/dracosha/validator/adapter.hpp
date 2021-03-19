@@ -111,8 +111,6 @@ class adapter : public check_member_exists_traits_proxy<adapter<TraitsT>>
         adapter& operator = (adapter&& other) = default;
         adapter& operator = (const adapter& other) = default;
 
-        //! @todo Move traits to private section, implement wrapping methods.
-
         /**
          * @brief Get traits.
          * @return Reference to traits.

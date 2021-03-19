@@ -43,10 +43,6 @@ struct apply_generated_paths_t
 {
     template <typename UsedPathSizeT, typename PathT, typename AdapterT, typename MemberT, typename HandlerT>
     status operator () (UsedPathSizeT&& used_path_size, PathT&& current_path, AdapterT&&, MemberT&& member, HandlerT&& handler) const;
-
-    //! @todo Remove gen().
-    template <typename PathT, typename AdapterT, typename HandlerT>
-    static status gen(PathT&& path, AdapterT&&, HandlerT&& handler);
 };
 constexpr apply_generated_paths_t apply_generated_paths{};
 
