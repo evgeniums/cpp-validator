@@ -192,60 +192,6 @@ struct all_t : public element_aggregation_with_modifier<ModifierT>,
     }
 };
 
-template <typename KeyT>
-struct generate_paths_t<KeyT,hana::when<std::is_base_of<all_aggregation_t,std::decay_t<KeyT>>::value>>
-{
-    template <typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
-    status operator () (UsedPathSizeT&& used_path_size, PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
-    {
-        return element_aggregation::invoke(
-            [](status ret)
-            {
-                return ret==true;
-            },
-            [](bool empty)
-            {
-                std::ignore=empty;
-                return status(status::code::success);
-            },
-            string_all,
-            std::forward<UsedPathSizeT>(used_path_size),
-            std::forward<PathT>(path),
-            std::forward<AdapterT>(adapter),
-            std::forward<HandlerT>(handler)
-        );
-    }
-};
-
-template <typename KeyT>
-struct generate_paths_t<KeyT,hana::when<
-                    std::is_base_of<variadic_arg_aggregation_tag,KeyT>::value
-                    &&
-                    hana::is_a<all_tag,typename KeyT::aggregation_type::type>
-        >>
-{
-    template <typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
-    status operator () (UsedPathSizeT&& used_path_size, PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
-    {
-        return element_aggregation::invoke_variadic(
-            [](status ret)
-            {
-                return ret==true;
-            },
-            [](bool empty)
-            {
-                std::ignore=empty;
-                return status(status::code::success);
-            },
-            string_all,
-            std::forward<UsedPathSizeT>(used_path_size),
-            std::forward<PathT>(path),
-            std::forward<AdapterT>(adapter),
-            std::forward<HandlerT>(handler)
-        );
-    }
-};
-
 /**
   @brief Aggregation operator ALL that requires for all container elements to satisfy a condition.
 */
