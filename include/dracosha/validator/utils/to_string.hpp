@@ -73,6 +73,7 @@ struct to_string_impl<T,hana::when<hana::is_a<property_tag,T>>>
     }
 };
 
+struct tree_tag;
 /**
  *  @brief Convert to string if argument is an iterator.
  */
@@ -81,6 +82,8 @@ struct to_string_impl<T,hana::when<
             hana::is_a<wrap_iterator_tag,T>
             ||
             hana::is_a<wrap_index_tag,T>
+            ||
+            hana::is_a<tree_tag,T>
         >>
 {
     std::string operator () (const T& id) const

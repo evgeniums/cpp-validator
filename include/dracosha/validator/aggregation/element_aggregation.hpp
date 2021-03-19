@@ -136,16 +136,6 @@ constexpr const iterators_t& iterators_t::instance()
     return iterators;
 }
 
-struct tree_modifier_t : public element_aggregation_modifier<tree_modifier_t>
-{
-    constexpr static const tree_modifier_t& instance();
-};
-constexpr tree_modifier_t tree_modifier{};
-constexpr const tree_modifier_t& tree_modifier_t::instance()
-{
-    return tree_modifier;
-}
-
 //-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

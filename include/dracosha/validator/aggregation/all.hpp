@@ -33,6 +33,8 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+struct tree_base;
+
 template <typename ModifierT>
 struct any_t;
 
@@ -105,7 +107,7 @@ struct string_all_t : public aggregate_op<string_all_t>,
     {
         return key_description;
     }
-    std::string operator() (const tree_modifier_t&) const
+    std::string operator() (const tree_base&) const
     {
         return tree_description;
     }

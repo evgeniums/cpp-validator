@@ -30,16 +30,23 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+struct tree_base{};
 struct tree_tag;
 
 template <typename AggregationT, typename PropertyT, typename MaxArgT>
-struct tree_t : public adjust_storable_ignore
+struct tree_t : public adjust_storable_ignore,
+                public tree_base
 {
     using hana_tag=tree_tag;
 
     AggregationT aggregation;
     PropertyT property;
     MaxArgT max_arg;
+
+    std::string name() const
+    {
+        return aggregation.string()(*this);
+    }
 
     template <typename AggregationT1, typename PropertyT1, typename MaxArgT1>
     tree_t(AggregationT1&& aggr, PropertyT1&& prop, MaxArgT1&& mx_arg)
@@ -117,7 +124,7 @@ struct generate_paths_t<KeyT,hana::when<hana::is_a<tree_tag,KeyT>>>
         auto&& tree_key=hana::back(path);
         auto pred=hana::partial(tree_key.aggregation.predicate(),adapter);
 
-        auto reporting_path=hana::append(upper_path,varg(wrap_it(0,tree_key.aggregation.string(),tree_modifier)));
+        const auto& reporting_path=path;
 
         // handle top node
         auto tmp_adapter=make_intermediate_adapter(adapter,upper_path,used_path_size);
