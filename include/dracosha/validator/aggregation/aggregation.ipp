@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/aggregation/aggregation.hpp>
 #include <dracosha/validator/member.hpp>
+#include <dracosha/validator/make_member.hpp>
 #include <dracosha/validator/extract.hpp>
 #include <dracosha/validator/get_member.hpp>
 #include <dracosha/validator/reporting/reporting_adapter_impl.hpp>

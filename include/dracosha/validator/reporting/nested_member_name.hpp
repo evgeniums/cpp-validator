@@ -27,6 +27,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/reporting/single_member_name.hpp>
 #include <dracosha/validator/reporting/backend_formatter.hpp>
 #include <dracosha/validator/variadic_property.hpp>
+#include <dracosha/validator/member_with_name.hpp>
+#include <dracosha/validator/member_with_name_list.hpp>
+#include <dracosha/validator/make_member.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

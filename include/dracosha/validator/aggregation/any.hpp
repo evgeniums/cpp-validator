@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/make_validator.hpp>
 #include <dracosha/validator/aggregation/and.hpp>
 #include <dracosha/validator/prevalidation/strict_any.hpp>
+#include <dracosha/validator/properties/value.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

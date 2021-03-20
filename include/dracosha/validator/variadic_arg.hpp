@@ -29,16 +29,12 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-struct variadic_arg_tag{};
-
 template <typename T>
 struct variadic_arg : public object_wrapper<T>,
                       public variadic_arg_tag
 {
     using object_wrapper<T>::object_wrapper;
 };
-
-struct variadic_arg_aggregation_tag{};
 
 template <typename AggregationT, typename MaxArgT>
 struct variadic_arg_aggregation_impl

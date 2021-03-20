@@ -22,7 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/adjust_storable_ignore.hpp>
 #include <dracosha/validator/aggregation/aggregation.hpp>
-#include <dracosha/validator/variadic_arg.hpp>
+#include <dracosha/validator/filter_member.hpp>
+#include <dracosha/validator/variadic_arg_tag.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 

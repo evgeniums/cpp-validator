@@ -51,6 +51,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/filter_member.ipp>
 #include <dracosha/validator/aggregation/aggregation.ipp>
 #include <dracosha/validator/aggregation/element_aggregation.ipp>
+#include <dracosha/validator/member_with_name.hpp>
+#include <dracosha/validator/member_with_name_list.hpp>
+#include <dracosha/validator/make_member.hpp>
+#include <dracosha/validator/detail/member_helper.ipp>
+#include <dracosha/validator/prepend_super_member.ipp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
