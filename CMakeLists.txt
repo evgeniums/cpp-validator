@@ -33,6 +33,7 @@ SET (HEADERS
     include/dracosha/validator/utils/copy.hpp
     include/dracosha/validator/utils/heterogeneous_size.hpp
     include/dracosha/validator/utils/foreach_if.hpp
+    include/dracosha/validator/utils/pointer_as_reference.hpp
 
     include/dracosha/validator/adapter.hpp
     include/dracosha/validator/property.hpp

@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/detail/get_impl.hpp>
 #include <dracosha/validator/utils/unwrap_object.hpp>
+#include <dracosha/validator/utils/pointer_as_reference.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -37,11 +38,12 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename Tv, typename Tk>
 auto get(Tv&& v, Tk&& k) -> decltype(auto)
 {
-    return detail::get_impl<decltype(v),decltype(unwrap_object(std::forward<Tk>(k)))>
-            (
-                std::forward<decltype(v)>(v),
+    return detail::get_impl<decltype(as_reference(std::forward<Tv>(v))),decltype(unwrap_object(std::forward<Tk>(k)))>
+             (
+                as_reference(std::forward<Tv>(v)),
                 unwrap_object(std::forward<Tk>(k))
-             );
+             )
+          ;
 }
 
 DRACOSHA_VALIDATOR_NAMESPACE_END

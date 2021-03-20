@@ -98,10 +98,14 @@ struct check_member_t<T1,T2,hana::when<can_check_contains_t<T1, T2>::value
     using type=std::decay_t<decltype(std::declval<T1>().find(std::declval<T2>()))>;
 };
 
+template <typename T1, typename T2>
+struct check_member_impl : public check_member_t<decltype(as_reference(std::declval<T1>())),T2>
+{};
+
 /**
   Instance to be used as check_member() callable.
 */
-constexpr hana::metafunction_t<check_member_t> check_member{};
+constexpr hana::metafunction_t<check_member_impl> check_member{};
 
 //-------------------------------------------------------------
 

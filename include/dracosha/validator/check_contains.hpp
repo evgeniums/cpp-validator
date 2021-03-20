@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/can_check_contains.hpp>
 #include <dracosha/validator/utils/safe_compare.hpp>
 #include <dracosha/validator/utils/unwrap_object.hpp>
+#include <dracosha/validator/utils/pointer_as_reference.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
@@ -115,10 +116,35 @@ struct check_contains_t
         return false;
     }
 };
+constexpr check_contains_t check_contains_inst{};
+
+struct check_contains_impl
+{
+    template <typename T1, typename T2>
+    constexpr bool operator () (T1&& a, T2&& b) const
+    {
+        return hana::if_(
+            is_pointer(a),
+            [](auto&& a, auto&& b)
+            {
+                if (!a)
+                {
+                    return false;
+                }
+                return check_contains_inst(as_reference(std::forward<decltype(a)>(a)),std::forward<decltype(b)>(b));
+            },
+            [](auto&& a, auto&& b)
+            {
+                return check_contains_inst(std::forward<decltype(a)>(a),std::forward<decltype(b)>(b));
+            }
+        )(std::forward<T1>(a),std::forward<T2>(b));
+    }
+};
+
 /**
   Instance to be used as check_contains() callable.
 */
-constexpr check_contains_t check_contains{};
+constexpr check_contains_impl check_contains{};
 
 //-------------------------------------------------------------
 

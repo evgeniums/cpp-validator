@@ -92,7 +92,7 @@ template <typename Tobj, typename Tpath>
 bool check_exists(Tobj&& object, Tpath&& path)
 {
     auto&& obj=unwrap_object(object);
-    return hana::if_(
+    auto ret=hana::if_(
          hana_tuple_empty<Tpath>{},
          [](auto&&, auto&&)
          {
@@ -125,16 +125,16 @@ bool check_exists(Tobj&& object, Tpath&& path)
                     };
 
                     // optional references must be wrapped with cref()
-                    using value_type=decltype(get_member(obj,path));
+                    using value_type=decltype(get_member_inst(obj,path));
                     return hana::eval_if(
                         std::is_lvalue_reference<value_type>{},
                         [&](auto&& _)
                         {
-                            return _(handler)(optional<decltype(cref(get_member(_(obj),_(path))))>{});
+                            return _(handler)(optional<decltype(cref(get_member_inst(_(obj),_(path))))>{});
                         },
                         [&](auto&& _)
                         {
-                            return _(handler)(optional<decltype(get_member(_(obj),_(path)))>{});
+                            return _(handler)(optional<decltype(get_member_inst(_(obj),_(path)))>{});
                         }
                     );
                 },
@@ -144,7 +144,26 @@ bool check_exists(Tobj&& object, Tpath&& path)
                 }
             )(std::forward<decltype(obj)>(obj),std::forward<decltype(path)>(path));
          }
-    )(obj,std::forward<decltype(path)>(path)).has_value();
+    )(obj,std::forward<decltype(path)>(path));
+
+    // if not exists then return false
+    if (!ret.has_value())
+    {
+        return false;
+    }
+
+    // if exists then check if it is a nullptr
+    return hana::eval_if(
+        is_pointer(extract_ref(ret.value())),
+        [&](auto&& _)
+        {
+            return static_cast<bool>(extract_ref(_(ret).value()));
+        },
+        [](auto&&)
+        {
+            return true;
+        }
+    );
 }
 
 //-------------------------------------------------------------

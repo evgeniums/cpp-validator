@@ -33,6 +33,7 @@ SET (VALIDATOR_TEST_SOURCES
     ${VALIDATOR_TEST_SRC}/testheterogeneouscontainers.cpp
     ${VALIDATOR_TEST_SRC}/testvaluetransformer.cpp
     ${VALIDATOR_TEST_SRC}/testtree.cpp
+    ${VALIDATOR_TEST_SRC}/testpointers.cpp
 )
 
 TARGET_SOURCES(${PROJECT_NAME} PUBLIC ${VALIDATOR_TEST_SOURCES})
