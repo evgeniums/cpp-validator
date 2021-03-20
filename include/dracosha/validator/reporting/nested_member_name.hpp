@@ -262,25 +262,43 @@ auto list_member_names(const T& id, const TraitsT& traits, grammar_categories gr
 template <typename T, typename TraitsT>
 auto join_member_names(T&& id, const TraitsT& traits, grammar_categories grammar_cats)
 {
+    // extract member path if member has explicit names
     auto&& member=hana::if_(
-        typename std::decay_t<T>::is_with_varg{},
-        [](auto&& id)
-        {
-            return inherit_member(compact_variadic_property(id.path()),id);
-        },
-        [](auto&& id) -> decltype(auto)
-        {
-            return hana::id(std::forward<decltype(id)>(id));
-        }
-    )(std::forward<T>(id));
+                std::is_base_of<member_with_name_list_tag,std::decay_t<T>>{},
+                [](auto&& id)
+                {
+                    // make pseudo member with preset names in path
+                    return make_member(id.name());
+                },
+                [](auto&& id) -> decltype(auto)
+                {
+                    // compact member path if variadic property
+                    return hana::if_(
+                        typename std::decay_t<decltype(id)>::is_with_varg{},
+                        [](auto&& id)
+                        {
+                            return inherit_member(compact_variadic_property(id.path()),id);
+                        },
+                        [](auto&& id) -> decltype(auto)
+                        {
+                            return hana::id(std::forward<decltype(id)>(id));
+                        }
+                    )(std::forward<decltype(id)>(id));
+                }
+            )(std::forward<T>(id));
 
+    // list name parts
     auto parts=list_member_names(member,traits,grammar_cats);
+
+    // join parts
     std::string dst;
     backend_formatter.append_join(
        dst,
        "",
        parts
     );
+
+    // return result with grammar categories
     if (!TraitsT::is_reverse_member_names_order)
     {
         return concrete_phrase(dst,last_grammar_categories(parts,grammar_cats));
@@ -307,7 +325,10 @@ struct nested_member_name_t
  */
 template <typename T, typename TraitsT>
 struct nested_member_name_t<T,TraitsT,
-            hana::when<T::has_name
+            hana::when<
+                        std::is_base_of<member_with_name_tag,T>::value
+                        &&
+                        !std::is_base_of<member_with_name_list_tag,T>::value
                         &&
                         !std::is_same<decltype(std::declval<T>().name()),concrete_phrase>::value
                      >
@@ -324,7 +345,8 @@ struct nested_member_name_t<T,TraitsT,
  */
 template <typename T, typename TraitsT>
 struct nested_member_name_t<T,TraitsT,
-            hana::when<T::has_name
+            hana::when<
+                std::is_base_of<member_with_name_tag,T>::value
                 &&
                 std::is_same<decltype(std::declval<T>().name()),concrete_phrase>::value
             >

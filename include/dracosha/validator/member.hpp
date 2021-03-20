@@ -484,9 +484,13 @@ class member
 
         template <typename MemberT, typename T1>
         friend auto make_member_with_name(MemberT&& member, T1&& name);
+
+        template <typename MemberT, typename T1>
+        friend auto make_member_with_name_list(MemberT&& member, T1&& name);
 };
 
 struct member_with_name_tag{};
+struct member_with_name_list_tag{};
 
 /**
  * @brief Member with excplicit name.
@@ -551,6 +555,13 @@ struct member_with_name : public member<T2,ParentPathT...>,
     T1 _name;
 };
 
+template <typename T1, typename T2, typename ...ParentPathT>
+struct member_with_name_list : public member_with_name<T1,T2,ParentPathT...>,
+                               public member_with_name_list_tag
+{
+    using member_with_name<T1,T2,ParentPathT...>::member_with_name;
+};
+
 /**
  * @brief Create a member with name from basic member.
  * @param member Basic member.
@@ -561,6 +572,12 @@ template <typename MemberT, typename T>
 auto make_member_with_name(MemberT&& member, T&& name)
 {
     return member.template create_derived<member_with_name>(std::forward<T>(name),std::move(member._path));
+}
+
+template <typename MemberT, typename T>
+auto make_member_with_name_list(MemberT&& member, T&& name_list)
+{
+    return member.template create_derived<member_with_name_list>(std::forward<T>(name_list),std::move(member._path));
 }
 
 /**
@@ -617,11 +634,75 @@ auto inherit_member(Ts&& path, T&& member)
     );
 };
 
+template <typename T, typename = hana::when<true>>
+struct member_name_list_t
+{
+    template <typename T1>
+    auto operator() (T1&& v) const
+    {
+        return v.path();
+    }
+};
+template <typename T>
+struct member_name_list_t<T,
+                hana::when<std::is_base_of<member_with_name_list_tag,std::decay_t<T>>::value>
+            >
+{
+    template <typename T1>
+    auto operator() (T1&& v) const
+    {
+        return v.name();
+    }
+};
+template <typename T>
+struct member_name_list_t<T,
+                hana::when<
+                    std::is_base_of<member_with_name_tag,std::decay_t<T>>::value
+                    &&
+                    !std::is_base_of<member_with_name_list_tag,std::decay_t<T>>::value
+                >
+            >
+{
+    template <typename T1>
+    auto operator() (T1&& v) const
+    {
+        return hana::make_tuple(v.name());
+    }
+};
+template <typename T>
+constexpr member_name_list_t<T> member_name_list_inst{};
+
+struct member_name_list_impl
+{
+    template <typename T>
+    auto operator() (T&& v) const
+    {
+        return member_name_list_inst<T>(std::forward<T>(v));
+    }
+};
+constexpr member_name_list_impl member_name_list{};
+
 template <typename SuperMemberT, typename MemberT>
 auto prepend_super_member(SuperMemberT&& super, MemberT&& member)
 {
     auto new_path=hana::concat(super.path(),member.path());
-    return inherit_member(std::move(new_path),member);
+
+    return hana::eval_if(
+        hana::or_(
+            std::is_base_of<member_with_name_tag,std::decay_t<SuperMemberT>>{},
+            std::is_base_of<member_with_name_tag,std::decay_t<MemberT>>{}
+        ),
+        [&](auto&& _)
+        {
+            return make_member_with_name_list(make_member(_(new_path)),
+                                              hana::concat(member_name_list(_(super)),member_name_list(_(member)))
+                                              );
+        },
+        [&](auto&& _)
+        {
+            return make_member(_(new_path));
+        }
+    );
 }
 
 namespace detail

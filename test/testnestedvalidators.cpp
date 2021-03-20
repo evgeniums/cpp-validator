@@ -116,8 +116,7 @@ BOOST_AUTO_TEST_CASE(TestMemberWithReport)
     BOOST_CHECK_EQUAL(rep,std::string("level2 of level1 must not exist"));
     rep.clear();
 
-    //! @todo Fix custom member names in reports with nested validators
-#if 0
+    // custom member names in reports with nested validators
     auto v5=validator(
         _["level2"]("name2")(exists,false)
     );
@@ -127,7 +126,26 @@ BOOST_AUTO_TEST_CASE(TestMemberWithReport)
     BOOST_CHECK(!v6.apply(a1));
     BOOST_CHECK_EQUAL(rep,std::string("name2 of name1 must not exist"));
     rep.clear();
-#endif
+
+    auto v7=validator(
+        _["level2"](exists,false)
+    );
+    auto v8=validator(
+        _["level1"]("name1")(v7)
+    );
+    BOOST_CHECK(!v8.apply(a1));
+    BOOST_CHECK_EQUAL(rep,std::string("level2 of name1 must not exist"));
+    rep.clear();
+
+    auto v9=validator(
+        _["level2"]("name2")(exists,false)
+    );
+    auto v10=validator(
+        _["level1"](v9)
+    );
+    BOOST_CHECK(!v10.apply(a1));
+    BOOST_CHECK_EQUAL(rep,std::string("name2 of level1 must not exist"));
+    rep.clear();
 }
 
 BOOST_AUTO_TEST_CASE(TestAggregationWithReport)
