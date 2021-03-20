@@ -90,7 +90,7 @@ struct string_all_t : public aggregate_op<string_all_t>,
     {
         return key_description;
     }
-    constexpr static const char* tree_decription_str()
+    constexpr static const char* tree_description_str()
     {
         return tree_description;
     }

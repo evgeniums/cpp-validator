@@ -138,6 +138,10 @@ inline const phrase_translator& validator_translator_ru()
                             {"каждый ключ"},
                             {"каждого ключа",grammar_ru::roditelny_padezh}
                       }; // "each iterator"
+        m[string_all.tree_description_str()]={
+                            {"каждый узел дерева"},
+                            {"каждого узла дерева",grammar_ru::roditelny_padezh}
+                      }; // "each tree node"
         m[string_all.name_str()]={
                             {"ВСЕ"}
                       }; // "ALL"
@@ -160,6 +164,10 @@ inline const phrase_translator& validator_translator_ru()
                             {"хотя бы один ключ"},
                             {"хотя бы одного ключа",grammar_ru::roditelny_padezh}
                       }; // "at least one key"
+        m[string_any.tree_description_str()]={
+                            {"хотя бы один узел дерева"},
+                            {"хотя бы одного узла дерева",grammar_ru::roditelny_padezh}
+                      }; // "at least one tree node"
         m[string_any.name_str()]={
                             {"ЛЮБОЙ"}
                       }; // "ANY"

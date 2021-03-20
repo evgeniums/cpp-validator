@@ -294,15 +294,17 @@ BOOST_AUTO_TEST_CASE(CheckSampleLocale)
     BOOST_CHECK_EQUAL(m(string_conjunction_of).text(),std::string(string_conjunction_of));
     BOOST_CHECK_EQUAL(m(string_member_name_conjunction).text(),std::string(string_member_name_conjunction));
     BOOST_CHECK_EQUAL(m(string_element).text(),std::string(string_element));
-    BOOST_CHECK_EQUAL(m(string_any).text(),std::string(string_any));
     BOOST_CHECK_EQUAL(m(string_all).text(),std::string(string_all));
     BOOST_CHECK_EQUAL(m(string_all.iterator_description_str()).text(),std::string(string_all.iterator_description_str()));
     BOOST_CHECK_EQUAL(m(string_all.base_phrase_str()).text(),std::string(string_all.base_phrase_str()));
     BOOST_CHECK_EQUAL(m(string_all.key_description_str()).text(),std::string(string_all.key_description_str()));
+    BOOST_CHECK_EQUAL(m(string_all.tree_description_str()).text(),std::string(string_all.tree_description_str()));
     BOOST_CHECK_EQUAL(m(string_all.name_str()).text(),std::string(string_all.name_str()));
+    BOOST_CHECK_EQUAL(m(string_any).text(),std::string(string_any));
     BOOST_CHECK_EQUAL(m(string_any.iterator_description_str()).text(),std::string(string_any.iterator_description_str()));
     BOOST_CHECK_EQUAL(m(string_any.base_phrase_str()).text(),std::string(string_any.base_phrase_str()));
     BOOST_CHECK_EQUAL(m(string_any.key_description_str()).text(),std::string(string_any.key_description_str()));
+    BOOST_CHECK_EQUAL(m(string_any.tree_description_str()).text(),std::string(string_any.tree_description_str()));
     BOOST_CHECK_EQUAL(m(string_any.name_str()).text(),std::string(string_any.name_str()));
 
     // flag descriptions
