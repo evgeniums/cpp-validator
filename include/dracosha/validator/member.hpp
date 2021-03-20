@@ -494,8 +494,6 @@ struct member_with_name_list_tag{};
 
 /**
  * @brief Member with excplicit name.
- *
- * @todo Fix named members with nested validators.
  */
 template <typename T1, typename T2, typename ...ParentPathT>
 struct member_with_name : public member<T2,ParentPathT...>,

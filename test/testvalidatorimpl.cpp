@@ -903,8 +903,3 @@ BOOST_AUTO_TEST_CASE(CheckMixedMemberAndOr)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
-//! @todo Split member.hpp file to a few separate files.
-//! @todo Refactor formatting of variadic properties with taking into account preceeding grammar categories.
-//! @todo Check prevalidation with variadic properties, heterogeneous containers and trees.
-//! @todo Implement filtering with predicate in element aggregation.

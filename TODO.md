@@ -1,0 +1,4 @@
+- Split member.hpp file to a few separate files.
+- Refactor formatting of variadic properties with taking into account preceding grammar categories.
+- Check prevalidation with variadic properties, heterogeneous containers and trees.
+- Implement filtering with predicates in element aggregation.
