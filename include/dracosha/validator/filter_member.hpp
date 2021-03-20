@@ -23,113 +23,12 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/filter_path.hpp>
 #include <dracosha/validator/embedded_object.hpp>
 #include <dracosha/validator/status.hpp>
+#include <dracosha/validator/generate_paths.hpp>
+#include <dracosha/validator/apply_generated_paths.hpp>
+#include <dracosha/validator/apply_member_path.hpp>
+#include <dracosha/validator/invoke_member_if_exists.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
-
-//-------------------------------------------------------------
-
-template <typename KeyT, typename Enable=hana::when<true>>
-struct generate_paths_t
-{
-    template <typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
-    status operator () (UsedPathSizeT&& used_path_size, PathT&& path, AdapterT&&, HandlerT&& handler) const;
-};
-template <typename KeyT>
-constexpr generate_paths_t<KeyT> generate_paths{};
-
-//-------------------------------------------------------------
-
-struct apply_generated_paths_t
-{
-    template <typename UsedPathSizeT, typename PathT, typename AdapterT, typename MemberT, typename HandlerT>
-    status operator () (UsedPathSizeT&& used_path_size, PathT&& current_path, AdapterT&&, MemberT&& member, HandlerT&& handler) const;
-};
-constexpr apply_generated_paths_t apply_generated_paths{};
-
-//-------------------------------------------------------------
-
-struct apply_member_path_t
-{
-    template <typename UsedPathSizeT, typename PathT, typename FnT, typename AdapterT, typename MemberT>
-    status operator () (UsedPathSizeT&& used_path_size, PathT&& current_path, FnT&& fn, AdapterT&& adapter, MemberT&& member) const;
-};
-constexpr apply_member_path_t apply_member_path{};
-
-//-------------------------------------------------------------
-
-struct invoke_member_if_exists_impl
-{
-    template <typename FnT, typename AdapterT, typename MemberT>
-    status operator () (FnT&& fn, AdapterT&& adapter, MemberT&& member) const
-    {
-        auto invoke=[](auto&& fn, auto&& adapter, auto&& member)
-        {
-            return fn(std::forward<decltype(adapter)>(adapter),std::forward<decltype(member)>(member));
-        };
-
-        using type=typename std::decay_t<AdapterT>::type;
-        return hana::eval_if(
-            hana::and_(
-                typename type::filter_if_not_exists{},
-                hana::not_(intermediate_ignore_check_exist(adapter,member))
-            ),
-            [&](auto&& _)
-            {
-                if (std::decay_t<FnT>::with_check_exists::value)
-                {
-                    auto ret=traits_of(adapter).validate_exists(
-                                        _(adapter),
-                                        _(member),
-                                        _(fn).exists_operator,
-                                        _(fn).check_exists_operand
-                                    );
-                    if (!ret)
-                    {
-                        return ret;
-                    }
-                }
-                else
-                {
-                    if (!embedded_object_has_member(_(adapter),_(member)))
-                    {
-                        auto not_found_status=traits_of(_(adapter)).not_found_status();
-                        if (not_found_status.value()==status::code::fail)
-                        {
-                            // some adapters need to know that member is not found
-                            // for example, reporting adapter need it to construct corresponding report
-                            traits_of(adapter).validate_exists(
-                                                _(adapter),
-                                                _(member),
-                                                _(fn).exists_operator,
-                                                true,
-                                                false,
-                                                true
-                                            );
-                        }
-                        return not_found_status;
-                    }
-                }
-
-                return hana::eval_if(
-                    is_embedded_object_path_valid(_(adapter),_(member).path()),
-                    [&](auto&& _)
-                    {
-                        return status(_(invoke(_(fn),_(adapter),_(member))));
-                    },
-                    [&](auto&&)
-                    {
-                        return status(status::code::ignore);
-                    }
-                );
-            },
-            [&](auto&& _)
-            {
-                return status(_(invoke(_(fn),_(adapter),_(member))));
-            }
-        );
-    }
-};
-constexpr invoke_member_if_exists_impl invoke_member_if_exists{};
 
 //-------------------------------------------------------------
 

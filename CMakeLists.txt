@@ -77,6 +77,14 @@ SET (HEADERS
     include/dracosha/validator/prepend_super_member.hpp
     include/dracosha/validator/prepend_super_member.ipp
     include/dracosha/validator/variadic_arg_tag.hpp
+    include/dracosha/validator/generate_paths.hpp
+    include/dracosha/validator/apply_generated_paths.hpp
+    include/dracosha/validator/apply_member_path.hpp
+    include/dracosha/validator/apply_generated_paths.ipp
+    include/dracosha/validator/apply_member_path.ipp
+    include/dracosha/validator/invoke_member_if_exists.hpp
+    include/dracosha/validator/filter_member.hpp
+    include/dracosha/validator/filter_path.hpp
 
     include/dracosha/validator/aggregation/and.hpp
     include/dracosha/validator/aggregation/or.hpp
@@ -190,10 +198,6 @@ SET (HEADERS
     include/dracosha/validator/detail/hint_helper.hpp
     include/dracosha/validator/detail/member_helper.hpp
     include/dracosha/validator/detail/member_helper.ipp
-
-    include/dracosha/validator/filter_member.hpp
-    include/dracosha/validator/filter_member.ipp
-    include/dracosha/validator/filter_path.hpp
 )
 
 ADD_CUSTOM_TARGET(headers SOURCES ${HEADERS})

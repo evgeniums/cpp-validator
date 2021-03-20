@@ -8,54 +8,26 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** @file validator/filer_member.ipp
+/** @file validator/apply_member_path.ipp
 *
-*  Defines "filter_member".
+*  Defines "apply_member_path".
 *
 */
 
 /****************************************************************************/
 
-#ifndef DRACOSHA_VALIDATOR_FILTER_MEMBER_IPP
-#define DRACOSHA_VALIDATOR_FILTER_MEMBER_IPP
+#ifndef DRACOSHA_VALIDATOR_APPLY_MEMBER_PATH_IPP
+#define DRACOSHA_VALIDATOR_APPLY_MEMBER_PATH_IPP
 
 #include <dracosha/validator/config.hpp>
 
+#include <dracosha/validator/apply_member_path.hpp>
 #include <dracosha/validator/utils/hana_to_std_tuple.hpp>
 #include <dracosha/validator/filter_member.hpp>
 #include <dracosha/validator/member.hpp>
 #include <dracosha/validator/utils/wrap_object.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
-
-template <typename KeyT, typename Enable>
-template <typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
-status generate_paths_t<KeyT,Enable>::operator() (UsedPathSizeT&&, PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
-{
-    return handler(std::forward<AdapterT>(adapter),std::forward<PathT>(path),hana::size(path));
-}
-
-template <typename UsedPathSizeT, typename PathT, typename AdapterT, typename MemberT, typename HandlerT>
-status apply_generated_paths_t::operator () (UsedPathSizeT&& used_path_size, PathT&& current_path, AdapterT&& adapter, MemberT&& member, HandlerT&& handler) const
-{
-    return hana::eval_if(
-        hana::greater_equal(used_path_size,hana::size(member.path())),
-        [&](auto&& _)
-        {
-            return generate_paths<std::decay_t<decltype(hana::back(_(current_path)))>>(_(used_path_size),_(current_path),_(adapter),_(handler));
-        },
-        [&](auto&& _)
-        {
-            auto&& key=wrap_object_ref(hana::at(_(member).path(),_(used_path_size)));
-            return generate_paths<std::decay_t<decltype(key)>>(
-                        hana::plus(_(used_path_size),hana::size_c<1>),
-                        hana::append(_(current_path),std::move(key)),
-                        _(adapter),
-                        _(handler)
-                      );
-        }
-    );
-}
 
 template <typename UsedPathSizeT, typename PathT, typename FnT, typename AdapterT, typename MemberT>
 status apply_member_path_t::operator ()
@@ -102,4 +74,4 @@ status apply_member_path_t::operator ()
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
-#endif // DRACOSHA_VALIDATOR_FILTER_MEMBER_HPP
+#endif // DRACOSHA_VALIDATOR_APPLY_MEMBER_PATH_IPP
