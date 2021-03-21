@@ -19,8 +19,6 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef DRACOSHA_VALIDATOR_REORDER_AND_PRESENT_HPP
 #define DRACOSHA_VALIDATOR_REORDER_AND_PRESENT_HPP
 
-#include <iostream>
-
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/reference_wrapper.hpp>
 #include <dracosha/validator/operators/flag.hpp>
@@ -50,6 +48,12 @@ auto arp_first_formatter(FormatterTs&& formatters) -> decltype(auto)
     return hana::at(formatters,hana::size_c<0>);
 }
 template <typename FormatterTs>
+auto arp_second_formatter(FormatterTs&& formatters) -> decltype(auto)
+{
+    return hana::at(formatters,hana::size_c<1>);
+}
+
+template <typename FormatterTs>
 auto arp_mn_formatter(FormatterTs&& formatters) -> decltype(auto)
 {
     return arp_first_formatter(formatters);
@@ -57,7 +61,7 @@ auto arp_mn_formatter(FormatterTs&& formatters) -> decltype(auto)
 template <typename FormatterTs>
 auto arp_strings_formatter(FormatterTs&& formatters) -> decltype(auto)
 {
-    return hana::at(formatters,hana::size_c<1>);
+    return arp_second_formatter(formatters);
 }
 template <typename FormatterTs>
 auto arp_operands_formatter(FormatterTs&& formatters) -> decltype(auto)
@@ -126,9 +130,8 @@ struct apply_reorder_present_2args_t
                      ) const
     {
         format_join_grammar_cats(dst,
-            std::forward<FormatterTs>(formatters),
-            op,
-            b
+            fmt_pair(arp_first_formatter(formatters),op),
+            fmt_pair(arp_second_formatter(formatters),b)
         );
     }
 };
@@ -148,10 +151,7 @@ struct apply_reorder_present_2args_t<
                     ) const
     {
         format_join_grammar_cats(dst,
-            hana::make_tuple(
-                arp_first_formatter(formatters)
-            ),
-            op.str(b)
+            fmt_pair(arp_first_formatter(formatters),op.str(b))
         );
     }
 };
@@ -171,10 +171,7 @@ struct apply_reorder_present_2args_t<
                     ) const
     {
         format_join_grammar_cats(dst,
-            hana::make_tuple(
-                arp_first_formatter(formatters)
-            ),
-            op.str(value,b,arp_first_formatter(formatters))
+            fmt_pair(arp_first_formatter(formatters),op.str(value,b,arp_first_formatter(formatters)))
         );
     }
 };
@@ -199,22 +196,17 @@ struct apply_reorder_present_3args_t
             {
                 // op b
                 format_join_grammar_cats(dst,
-                    hana::make_tuple(
-                        arp_strings_formatter(formatters),
-                        arp_operands_formatter(formatters)
-                    ),
-                    op,
-                    b
+                    fmt_pair(arp_strings_formatter(formatters),op),
+                    fmt_pair(arp_operands_formatter(formatters),b)
                 );
             },
             [&](auto)
             {
                 // prop op b
                 format_join_grammar_cats(dst,
-                    std::forward<FormatterTs>(formatters),
-                    prop,
-                    op,
-                    b
+                    fmt_pair(arp_mn_formatter(formatters),prop),
+                    fmt_pair(arp_strings_formatter(formatters),op),
+                    fmt_pair(arp_operands_formatter(formatters),b)
                 );
             }
         );
@@ -242,22 +234,15 @@ struct apply_reorder_present_3args_t<
             {
                 // op b
                 format_join_grammar_cats(dst,
-                    hana::make_tuple(
-                        arp_strings_formatter(formatters)
-                    ),
-                    op.str(b)
+                    fmt_pair(arp_strings_formatter(formatters),op.str(b))
                 );
             },
             [&](auto)
             {
                 // prop op.str(b)
                 format_join_grammar_cats(dst,
-                    hana::make_tuple(
-                        arp_mn_formatter(formatters),
-                        arp_strings_formatter(formatters)
-                    ),
-                    prop,
-                    op.str(b)
+                    fmt_pair(arp_mn_formatter(formatters),prop),
+                    fmt_pair(arp_strings_formatter(formatters),op.str(b))
                 );
             }
         );
@@ -285,22 +270,15 @@ struct apply_reorder_present_3args_t<
             {
                 // prop op.str(b)
                 format_join_grammar_cats(dst,
-                    hana::make_tuple(
-                        arp_mn_formatter(formatters),
-                        arp_strings_formatter(formatters)
-                    ),
-                    prop,
-                    op.str(prop,b,arp_mn_formatter(formatters))
+                    fmt_pair(arp_mn_formatter(formatters),prop),
+                    fmt_pair(arp_strings_formatter(formatters),op.str(prop,b,arp_mn_formatter(formatters)))
                 );
             },
             [&dst,&formatters,&op,&prop,&b](auto&&)
             {
                 // prop op.str(b)
                 format_join_grammar_cats(dst,
-                    hana::make_tuple(
-                        arp_strings_formatter(formatters)
-                    ),
-                    op.str(prop,b,arp_mn_formatter(formatters))
+                    fmt_pair(arp_strings_formatter(formatters),op.str(prop,b,arp_mn_formatter(formatters)))
                 );
             }
         );
@@ -328,26 +306,17 @@ struct apply_reorder_present_3args_t<
             {
                 // op b
                 format_join_grammar_cats(dst,
-                    hana::make_tuple(
-                        arp_strings_formatter(formatters),
-                        arp_mn_formatter(formatters)
-                    ),
-                    op,
-                    b.get()
+                    fmt_pair(arp_strings_formatter(formatters),op),
+                    fmt_pair(arp_mn_formatter(formatters),b.get())
                 );
             },
             [&](auto)
             {
                 // prop op b
                 format_join_grammar_cats(dst,
-                    hana::make_tuple(
-                        arp_mn_formatter(formatters),
-                        arp_strings_formatter(formatters),
-                        arp_mn_formatter(formatters)
-                    ),
-                    prop,
-                    op,
-                    b.get()
+                    fmt_pair(arp_mn_formatter(formatters),prop),
+                    fmt_pair(arp_strings_formatter(formatters),op),
+                    fmt_pair(arp_mn_formatter(formatters),b.get())
                 );
             }
         );
@@ -374,28 +343,18 @@ struct apply_reorder_present_4args_t
             {
                 // member op b
                 format_join_grammar_cats(dst,
-                    hana::make_tuple(
-                        arp_mn_formatter(formatters),
-                        arp_strings_formatter(formatters),
-                        arp_operands_formatter(formatters)
-                    ),
-                    member,
-                    op,
-                    b
+                    fmt_pair(arp_mn_formatter(formatters),member),
+                    fmt_pair(arp_strings_formatter(formatters),op),
+                    fmt_pair(arp_operands_formatter(formatters),b)
                 );
             },
             [&](auto)
             {
                 // prop of member op b
                 format_join_grammar_cats(dst,
-                    hana::make_tuple(
-                        arp_mn_formatter(formatters),
-                        arp_strings_formatter(formatters),
-                        arp_operands_formatter(formatters)
-                    ),
-                    make_member_property(member,prop),
-                    op,
-                    b
+                    fmt_pair(arp_mn_formatter(formatters),make_member_property(member,prop)),
+                    fmt_pair(arp_strings_formatter(formatters),op),
+                    fmt_pair(arp_operands_formatter(formatters),b)
                 );
             }
         );
@@ -422,28 +381,18 @@ struct apply_reorder_present_4args_t<
             {
                 // member op member_operand(b)
                 format_join_grammar_cats(dst,
-                    hana::make_tuple(
-                        arp_mn_formatter(formatters),
-                        arp_strings_formatter(formatters),
-                        arp_mn_formatter(formatters)
-                    ),
-                    member,
-                    op,
-                    b.get()
+                    fmt_pair(arp_mn_formatter(formatters),member),
+                    fmt_pair(arp_strings_formatter(formatters),op),
+                    fmt_pair(arp_mn_formatter(formatters),b.get())
                 );
             },
             [&](auto)
             {
                 // prop of member op prop of member_operand(b)
                 format_join_grammar_cats(dst,
-                    hana::make_tuple(
-                        arp_mn_formatter(formatters),
-                        arp_strings_formatter(formatters),
-                        arp_mn_formatter(formatters)
-                    ),
-                    make_member_property(member,prop),
-                    op,
-                    make_member_property(b.get(),prop)
+                    fmt_pair(arp_mn_formatter(formatters),make_member_property(member,prop)),
+                    fmt_pair(arp_strings_formatter(formatters),op),
+                    fmt_pair(arp_mn_formatter(formatters),make_member_property(b.get(),prop))
                 );
             }
         );
@@ -473,24 +422,16 @@ struct apply_reorder_present_4args_t<
             {
                 // member op.str(b)
                 format_join_grammar_cats(dst,
-                    hana::make_tuple(
-                        arp_mn_formatter(formatters),
-                        arp_strings_formatter(formatters)
-                    ),
-                    member,
-                    op.str(b)
+                    fmt_pair(arp_mn_formatter(formatters),member),
+                    fmt_pair(arp_strings_formatter(formatters),op.str(b))
                 );
             },
             [&](auto)
             {
                 // prop of member op.str(b)
                 format_join_grammar_cats(dst,
-                    hana::make_tuple(
-                        arp_mn_formatter(formatters),
-                        arp_strings_formatter(formatters)
-                    ),
-                    make_member_property(member,prop),
-                    op.str(b)
+                    fmt_pair(arp_mn_formatter(formatters),make_member_property(member,prop)),
+                    fmt_pair(arp_strings_formatter(formatters),op.str(b))
                 );
             }
         );
@@ -524,24 +465,16 @@ struct apply_reorder_present_4args_t<
                     [&](auto &&)
                     {
                         format_join_grammar_cats(dst,
-                            hana::make_tuple(
-                                arp_mn_formatter(formatters),
-                                arp_strings_formatter(formatters)
-                            ),
-                            member,
-                            op.str(prop,b,arp_mn_formatter(formatters))
+                            fmt_pair(arp_mn_formatter(formatters),member),
+                            fmt_pair(arp_strings_formatter(formatters),op.str(prop,b,arp_mn_formatter(formatters)))
                         );
                     },
                     [&](auto &&)
                     {
                         // prop of member flag.str(prop,b)
                         format_join_grammar_cats(dst,
-                            hana::make_tuple(
-                                arp_mn_formatter(formatters),
-                                arp_strings_formatter(formatters)
-                            ),
-                            make_member_property(member,prop),
-                            op.str(prop,b,arp_mn_formatter(formatters),true)
+                            fmt_pair(arp_mn_formatter(formatters),make_member_property(member,prop)),
+                            fmt_pair(arp_strings_formatter(formatters),op.str(prop,b,arp_mn_formatter(formatters),true))
                         );
                     }
                 );
@@ -550,12 +483,8 @@ struct apply_reorder_present_4args_t<
             {
                 // prop of member flag.str(prop,b)
                 format_join_grammar_cats(dst,
-                    hana::make_tuple(
-                        arp_mn_formatter(formatters),
-                        arp_strings_formatter(formatters)
-                    ),
-                    make_member_property(member,prop),
-                    op.str(prop,b,arp_mn_formatter(formatters))
+                    fmt_pair(arp_mn_formatter(formatters),make_member_property(member,prop)),
+                    fmt_pair(arp_strings_formatter(formatters),op.str(prop,b,arp_mn_formatter(formatters)))
                 );
             }
         );
@@ -582,36 +511,22 @@ struct apply_reorder_present_5args_t
             {
                 // member op member of sample
                 format_join_grammar_cats(dst,
-                    hana::make_tuple(
-                        arp_mn_formatter(formatters),
-                        arp_strings_formatter(formatters),
-                        arp_mn_formatter(formatters),
-                        arp_strings_formatter(formatters),
-                        arp_operands_formatter(formatters)
-                    ),
-                    member,
-                    op,
-                    member_sample,
-                    string_conjunction_of,
-                    b
+                    fmt_pair(arp_mn_formatter(formatters),member),
+                    fmt_pair(arp_strings_formatter(formatters),op),
+                    fmt_pair(arp_mn_formatter(formatters),member_sample),
+                    fmt_pair(arp_strings_formatter(formatters),string_conjunction_of),
+                    fmt_pair(arp_operands_formatter(formatters),b)
                 );
             },
             [&](auto)
             {
                 // prop of member op prop of member of sample
                 format_join_grammar_cats(dst,
-                    hana::make_tuple(
-                        arp_mn_formatter(formatters),
-                        arp_strings_formatter(formatters),
-                        arp_mn_formatter(formatters),
-                        arp_strings_formatter(formatters),
-                        arp_operands_formatter(formatters)
-                    ),
-                    make_member_property(member,prop),
-                    op,
-                    make_member_property(member_sample,prop),
-                    string_conjunction_of,
-                    b
+                    fmt_pair(arp_mn_formatter(formatters),make_member_property(member,prop)),
+                    fmt_pair(arp_strings_formatter(formatters),op),
+                    fmt_pair(arp_mn_formatter(formatters),make_member_property(member_sample,prop)),
+                    fmt_pair(arp_strings_formatter(formatters),string_conjunction_of),
+                    fmt_pair(arp_operands_formatter(formatters),b)
                 );
             }
         );
@@ -626,14 +541,6 @@ struct apply_reorder_present_5args_t
 template <typename ...Args>
 struct apply_reorder_present_t
 {
-    template <typename DstT, typename FormatterTs>
-    void operator () (DstT& dst, FormatterTs&& formatters, Args&&... args) const
-    {
-        format_join_grammar_cats(dst,
-            std::forward<FormatterTs>(formatters),
-            std::forward<Args>(args)...
-        );
-    }
 };
 
 /**

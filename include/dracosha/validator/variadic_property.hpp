@@ -133,9 +133,9 @@ std::string format_variadic_property(const PropT& prop, const FormatterT& format
         {
             std::string dst;
             format_join_grammar_cats(dst,
-                                     hana::make_tuple(_(formatter),_(formatter)),
-                                     _(arg).aggregation().base_phrase_str(),
-                                     _(prop).name());
+                                     fmt_pair(_(formatter),_(arg).aggregation().base_phrase_str()),
+                                     fmt_pair(_(formatter),_(prop).name())
+                                     );
             return dst;
         },
         [&](auto&& _)
