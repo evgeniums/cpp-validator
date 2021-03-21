@@ -15,6 +15,8 @@
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
 #include <dracosha/validator/reporting/quotes_decorator.hpp>
+#include <dracosha/validator/reporting/phrase_translator.hpp>
+#include <dracosha/validator/compact_variadic_property.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -88,7 +90,9 @@ struct TestStruct
 }
 
 BOOST_AUTO_TEST_SUITE(TestVariadicProperty)
+
 #if 1
+
 BOOST_AUTO_TEST_CASE(TestArgs)
 {
     TestStruct ts1;
@@ -454,6 +458,29 @@ BOOST_AUTO_TEST_CASE(TestReporting)
     BOOST_CHECK(!v1.apply(ra2));
     BOOST_CHECK_EQUAL(rep,std::string("\"child_word(20,hello)\" must be equal to 30"));
     rep.clear();
+
+    auto v3=validator(
+        _[0](child_word(20,"hello")(eq,30))
+    );
+    std::vector<WithChild> vec3{o1};
+    auto ra3=make_reporting_adapter(vec3,reporter);
+    BOOST_CHECK(!v3.apply(ra3));
+    BOOST_CHECK_EQUAL(rep,std::string("\"child_word(20,hello)\" of \"element #0\" must be equal to 30"));
+    rep.clear();
+
+    auto v4=validator(
+        _[child][varg(1)](eq,30)
+    );
+    BOOST_CHECK(!v4.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,std::string("\"child(1)\" must be equal to 30"));
+    rep.clear();
+
+    auto v5=validator(
+        child(1)(eq,30)
+    );
+    BOOST_CHECK(!v5.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,std::string("\"child(1)\" must be equal to 30"));
+    rep.clear();
 }
 
 BOOST_AUTO_TEST_CASE(TestFlag)
@@ -601,7 +628,6 @@ BOOST_AUTO_TEST_CASE(TestCompactVariadicProperty)
     rep.clear();
 }
 #endif
-
 BOOST_AUTO_TEST_CASE(TestAllAny)
 {
     WithChild o1;
@@ -644,7 +670,7 @@ BOOST_AUTO_TEST_CASE(TestAllAny)
     auto v2=validator(
         _[child][varg(ALL,child_count)](gte,5)
     );
-#if 1
+
     BOOST_CHECK(!v2.apply(o1));
 
     auto v3=validator(
@@ -704,7 +730,22 @@ BOOST_AUTO_TEST_CASE(TestAllAny)
     BOOST_CHECK(!v8.apply(a13));
     BOOST_CHECK_EQUAL(rep,std::string("at least one child must be greater than or equal to 100"));
     rep.clear();
-#endif
+
+    // test translation of variadic property
+    phrase_translator mn_translator;
+    phrase_translator strings_translator;
+    mn_translator["child"]="translated_child";
+    mn_translator["each"]="ever every"; // currently onlu member names formatter is used, even for translation of misc. strings
+    strings_translator["each"]="every";
+    strings_translator["at least one"]="some";
+    auto mn1=make_translated_member_names(mn_translator);
+    auto strings1=make_translated_strings(strings_translator);
+
+    auto frmt=make_formatter(mn1,default_operand_formatter,strings1);
+    auto a14=make_reporting_adapter(o1,make_reporter(rep,frmt));
+    BOOST_CHECK(!v2.apply(a14));
+    BOOST_CHECK_EQUAL(rep,std::string("ever every translated_child must be greater than or equal to 5"));
+    rep.clear();
 }
 #if 1
 BOOST_AUTO_TEST_CASE(TestAllAnyMultiArg)
@@ -757,5 +798,24 @@ BOOST_AUTO_TEST_CASE(TestAllAnyMultiArg)
     BOOST_CHECK(v11.apply(a1));
     rep.clear();
 }
+
+BOOST_AUTO_TEST_CASE(TestGrammarCatsReport)
+{
+    auto t1=hana::make_tuple(1,2,hana::make_tuple(11,12));
+    auto t2=hana::flatten(
+                    hana::adjust_if(
+                        t1,
+                        [](auto&& v)
+                        {
+                            return !hana::is_a<hana::tuple_tag,decltype(v)>;
+                        },
+                        hana::make_tuple
+                    )
+                );
+    BOOST_CHECK(hana::equal(t2,hana::make_tuple(1,2,11,12)));
+
+
+}
 #endif
+
 BOOST_AUTO_TEST_SUITE_END()

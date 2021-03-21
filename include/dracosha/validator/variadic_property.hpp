@@ -118,8 +118,16 @@ struct variadic_property_closure
     FnHasT _fn_has;
 };
 
-//! @todo Consider taking into account preceeding gramma categories and use
-//! two formatters: "member_names" for property name and "strings" for aggregation descriptions.
+/**
+ * @brief Format variadic property in reports.
+ * @param prop Prpperty to format.
+ * @param formatter Member names formatter.
+ * @return Formatted string.
+ *
+ * @note Only member names formatter is used to format variadic property and its parts,
+ * even if misc. strings are used, for example for aggregation descriptions.
+ * Thus, in order to translate misc. strings in variadic property then they must be translated by translator of member names formatter.
+ */
 template <typename PropT, typename FormatterT>
 std::string format_variadic_property(const PropT& prop, const FormatterT& formatter)
 {
@@ -148,6 +156,50 @@ std::string format_variadic_property(const PropT& prop, const FormatterT& format
         }
     );
 }
+
+/**
+ * @brief Currently not used.
+ */
+#ifdef DRACOSHA_VALIDATOR_PREPARE_PROPERTY_FORMATTING
+
+/**
+ * This formatting is used from prepare_property_formatting() only when explicit property formatting is requested.
+ * If impllicit property formatting as part of a member's path is requested then format_variadic_property() is used to format property's name.
+ */
+template <typename StringsFmtT, typename MemberNamesFmtT, typename PropT>
+auto prepare_variadic_property_formatting(StringsFmtT&& strings, MemberNamesFmtT&& mn, PropT&& prop)
+{
+    const auto& arg=unwrap_object(hana::front(prop.args()));
+    return hana::eval_if(
+        hana::and_(
+            hana::equal(hana::size(prop.args()),hana::size_c<1>),
+            is_wrap_index(arg)
+        ),
+        [&](auto&& _)
+        {
+            // format aggregation using strings formatter and format name using member name formatter and return sequence
+            return hana::make_tuple(
+                     fmt_plain_pair(_(strings),_(arg).aggregation().base_phrase_str()),
+                     fmt_plain_pair(_(mn),_(prop).name())
+                  );
+        },
+        [&](auto&& _)
+        {
+            // format name without grammar cats using strings formatter
+            //! @todo Mention it in documentation. Because member names formatters can be decorated but strings can not.
+            std::string args{extract_ref(_(strings))(_(prop).name())};
+
+            // format arguments using strings formatter
+            backend_formatter.append(args,"(");
+            backend_formatter.append_join(args,",",hana::transform(_(prop).args(),extract_ref(_(strings))));
+            backend_formatter.append(args,")");
+
+            // final property name is formatted using member names formatter
+            return fmt_pair(_(mn),std::move(args));
+        }
+    );
+}
+#endif
 
 struct variadic_property_tag{};
 struct variadic_property_base_tag{};
@@ -315,77 +367,6 @@ auto type_variadic_p_##prop::operator () (Args&&... args) const \
 #define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(prop) DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HF(prop,always_has_property,nullptr,nullptr)
 #define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(prop,has) DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HF(prop,has,nullptr,nullptr)
 #define DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_FLAG(prop,flag_dscr,n_flag_dscr) DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HF(prop,always_has_property,flag_dscr,n_flag_dscr)
-
-struct compact_variadic_property_t
-{
-    template <typename PathT>
-    auto operator () (PathT&& path) const -> decltype(auto)
-    {
-        return hana::fold(
-            path,
-            hana::tuple<>{},
-            [](auto&& accumulated, auto&& current_key)
-            {
-                // check if current key is variadic property
-                using type=std::decay_t<decltype(current_key)>;
-                return hana::eval_if(
-                    hana::and_(
-                        std::is_base_of<variadic_arg_tag,type>{},
-                        hana::not_(hana::is_empty(accumulated))
-                    ),
-                    [&](auto&& _)
-                    {
-                        // modify last element in path if current key is variadic property
-                        const auto& prev=hana::back(_(accumulated));
-                        using prev_type=unwrap_object_t<decltype(prev)>;
-                        return hana::eval_if(
-                            std::is_base_of<variadic_property_base_tag,prev_type>{},
-                            [&](auto&& _)
-                            {
-                                const auto& p1=_(prev);
-                                using prev_type1=unwrap_object_t<decltype(p1)>;
-                                return hana::eval_if(
-                                    std::is_base_of<variadic_property_tag,prev_type1>{},
-                                    [&](auto&& _)
-                                    {
-                                        // create next property notation appending current key
-                                        auto new_prev=_(prev).next(_(current_key));
-                                        return hana::append(
-                                                        hana::drop_back(_(accumulated)),
-                                                        new_prev
-                                                    );
-                                    },
-                                    [&](auto&& _)
-                                    {
-                                        // create property notation with current key as the first argument
-                                        auto new_prev=_(prev)(_(current_key));
-                                        return hana::append(
-                                                        hana::drop_back(_(accumulated)),
-                                                        new_prev
-                                                    );
-                                    }
-                                );
-                            },
-                            [&](auto&& _)
-                            {
-                                // varg must follow variadic property
-                                // if not then leave the key as is
-                                return hana::append(_(accumulated),_(current_key));
-                            }
-                        );
-                    },
-                    [&](auto&& _)
-                    {
-                        // leave the key as is if current key is not variadic property
-                        // or varg is the first key in the path
-                        return hana::append(_(accumulated),_(current_key));
-                    }
-                );
-            }
-        );
-    }
-};
-constexpr compact_variadic_property_t compact_variadic_property{};
 
 //-------------------------------------------------------------
 

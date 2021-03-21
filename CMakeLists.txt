@@ -85,6 +85,7 @@ SET (HEADERS
     include/dracosha/validator/invoke_member_if_exists.hpp
     include/dracosha/validator/filter_member.hpp
     include/dracosha/validator/filter_path.hpp
+    include/dracosha/validator/compact_variadic_property.hpp
 
     include/dracosha/validator/aggregation/and.hpp
     include/dracosha/validator/aggregation/or.hpp
@@ -165,6 +166,7 @@ SET (HEADERS
     include/dracosha/validator/reporting/format_bool_operand.hpp
     include/dracosha/validator/reporting/format_operand.hpp
     include/dracosha/validator/reporting/format_join_grammar_cats.hpp
+    include/dracosha/validator/reporting/prepare_property_formatting.hpp
 
     include/dracosha/validator/reporting/locale/sample_locale.hpp
     include/dracosha/validator/reporting/locale/ru.hpp

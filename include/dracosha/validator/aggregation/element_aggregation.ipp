@@ -34,6 +34,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <dracosha/validator/utils/heterogeneous_size.hpp>
 #include <dracosha/validator/utils/foreach_if.hpp>
 #include <dracosha/validator/aggregation/wrap_heterogeneous_index.hpp>
+#include <dracosha/validator/compact_variadic_property.hpp>
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
