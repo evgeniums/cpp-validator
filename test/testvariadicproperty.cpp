@@ -799,23 +799,6 @@ BOOST_AUTO_TEST_CASE(TestAllAnyMultiArg)
     rep.clear();
 }
 
-BOOST_AUTO_TEST_CASE(TestGrammarCatsReport)
-{
-    auto t1=hana::make_tuple(1,2,hana::make_tuple(11,12));
-    auto t2=hana::flatten(
-                    hana::adjust_if(
-                        t1,
-                        [](auto&& v)
-                        {
-                            return !hana::is_a<hana::tuple_tag,decltype(v)>;
-                        },
-                        hana::make_tuple
-                    )
-                );
-    BOOST_CHECK(hana::equal(t2,hana::make_tuple(1,2,11,12)));
-
-
-}
 #endif
 
 BOOST_AUTO_TEST_SUITE_END()

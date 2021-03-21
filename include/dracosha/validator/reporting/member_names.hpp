@@ -74,7 +74,7 @@ struct member_names
                      std::enable_if_t<hana::is_a<member_property_tag,T>,void*> =nullptr
             ) const -> decltype(auto)
     {
-        return property_member_name(member_prop,traits,grammar_cats);
+        return property_member_name(member_prop,*this,grammar_cats);
     }
 
     /**

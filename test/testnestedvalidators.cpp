@@ -37,7 +37,6 @@ BOOST_AUTO_TEST_CASE(TestWithoutMember)
     BOOST_CHECK(v4.apply(m1));
     BOOST_CHECK(!v4.apply(m2));
 }
-#endif
 
 BOOST_AUTO_TEST_CASE(TestMember)
 {
@@ -61,8 +60,6 @@ BOOST_AUTO_TEST_CASE(TestMember)
     );
     BOOST_CHECK(!v4.apply(m1));
 }
-
-#if 1
 
 BOOST_AUTO_TEST_CASE(TestMemberAggregation)
 {
@@ -146,8 +143,50 @@ BOOST_AUTO_TEST_CASE(TestMemberWithReport)
     BOOST_CHECK(!v10.apply(a1));
     BOOST_CHECK_EQUAL(rep,std::string("name2 of level1 must not exist"));
     rep.clear();
-}
 
+}
+#endif
+
+#if 1
+
+BOOST_AUTO_TEST_CASE(TestPropertyOfMemberWithHint)
+{
+    std::string rep;
+    std::map<std::string,std::set<std::string>> m1{
+        {"level1",{"level2"}}
+    };
+    auto a1=make_reporting_adapter(m1,rep);
+
+    auto v1=validator(
+        _["level2"]("name2")(size(gt,10))
+    );
+    auto v2=validator(
+        _["level1"]("name1")(v1)
+    );
+    BOOST_CHECK(!v2.apply(a1));
+    BOOST_CHECK_EQUAL(rep,std::string("size of name2 of name1 must be greater than 10"));
+    rep.clear();
+
+    auto v3=validator(
+        _["level1"](v1)
+    );
+    BOOST_CHECK(!v3.apply(a1));
+    BOOST_CHECK_EQUAL(rep,std::string("size of name2 of level1 must be greater than 10"));
+    rep.clear();
+
+    auto v4=validator(
+        _["level2"](size(gt,10))
+    );
+    auto v5=validator(
+        _["level1"]("name1")(v4)
+    );
+    BOOST_CHECK(!v5.apply(a1));
+    BOOST_CHECK_EQUAL(rep,std::string("size of level2 of name1 must be greater than 10"));
+    rep.clear();
+}
+#endif
+
+#if 1
 BOOST_AUTO_TEST_CASE(TestAggregationWithReport)
 {
     std::string rep;
