@@ -236,6 +236,9 @@ struct member_helper_t<T1,T2> : public member_helper_2args_t<T1,T2>
 template <typename ... Args>
 constexpr member_helper_t<Args...> member_helper{};
 
+/**
+ * @brief Helper to figure out if member has aggregations in path.
+ */
 template <typename ... PathT>
 struct is_member_aggregated
 {
@@ -246,6 +249,9 @@ struct is_member_aggregated
             );
 };
 
+/**
+ * @brief Helper to figure out if member has ANY aggregations in path.
+ */
 template <typename ... PathT>
 struct is_member_with_any
 {
@@ -256,6 +262,9 @@ struct is_member_with_any
             );
 };
 
+/**
+ * @brief Helper to figure out if member variadic arguments in path.
+ */
 template <typename ... PathT>
 struct is_member_with_varg
 {

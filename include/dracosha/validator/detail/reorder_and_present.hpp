@@ -42,6 +42,8 @@ namespace detail
 
 //-------------------------------------------------------------
 
+// Hepers for getting single formatters form formatters tuple.
+
 template <typename FormatterTs>
 auto arp_first_formatter(FormatterTs&& formatters) -> decltype(auto)
 {
