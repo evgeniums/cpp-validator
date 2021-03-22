@@ -28,8 +28,20 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Tag of intermediate adapters.
+ */
 struct intermediate_adapter_tag{};
 
+/**
+ * @brief Traits of intermediate adapters.
+ * @param BaseTraitsT Base traits this intermediate adapter will wrap.
+ * @param IntermediateT Type of intermediate member's value.
+ * @param PathPrefixLengthT Length of member's path already used to extract the intermidiate value.
+ *
+ * Intermediate adapters are used to hold pre-extracted intermediate values (references) of nested members
+ * in order to extract full member path only once per aggregation.
+ */
 template <typename BaseTraitsT, typename IntermediateT, typename PathPrefixLengthT>
 class intermediate_adapter_traits : public adapter_traits_wrapper<BaseTraitsT>,
                                     public intermediate_adapter_tag
@@ -38,6 +50,12 @@ class intermediate_adapter_traits : public adapter_traits_wrapper<BaseTraitsT>,
 
         using path_prefix_length=std::decay_t<PathPrefixLengthT>;
 
+        /**
+         * @brief Constructor.
+         * @param traits Base traits this intermediate adapter will wrap.
+         * @param intermediate Intermediate member's value.
+         * @param path_prefix_size Length of member's path already used to extract the intermidiate value.
+         */
         template <typename BaseTraitsT1>
         intermediate_adapter_traits(
                 BaseTraitsT1&& traits,
@@ -49,21 +67,38 @@ class intermediate_adapter_traits : public adapter_traits_wrapper<BaseTraitsT>,
               _path_prefix_length(path_prefix_size)
         {}
 
+        /**
+         *  @brief Get intermediate member's value.
+         */
         auto value() const -> decltype(auto)
         {
             return _intermediate.get();
         }
+
+        /**
+         *  @brief Get intermediate member's value.
+         */
         auto value() -> decltype(auto)
         {
             return _intermediate.get();
         }
 
+        /**
+         *  @brief Get remaining member's path skipping already used part of path of path_prefix_length.
+         *  @param path Full member's path.
+         *  @return Remaining path excluding already used prefix.
+         */
         template <typename OriginalPathT>
         auto path(const OriginalPathT& path) const
         {
             return hana::drop_front(path,_path_prefix_length);
         }
 
+        /**
+         * @brief Check if full path is already used and the exists() checking must be ignored.
+         * @param PathSizeT Integral constant holding full path size.
+         * @return Logical integral constant.
+         */
         template <typename PathSizeT>
         constexpr static auto ignore_exists(PathSizeT)
         {
@@ -81,7 +116,12 @@ class intermediate_adapter_traits : public adapter_traits_wrapper<BaseTraitsT>,
 
 //-------------------------------------------------------------
 
-struct intermediate_ignore_check_exist1_impl
+namespace detail
+{
+/**
+ * @brief Implementer of intermediate_ignore_check_exist.
+ */
+struct intermediate_ignore_check_exist_impl
 {
     template <typename AdapterT, typename MemberT>
     constexpr auto operator() (AdapterT&&, MemberT&&) const
@@ -92,9 +132,18 @@ struct intermediate_ignore_check_exist1_impl
                     );
     }
 };
-constexpr intermediate_ignore_check_exist1_impl intermediate_ignore_check_exist1{};
+/**
+ * @brief Helper to check if full member's path is already used by intermediate adapter and the exists() checking must be ignored.
+ * @param AdapterT Intermediate adapter.
+ * @param MemberT Member.
+ * @return Logical integral constant.
+ */
+constexpr intermediate_ignore_check_exist_impl intermediate_ignore_check_exist{};
 
-struct intermediate_ignore_check_exist2_impl
+/**
+ * @brief Implementer of intermediate_ignore_check_exist_false.
+ */
+struct intermediate_ignore_check_exist_false_impl
 {
     template <typename AdapterT, typename MemberT>
     constexpr auto operator() (AdapterT&&, MemberT&&) const
@@ -102,8 +151,16 @@ struct intermediate_ignore_check_exist2_impl
         return hana::false_c;
     }
 };
-constexpr intermediate_ignore_check_exist2_impl intermediate_ignore_check_exist2{};
+/**
+ * @brief Helper returning logical false integral constant to be used with intermediate_ignore_check_exist.
+ */
+constexpr intermediate_ignore_check_exist_false_impl intermediate_ignore_check_exist_false{};
 
+}
+
+/**
+ * @brief Implementer intermediate_ignore_check_exist.
+ */
 struct intermediate_ignore_check_exist_impl
 {
     template <typename AdapterT, typename MemberT>
@@ -111,11 +168,17 @@ struct intermediate_ignore_check_exist_impl
     {
         return hana::if_(
             std::is_base_of<intermediate_adapter_tag,typename std::decay_t<AdapterT>::type>{},
-            intermediate_ignore_check_exist1,
-            intermediate_ignore_check_exist2
+            detail::intermediate_ignore_check_exist,
+            detail::intermediate_ignore_check_exist_false
         )(adapter,member);
     }
 };
+/**
+ * @brief Check if full member's path is already used by intermediate adapter and the exists() checking must be ignored.
+ * @param adapter Intermediate adapter.
+ * @param member Member.
+ * @return Logical integral constant.
+ */
 constexpr intermediate_ignore_check_exist_impl intermediate_ignore_check_exist{};
 
 //-------------------------------------------------------------

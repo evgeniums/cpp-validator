@@ -159,6 +159,9 @@ struct default_adapter_impl
         )(adapter,member);
     }
 
+    /**
+     * Validate aggregation.
+     */
     template <typename PredicateT, typename AdapterT, typename OpsT>
     static status validate_aggregation(const PredicateT& pred, AdapterT&& adapter, OpsT&& ops)
     {
@@ -182,8 +185,11 @@ struct default_adapter_impl
         return validate_aggregation(predicate_and,std::forward<AdapterT>(adapter),std::forward<OpsT>(ops));
     }
 
+    /**
+     * @brief Validate a member using AND aggregation.
+     */
     template <typename AdapterT, typename MemberT, typename OpsT>
-    static status validate_member_and(AdapterT&& adapter, MemberT&& member, OpsT&& ops)
+    static status validate_and(AdapterT&& adapter, MemberT&& member, OpsT&& ops)
     {
         return traits_of(adapter).validate_member_aggregation(
                     predicate_and,
@@ -191,19 +197,6 @@ struct default_adapter_impl
                     std::forward<MemberT>(member),
                     std::forward<OpsT>(ops)
                );
-    }
-
-    /**
-     * @brief Validate a member using AND aggregation.
-     */
-    template <typename AdapterT, typename MemberT, typename OpsT>
-    static status validate_and(AdapterT&& adapter, MemberT&& member, OpsT&& ops)
-    {
-        return validate_member_and(
-                    std::forward<decltype(adapter)>(adapter),
-                    std::forward<decltype(member)>(member),
-                    std::forward<decltype(ops)>(ops)
-                  );
     }
 
     /**
@@ -215,23 +208,13 @@ struct default_adapter_impl
         return validate_aggregation(status_predicate_or,std::forward<AdapterT>(adapter),std::forward<OpsT>(ops));
     }
 
-    template <typename AdapterT, typename MemberT, typename OpsT>
-    static status validate_member_or(AdapterT&& adapter, MemberT&& member, OpsT&& ops)
-    {
-        return traits_of(adapter).validate_member_aggregation(status_predicate_or,std::forward<AdapterT>(adapter),std::forward<MemberT>(member),std::forward<OpsT>(ops));
-    }
-
     /**
      * @brief Validate a member using OR aggregation.
      */
     template <typename AdapterT, typename MemberT, typename OpsT>
     static status validate_or(AdapterT&& adapter, MemberT&& member, OpsT&& ops)
     {
-        return validate_member_or(
-                    std::forward<decltype(adapter)>(adapter),
-                    std::forward<decltype(member)>(member),
-                    std::forward<decltype(ops)>(ops)
-                  );
+        return traits_of(adapter).validate_member_aggregation(status_predicate_or,std::forward<AdapterT>(adapter),std::forward<MemberT>(member),std::forward<OpsT>(ops));
     }
 
     /**

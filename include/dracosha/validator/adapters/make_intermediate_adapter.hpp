@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** @file validator/adapters/make_intermediate_adapter.hpp
 *
-*  Defines "make_intermediate_adapter".
+*  Defines "make_intermediate_adapter" and "clone_intermediate_adapter".
 *
 */
 
@@ -27,6 +27,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Implementer of make_intermediate_adapter.
+ */
 struct make_intermediate_adapter_impl
 {
     template <typename AdapterT, typename PathT, typename PathPrefixSizeT=std::decay_t<decltype(hana::size(std::declval<PathT>()))>>
@@ -60,10 +63,23 @@ struct make_intermediate_adapter_impl
         return adapter.clone(create);
     }
 };
+/**
+ * @brief Make intermediate adapter from other adapter.
+ * @param adapter Original adapter or other intermediate adapter.
+ * @param path Path of intermediate member whose value must be extracted and placed into intermediate adapter.
+ * @param path_prefix_length Length of path prefix already used in full member's path.
+ * @return Intermediate adapter.
+ *
+ * Value of intermediate object's member is extracted from the object wrapped by original adapter and then
+ * this value is placed into the intermediate adapter.
+ */
 constexpr make_intermediate_adapter_impl make_intermediate_adapter{};
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Implementer of clone_intermediate_adapter.
+ */
 struct clone_intermediate_adapter_impl
 {
     template <typename AdapterT, typename NewValueT, typename PathPrefixSizeT>
@@ -92,6 +108,13 @@ struct clone_intermediate_adapter_impl
         return (*this)(std::forward<AdapterT>(adapter),std::forward<NewValueT>(new_value),path_prefix_length{});
     }
 };
+/**
+ * @brief Clone other intermediate adapter replacing wrapped value.
+ * @param adapter Other intermediate adapter.
+ * @param new_value New value to put into the intermediate adapter.
+ * @param path_prefix_length Length of path prefix already used in full member's path.
+ * @return New intermediate adapter.
+ */
 constexpr clone_intermediate_adapter_impl clone_intermediate_adapter{};
 
 //-------------------------------------------------------------

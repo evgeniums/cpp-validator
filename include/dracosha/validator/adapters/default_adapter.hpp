@@ -53,11 +53,17 @@ class default_adapter_traits :  public adapter_traits,
                     _obj(std::forward<T>(obj))
         {}
 
+        /**
+         *  @brief Get wrapped object under validation.
+         */
         auto get() const -> decltype(auto)
         {
             return _obj.get();
         }
 
+        /**
+         *  @brief Get wrapped object under validation.
+         */
         auto get() -> decltype(auto)
         {
             return _obj.get();
@@ -88,6 +94,11 @@ auto make_default_adapter(T&& v)
     return default_adapter<T>(std::forward<T>(v));
 }
 
+/**
+ * @brief Ensure that object is wrapped with validation adapter.
+ * @param Object or validation adapter.
+ * @return If input is an adapter then returns adapter "as is", otherwise returns default adapter wrapping input object.
+ */
 template <typename T>
 auto ensure_adapter(T&& v) -> decltype(auto)
 {
