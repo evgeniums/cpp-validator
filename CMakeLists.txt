@@ -192,7 +192,6 @@ SET (HEADERS
     include/dracosha/validator/detail/aggregate_all.hpp
     include/dracosha/validator/detail/logical_not.hpp
     include/dracosha/validator/detail/dispatcher_impl.hpp
-    include/dracosha/validator/detail/take_address_of.hpp
     include/dracosha/validator/detail/formatter_fmt.hpp
     include/dracosha/validator/detail/reorder_and_present.hpp
     include/dracosha/validator/detail/formatter_std.hpp
