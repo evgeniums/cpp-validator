@@ -30,9 +30,18 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Base struct for tree aggregations.
+ */
 struct tree_base{};
+/**
+ * @brief Tag for tree aggregations.
+ */
 struct tree_tag;
 
+/**
+ * @base Tree aggregation.
+ */
 template <typename AggregationT, typename PropertyT, typename MaxArgT>
 struct tree_t : public adjust_storable_ignore,
                 public tree_base
@@ -43,11 +52,21 @@ struct tree_t : public adjust_storable_ignore,
     PropertyT property;
     MaxArgT max_arg;
 
+    /**
+     * @brief Name of the tree aggregation.
+     * @return String description.
+     */
     std::string name() const
     {
         return aggregation.string()(*this);
     }
 
+    /**
+     * @brief Constructor.
+     * @param aggr Element aggregation.
+     * @param prop Property (class method) to use for tree traversal.
+     * @param mx_arg Property or constant to use as max value in "for" loops of tree traversal.
+     */
     template <typename AggregationT1, typename PropertyT1, typename MaxArgT1>
     tree_t(AggregationT1&& aggr, PropertyT1&& prop, MaxArgT1&& mx_arg)
         : aggregation(std::forward<AggregationT1>(aggr)),
@@ -56,6 +75,9 @@ struct tree_t : public adjust_storable_ignore,
     {}
 };
 
+/**
+ * @brief Implementer of tree().
+ */
 struct tree_impl
 {
     template <typename AggregationT, typename PropertyT, typename MaxArgT>
@@ -69,8 +91,29 @@ struct tree_impl
         };
     }
 };
+/**
+ * @brief Builder of tree aggregation.
+ * @param aggr Element aggregation.
+ * @param prop Variadic property (class method) to use as getter of tree nodes (children of each node).
+ * @param mx_arg Property or constant to use as max value in "for" loops of tree traversal.
+ * @return Tree aggregation object.
+ */
 constexpr tree_impl tree{};
 
+//-------------------------------------------------------------
+
+/**
+ * @brief Process each tree node and iterate further.
+ * @param tree_key Tree aggregation object used as a kay in member's path.
+ * @param tmp_adapter Curent intermediate adapter.
+ * @param pred Logical predicate to be used for ALL/ANY aggregation.
+ * @param handler Handler to invoke on each node.
+ * @param used_path_size Length of already used member's path prefix.
+ * @param path Member's path.
+ * @param node Parent node.
+ * @param aggregation_varg Variadic argument od the property that is used as getter of tree nodes.
+ * @return Validation status.
+ */
 template <typename TreeKeyT, typename AdapterT, typename PredT, typename HandlerT, typename UsedPathSizeT,
           typename PathT, typename NodeT, typename VargT>
 status each_tree_node(const TreeKeyT& tree_key, AdapterT& tmp_adapter, const PredT& pred,
@@ -114,6 +157,9 @@ status each_tree_node(const TreeKeyT& tree_key, AdapterT& tmp_adapter, const Pre
     return status::code::ignore;
 }
 
+/**
+ * @brief Template specialization of generate_paths_t to generate paths from tree aggregation.
+ */
 template <typename KeyT>
 struct generate_paths_t<KeyT,hana::when<hana::is_a<tree_tag,KeyT>>>
 {

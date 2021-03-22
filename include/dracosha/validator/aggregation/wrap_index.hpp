@@ -31,7 +31,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 struct wrap_index_tag;
 
 /**
- * @brief Wrapper of index for variadic properties.
+ * @brief Wrapper of index for element aggregation of variadic properties.
  */
 template <typename T, typename AggregationT>
 struct wrap_index_t : public AggregationT::type,
@@ -39,6 +39,11 @@ struct wrap_index_t : public AggregationT::type,
 {
     using hana_tag=wrap_index_tag;
 
+    /**
+     * @brief Constructor.
+     * @param index Element's index to wrap.
+     * @param aggregation Element aggregation.
+     */
     template <typename Ti, typename Ta>
     wrap_index_t(Ti index, Ta&& aggregation)
             : _index(std::move(index)),
@@ -87,6 +92,11 @@ struct wrap_index_t : public AggregationT::type,
         AggregationT _aggregation_type;
 };
 
+/**
+ * @brief Wrap index for element aggregation.
+ * @param index Element's index to wrap.
+ * @param aggregation Element aggregation.
+ */
 template <typename Ti, typename Ta>
 auto wrap_index(Ti&& it, Ta&& aggregation)
 {
@@ -96,7 +106,12 @@ auto wrap_index(Ti&& it, Ta&& aggregation)
     };
 }
 
-struct is_wrap_index_t
+//-------------------------------------------------------------
+
+/**
+ * @brief Implementer of is_wrap_index.
+ */
+struct is_wrap_index_impl
 {
     template <typename T>
     constexpr auto operator() (T&&) const
@@ -104,7 +119,14 @@ struct is_wrap_index_t
         return hana::is_a<wrap_index_tag,T>;
     }
 };
-constexpr is_wrap_index_t is_wrap_index{};
+/**
+ * @brief Helper to figure out if argument is of wrap_index_t.
+ */
+constexpr is_wrap_index_impl is_wrap_index{};
+
+//-------------------------------------------------------------
+
+// Tenplate specializations of some type traits helpers for wrap_index_t.
 
 template <typename T, typename AggregationT>
 struct is_bool<wrap_index_t<T,AggregationT>> : public is_bool<T>
@@ -118,9 +140,15 @@ template <typename T, typename AggregationT>
 struct is_string<wrap_index_t<T,AggregationT>> : public is_string<T>
 {};
 
+//-------------------------------------------------------------
+
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
+//-------------------------------------------------------------
+
 namespace std {
+
+// Template specialization of some std type traits helpers for wrap_index_t.
 
 template <typename T, typename AggregationT>
 struct is_floating_point<DRACOSHA_VALIDATOR_NAMESPACE::wrap_index_t<T,AggregationT>> : public is_floating_point<T>
@@ -135,5 +163,7 @@ struct make_unsigned<DRACOSHA_VALIDATOR_NAMESPACE::wrap_index_t<T,AggregationT>>
 {};
 
 }
+
+//-------------------------------------------------------------
 
 #endif // DRACOSHA_VALIDATOR_WRAP_INDEX_HPP

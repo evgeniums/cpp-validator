@@ -35,9 +35,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct tree_base;
 
-template <typename ModifierT>
-struct any_t;
-
+/**
+ * @brief Base tag for ALL element aggregation.
+ */
 struct all_tag
 {
     template <typename T>

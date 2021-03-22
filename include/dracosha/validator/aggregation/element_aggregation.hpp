@@ -29,6 +29,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Base tag of ANY/ALL element aggregations.
+ */
 struct element_aggregation_tag
 {
     template <typename T>
@@ -55,16 +58,38 @@ struct element_aggregation_tag
 };
 
 //-------------------------------------------------------------
-
+/**
+ * @brief Base struct of ANY/ALL element aggregations.
+ */
 struct element_aggregation : public adjust_storable_ignore
 {
     using hana_tag=element_aggregation_tag;
 
+    /**
+     * @brief Invoke element aggregation operation for ALL/ANY aggregation.
+     * @param pred Logical predicate to use for aggregation (and/or for ALL/ANY).
+     * @param empt Handler of empty list of elements.
+     * @param aggr Aggregation.
+     * @param used_path_size Length of member's path prefix already used for extracting intermediate member values.
+     * @param path Member's path prefix before this aggregation in the path including the aggregation itself.
+     * @param adapter Validation adapter.
+     * @param handler Handler to invoke on the member.
+     */
     template <typename PredicateT, typename EmptyFnT, typename AggregationT,
               typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
     static status invoke(PredicateT&& pred, EmptyFnT&& empt, AggregationT&& aggr,
                          UsedPathSizeT&& used_path_size, PathT&& path, AdapterT&& adapter, HandlerT&& handler);
 
+    /**
+     * @brief Invoke element aggregation operation for ALL/ANY aggregation of variadic property argument aka varg(ALL/ANY,max_arg).
+     * @param pred Logical predicate to use for aggregation (and/or for ALL/ANY).
+     * @param empt Handler of empty list of elements.
+     * @param aggr Aggregation.
+     * @param used_path_size Length of member's path prefix already used for extracting intermediate member values.
+     * @param path Member's path prefix before this aggregation in the path including the aggregation itself.
+     * @param adapter Validation adapter.
+     * @param handler Handler to invoke on the member.
+     */
     template <typename PredicateT, typename EmptyFnT, typename AggregationT,
               typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
     static status invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, AggregationT&& aggr,
@@ -75,7 +100,10 @@ struct element_aggregation : public adjust_storable_ignore
 
 struct tree_tag;
 
-struct is_element_aggregation_t
+/**
+ * @brief Implementer of is_element_aggregation.
+ */
+struct is_element_aggregation_impl
 {
     template <typename PrevResultT, typename T>
     constexpr auto operator () (PrevResultT prev, T) const
@@ -95,12 +123,16 @@ struct is_element_aggregation_t
         );
     }
 };
-constexpr is_element_aggregation_t is_element_aggregation{};
+/**
+ * @brief Helper to figure out out if member path contains element aggregation.
+ */
+constexpr is_element_aggregation_impl is_element_aggregation{};
 
 //-------------------------------------------------------------
 
-struct element_aggregation_modifier_tag;
-
+/**
+ * @brief Base struct of element aggregations with modifiers.
+ */
 template <typename ModifierT>
 struct element_aggregation_with_modifier : public element_aggregation
 {
@@ -109,12 +141,20 @@ struct element_aggregation_with_modifier : public element_aggregation
 
 //-------------------------------------------------------------
 
+struct element_aggregation_modifier_tag;
+
+/**
+ * @brief Base struct of element aggregation modifiers.
+ */
 template <typename DerivedT>
 struct element_aggregation_modifier
 {
     using hana_tag=element_aggregation_modifier_tag;
 };
 
+/**
+ * @brief Element aggregation modifier for keys.
+ */
 struct keys_t : public element_aggregation_modifier<keys_t>
 {
     constexpr static const keys_t& instance();
@@ -125,6 +165,9 @@ constexpr const keys_t& keys_t::instance()
     return keys;
 }
 
+/**
+ * @brief Element aggregation modifier for values.
+ */
 struct values_t : public element_aggregation_modifier<values_t>
 {
     constexpr static const values_t& instance();
@@ -135,6 +178,9 @@ constexpr const values_t& values_t::instance()
     return values;
 }
 
+/**
+ * @brief Element aggregation modifier for iterators.
+ */
 struct iterators_t : public element_aggregation_modifier<iterators_t>
 {
     constexpr static const iterators_t& instance();
@@ -147,6 +193,9 @@ constexpr const iterators_t& iterators_t::instance()
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Template specialization of generate_paths_t to generate paths from element aggregation.
+ */
 template <typename KeyT>
 struct generate_paths_t<KeyT,hana::when<std::is_base_of<element_aggregation,std::decay_t<KeyT>>::value>>
 {
@@ -168,6 +217,9 @@ struct generate_paths_t<KeyT,hana::when<std::is_base_of<element_aggregation,std:
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Template specialization of generate_paths_t to generate paths from element aggregation of variadic property arguments.
+ */
 template <typename KeyT>
 struct generate_paths_t<KeyT,hana::when<std::is_base_of<variadic_arg_aggregation_tag,KeyT>::value>>
 {

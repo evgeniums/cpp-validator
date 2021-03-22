@@ -41,6 +41,9 @@ enum class aggregation_id : int
     ALL
 };
 
+/**
+ * @brief Tag of aggregation operators.
+ */
 struct aggregation_op_tag;
 
 /**
@@ -110,6 +113,9 @@ struct aggregate_op
     using hana_tag=aggregation_op_tag;
 };
 
+/**
+ * @brief Implementer of make_aggregation_validator.
+ */
 struct make_aggregation_validator_impl
 {
     template <typename HandlerT, typename Ts>
@@ -129,6 +135,12 @@ struct make_aggregation_validator_impl
             };
     }
 };
+/**
+ * @brief Make validator from logical aggregation.
+ * @param handler Handler of logical aggregation.
+ * @param List of validators to be invoked within logical aggregation.
+ * @return Validator.
+ */
 constexpr make_aggregation_validator_impl make_aggregation_validator{};
 
 //-------------------------------------------------------------

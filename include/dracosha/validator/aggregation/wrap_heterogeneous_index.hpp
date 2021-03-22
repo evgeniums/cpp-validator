@@ -24,9 +24,15 @@ Distributed under the Boost Software License, Version 1.0.
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
+/**
+ * @brief Wrapper of index of element of heterogeneous container for element aggregations.
+ */
 template <size_t Index, typename AggregationT>
 struct wrap_heterogeneous_index_t :  public heterogeneous_property_t<Index>
 {
+    /**
+     * @brief Name of index.
+     */
     constexpr static auto name()
     {
         return AggregationT::description;
@@ -44,6 +50,12 @@ struct wrap_heterogeneous_index_t :  public heterogeneous_property_t<Index>
     }
 };
 
+/**
+ * @brief Wrap index of heterogeneous container for element aggregation.
+ * @param Ti Itegral constant index.
+ * @param Ta Aggregation.
+ * @return Wrapped heterogeneous index.
+ */
 template <typename Ti, typename Ta>
 constexpr auto wrap_heterogeneous_index(Ti&&, Ta&&)
 {

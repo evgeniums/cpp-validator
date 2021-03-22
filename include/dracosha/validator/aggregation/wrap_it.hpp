@@ -39,6 +39,13 @@ struct wrap_it_t : public AggregationT::type,
 {
     using hana_tag=wrap_iterator_tag;
 
+    /**
+      @brief Constructor.
+      @param it Iterator.
+      @param aggregation Aggregation descriptor to take iterator name or desctiption from.
+      @param modifier Aggregation modifier.
+      @return Wrapped iterator.
+    */
     template <typename Ti, typename Ta, typename Tm>
     wrap_it_t(Ti&& it, Ta&& aggregation, Tm&& modifier)
             : _it(std::forward<Ti>(it)),
@@ -115,7 +122,7 @@ struct wrap_it_t : public AggregationT::type,
   @brief Wrap iterator and pair it with explicit name or description.
   @param it Iterator.
   @param aggregation Aggregation descriptor to take iterator name or desctiption from.
-  @paran
+  @param modifier Aggregation modifier.
   @return Wrapped iterator.
   */
 template <typename Ti, typename Ta, typename Tm>

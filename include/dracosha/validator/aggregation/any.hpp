@@ -32,9 +32,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct tree_base;
 
-template <typename ModifierT>
-struct all_t;
-
+/**
+ * @brief Base tag for ANY element aggregation.
+ */
 struct any_tag
 {
     template <typename T>
@@ -116,6 +116,9 @@ constexpr string_any_t string_any{};
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Helper to find out if adapter is configured to perform strict check of ANY aggregation.
+ */
 template <typename AdapterT, typename = hana::when<true>>
 struct check_strict_any
 {
@@ -227,7 +230,10 @@ constexpr any_t<decltype(values)> ANY{};
 
 //-------------------------------------------------------------
 
-struct is_aggregation_any_t
+/**
+ * @brief Implementer of is_aggregation_any.
+ */
+struct is_aggregation_any_impl
 {
     template <typename PrevResultT, typename T>
     constexpr auto operator () (PrevResultT prev, T) const
@@ -243,7 +249,10 @@ struct is_aggregation_any_t
         );
     }
 };
-constexpr is_aggregation_any_t is_aggregation_any{};
+/**
+ * @brief Helper to figure out out if member path contains ANY aggregation.
+ */
+constexpr is_aggregation_any_impl is_aggregation_any{};
 
 //-------------------------------------------------------------
 

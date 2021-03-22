@@ -119,6 +119,8 @@ status element_aggregation::invoke(PredicateT&& pred, EmptyFnT&& empt, Aggregati
     );
 }
 
+//-------------------------------------------------------------
+
 template <typename PredicateT, typename EmptyFnT, typename AggregationT,
           typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
 status element_aggregation::invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, AggregationT&& aggr,
@@ -167,6 +169,8 @@ status element_aggregation::invoke_variadic(PredicateT&& pred, EmptyFnT&& empt, 
     );
 }
 
+//-------------------------------------------------------------
+
 template <typename ModifierT>
 template <typename OpT>
 constexpr auto all_t<ModifierT>::operator() (OpT&& op) const
@@ -188,6 +192,8 @@ constexpr auto all_t<ModifierT>::operator() (OpT&& op) const
         }
     )(std::forward<OpT>(op));
 }
+
+//-------------------------------------------------------------
 
 template <typename ModifierT>
 template <typename OpT>

@@ -31,6 +31,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Helper for construction of element aggregation reports.
+ */
 template <typename AdapterT, typename=hana::when<true>>
 struct aggregate_report
 {
