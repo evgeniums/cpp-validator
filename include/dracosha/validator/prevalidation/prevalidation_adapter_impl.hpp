@@ -43,8 +43,6 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
  *
  * Adapter first checks path of the member to validate and performs validation only
  * if the path matches the path of filtering member.
- *
- * @note Currently nested ALL/ANY aggregation operators are not supported.
  */
 template <typename CheckMemberT>
 class prevalidation_adapter_impl : public strict_any_tag
