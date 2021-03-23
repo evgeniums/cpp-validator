@@ -165,8 +165,9 @@ struct all_t : public element_aggregation_with_modifier<ModifierT>,
 
     static auto predicate()
     {
-        return [](auto&&, status& ret)
+        return [](auto&& adapter, status& ret)
         {
+            std::ignore=adapter;
             return ret==true;
         };
     }
