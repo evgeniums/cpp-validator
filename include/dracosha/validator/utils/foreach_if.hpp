@@ -27,8 +27,13 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //---------------------------------------------------------------
 
+namespace detail {
+
+/**
+ * @brief Implementations of of foreach_if().
+ */
 template <typename IndexT>
-struct foreach_if_impl
+struct foreach_if_t
 {
     template <typename T, typename HandlerT, typename PredicateT>
     static auto each(const T& obj, const PredicateT& pred, const HandlerT& fn)
@@ -50,22 +55,34 @@ struct foreach_if_impl
             [&](auto&& _)
             {
                 auto index=_(next_index);
-                return foreach_if_impl<decltype(index)>::each(_(obj),_(pred),_(fn));
+                return foreach_if_t<decltype(index)>::each(_(obj),_(pred),_(fn));
             }
         );
     }
 };
+}
 
-struct foreach_if_t
+/**
+ * @brief Implementer of foreach_if().
+ */
+struct foreach_if_impl
 {
+    /**
+     * @brief Invoke a handler on each element of an object till predicate is satisfied, with initial value.
+     * @param obj Object.
+     * @param pred Predicate.
+     * @param init Initial value to return if object is not a heterogeneous container.
+     * @param handler Handler to invoke.
+     * @return Accumulated result of handler invocations.
+     */
     template <typename T, typename PredicateT, typename InitT, typename HandlerT>
-    auto operator () (const T& obj, const PredicateT& pred, InitT&& init, const HandlerT& fn) const
+    auto operator () (const T& obj, const PredicateT& pred, InitT&& init, const HandlerT& handler) const
     {
         return hana::eval_if(
             is_heterogeneous_container(obj),
             [&](auto&& _)
             {
-                return foreach_if_impl<hana::size_t<0>>::each(_(obj),_(pred),_(fn));
+                return detail::foreach_if_t<hana::size_t<0>>::each(_(obj),_(pred),_(handler));
             },
             [&](auto&& _)
             {
@@ -74,13 +91,31 @@ struct foreach_if_t
         );
     }
 
+    /**
+     * @brief Invoke a handler on each element of an object till predicate is satisfied.
+     * @param obj Object.
+     * @param pred Predicate.
+     * @param handler Handler to invoke.
+     * @return Accumulated result of handler invocations or false if object is not a heterogeneous container.
+     */
     template <typename T, typename PredicateT, typename HandlerT>
-    auto operator () (const T& obj, const PredicateT& pred, const HandlerT& fn) const
+    auto operator () (const T& obj, const PredicateT& pred, const HandlerT& handler) const
     {
-        return (*this)(obj,pred,false,fn);
+        return (*this)(obj,pred,false,handler);
     }
 };
-constexpr foreach_if_t foreach_if{};
+/**
+ * @brief Invoke a handler on each element of a foldable container while predicate is satisfied.
+ *
+ * Three versions are available:
+ *  - with init;
+ *  - without init;
+ *
+ *  See comments to respective operators above.
+ *
+ * Handler signature must be: "RetT (auto&& element, auto&& element_index)".
+ */
+constexpr foreach_if_impl foreach_if{};
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 

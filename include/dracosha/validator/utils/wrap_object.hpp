@@ -27,6 +27,11 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Wrap a value into object_wrapper if it is not an object_wrapper already.
+ * @param v Value.
+ * @return object_wrapper if value is not an object_wrapper, otherwise value as is.
+ */
 struct wrap_object_impl
 {
     template <typename T>
@@ -47,6 +52,16 @@ struct wrap_object_impl
 };
 constexpr wrap_object_impl wrap_object{};
 
+//-------------------------------------------------------------
+/**
+ * @brief Wrap a reference to an object into object_wrapper if object is already wrapped by another object_wrapper.
+ * @param v Value.
+ * @return A wrapped reference if value is a object_wrapper, otherwise the value as is.
+ *
+ * This helper is used to avoid extra copies of object_wrapper embeddable in cases when object_wrapper wraps rvalue.
+ * In this case the original object_wrapper with actual storable value will be transformed to object_wrapper
+ * with constant reference to the value.
+ */
 template <typename T>
 auto wrap_object_ref(T&& v) -> decltype(auto)
 {

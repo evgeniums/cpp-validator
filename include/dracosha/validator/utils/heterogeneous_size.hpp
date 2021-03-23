@@ -28,6 +28,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Implementation of is_constant_size.
+ */
 template <typename T, typename Enable=hana::when<true>>
 struct is_constant_size_impl
 {
@@ -47,16 +50,26 @@ struct is_constant_size_impl<T,
     constexpr static const bool value=true;
 };
 
+/**
+ * @brief Helper to figure out if a type is of integral constant size_t.
+ */
 template <typename T>
 struct is_constant_size : public std::integral_constant<bool,is_constant_size_impl<T>::value>
 {};
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Helper for getting heterogeneous size of a type.
+ * By default size is hana::size_t<0>.
+ */
 template <typename T, typename Enable=hana::when<true>>
 struct heterogeneous_size_t : public hana::size_t<0>
 {
 };
+/**
+ * @brief Helper for getting heterogeneous size of foldable type such as han::tuple and std::tuple.
+ */
 template <typename T>
 struct heterogeneous_size_t<T,
             hana::when<hana::Foldable<T>::value>
@@ -64,6 +77,9 @@ struct heterogeneous_size_t<T,
 {
 };
 
+/**
+ * @brief Implementer of heterogeneous_size().
+ */
 struct heterogeneous_size_impl
 {
     template <typename T>
@@ -72,10 +88,16 @@ struct heterogeneous_size_impl
         return heterogeneous_size_t<T>{};
     }
 };
+/**
+ * @brief Get size of heterogeneous container.
+ */
 constexpr heterogeneous_size_impl heterogeneous_size{};
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Implementer of is_heterogeneous_container().
+ */
 struct is_heterogeneous_container_impl
 {
     template <typename T>
@@ -84,6 +106,11 @@ struct is_heterogeneous_container_impl
         return hana::not_equal(heterogeneous_size(v),hana::size_c<0>);
     }
 };
+/**
+ * @brief Figure out if object is a heterogeneous container.
+ * @param v Object.
+ * @return Logical integral constant.
+ */
 constexpr is_heterogeneous_container_impl is_heterogeneous_container{};
 
 //-------------------------------------------------------------

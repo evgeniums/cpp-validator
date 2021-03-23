@@ -25,6 +25,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Struct to be used as a base struct for objects that must be copied as is to adjust_storable_t wrapper.
+ */
 struct adjust_storable_ignore{};
 
 //-------------------------------------------------------------

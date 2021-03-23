@@ -28,6 +28,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Tag for object_wrapper types.
+ */
 struct object_wrapper_tag
 {
     template <typename T>

@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** @file validator/utils/poniter_as_reference.hpp
 *
-*  Defines poniter_as_reference.
+*  Defines helpers for pointer dereferencing.
 *
 */
 
@@ -27,6 +27,10 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Helper for dereferencing pointers if applicable.
+ * By defaualt if value is not a pointer the value is used itself as is.
+ */
 template <typename T, typename = hana::when<true>>
 struct pointer_as_reference_t
 {
@@ -38,6 +42,9 @@ struct pointer_as_reference_t
         return hana::id(std::forward<T1>(v));
     }
 };
+/**
+ * Dereference plain pointer.
+ */
 template <typename T>
 struct pointer_as_reference_t<T,
             hana::when<std::is_pointer<T>::value>
@@ -51,6 +58,9 @@ struct pointer_as_reference_t<T,
        return *v;
     }
 };
+/**
+ * Dereference shared pointer.
+ */
 template <typename T>
 struct pointer_as_reference_t<std::shared_ptr<T>>
 {
@@ -62,9 +72,17 @@ struct pointer_as_reference_t<std::shared_ptr<T>>
        return *v;
     }
 };
+/**
+ * @brief Instance of pointer dereferencing object.
+ */
 template <typename T>
 constexpr pointer_as_reference_t<T> pointer_as_reference_inst{};
 
+//-------------------------------------------------------------
+
+/**
+ * @brief Implementer of as_reference().
+ */
 struct pointer_as_reference_impl
 {
     template <typename T>
@@ -73,17 +91,33 @@ struct pointer_as_reference_impl
         return pointer_as_reference_inst<std::decay_t<T>>(std::forward<T>(v));
     }
 };
+/**
+ * @brief Dereference pointer if applicable.
+ * @param v Value.
+ * @return Dereferenced pointer if value is of pointer type, otherwise value as is.
+ */
 constexpr pointer_as_reference_impl as_reference{};
 
+//-------------------------------------------------------------
+
+/**
+ * @brief Implementer of is_pointer.
+ */
 struct is_pointer_impl
 {
     template <typename T>
-    constexpr auto operator () (T&&) const
+    constexpr auto operator () (T&& v) const
     {
+        std::ignore=v;
         using type=typename pointer_as_reference_t<std::decay_t<T>>::is_pointer;
         return type{};
     }
 };
+/**
+ * @brief Helper to figure out if type is a smart pointer or shared pointer.
+ * @param v Object.
+ * @return Logical integral constant.
+ */
 constexpr is_pointer_impl is_pointer{};
 
 //-------------------------------------------------------------

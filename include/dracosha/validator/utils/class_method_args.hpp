@@ -25,6 +25,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Helper to extract list of argument types of a class/struct method.
+ */
 template <class FnT>
 struct class_method_args
 {
@@ -88,7 +91,7 @@ struct class_method_args<Ret (Cls::*)(Args...) const &&>
     }
 };
 
-// -- noexcept
+// Starting from c++17 methods with noexcept specifier are considered being of other types.
 #if __cplusplus >= 201703L
 
 template <typename Ret, typename Cls, typename... Args>

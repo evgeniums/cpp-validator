@@ -25,6 +25,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Implementer of copy().
+ */
 struct copy_impl
 {
     template <typename T>
@@ -33,6 +36,11 @@ struct copy_impl
         return v;
     }
 };
+/**
+ * @brief Explicitly copy a variable.
+ * @param v Value to copy.
+ * @return Copied variable.
+ */
 constexpr copy_impl copy{};
 
 //-------------------------------------------------------------

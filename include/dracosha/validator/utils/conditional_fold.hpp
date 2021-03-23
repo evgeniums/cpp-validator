@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 /** @file validator/utils/conditional_fold.hpp
 *
-*  Defines helpers to sequantially call each callable in a tupple with AND conjunction.
+*  Defines helpers to sequantially call each callable in a tuple with some logical predicate.
 *
 */
 
@@ -26,6 +26,11 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //---------------------------------------------------------------
 
+namespace detail {
+
+/**
+ * @brief Implementations of while_each() and while_prefix().
+ */
 template <typename FoldableT>
 struct conditional_fold_t
 {
@@ -121,31 +126,25 @@ DCS_IGNORE_MAYBE_UNINITIALIZED_END
         );
     }
 };
+}
 
-struct predicate_and_t
-{
-    template <typename T>
-    constexpr bool operator() (const T& v) const
-    {
-        return v==true;
-    }
-};
-constexpr predicate_and_t predicate_and{};
+//-------------------------------------------------------------
 
-struct predicate_or_t
+/**
+ * @brief Implementer of while_each().
+ */
+struct while_each_impl
 {
-    template <typename T>
-    constexpr bool operator() (const T& v) const
-    {
-        return v==false;
-    }
-};
-constexpr predicate_or_t predicate_or{};
-
-struct while_each_t
-{
+    /**
+     * @brief Invoke a handler on each element of a foldable container while predicate is satisfied.
+     * @param foldable Foldable container.
+     * @param pred Predicate taking handler's return as input.
+     * @param init Initial value to pass to predicate and return if predicate is not satisfied.
+     * @param handler Handler to invoke. Handler signature must be: "RetT (auto&& element)".
+     * @return Accumulated result of handler invocations.
+     */
     template <typename FoldableT, typename PredicateT, typename InitT, typename HandlerT>
-    auto operator () (const FoldableT& foldable, const PredicateT& pred, InitT&& init, const HandlerT& fn) const -> decltype(auto)
+    auto operator () (const FoldableT& foldable, const PredicateT& pred, InitT&& init, const HandlerT& handler) const -> decltype(auto)
     {
         return hana::eval_if(
             hana::is_empty(foldable),
@@ -159,13 +158,22 @@ struct while_each_t
                 {
                     return init;
                 }
-                return conditional_fold_t<FoldableT>::each(_(foldable),_(pred),_(fn));
+                return detail::conditional_fold_t<FoldableT>::each(_(foldable),_(pred),_(handler));
             }
         );
     }
 
+    /**
+     * @brief Invoke a handler on each element of a foldable container while predicate is satisfied, with state value.
+     * @param foldable Foldable container.
+     * @param pred Predicate taking handler's return as input.
+     * @param init Initial value to pass to predicate and return if predicate is not satisfied.
+     * @param state State that can be changed after each invocation of the handler and passed to next invocation.
+     * @param handler Handler to invoke. Handler signature must be: "RetT (auto&& state, auto&& element)".
+     * @return Accumulated result of handler invocations.
+     */
     template <typename FoldableT, typename PredicateT, typename InitT, typename StateT, typename HandlerT>
-    auto operator () (const FoldableT& foldable, const PredicateT& pred, InitT&& init, StateT&& state, const HandlerT& fn) const -> decltype(auto)
+    auto operator () (const FoldableT& foldable, const PredicateT& pred, InitT&& init, StateT&& state, const HandlerT& handler) const -> decltype(auto)
     {
         return hana::eval_if(
             hana::is_empty(foldable),
@@ -179,13 +187,24 @@ struct while_each_t
                 {
                     return init;
                 }
-                return conditional_fold_t<FoldableT>::each_with_state(_(foldable),_(pred),_(state),_(fn));
+                return detail::conditional_fold_t<FoldableT>::each_with_state(_(foldable),_(pred),_(state),_(handler));
             }
         );
     }
 
+    /**
+     * @brief Invoke a handler on each element of a foldable container while predicate is satisfied, with state and return values.
+     * @param foldable Foldable container.
+     * @param pred Predicate taking handler's return as input.
+     * @param init Initial value to pass to predicate.
+     * @param state State that can be changed after each invocation of the handler and passed to next invocation.
+     * @param ret Return value that must be returned if predicate is not satisfied.
+     * @param handler Handler to invoke. Handler signature must be: "RetT (auto&& state, auto&& element)".
+     * @return Accumulated result of handler invocations if predicate is satisfied, ret otherwise.
+     */
     template <typename FoldableT, typename PredicateT, typename InitT, typename StateT, typename RetT, typename HandlerT>
-    auto operator () (const FoldableT& foldable, const PredicateT& pred, InitT&& init, StateT&& state, RetT&& ret, const HandlerT& fn) const -> decltype(auto)
+    auto operator () (const FoldableT& foldable, const PredicateT& pred, InitT&& init,
+                      StateT&& state, RetT&& ret, const HandlerT& handler) const -> decltype(auto)
     {
         return hana::eval_if(
             hana::is_empty(foldable),
@@ -199,17 +218,32 @@ struct while_each_t
                 {
                     return _(ret);
                 }
-                return conditional_fold_t<FoldableT>::each_with_state_and_ret(_(foldable),_(pred),_(state),_(ret),_(fn));
+                return detail::conditional_fold_t<FoldableT>::each_with_state_and_ret(_(foldable),_(pred),_(state),_(ret),_(handler));
             }
         );
     }
 };
-constexpr while_each_t while_each{};
+/**
+ * @brief Invoke a handler on each element of a foldable container while predicate is satisfied.
+ *
+ * Three versions are available:
+ *  - with init;
+ *  - with init and state;
+ *  - with init, state and return.
+ *
+ *  See comments to respective operators above.
+ */
+constexpr while_each_impl while_each{};
 
-struct while_prefix_t
+//-------------------------------------------------------------
+
+/**
+ * @brief Implementer of while_prefix().
+ */
+struct while_prefix_impl
 {
     template <typename FoldableT, typename HandlerT, typename PredicateT, typename InitT>
-    auto operator () (const FoldableT& foldable, const PredicateT& pred, InitT&& init, const HandlerT& fn) const -> decltype(auto)
+    auto operator () (const FoldableT& foldable, const PredicateT& pred, InitT&& init, const HandlerT& handler) const -> decltype(auto)
     {
         return hana::eval_if(
             hana::is_empty(foldable),
@@ -223,12 +257,58 @@ struct while_prefix_t
                 {
                     return init;
                 }
-                return conditional_fold_t<FoldableT>::prefix(hana::tuple<>{},_(foldable),_(pred),_(init),_(fn));
+                return detail::conditional_fold_t<FoldableT>::prefix(hana::tuple<>{},_(foldable),_(pred),_(init),_(handler));
             }
         );
     }
 };
-constexpr while_prefix_t while_prefix{};
+/**
+ * @brief Invoke a handler on each prefix of a foldable container while predicate is satisfied.
+ * @param foldable Foldable container.
+ * @param pred Predicate taking handler's return as input.
+ * @param init Initial value to pass to predicate and return if predicate is not satisfied.
+ * @param handler Handler to invoke. Handler signature must be: "RetT (auto&& state, auto&& foldable_prefix)".
+ * @return Accumulated result of handler invocations.
+ */
+constexpr while_prefix_impl while_prefix{};
+
+//-------------------------------------------------------------
+
+/**
+ * @brief Implementer of predicate_and.
+ */
+struct predicate_and_impl
+{
+    template <typename T>
+    constexpr bool operator() (const T& v) const
+    {
+        return v==true;
+    }
+};
+/**
+ * @brief Default predicate for AND condition.
+ */
+constexpr predicate_and_impl predicate_and{};
+
+//-------------------------------------------------------------
+
+/**
+ * @brief Implementer of predicate_or.
+ */
+struct predicate_or_impl
+{
+    template <typename T>
+    constexpr bool operator() (const T& v) const
+    {
+        return v==false;
+    }
+};
+/**
+ * @brief Default predicate for OR condition.
+ */
+constexpr predicate_or_impl predicate_or{};
+
+//-------------------------------------------------------------
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 
