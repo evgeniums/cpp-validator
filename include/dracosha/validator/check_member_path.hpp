@@ -117,6 +117,14 @@ auto same_member_path_types(const Tm1& member1,const Tm2& member2)
     return same_path_types(member1.path(),member2.path());
 }
 
+//-------------------------------------------------------------
+
+/**
+ * @brief Check if two paths are equal.
+ * @param path1 First path.
+ * @param path2 Second path.
+ * @return Result of comparison.
+ */
 template <typename T1, typename T2>
 bool paths_equal(const T1& path1, const T2& path2)
 {

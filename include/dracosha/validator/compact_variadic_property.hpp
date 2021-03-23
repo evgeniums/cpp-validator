@@ -26,7 +26,10 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-struct compact_variadic_property_t
+/**
+ * @brief Implementer of compact_variadic_property().
+ */
+struct compact_variadic_property_impl
 {
     template <typename PathT>
     auto operator () (PathT&& path) const -> decltype(auto)
@@ -95,7 +98,10 @@ struct compact_variadic_property_t
         );
     }
 };
-constexpr compact_variadic_property_t compact_variadic_property{};
+/**
+ * @brief Compact path with variadic property for reporting.
+ */
+constexpr compact_variadic_property_impl compact_variadic_property{};
 
 //-------------------------------------------------------------
 

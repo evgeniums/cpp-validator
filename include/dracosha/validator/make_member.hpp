@@ -65,6 +65,14 @@ auto make_member(Ts&& path)
     );
 }
 
+/**
+ * @brief Make new member inherting given member.
+ * @param path Path of new member.
+ * @param member Member to inherit from.
+ * @return New member.
+ *
+ * New member uses name() of original member if applicable.
+ */
 template <typename Ts, typename T>
 auto inherit_member(Ts&& path, T&& member)
 {

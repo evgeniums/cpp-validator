@@ -25,8 +25,14 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Base tag of variadic arguments.
+ */
 struct variadic_arg_tag{};
 
+/**
+ * @brief Base tag of variadic arguments with element aggregations.
+ */
 struct variadic_arg_aggregation_tag{};
 
 //-------------------------------------------------------------

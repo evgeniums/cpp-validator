@@ -30,7 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 template <typename UsedPathSizeT, typename PathT, typename FnT, typename AdapterT, typename MemberT>
-status apply_member_path_t::operator ()
+status apply_member_path_impl::operator ()
     (UsedPathSizeT&& used_path_size, PathT&& current_path, FnT&& fn, AdapterT&& adapter, MemberT&& member) const
 {
     return apply_generated_paths(

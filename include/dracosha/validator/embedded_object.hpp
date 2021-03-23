@@ -30,6 +30,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Implementer of embedded_object().
+ */
 struct embedded_object_impl
 {
     template <typename AdapterT>
@@ -49,7 +52,17 @@ struct embedded_object_impl
         );
     }
 };
+/**
+ * @brief Get reference to embedded object from validation adapter.
+ * @param adapter Validation adapter.
+ * @return Reference to object wrapped into adapter.
+ *
+ * In case of intermediate adapter the intermediate value of that adapter is returned.
+ */
 constexpr embedded_object_impl embedded_object;
+
+//-------------------------------------------------------------
+
 struct original_embedded_object_impl
 {
     template <typename AdapterT>
@@ -58,10 +71,20 @@ struct original_embedded_object_impl
         return extract(traits_of(adapter).get());
     }
 };
+/**
+ * @brief Get reference to original object from validation adapter.
+ * @param adapter Validation adapter.
+ * @return Reference to object wrapped into adapter.
+ *
+ * In case of intermediate adapter the original value of the first adapter original adapter is returned.
+ */
 constexpr original_embedded_object_impl original_embedded_object;
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Implementer of embedded_object_path_suffix().
+ */
 struct embedded_object_path_suffix_impl
 {
     template <typename AdapterT, typename PathT>
@@ -81,10 +104,19 @@ struct embedded_object_path_suffix_impl
         );
     }
 };
+/**
+ *  @brief Get remaining member's path skipping already used part of path.
+ *  @param adapter Validation adapter.
+ *  @param path Full member's path.
+ *  @return Remaining path excluding already used prefix.
+ */
 constexpr embedded_object_path_suffix_impl embedded_object_path_suffix{};
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Implementer of is_embedded_object_path_valid().
+ */
 struct is_embedded_object_path_valid_impl
 {
     template <typename Tadapter, typename Tpath>
@@ -96,10 +128,23 @@ struct is_embedded_object_path_valid_impl
                         );
     }
 };
+/**
+ *  @brief Check member's path is valid for object wrapped in adapter.
+ *  @param adapter Validation adapter.
+ *  @param path Full member's path.
+ *  @return Remaining path excluding already used prefix.
+ */
 constexpr is_embedded_object_path_valid_impl is_embedded_object_path_valid{};
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Check if path exists for object embedded into adapter.
+ * @param adapter Validation adapter.
+ * @param path Member's path.
+ * @param b Boolean integral constant to check for existence/not-existence.
+ * @return Boolean result of checking.
+ */
 struct embedded_object_has_path_impl
 {
     template <typename AdapterT, typename PathT, typename T2>
@@ -186,7 +231,20 @@ struct embedded_object_has_path_impl
     }
 
 };
+/**
+ * @brief Check if path exists for object embedded into adapter.
+ * @param adapter Validation adapter.
+ * @param path Member's path.
+ * @param b Boolean true/false to check for existence/not-existence.
+ * @return Boolean result of checking.
+ */
 constexpr embedded_object_has_path_impl embedded_object_has_path;
+
+//-------------------------------------------------------------
+
+/**
+ * @brief Implementer of original_embedded_object_has_path().
+ */
 struct original_embedded_object_has_path_impl
 {
     template <typename AdapterT, typename PathT>
@@ -195,10 +253,19 @@ struct original_embedded_object_has_path_impl
         return embedded_object_has_path.invoke(adapter,path,std::true_type{});
     }
 };
+/**
+ * @brief Check if path exists for original object wrapped into first adapter.
+ * @param adapter Validation adapter.
+ * @param path Member's path.
+ * @return Boolean result of checking.
+ */
 constexpr original_embedded_object_has_path_impl original_embedded_object_has_path;
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Implementer of embedded_object_has_member().
+ */
 struct embedded_object_has_member_impl
 {
     template <typename AdapterT, typename MemberT>
@@ -207,8 +274,19 @@ struct embedded_object_has_member_impl
         return embedded_object_has_path(adapter,member.path());
     }
 };
+/**
+ * @brief Check if object embedded into adapter has a member.
+ * @param adapter Validation adapter.
+ * @param member Member.
+ * @return Boolean result of checking.
+ */
 constexpr embedded_object_has_member_impl embedded_object_has_member;
 
+//-------------------------------------------------------------
+
+/**
+ * @brief Implementer of original_embedded_object_has_member().
+ */
 struct original_embedded_object_has_member_impl
 {
     template <typename AdapterT, typename MemberT>
@@ -217,10 +295,19 @@ struct original_embedded_object_has_member_impl
         return original_embedded_object_has_path(adapter,member.path());
     }
 };
+/**
+ * @brief Check if original object wrapped into first adapter has a member.
+ * @param adapter Validation adapter.
+ * @param member Member.
+ * @return Boolean result of checking.
+ */
 constexpr original_embedded_object_has_member_impl original_embedded_object_has_member;
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Implementer of embedded_object_member().
+ */
 struct embedded_object_member_impl
 {
     template <typename AdapterT, typename MemberT>
@@ -229,8 +316,19 @@ struct embedded_object_member_impl
         return get_member(embedded_object(adapter),embedded_object_path_suffix(adapter,path_of(member)));
     }
 };
+/**
+ * @brief Get member's value of object embedded into adapter.
+ * @param adapter Validation adapter.
+ * @param member Member.
+ * @return Member's value.
+ */
 constexpr embedded_object_member_impl embedded_object_member;
 
+//-------------------------------------------------------------
+
+/**
+ * @brief Impolementer of original_embedded_object_member().
+ */
 struct original_embedded_object_member_impl
 {
     template <typename AdapterT, typename MemberT>
@@ -239,6 +337,12 @@ struct original_embedded_object_member_impl
         return get_member(original_embedded_object(adapter),member.path());
     }
 };
+/**
+ * @brief Get member's value of original object wrapped into first adapter.
+ * @param adapter Validation adapter.
+ * @param member Member.
+ * @return Member's value.
+ */
 constexpr original_embedded_object_member_impl original_embedded_object_member;
 
 //-------------------------------------------------------------

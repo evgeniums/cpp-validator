@@ -29,6 +29,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Base template for variadic arguments.
+ */
 template <typename T>
 struct variadic_arg : public object_wrapper<T>,
                       public variadic_arg_tag
@@ -36,9 +39,17 @@ struct variadic_arg : public object_wrapper<T>,
     using object_wrapper<T>::object_wrapper;
 };
 
+/**
+ * @brief Implementer of variadic argument with element aggregation.
+ */
 template <typename AggregationT, typename MaxArgT>
 struct variadic_arg_aggregation_impl
 {
+    /**
+     * @brief Get end "index" of variadic argument.
+     * @param v Object/value variadic property is applied to.
+     * @return End value of variadic "index".
+     */
     template <typename T>
     auto end(T&& v) const -> decltype(auto)
     {
@@ -56,6 +67,11 @@ struct variadic_arg_aggregation_impl
                );
     }
 
+    /**
+     * @brief Get begin "index" of variadic argument.
+     * @param v Object/value variadic property is applied to.
+     * @return Begin value of variadic "index".
+     */
     template <typename T>
     auto begin(T&& v) const -> decltype(auto)
     {
@@ -64,6 +80,12 @@ struct variadic_arg_aggregation_impl
         return static_cast<std::decay_t<decltype(end(std::forward<T>(v)))>>(0);
     }
 
+    /**
+     * @brief Get next "index" of variadic argument.
+     * @param v Object/value variadic property is applied to.
+     * @param index Current index.
+     * @return Next value of variadic "index".
+     */
     template <typename T, typename IndexT>
     void next(T&&, IndexT& index) const
     {
@@ -71,16 +93,25 @@ struct variadic_arg_aggregation_impl
         ++index;
     }
 
+    /**
+     * @brief Check if "while" condition of variadic argument is satisfied.
+     * @param v Object/value variadic property is applied to.
+     * @param index Current index.
+     * @return Boolean result.
+     */
     template <typename T, typename IndexT>
     bool while_cond(T&& v, const IndexT& index) const
     {
-        return index<end(std::forward<T>(v));
+        return index < end(std::forward<T>(v));
     }
 
     AggregationT aggregation;
     MaxArgT max_arg;
 };
 
+/**
+ * @brief Variadic argument with element aggregation.
+ */
 template <typename AggregationT, typename MaxArgT>
 struct variadic_arg_aggregation : public variadic_arg<variadic_arg_aggregation_impl<AggregationT,MaxArgT>>,
                                   public variadic_arg_aggregation_tag
@@ -89,8 +120,18 @@ struct variadic_arg_aggregation : public variadic_arg<variadic_arg_aggregation_i
     using variadic_arg<variadic_arg_aggregation_impl<AggregationT,MaxArgT>>::variadic_arg;
 };
 
-struct varg_t
+//-------------------------------------------------------------
+
+/**
+ * @brief Implementer of varg().
+ */
+struct varg_impl
 {
+    /**
+     * @brief Create variadic argument from a variable.
+     * @param v Variable.
+     * @return Variadic argument.
+     */
     template <typename T>
     auto operator() (T&& v) const
     {
@@ -111,6 +152,12 @@ struct varg_t
         )(std::forward<T>(v));
     }
 
+    /**
+     * @brief Create variadic argument with element aggregation.
+     * @param aggr Aggregation.
+     * @param max_val Maximal value of variadic argument or property to figure out maximal value.
+     * @return Variadic argument.
+     */
     template <typename AggregationT, typename MaxT>
     auto operator() (AggregationT aggr, MaxT&& max_val) const
     {
@@ -119,16 +166,30 @@ struct varg_t
         return variadic_arg_aggregation<AggregationT,decltype(wrapped_max_val)>{std::move(val)};
     }
 };
-constexpr varg_t varg{};
+/**
+ * @brief Helper for creating variadic argument.
+ */
+constexpr varg_impl varg{};
 
-struct is_varg_t
+//-------------------------------------------------------------
+
+/**
+ * @brief Implementer of is_varg().
+ */
+struct is_varg_impl
 {
+    /**
+     * @brief Check if variable is a variadic argument.
+     */
     template <typename T>
     constexpr auto operator() (T&&) const
     {
         return std::is_base_of<variadic_arg_tag,std::decay_t<T>>{};
     }
 
+    /**
+     * @brief Check if foldable contains at least one variadic argument.
+     */
     template <typename FoldStateT, typename T>
     constexpr auto operator() (FoldStateT&& prev, T&&) const
     {
@@ -143,7 +204,10 @@ struct is_varg_t
         );
     }
 };
-constexpr is_varg_t is_varg{};
+/**
+ * @brief Helper to figure out if variable is a variadic argument or a foldable containing at least one variadic argument.
+ */
+constexpr is_varg_impl is_varg{};
 
 //-------------------------------------------------------------
 

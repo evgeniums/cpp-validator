@@ -28,6 +28,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Base tag of heterogeneous properties.
+ */
 struct heterogeneous_property_tag{};
 
 //-------------------------------------------------------------
@@ -45,6 +48,15 @@ struct heterogeneous_property_index_impl
 constexpr heterogeneous_property_index_impl heterogeneous_property_index{};
 }
 
+/**
+ * @brief Helper for extracting integral constant index from heterogeneous property.
+ *
+ * Default implementation handles two kinds of such properties:
+ * - if property is of heterogeneous_property_tag then index{} of that property is used;
+ * - property is considered being integral constant itself and is used as is.
+ *
+ * For custom types custom specializations of this helper can be defined.
+ */
 template <typename PropertyT, typename Enable=hana::when<true>>
 struct heterogeneous_property_index_t
 {
@@ -58,9 +70,15 @@ struct heterogeneous_property_index_t
         )(std::forward<PropertyT1>(prop));
     }
 };
+/**
+ * Instance of heterogeneous_property_index_t helper.
+ */
 template <typename PropertyT>
 constexpr heterogeneous_property_index_t<PropertyT> heterogeneous_property_index_inst{};
 
+/**
+ * @brief Implementation of heterogeneous_property_index().
+ */
 struct heterogeneous_property_index_impl
 {
     template <typename PropertyT>
@@ -69,10 +87,26 @@ struct heterogeneous_property_index_impl
         return heterogeneous_property_index_inst<std::decay_t<PropertyT>>(std::forward<PropertyT>(prop));
     }
 };
+/**
+ * @brief Extract integral constant index from heterogeneous property.
+ * @param prop Heterogeneous property.
+ * @return Integral constant index of the property.
+ *
+ * If property is of heterogeneous_property_tag then index{} of that property is used.
+ * Otherwise, the property is considered being integral constant itself and is returned as is.
+ * Besides, specialization of heterogeneous_property_index_t can be defined for a custom type to
+ * extract heterogeneous index from that type.
+ */
 constexpr heterogeneous_property_index_impl heterogeneous_property_index{};
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Helper for getting heterogeneous property from an object.
+ *
+ * Default implementation uses hana::at() to get the value by heterogeneous_property_index(prop).
+ * For custom types custom specializations of get_heterogeneous_property_t can be defined.
+ */
 template <typename T, typename PropertyT, typename Enable=hana::when<true>>
 struct get_heterogeneous_property_t
 {
@@ -82,9 +116,15 @@ struct get_heterogeneous_property_t
         return hana::at(obj,heterogeneous_property_index(prop));
     }
 };
+/**
+ * Instance of get_heterogeneous_property_t helper.
+ */
 template <typename T, typename PropertyT>
 constexpr get_heterogeneous_property_t<T,PropertyT> get_heterogeneous_property_inst{};
 
+/**
+ * @brief Implementation of get_heterogeneous_property().
+ */
 struct get_heterogeneous_property_impl
 {
     template <typename T, typename PropertyT>
@@ -96,10 +136,22 @@ struct get_heterogeneous_property_impl
                 );
     }
 };
+/**
+ * @brief Get heterogeneous property form an object.
+ * @param obj Object, typically a kind of tuple.
+ * @param prop Heterogeneous property or integral constant of size_t type.
+ * @return Element of object corresponding to heterogeneous property.
+ */
 constexpr get_heterogeneous_property_impl get_heterogeneous_property{};
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Base struct for heterogeneous properties.
+ *
+ * Heterogeneous property usually correspond to a tuple's element.
+ * Thus, the property just wraps an integral constant for the element's index.
+ */
 template <size_t Index>
 struct heterogeneous_property_t : public heterogeneous_property_tag,
                                   public basic_property
@@ -108,17 +160,26 @@ struct heterogeneous_property_t : public heterogeneous_property_tag,
 
     heterogeneous_property_t()=default;
 
-    // Construct from any value
+    //! Constructor from any value used as a stub.
     template <typename T>
     heterogeneous_property_t(T&&)
     {}
 
+    /**
+     * @brief Get value of heterogeneous property from object.
+     * @param v Object.
+     * @result Object's element corresponding to this property.
+     */
     template <typename T>
     constexpr static auto get(T&& v) -> decltype(auto)
     {
         return get_heterogeneous_property(std::forward<T>(v),index{});
     }
 
+    /**
+     * @brief Check if object has a property.
+     * @return If property index is less than size of heterogeneous object then true, otherwise false.
+     */
     template <typename T>
     constexpr static bool has()
     {
@@ -151,6 +212,10 @@ struct heterogeneous_property_t : public heterogeneous_property_tag,
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Base struct for heterogeneous properties with configuration holding property's strings
+ *        such as name and flag descriptions.
+ */
 template <size_t Index, typename ConfigT>
 struct heterogeneous_property_with_config_t : public heterogeneous_property_t<Index>
 {
@@ -179,6 +244,9 @@ struct heterogeneous_property_with_config_t : public heterogeneous_property_t<In
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Config of heterogeneous property made of integral constant index.
+ */
 template <size_t Index>
 struct heterogeneous_property_const_config_t
 {
@@ -199,8 +267,14 @@ struct heterogeneous_property_const_config_t
     }
 };
 
+/**
+ * @brief Base tag struct for heterogeneous properties made of integral constant indexes.
+ */
 struct heterogeneous_property_just_index_tag{};
 
+/**
+ * @brief Heterogeneous property made of integral constant index.
+ */
 template <size_t Index>
 struct heterogeneous_property_just_index_t : public heterogeneous_property_with_config_t<Index,heterogeneous_property_const_config_t<Index>>,
                                              public heterogeneous_property_just_index_tag

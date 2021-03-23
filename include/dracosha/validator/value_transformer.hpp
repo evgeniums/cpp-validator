@@ -26,8 +26,13 @@ Distributed under the Boost Software License, Version 1.0.
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
+//-------------------------------------------------------------
+
 namespace detail {
 
+/**
+ * @brief Helper to figure out if value transformer is invokable for given type.
+ */
 template <typename T, typename HandlerT, typename=hana::when<true>>
 struct is_transformer_invokable
 {
@@ -50,6 +55,11 @@ struct is_transformer_invokable<T,HandlerT,
 
 }
 
+//-------------------------------------------------------------
+
+/**
+ * @brief Special property that transforms preceding value using some handler.
+ */
 template <typename HandlerT, typename HasFlagT=hana::false_>
 struct value_transformer_t : public basic_property
 {
@@ -58,6 +68,13 @@ struct value_transformer_t : public basic_property
     std::string _flag_str;
     std::string _n_flag_str;
 
+    /**
+     * @brief Constructor.
+     * @param handler Handler used to transform value.
+     * @param name Name of this property.
+     * @param flag_str Flag description of this property.
+     * @param n_flag_str Negative flag description of this property.
+     */
     template <typename HandlerT1>
     value_transformer_t(
             HandlerT1&& handler,
@@ -70,18 +87,31 @@ struct value_transformer_t : public basic_property
             _n_flag_str(std::move(n_flag_str))
     {}
 
+    /**
+     * @brief Get property from the value.
+     * @param v Value.
+     * @return Value transformed with handler.
+     */
     template <typename T>
     auto get(T&& v) const -> decltype(auto)
     {
         return _handler(std::forward<T>(v));
     }
 
+    /**
+     * @brief Check if value of givent type can be transformed with handler of this property.
+     */
     template <typename T>
     constexpr static bool has()
     {
         return detail::is_transformer_invokable<T,HandlerT>::value;
     }
 
+    /**
+     * @brief Create poperty validator with this property.
+     * @param args Arguments to forward to property validator.
+     * @return Property validator.
+     */
     template <typename ... Args>
     auto operator () (Args&&... args) const
     {
@@ -122,8 +152,19 @@ struct value_transformer_t : public basic_property
     }
 };
 
+//-------------------------------------------------------------
+
+/**
+ * @brief Implementer of make_value_transformer().
+ */
 struct make_value_transformer_impl
 {
+    /**
+     * @brief Create property for value transformation.
+     * @param handler Handler to use for value transformation.
+     * @param name Name of the property.
+     * @return Property of value_transformer_t type.
+     */
     template <typename HandlerT>
     auto operator() (HandlerT&& handler, std::string name) const
     {
@@ -135,6 +176,14 @@ struct make_value_transformer_impl
         };
     }
 
+    /**
+     * @brief Create property for value transformation.
+     * @param handler Handler to use for value transformation.
+     * @param name Name of the property.
+     * @param flag_str Flag description of this property.
+     * @param n_flag_str Negative flag description of this property.
+     * @return Property of value_transformer_t type.
+     */
     template <typename HandlerT>
     auto operator() (HandlerT&& handler, std::string name, std::string flag_str, std::string n_flag_str) const
     {
@@ -146,6 +195,11 @@ struct make_value_transformer_impl
         };
     }
 };
+/**
+ * @brief Create property for value transformation.
+ *
+ * See descriptions of operators above in make_value_transformer_impl.
+*/
 constexpr make_value_transformer_impl make_value_transformer{};
 
 //-------------------------------------------------------------

@@ -28,6 +28,9 @@ struct property_tag;
 
 //-------------------------------------------------------------
 
+/**
+ * @brief base struct for properties.
+ */
 struct basic_property : public adjust_storable_ignore
 {
     using hana_tag=property_tag;

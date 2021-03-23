@@ -29,7 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 template <typename UsedPathSizeT, typename PathT, typename AdapterT, typename MemberT, typename HandlerT>
-status apply_generated_paths_t::operator () (UsedPathSizeT&& used_path_size, PathT&& current_path, AdapterT&& adapter, MemberT&& member, HandlerT&& handler) const
+status apply_generated_paths_impl::operator () (UsedPathSizeT&& used_path_size, PathT&& current_path, AdapterT&& adapter, MemberT&& member, HandlerT&& handler) const
 {
     return hana::eval_if(
         hana::greater_equal(used_path_size,hana::size(member.path())),

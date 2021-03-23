@@ -27,6 +27,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
+//-------------------------------------------------------------
+
 struct member_tag;
 
 template <typename Ts>
@@ -34,6 +36,8 @@ auto make_member(Ts&& path);
 
 template <typename Ts, typename T>
 auto inherit_member(Ts&& path, T&& member);
+
+//-------------------------------------------------------------
 
 /**
  *  @brief Generic descriptor of a member to be validated.
@@ -175,6 +179,9 @@ class member
             return unwrap_object(hana::back(_path));
         }
 
+        /**
+          * @brief Get reference to the last path element holding the member's key.
+          */
         auto last_path_item() const -> decltype(auto)
         {
             return hana::back(_path);

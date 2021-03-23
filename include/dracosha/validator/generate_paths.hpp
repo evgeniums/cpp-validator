@@ -26,15 +26,29 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Helper for generating member paths.
+ */
 template <typename KeyT, typename Enable=hana::when<true>>
 struct generate_paths_t
 {
     template <typename UsedPathSizeT, typename PathT, typename AdapterT, typename HandlerT>
-    status operator () (UsedPathSizeT&&, PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
+    status operator () (UsedPathSizeT&& used_path_size, PathT&& path, AdapterT&& adapter, HandlerT&& handler) const
     {
+        std::ignore=used_path_size;
         return handler(std::forward<AdapterT>(adapter),std::forward<PathT>(path),hana::size(path));
     }
 };
+/**
+ * @brief Generate paths from original member's path.
+ * @param used_path_size Length of already used member's path prefix.
+ * @param path Previous/original path.
+ * @param adapter Validation adapter.
+ * @param handler Validation handler to apply to member with generated path.
+ * @return Validation status.
+ *
+ * Paths can be generated in case of element aggregations and trees.
+ */
 template <typename KeyT>
 constexpr generate_paths_t<KeyT> generate_paths{};
 

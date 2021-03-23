@@ -39,7 +39,7 @@ enum class if_member_not_found : int
 };
 
 /**
- * @brief Base template for classes that can be queried if a member exists.
+ * @brief Base template for adapters that can be queried if a member exists.
  */
 template <typename TraitsT>
 struct with_check_member_exists
@@ -48,6 +48,10 @@ struct with_check_member_exists
     if_member_not_found _unknown_member_mode;
     bool _check_member_exists;
 
+    /**
+     * @brief Constructor.
+     * @param traits Adapter traits.
+     */
     with_check_member_exists(const TraitsT& traits):
         _traits(traits),
         _unknown_member_mode(if_member_not_found::ignore),

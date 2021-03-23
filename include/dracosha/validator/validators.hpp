@@ -8,9 +8,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** @file validator/detail/validator_impl.hpp
+/** @file validator/validator.hpp
 *
-*  Defines implementation of validator.
+*  Defines validator templates.
 *
 */
 
@@ -18,8 +18,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 #ifndef DRACOSHA_VALIDATOR_VALIDATOR_IMPL_HPP
 #define DRACOSHA_VALIDATOR_VALIDATOR_IMPL_HPP
-
-#include <string>
 
 #include <dracosha/validator/config.hpp>
 #include <dracosha/validator/utils/adjust_storable_type.hpp>
@@ -34,6 +32,11 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct validator_tag;
 
+//-------------------------------------------------------------
+
+/**
+ * @brief Base template for validators with explicit description hints.
+ */
 template <typename ValidatorT, typename HintT>
 class validator_with_hint_t : public ValidatorT
 {
@@ -41,6 +44,11 @@ class validator_with_hint_t : public ValidatorT
 
         using hint_type=typename adjust_storable_type<HintT>::type;
 
+        /**
+         * @brief Constructor.
+         * @param hint Description hint.
+         * @param args Arguments to forward to constructor of original validator.
+         */
         template <typename HintT1, typename ... Args>
         validator_with_hint_t(HintT1&& hint, Args&&... args)
             : ValidatorT(std::forward<Args>(args)...),
@@ -72,6 +80,8 @@ class validator_with_hint_t : public ValidatorT
 
         hint_type _hint;
 };
+
+//-------------------------------------------------------------
 
 /**
  * @brief Validator.
@@ -151,6 +161,11 @@ class validator_t
         HandlerT _fn;
 };
 
+//-------------------------------------------------------------
+
+/**
+ * @brief Base template for member validators.
+ */
 template <typename MemberT, typename ValidatorT, typename ExistsOperatorT=exists_t>
 class validator_with_member_t
 {
@@ -162,6 +177,11 @@ class validator_with_member_t
         const bool check_exists_operand;
         const exists_t& exists_operator;
 
+        /**
+         * @brief Constructor.
+         * @param member Member.
+         * @param v Validation handler.
+         */
         validator_with_member_t(MemberT member, ValidatorT v, bool =false, const ExistsOperatorT& =exists)
             : check_exists_operand(false),
               exists_operator(exists),

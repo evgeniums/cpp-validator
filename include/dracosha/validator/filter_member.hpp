@@ -32,6 +32,14 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Default invoker of member filtering.
+ *
+ * This implementation processes member in 3 steps:
+ *  1. check if member's path must be filtered;
+ *  2. if not filtered then check if member exists or might exist;
+ *  3. if esists or might exist then invoke validation handler.
+ */
 template <typename AdapterT, typename MemberT, typename Enable=hana::when<true>>
 struct filter_member_invoker
 {
@@ -46,6 +54,13 @@ struct filter_member_invoker
     }
 };
 
+/**
+ * @brief Invoker of member filtering in case of aggregated members and adapters with expand_aggregation_members set to integral constant true.
+ *
+ * This implementation forwards member processing to paths generating.
+ * For each generated path it checks if that path must be filtered and if not then invoke
+ * validation handler if member exists or might exist.
+ */
 template <typename AdapterT, typename MemberT>
 struct filter_member_invoker<AdapterT,MemberT,
             hana::when<
@@ -68,7 +83,10 @@ struct filter_member_invoker<AdapterT,MemberT,
 
 //-------------------------------------------------------------
 
-struct filter_member_t
+/**
+ * @brief Implementer of filter_member().
+ */
+struct filter_member_impl
 {
     template <typename FnT, typename AdapterT, typename MemberT>
     auto operator () (FnT&& fn, AdapterT&& adapter, MemberT&& member) const
@@ -77,7 +95,14 @@ struct filter_member_t
                     ::invoke(std::forward<FnT>(fn),std::forward<AdapterT>(adapter),std::forward<MemberT>(member));
     }
 };
-constexpr filter_member_t filter_member{};
+/**
+ * @brief Filter a member before validation.
+ * @param fn Validation handler.
+ * @param adapter Validation adapter.
+ * @param member Member.
+ * @return If member is filtered status::code::ignore, otherwise result of validation handler.
+ */
+constexpr filter_member_impl filter_member{};
 
 //-------------------------------------------------------------
 

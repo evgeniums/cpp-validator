@@ -34,7 +34,10 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-struct always_has_property_t
+/**
+ * @brief Implementer of always_has_property().
+ */
+struct always_has_property_impl
 {
     template <typename ...Args>
     constexpr static bool apply(Args&&...) noexcept
@@ -42,11 +45,29 @@ struct always_has_property_t
         return true;
     }
 };
-constexpr always_has_property_t always_has_property{};
+/**
+ * @brief Stub helper meaning tha value/object unconditionally has a variadic property.
+ */
+constexpr always_has_property_impl always_has_property{};
 
+//-------------------------------------------------------------
+
+/**
+ * @brief Closure of variadic property.
+ *
+ * The closure is used for variadic property currying which results in
+ * creating temporary closures with partial variadic arguments. Each such closure is
+ * a temporary value in a member's path that has at() method for getting next temporary value.
+ * When number of collected keys after variadic property becomes equal to the number of arguments in the variadic property
+ * then the variadic property with accumulated arguments is applied to the value/object standing before the
+ * variadic property in the member's path.
+ */
 template <typename ObjT, typename FnT, typename AccumulatedArgsT, typename FnArgTypes, typename FnHasT>
 struct variadic_property_closure
 {
+    /**
+     * @brief Check if closure can call at() with the next arg in the member's path.
+     */
     template <typename T>
     constexpr static bool has_c()
     {
@@ -57,6 +78,12 @@ struct variadic_property_closure
         return std::is_convertible<T,typename decltype(current_type)::type>::value;
     }
 
+    /**
+     * @brief Call at() with the next key in the member's path.
+     * @param arg Next key in the member's path.
+     * @return Next variadic closure if number of accumulated arguments less than number of arguments in variadic property,
+     *         othervise invoke the variadic property with accumulated arguments.
+     */
     template <typename T>
     auto at(T&& arg,
             std::enable_if_t<variadic_property_closure::has_c<T>(), void*> =nullptr
@@ -86,6 +113,9 @@ struct variadic_property_closure
         )(this,std::forward<T>(arg));
     }
 
+    /**
+     * @brief Check if at() can be called with accumulated arguments and the last provided arg.
+     */
     template <typename T>
     bool has(
             T&& arg,

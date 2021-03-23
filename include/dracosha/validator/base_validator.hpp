@@ -30,11 +30,22 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 struct exists_t;
 
+//-------------------------------------------------------------
+
+/**
+ * @brief Base template struct for validators.
+ */
 template <typename HandlerT, typename WithCheckExistsT=hana::false_, typename ExistsOperatorT=exists_t>
 struct base_validator
 {
     using with_check_exists=WithCheckExistsT;
 
+    /**
+     * @brief Constructor.
+     * @param fn Validation handler.
+     * @param must_exist If "exists()" must be checked before validation.
+     * @param exists_op Operand to be used to check if "exists()".
+     */
     base_validator(
             HandlerT fn,
             bool must_exist=false,
@@ -44,6 +55,11 @@ struct base_validator
             exists_operator(std::move(exists_op))
     {}
 
+    /**
+     * @brief Invoke handler.
+     * @param args Arguments.
+     * @return Validation result.
+     */
     template <typename ... Args>
     auto operator () (Args&&... args) const -> decltype(auto)
     {
@@ -55,6 +71,9 @@ struct base_validator
     const ExistsOperatorT exists_operator;
 };
 
+//-------------------------------------------------------------
+
+namespace detail {
 struct is_validator_with_check_exists_single_impl
 {
     template <typename T>
@@ -90,7 +109,11 @@ struct is_validator_with_check_exists_tuple_impl
     }
 };
 constexpr is_validator_with_check_exists_tuple_impl is_validator_with_check_exists_tuple{};
+}
 
+/**
+ * @brief Implementer of is_validator_with_check_exists.
+ */
 struct is_validator_with_check_exists_impl
 {
     template <typename T>
@@ -98,19 +121,23 @@ struct is_validator_with_check_exists_impl
     {
         return hana::if_(
             hana::is_a<hana::tuple_tag,T>,
-            [](auto&& xs)
-            {
-                return is_validator_with_check_exists_tuple(xs);
-            },
-            [](auto&& xs)
-            {
-                return is_validator_with_check_exists_single(xs);
-            }
+            detail::is_validator_with_check_exists_tuple,
+            detail::is_validator_with_check_exists_single
         )(std::forward<T>(xs));
     }
 };
+/**
+ * @brief Figure if with_check_exists is set in validator(s).
+ * @param Validator or container with validators.
+ * @return True if any of validators have with_check_exists set.
+ */
 constexpr is_validator_with_check_exists_impl is_validator_with_check_exists{};
 
+//-------------------------------------------------------------
+
+/**
+ * @brief Implementer of content_of_check_exists.
+ */
 struct content_of_check_exists_impl
 {
     template <typename T>
@@ -147,6 +174,11 @@ struct content_of_check_exists_impl
         )(std::forward<T>(xs));
     }
 };
+/**
+ * @brief Get content of "exists()" condition of validator where with_check_exists is set.
+ * @param Validator or container with validators.
+ * @return Content of "exists()" condition as std::pair{check_exists_operand,exists_operator}.
+ */
 constexpr content_of_check_exists_impl content_of_check_exists{};
 
 //-------------------------------------------------------------

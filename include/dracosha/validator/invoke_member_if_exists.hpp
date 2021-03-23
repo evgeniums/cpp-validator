@@ -27,6 +27,9 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+/**
+ * @brief Implementer of invoke_member_if_exists().
+ */
 struct invoke_member_if_exists_impl
 {
     template <typename FnT, typename AdapterT, typename MemberT>
@@ -99,6 +102,16 @@ struct invoke_member_if_exists_impl
         );
     }
 };
+/**
+ * @brief Helper for checking member existence before invoking validation handler.
+ * @param fn Validation handler.
+ * @param adapter Validation adapter.
+ * @param member Member under validation.
+ * @return Validation result.
+ *
+ * Actual checking of member existence is performed only if adapter allows such check.
+ * But anyway, checking if member's path is valid for the object is performed always at compilation time.
+ */
 constexpr invoke_member_if_exists_impl invoke_member_if_exists{};
 
 //-------------------------------------------------------------

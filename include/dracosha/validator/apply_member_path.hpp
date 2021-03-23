@@ -26,12 +26,27 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-struct apply_member_path_t
+/**
+ * @brief Implementer of apply_member_path.
+ */
+struct apply_member_path_impl
 {
     template <typename UsedPathSizeT, typename PathT, typename FnT, typename AdapterT, typename MemberT>
     status operator () (UsedPathSizeT&& used_path_size, PathT&& current_path, FnT&& fn, AdapterT&& adapter, MemberT&& member) const;
 };
-constexpr apply_member_path_t apply_member_path{};
+/**
+ * @brief Apply validation handler to member path.
+ * @param used_path_size Length of already used member's path prefix.
+ * @param current_path Current path to apply handler to.
+ * @param fn Validation handler.
+ * @param adapter Validation adapter.
+ * @param member Member.
+ * @return Status of validation.
+ *
+ * Member path might be not the final actual path the validation is applied to.
+ * If there are aggregations in path then actual paths would be generated and processed in apply_generated_paths().
+ */
+constexpr apply_member_path_impl apply_member_path{};
 
 
 //-------------------------------------------------------------

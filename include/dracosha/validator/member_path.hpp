@@ -23,14 +23,16 @@ Distributed under the Boost Software License, Version 1.0.
 
 DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 
+//-------------------------------------------------------------
+
 struct member_tag;
 
+//-------------------------------------------------------------
+
 /**
-* @brief Extract path from a member.
-* @param member Member.
-* @return Member's path.
+* @brief Implementer of member_path().
 */
-struct member_path_t
+struct member_path_impl
 {
     template <typename MemberT>
     auto operator () (const MemberT& member) const -> decltype(auto)
@@ -48,8 +50,20 @@ struct member_path_t
         );
     }
 };
-constexpr member_path_t member_path{};
+/**
+* @brief Extract path from a member.
+* @param member Member.
+* @return Member's path.
+*
+* If "member" is not of member type then it is packed into hana::tuple as a result.
+*/
+constexpr member_path_impl member_path{};
 
+//-------------------------------------------------------------
+
+/**
+ * @brief Implementer of path_of().
+ */
 struct path_of_impl
 {
     template <typename ArgT>
@@ -70,9 +84,19 @@ struct path_of_impl
         )(std::forward<ArgT>(arg));
     }
 };
+/**
+ * @brief Get path of a member.
+ * @param arg Input value.
+ * @return Path of arg if it is a member, otherwise arg as is.
+ */
 constexpr path_of_impl path_of{};
 
-struct member_path_list_t
+//-------------------------------------------------------------
+
+/**
+ * @brief Implementer of member_path_list().
+ */
+struct member_path_list_impl
 {
     template <typename ...Args>
     constexpr auto operator () (Args&&... args) const
@@ -80,7 +104,12 @@ struct member_path_list_t
         return hana::transform(hana::make_tuple(std::forward<Args>(args)...),member_path);
     }
 };
-constexpr member_path_list_t member_path_list{};
+/**
+ * @brief Construct list of paths from list of members.
+ * @param args Members.
+ * @return List of members' paths as hana::tuple.
+ */
+constexpr member_path_list_impl member_path_list{};
 
 //-------------------------------------------------------------
 
