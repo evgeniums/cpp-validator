@@ -944,7 +944,8 @@ A heterogeneous property can be defined either implicitly or explicitly.
 
 #### Implicit heterogeneous property
 
-Heterogeneous property is defined implicitly when an integral constant is used as one of the keys of [member's](#member) path. 
+Heterogeneous property is defined implicitly when an integral constant is used as one of the keys of [member's](#member) path.
+
 See example below.
 
 ```cpp
@@ -1739,6 +1740,14 @@ Examples of *custom adapter traits* implementation can be found in `validator/ad
 
 Examples of *custom adapter* implementation can be found in `validator/adapters/default_adapter.hpp`, `validator/adapters/reporting_adapter.hpp` and `validator/adapters/single_member_adapter.hpp`. 
 
+## Validation of trees
+
+## Partial validation
+
+## Validation of results of evaluations or value transformations
+
+## Reusing validators in nested validators
+
 ## Reporting
 
 `cpp-library` can construct text [reports](#report) describing validation errors. To enable construction of error [reports](#report) either [reporting adapter](#reporing-adapter) or [single member adapter](#single-member-adapter) should be used. [Reports](#report) can be customized with help of custom [reporters](#reporter) given to the corresponding adapters.
@@ -2431,6 +2440,92 @@ if (!v4.apply(ra1))
 }
 rep.clear();
 ```
+
+# Performance considerations
+
+## Validation overhead
+
+Normally, validator should add very little overhead compared to manual coding of the same checks because significant part of preparations is made and optimized at compilation time.
+
+Still, there are some considerations that must be taken into account.
+For example, have a look at four validators below. All of them logically do the same verification: a value of nested member must be greater or equal to 100 and less or equal 1000. Nevertheless, the first validator has the worst performance and the fourth validator has the best performance. The second and the third validators are equivalent.
+
+```cpp
+    auto v1=validator(
+        _[key1][key2][key3](gte,100),
+        _[key1][key2][key3](lte,1000)
+    );
+    
+    auto v2=validator(
+        _[key1][key2][key3](value(gte,100) ^AND^ value(lte,1000))
+    );
+
+    auto v3_1=validator(
+        _[key3](value(gte,100) ^AND^ value(lte,1000))
+    );
+    auto v3=validator(
+        _[key1][key2](v3_1)
+    );
+    
+    auto v4=validator(
+        _[key1][key2][key3](in, interval(100,1000))
+    );
+```
+
+- The first validator extracts a value of the nested member twice because each member in validator is evaluated independently. If object is a nested container with huge number of elements then that extraction can be noticeably expensive.
+- The second validator extracts a value only once and then invokes two operators one by one which is quite fast but can be a little bit more expensive than the forth variant.
+- The third validator pre-extracts intermediate value of a partial member's path and then invokes nested validator that finishes value extraction and applies final validation. As a result, full actual validation procedure and its speed are the same as in case with the second validator.
+- The fourth validator extracts a value once and invokes single operator which is the most effective way to solve this sample task. 
+
+Though, it is a rare case when two operators can be narrowed down to a single operator.
+In general, a rule of thumb is to use [logical aggregations](#logical-aggregations) and/or [nested validators](#reusing-validators-in-nested-validators) at a member level to avoid repetitive value extractions at the same member path.
+
+## Zero copy
+
+A `validator` tries to do as little data copying as possible. All variables provided to validators are used by references. Thus, a user is responsible for the variables to stay valid during life time of a validator. If it is not possible then a variable must be explicitly moved or copied to a validator. Note that moved/copied values owned by the validator can be implicitly copied or moved multiple times during some validator operations - for example, when a nested member is constructed the keys of parent member path are moved or copied to the elements of the child member path. Therefore, it is still recommended to use validators with variables by references.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/utils/copy.hpp>
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// ....
+
+std::string key1{"key1"};
+std::string value1{"value1"};
+// key1 and value1 are passed by reference and must stay valid duiring validator life time
+auto v1=validator(
+    _[key1](eq,value1)
+);
+
+std::string key2{"key2"};
+std::string value2{"value2"};
+// key2 and value2 are explicitly moved to validator and validator becomes responsible for their contents
+auto v2=validator(
+    _[std::move(key2)](eq,std::move(value2))
+);
+
+std::string key3{"key3"};
+std::string value3{"value3"};
+// key3 and value3 are explicitly copied to validator and validator becomes responsible for copies of their contents
+auto v3=validator(
+    _[copy(key3)](eq,copy(value3))
+);
+
+// "key4" and "value4" are implicitly moved to validator and validator is responsible for their contents
+auto v3=validator(
+    _["key4")](eq,"value4")
+);
+```
+
+## Checking member existence before validation
+
+By default only types compatibility is checked before validation. This can lead to exceptions or other errors or undefined behaviour in case the validation operation is requsted on the member that doesn't exist. To avoid such problems explicit or implicit checks of member existence can be used, see [Member existence](#member-existence). Though, those checks can add some overhead because a value might be looked up twice - the first one is to check exictence and the second one is to extract a value for validation. So, it depends on the use case whether to enable or not enable pre-checking of member existence.
+
+## Validation with text reports
+
+Building text reports sometimes can add meaningful overhead because construction of the reports can be rather complicated at certain cases. Therefore, in applications with very strong requirements to performance and minimal delays it is recommended to use validation with reporting only when text reports are really needed or use double run - first, validate data without text report, and then, use validation with text reports only on already failed data just to construct a report.
 
 # Building and installation
 
