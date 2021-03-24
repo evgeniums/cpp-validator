@@ -9,6 +9,7 @@
 #include <dracosha/validator/properties/h_size.hpp>
 #include <dracosha/validator/utils/foreach_if.hpp>
 #include <dracosha/validator/utils/conditional_fold.hpp>
+#include <dracosha/validator/validate.hpp>
 
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -400,6 +401,51 @@ BOOST_AUTO_TEST_CASE(CheckHeterogeneousAllAny)
     BOOST_CHECK(!v2.apply(ra3));
     BOOST_CHECK_EQUAL(rep,std::string("size of at least one element must be greater than or equal to 3"));
     rep.clear();
+}
+
+BOOST_AUTO_TEST_CASE(CheckImplicitFromDoc)
+{
+    auto v1=validator(
+        _[std::integral_constant<size_t,1>{}](gt,100)
+    );
+    auto v2=validator(
+        _[hana::size_c<1>](gt,100)
+    );
+
+    auto t1=std::make_tuple(200,50,"hello");
+    auto t2=hana::make_tuple(200,50,"hello");
+
+    error_report err;
+
+    validate(t1,v1,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("element #1 must be greater than 100"));
+
+    validate(t2,v2,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("element #1 must be greater than 100"));
+}
+
+BOOST_AUTO_TEST_CASE(CheckExplicitFromDoc)
+{
+    auto v1=validator(
+        _[one](gt,100)
+    );
+    auto v2=validator(
+        _[zero](lt,100)
+    );
+
+    error_report err;
+
+    auto t1=std::make_tuple(200,50,"hello");
+    validate(t1,v1,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("one must be greater than 100"));
+
+    auto t2=hana::make_tuple(200,50,"hello");
+    validate(t2,v2,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("zero must be less than 100"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

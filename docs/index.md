@@ -97,19 +97,20 @@
 
 [//]: # (TOC End)
 
-
-
 ----
 
 # Introduction
 
-`cpp-validator` is a modern **C++** header-only library for validation of variables, objects and containers.
+`cpp-validator` is a modern C++ header-only library for validation of variables, objects and containers.
 
 `cpp-validator` can be used to validate:
 - plain variables;
 - properties of objects, where a property can be accessed either as object's variable or object's method;
 - contents and properties of containers;
-- nested containers and objects.
+- nested containers and objects;
+- heterogeneous containers such as pairs and tuples;
+- trees;
+- results of some evaluations or transformations performed on object or object's parts.
 
 Basic usage of the library includes a few steps:
 
@@ -175,7 +176,7 @@ Bundle of validation conditions described with [operators](#operator) and [aggre
 To construct a validator one should describe validation conditions using five groups of components.
 
 1. Part(s) of an [object](#object) the validation will be applied to, which can be:
-    * whole object itself;
+    * whole object;
     * [member(s)](#member) of the object.
 
 2. [Property](#property) of selected object's part that must be verified. By default a special pseudo property *value* is used which means that validation must be applied to the variable "as is". The library provides a few other predefined properties such as *size*, *length* and *empty*. Custom properties can also be defined, see [Properties](#properties).
@@ -810,6 +811,27 @@ See examples of different property notations in section [Validator with properti
 
 `empty` property is used to validate result of `empty()` method or `empty` member variable of an [object](#object).
 
+#### *h_size*
+
+`h_size` property is used to validate size of heterogeneous container. If object is not heterogeneous container then `h_size` is zero. The library can detect size of two type of heterogeneous containers: `std::tuple` and `hana::tuple`. A custom type can be added by defining specialization of `heterogeneous_size_t` template struct that must be of `size_t` integral constant type. See example below.
+
+```cpp
+#include <utility>
+#include "dracosha/validator/utils/heterogeneous_size.hpp"
+
+DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+
+// template specialization for std:pair
+template <typename T>
+struct heterogeneous_size_t<std::pair<T>> : public hana::size_t<2>
+{};
+
+DRACOSHA_VALIDATOR_NAMESPACE_END
+```
+#### *first* and *second*
+
+`first` and `second` properties are used to validate elements of `std::pair`.
+
 ### Adding new property
 
 A new [property](#property) can be added using special macros defined in `cpp-validator` library. 
@@ -913,6 +935,102 @@ if (!v.apply(ra))
 return 0;
 }
 ```
+
+### Properties of heterogeneous containers
+
+To validate elements of heterogeneous containers a special kind of properties should be used. A `heterogeneous property` wraps an index of a tuple element. [Element aggregations](#element-aggregations) can be used with heterogeneous properties in the same way as with ordinary properties if [h_size](h_size) of validated container is not equal to zero.
+
+A heterogeneous property can be defined either implicitly or explicitly.
+
+#### Implicit heterogeneous property
+
+Heterogeneous property is defined implicitly when an integral constant is used as one of the keys of [member's](#member) path. 
+See example below.
+
+```cpp
+#include <dracosha/validator/heterogeneous_property.hpp>
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/validate.hpp>
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+    // implicit heterogeneous property from std::integral_constant<size_t,CONSTANT>
+    auto v1=validator(
+        _[std::integral_constant<size_t,1>{}](gt,100)
+    );
+    // implicit heterogeneous property from hana::size_c<CONSTANT>
+    auto v2=validator(
+        _[hana::size_c<1>](gt,100)
+    );
+
+    error_report err;
+
+    // validate std::tuple
+    auto t1=std::make_tuple(200,50,"hello");
+    validate(t1,v1,err);
+    assert(err);
+    assert(err.message()==std::string("element #1 must be greater than 100"));
+
+    // validate hana::tuple
+    auto t2=hana::make_tuple(200,50,"hello");
+    validate(t2,v2,err);
+    assert(err);
+    assert(err.message()==std::string("element #1 must be greater than 100"));
+
+    return 0;
+}
+```
+
+#### Explicit heterogeneous property
+
+Explicit heterogeneous property can be used if the property must have distinct name and/or [flag](#flag) descriptions. To define explicit heterogeneous property use either macro `DRACOSHA_VALIDATOR_HETEROGENEOUS_PROPERTY(name,element_index)` or macro `DRACOSHA_VALIDATOR_HETEROGENEOUS_PROPERTY_FLAG(name,element_index,flag_description,negative_flag_description)`.
+
+See example below.
+
+```cpp
+#include <dracosha/validator/heterogeneous_property.hpp>
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/validate.hpp>
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// define property "zero" with index 0
+DRACOSHA_VALIDATOR_HETEROGENEOUS_PROPERTY(zero,0)
+// define property "one" with index 1
+DRACOSHA_VALIDATOR_HETEROGENEOUS_PROPERTY(one,1)
+
+int main()
+{
+    // use explicit heterogeneous property "one"
+    auto v1=validator(
+        _[one](gt,100)
+    );
+    // use explicit heterogeneous property "zero"
+    auto v2=validator(
+        _[zero](lt,100)
+    );
+
+    error_report err;
+
+    auto t1=std::make_tuple(200,50,"hello");
+    validate(t1,v1,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("one must be greater than 100"));
+
+    auto t2=hana::make_tuple(200,50,"hello");
+    validate(t2,v2,err);
+    BOOST_CHECK(err);
+    BOOST_CHECK_EQUAL(err.message(),std::string("zero must be less than 100"));
+
+    return 0;
+}
+```
+
+### Variadic properties
+
+Ordinary [properties](#properties) do not have arguments. To validate returns of [object](#object) methods with arguments one shoud use `variadic properties`
 
 ## Operators
 
