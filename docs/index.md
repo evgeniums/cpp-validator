@@ -1637,7 +1637,7 @@ auto v4=validator(
 
 ### Element aggregations
 
-Element aggregations are used when the same validation conditions must be applied to multiple elements of container. Element aggregations can use only `functional notation` with single argument.
+Element aggregations are used when the same validation conditions must be applied to multiple elements of container. Element aggregations can be used either with `member notation` or with `functional notation` with single argument. In both cases element aggregations can be nested.
 
 #### ANY
 
@@ -1646,14 +1646,34 @@ Element aggregations are used when the same validation conditions must be applie
 ```cpp
 // at least one element of container must be equal to "unknown" 
 // or must have size greater or equal to 5
-auto v1=validator(
+// member notation
+auto v1_1=validator(
+        _[ANY](value(eq,"unknown") ^OR^ size(gte,5))
+    );
+// functional notation    
+auto v1_2=validator(
         ANY(value(eq,"unknown") ^OR^ size(gte,5))
     );
 
 // at least one element of cntainer at "key1" element must be equal to "unknown" 
 // or must have size greater or equal to 5
-auto v2=validator(
+// member notation
+auto v2_1=validator(
+        _["key1"][ANY](value(eq,"unknown") ^OR^ size(gte,5))
+    );
+// functional notation    
+auto v2_2=validator(
         _["key1"](ANY(value(eq,"unknown") ^OR^ size(gte,5)))
+    );
+    
+// nested ANY
+// member notation
+auto v3_1=validator(
+        _["key1"][ANY][ANY](value(eq,"unknown") ^OR^ size(gte,5))
+    );
+// functional notation    
+auto v3_2=validator(
+        _["key1"](ANY(ANY(value(eq,"unknown") ^OR^ size(gte,5))))
     );
 ```
 
@@ -1664,14 +1684,34 @@ auto v2=validator(
 ```cpp
 // each element of container must be equal to "unknown" 
 // or must have size greater or equal to 5
-auto v1=validator(
+// member notation
+auto v1_1=validator(
+        _[ALL](value(eq,"unknown") ^OR^ size(gte,5))
+    );
+// functional notation
+auto v1_2=validator(
         ALL(value(eq,"unknown") ^OR^ size(gte,5))
     );
 
 // each element of container at "key1" element must be equal to "unknown" 
 // or must have size greater or equal to 5
-auto v2=validator(
+// member notation
+auto v2_1=validator(
+        _["key1"][ALL](value(eq,"unknown") ^OR^ size(gte,5))
+    );
+// functional notation    
+auto v2_2=validator(
         _["key1"](ALL(value(eq,"unknown") ^OR^ size(gte,5)))
+    );
+    
+// nested ALL
+// member notation
+auto v3_1=validator(
+        _["key1"][ALL][ALL](value(eq,"unknown") ^OR^ size(gte,5))
+    );
+// functional notation    
+auto v3_2=validator(
+        _["key1"](ALL(ALL(value(eq,"unknown") ^OR^ size(gte,5))))
     );
 ```
 
@@ -1679,7 +1719,7 @@ auto v2=validator(
 
 Validator can be used for validation of tree nodes. To validate trees a special keyword `tree` must be used as a key in [member](#member) path. A `tree` key has three parameters `tree(aggregation,node_child_getter,node_children_count)`, where:
 - `aggregation` is a mode of [element aggregation](#element-aggregations) - [ALL](#ALL) or [ANY](#ANY). In the former case each node must satisfy validation conditions, in the latter case at least one node must satisfy validation conditions.
-- `node_child_getter` is a [variadic property](#variadic-properties) of a node to access a node's child by index. Variadic property must have only one argument of index type.
+- `node_child_getter` is a [variadic property](#variadic-properties) of a node to access the node's child by index. Variadic property must have only one argument of index type.
 - `node_children_count` is a [property](#properties) of a node to figure out number of the node's children.
 
 See example below.
