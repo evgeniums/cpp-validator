@@ -1069,7 +1069,176 @@ int main()
 
 ### Variadic properties
 
-Ordinary [properties](#properties) do not have arguments. To validate returns of [object](#object) methods with arguments one shoud use `variadic properties`
+#### Properties with arguments
+
+Ordinary [properties](#properties) do not have arguments. To validate [object](#object) methods with arguments one shoud use `variadic properties`. A variadic property is defined similar to ordinary property using one of the macros:
+- `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(method)` defines variadic property corresponding to object's `method`;
+- `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(method,has_method)` defines variadic property corresponding to object's `method` and `has_method` used to check if object has the variadic property with provided arguments;
+- `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_FLAG(method,flag_descriprion,negative_flag_description)` defines variadic property corresponding to object's `method` that can be used with [flag](#flag) operator.
+
+A variadic property defined with one of the macros listed above can be used "as is" either in property notation or member notation:
+- `auto property_notation=variadic_property(arg1,arg2);`
+- `auto member_notation=_[variadic_property][arg1][arg2];`
+
+When used with member notation the arguments passed to variadic property must follow the property's key in the member's path. In this case special intermediate closures will be created at each stage of member's path until number of required arguments is reached thus using [currying](https://en.wikipedia.org/wiki/Currying) technique. 
+
+The arguments following the variadic property in the member's path can be provided either "as is" or wrapped into `varg(argument)`. In the latter case the variadic property will be presented in more natural way in text reports:
+
+- `auto member_notation=_[variadic_property][1][2];` will result in "2 of 1 of variadic_property" in the text report;
+- `auto member_notation=_[variadic_property][varg(1)][varg(2)];` will result in "variadic_property(1,2)" in the text report;
+
+See examples below.
+
+```cpp
+#include <dracosha/validator/variadic_property.hpp>
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/adapters/reporting_adapter.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// define a structure with variadic properties
+struct WithChild
+{
+    // method with one argument
+    int child(int val) const noexcept
+    {
+        return val+1;
+    }
+
+    // method with two arguments
+    int child_word(int val, const std::string& word) const noexcept
+    {
+        return val+static_cast<int>(word.size());
+    }
+
+    // method to check if object "has" child_world with provided arguments
+    bool has_child_word(int val, const std::string& word) const noexcept
+    {
+        return val>10 && word.size()>=5;
+    }
+};
+
+// define variadic property
+DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(child)
+// define variadic property to be used as "exists" checker
+DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(has_child_word)
+// define variadic property with "exists" checker
+DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(child_word,has_child_word)
+
+int main()
+{
+    // define object
+    WithChild o1;
+    
+    // define validation adapter with test reports
+    std::string rep;
+    auto ra1=make_reporting_adapter(o1,rep);
+
+    // variadic property with single argument and member notation
+    auto v1=validator(
+        _[child][varg(1)](eq,30)
+    );
+    assert(!v1.apply(ra1));
+    assert(rep==std::string("child(1) must be equal to 30"));
+    rep.clear();
+    
+    // variadic property with single argument and property notation
+    auto v2=validator(
+        child(1)(eq,30)
+    );
+    assert(!v2.apply(ra1));
+    assert(rep==std::string("child(1) must be equal to 30"));
+    rep.clear();
+
+    // variadic property with two arguments and member notation
+    auto v3=validator(
+        _[child_word][varg(20)][varg("hello")](eq,30)
+    );
+    assert(!v3.apply(ra1));
+    assert(rep==std::string("child_word(20,hello) must be equal to 30"));
+    rep.clear();
+
+    // variadic property with two arguments and property notation
+    auto v4=validator(
+        child_word(20,"hello")(eq,30)
+    );
+    assert(!v4.apply(ra1));
+    assert(rep==std::string("child_word(20,hello) must be equal to 30"));
+    rep.clear();
+    
+    // check if variadic property exists
+    auto v5=validator(
+        _[child_word][20]["hello"](exists,true)
+    );
+    assert(v5.apply(o1));
+    auto v6=validator(
+        _[child_word][5]["hello"](exists,true)
+    );
+    assert(!v6.apply(o1));
+    
+    return 0;
+}
+```
+
+#### Variadic properties with aggregations
+
+Variadic properties can be used with [element aggregations](#element-aggregations). Element aggregation can be applied to any argument of a variadic property. Element aggregations with variadic properties can be used only in `member notation` as `_[variadic_property][varg(aggregation,end_argument)]` where:
+
+- `variadic_property` - name of the property (object's method);
+- `aggregation` - name of element aggregation which can be either `ALL` or `ANY`;
+- `end_argument` - end value of the argument passed to the variadic property; note that the end value will not be processed as it is used only as end condition in `for-loop`; end_argument can be either a variable or an ordinary [property](#property) of the object.
+
+See example below.
+
+```cpp
+#include <dracosha/validator/variadic_property.hpp>
+#include <dracosha/validator/validator.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// sample struct
+struct Matrix
+{
+    size_t element(size_t i, size_t j) const noexcept
+    {
+        return i+j;
+    }
+    
+    size_t count_i() const noexcept
+    {
+        return 1000;
+    }
+    
+    size_t count_j() const noexcept
+    {
+        return 100;
+    }
+};
+
+// define variadic property
+DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(element)
+
+// define "end" properties
+DRACOSHA_VALIDATOR_PROPERTY(count_i)
+DRACOSHA_VALIDATOR_PROPERTY(count_j)
+
+int main()
+{
+    Matrix m1;
+    
+    // check if each element is greater than 100 - fails
+    auto v1=validator(
+        _[element][varg(ALL,count_i)][varg(ALL,count_j)](gt,100)
+    );
+    assert(!v1.apply(m1));
+
+    // check if at least one element is greater than 100 - succeeds
+    auto v2=validator(
+        _[element][varg(ANY,count_i)][varg(ANY,count_j)](gt,100)
+    );
+    assert(v2.apply(m1));
+    
+    return 0;
+}
+```
 
 ## Operators
 
@@ -2026,7 +2195,7 @@ To transform a value before validation a special [property](#properties) of valu
 - `handler` is a function taking a value as a single argument and returning result of value transformation or result of some evaluations on the value;
 - `name` is a string to be used as a key's name in text reports.
 
-There is also an extended version of this helper to construct value transforming properties that can be used with [flag](#flag) operator: `make_value_transformer(handler,name, flag_string,negative_flag_string)`.
+There is also an extended version of this helper to construct value transforming properties that can be used with [flag](#flag) operator: `make_value_transformer(handler,name,flag_string,negative_flag_string)`.
 
 See example below.
 
