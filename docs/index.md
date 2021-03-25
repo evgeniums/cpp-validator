@@ -110,7 +110,7 @@
 - nested containers and objects;
 - heterogeneous containers such as pairs and tuples;
 - trees;
-- results of some evaluations or transformations performed on object or object's parts.
+- transformed values or results of evaluations.
 
 Basic usage of the library includes a few steps:
 
@@ -1963,6 +1963,9 @@ Sometimes a validator can be too strict and only part of its rules needs to be c
 See examples below.
 
 ```cpp
+#include <map>
+#include <set>
+
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/default_adapter.hpp>
 #include <dracosha/validator/filter_path.hpp>
@@ -2015,7 +2018,57 @@ int main()
 }
 ```
 
-## Validation of results of evaluations or value transformations
+## Validation of transformed or evaluated values
+
+A value can be passed to some function before validation and the result of that function will be validated instead of the original value. That function could perform any transformations or evaluations on the value. 
+
+To transform a value before validation a special [property](#properties) of value transformer type must be used. Call `make_value_transformer(handler,name)` to create such property, where:
+- `handler` is a function taking a value as a single argument and returning result of value transformation or result of some evaluations on the value;
+- `name` is a string to be used as a key's name in text reports.
+
+There is also an extended version of this helper to construct value transforming properties that can be used with [flag](#flag) operator: `make_value_transformer(handler,name, flag_string,negative_flag_string)`.
+
+See example below.
+
+```cpp
+#include <dracosha/validator/value_transformer.hpp>
+#include <dracosha/validator/validator.hpp>
+
+namespace {
+// define handler that returns a size of provided string
+size_t string_size(const std::string& val) noexcept
+{
+    return val.size();
+}
+}
+
+int main()
+{
+    // create value transforming property
+    auto transformer=make_value_transformer(string_size,"string size");
+    
+    // value transformer with member notation
+    auto v1=validator(
+            _[transformer](gte,5)
+        );
+    // value transformer with property notation
+    auto v2=validator(
+            transformer(gte,5)
+        );
+ 
+    // validate string that satisfies validation conditions
+    std::string s1("Hello world");
+    assert(v1.apply(s1));
+    assert(v2.apply(s1));
+
+    // validate string that does not satisfy validation conditions
+    std::string s2("Hi");
+    assert(!v1.apply(s2));
+    assert(!v2.apply(s2));
+ 
+    return 0;   
+}
+```
 
 ## Reporting
 
