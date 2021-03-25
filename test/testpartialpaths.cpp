@@ -180,6 +180,12 @@ BOOST_AUTO_TEST_CASE(CheckNestedPaths)
                 member_path_list(_["level2"][ALL])
             );
     BOOST_CHECK(v1.apply(a10));
+
+    auto a11=include_and_exclude_paths(a1,
+                member_path_list(_["level1"],_["level2"]),
+                member_path_list(_["level2"]["field3"])
+            );
+    BOOST_CHECK(v1.apply(a11));
 }
 #endif
 

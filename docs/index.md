@@ -1717,7 +1717,7 @@ auto v3_2=validator(
 
 ### Validation of trees
 
-Validator can be used for validation of tree nodes. To validate trees a special keyword `tree` must be used as a key in [member](#member) path. A `tree` key has three parameters `tree(aggregation,node_child_getter,node_children_count)`, where:
+Validator can be used for validation of tree nodes. To validate trees a special keyword `tree` must be used as a key in [member's](#member) path. A `tree` key has three parameters `tree(aggregation,node_child_getter,node_children_count)`, where:
 - `aggregation` is a mode of [element aggregation](#element-aggregations) - [ALL](#ALL) or [ANY](#ANY). In the former case each node must satisfy validation conditions, in the latter case at least one node must satisfy validation conditions.
 - `node_child_getter` is a [variadic property](#variadic-properties) of a node to access the node's child by index. Variadic property must have only one argument of index type.
 - `node_children_count` is a [property](#properties) of a node to figure out number of the node's children.
@@ -1954,6 +1954,66 @@ DRACOSHA_VALIDATOR_NAMESPACE_END
 ```
 
 ## Partial validation
+
+Sometimes a validator can be too strict and only part of its rules needs to be checked on certain object. In this case a filtering validation adapter can be used to check only specific [members](#member) ignoring other paths. There are three forms of defining a filter for such validation:
+- use `include_paths()` to list explicitly only paths that must be validated;
+- use `exclude_paths()` to list explicitly paths that must be ignored;
+- use `include_and_exclude_paths()` to list explicitly paths that must be validated and specify sub-paths that must be excluded from validaton.
+
+See examples below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/adapters/default_adapter.hpp>
+#include <dracosha/validator/filter_path.hpp>
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+    // original validator
+    auto v1=validator(
+        _["level1"]["field1"](exists,true),
+        _["level1"]["field2"](exists,true),
+        _["level2"]["field3"](exists,true)
+    );
+
+    // container to validate
+    std::map<std::string,std::set<std::string>> m1{
+        {"level1",{"field1","field2"}},
+        {"level2",{"field4"}},
+    };
+    // wrap container into default adapter
+    auto a1=make_default_adapter(m1);
+    
+    // validation fails with original validator
+    assert(!v1.apply(a1));
+
+    // limit validation paths to a single path
+    auto a2=include_paths(a1,
+                member_path_list(_["level1"])
+            );
+    // validation succeeded with partial validation
+    assert(v1.apply(a2));
+
+    // exclude failing path from validation
+    auto a3=exclude_paths(a1,
+                member_path_list(_["level2"]["field3"])
+            );
+    // validation succeeded
+    assert(v1.apply(a3));
+
+    // include paths for validation and exclude failing sub-path
+    auto a4=include_and_exclude_paths(a1,
+                member_path_list(_["level1"],_["level2"]),
+                member_path_list(_["level2"]["field3"])
+            );
+    // validation succeeded
+    assert(v1.apply(a4));
+
+    return 0;
+}
+```
 
 ## Validation of results of evaluations or value transformations
 
