@@ -362,6 +362,44 @@ int main()
 }
 ```
 
+## Nested validators
+
+Once defined validator can be reused by other validators. For example, if there is already a validator that validates objects of certain type this validator can be used within other validators for validation of containers of objects of that type.
+
+```cpp
+#include <map>
+#include <set>
+
+#include <dracosha/validator/validator.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+    // plain validator
+    auto validator_of_sets=validator(
+        _["level2"](exists,true)
+    );
+    // nested validator
+    auto validator_of_maps_of_sets=validator(
+        _["level1"](validator_of_sets)
+    );
+
+    // apply validator to nested container that satisfies validation conditions
+    std::map<std::string,std::set<std::string>> map_of_sets1{
+        {"level1",{"level2"}}
+    };
+    assert(validator_of_maps_of_sets.apply(map_of_sets1));
+    
+    // apply validator to nested container that does not satisfy validation conditions
+    std::map<std::string,std::set<std::string>> map_of_sets2{
+        {"level1",{"level2_1"}}
+    };
+    assert(!validator_of_maps_of_sets.apply(map_of_sets2));
+
+    return 0;    
+}
+```
+
 ## Using validator for data validation
 
 ### Post-validation
@@ -1778,8 +1816,6 @@ DRACOSHA_VALIDATOR_NAMESPACE_END
 
 ## Validation of results of evaluations or value transformations
 
-## Reusing validators in nested validators
-
 ## Reporting
 
 `cpp-library` can construct text [reports](#report) describing validation errors. To enable construction of error [reports](#report) either [reporting adapter](#reporing-adapter) or [single member adapter](#single-member-adapter) should be used. [Reports](#report) can be customized with help of custom [reporters](#reporter) given to the corresponding adapters.
@@ -2510,7 +2546,7 @@ For example, have a look at four validators below. All of them logically do the 
 - The fourth validator extracts a value once and invokes single operator which is the most effective way to solve this sample task. 
 
 Though, it is a rare case when two operators can be narrowed down to a single operator.
-In general, a rule of thumb is to use [logical aggregations](#logical-aggregations) and/or [nested validators](#reusing-validators-in-nested-validators) at a member level to avoid repetitive value extractions at the same member path.
+In general, a rule of thumb is to use [logical aggregations](#logical-aggregations) and/or [nested validators](#nested-validators) at a member level to avoid repetitive value extractions at the same member path.
 
 ## Zero copy
 
