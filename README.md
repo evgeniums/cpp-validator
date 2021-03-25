@@ -8,15 +8,35 @@ A typical approach for implementing complex data validation is writing nested *i
 
 `cpp-validator` library allows one to declare data constraints with clean statements in certain points of code and apply them in other points of code on demand. If needed, the validation error messages are automatically constructed with taking into account the user's locale.
 
+Minimal example:
+
+```cpp
+// define validator
+auto v1=validator(
+        _[key1][key1_1][key1_2](gt,100),
+        _[key2][key2_1](value(ne,"UNKNOWN") ^AND^ size(lte,32))
+    );
+
+// validate objects
+Class1 obj1;
+Class2 obj2;
+
+validate(obj1,v1);
+validate(obj2,v1);
+```
+
 ## Introduction
 
 *cpp-validator* is a modern C++ header-only library for validation of variables, objects and containers. 
 
 The library can be used to validate:
 - plain variables;
-- properties of objects, where a property can be accessed either as object's variable or object's getter method;
+- properties of objects, where a property can be accessed either as object's variable or object's method;
 - contents and properties of containers;
-- nested containers and objects.
+- nested containers and objects;
+- heterogeneous containers such as pairs and tuples;
+- trees;
+- transformed values or results of evaluations.
 
 Basic usage of the library includes two steps:
 
