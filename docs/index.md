@@ -1884,6 +1884,69 @@ auto v3_2=validator(
     );
 ```
 
+#### Aggregation modifiers
+
+By default `ALL` and `ANY` aggregations validate values of container elements. In order to validate iterators or keys the aggregation modifiers should be used. There are three kinds of aggregation modifiers:
+
+- `values` (default) to validate a value of each element;
+- `keys` to validate a key of each element;
+- `iterators` to validate an iterator of each element.
+
+To use aggregation with modifier the modifier must be provided as an argument to the aggregation, e.g. `ALL(keys)` or `ANY(iterators)`.
+
+See examples below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/properties/pair.hpp>
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+    std::map<std::string,std::string> m1{
+        {"key1","value1"},
+        {"key2","value2"},
+        {"key3","value3"}
+    };
+    std::map<std::string,std::string> m2{
+        {"key1","val1"},
+        {"key2","val2"},
+        {"key","val3"}
+    };
+
+    // validate keys
+    auto v1=validator(
+        _[ALL(keys)](gt,"key")
+    );
+    assert(v1.apply(m1));
+    assert(!v1.apply(m2));
+
+    // validate values
+    auto v2=validator(
+        _[ALL(values)](gt,"value")
+    );
+    assert(v2.apply(m1));
+    assert(!v2.apply(m2));
+
+    // validate first elements of iterators
+    auto v3=validator(
+        _[ALL(iterators)](first(gt,"key"))
+    );
+    assert(v3.apply(m1));
+    assert(!v3.apply(m2));
+
+    // validate second elements of iterators
+    auto v4=validator(
+        _[ALL(iterators)](second(gt,"value"))
+    );
+    assert(v4.apply(m1));
+    assert(!v4.apply(m2));
+    
+    return 0;
+}
+```
+
 ### Validation of trees
 
 Validator can be used for validation of tree nodes. To validate trees a special keyword `tree` must be used as a key in [member's](#member) path. A `tree` key has three parameters `tree(aggregation,node_child_getter,node_children_count)`, where:
