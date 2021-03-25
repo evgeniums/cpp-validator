@@ -576,7 +576,46 @@ return 0;
 
 ### Pre-validation
 
-*Pre-validation* here stands for validating the data before writing it to the object. The simplest way to validate data before writing it to the object is to use `set_validated`. To customize data *pre-validation* use [single member adapter](#single-member-adapter).
+*Pre-validation* here stands for validating data before updating the target object. To customize data *pre-validation* use [prevalidation adapter](#prevalidation-adapter). The library already implements a few pre-validation helpers:
+
+- `set_validated` - validate variable and write it to a member of the target object;
+- `unset_validated` - validate if a member can be unset and remove it from the target object;
+- `resize_validated` - validate a member's size and resize the member in the target object;
+- `clear_validated` - validate if a member can be cleared and clear it in the target object.
+
+#### set_validated
+
+Default implementation of `set_validated` uses square brackets operator to set a member as an element of a container.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/prevalidation/set_validated.hpp>
+
+DRACOSHA_VALIDATOR_PROPERTY(field1)
+
+int main()
+{
+    // define validator
+    auto v=validator(
+        _["field1"](gte,100)
+    );
+
+    std::map<std::string,size_t> m1;
+    error_report err;
+    
+    // set valid value
+    set_validated(m1,_["field1"],1000,v,err);
+    assert(!err); // success
+    assert(m1["field1"]==1000); // was set
+
+    // try to set invalid value
+    set_validated(m1,_["field1"],10,v,err);
+    assert(err); // fail
+    assert(m1["field1"]==1000); // not changed
+    
+    return 0;
+}    
+```
 
 To use `set_validated` with custom [properties](#property) a template specialization of property setter `set_member_t` in `DRACOSHA_VALIDATOR_NAMESPACE` must be defined first. `set_validated` can be used both with and without exceptions.
 
@@ -660,6 +699,132 @@ if (err)
 
 return 0;
 } 
+```
+
+#### unset_validated
+
+Default implementation of `unset_validated` uses `erase()` method of container. Before unsetting a member the validator checks [exists](#exists) and [contains](#contains) operators.
+To use `unset_validator` with custom types a template specialization of `unset_member_t` must be defined. See example in `validator/prevalidation/unset_validated.hpp` header.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/prevalidation/unset_validated.hpp>
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+    error_report err;
+
+    // define validator
+    auto v1=validator(
+                _["field1"](exists,true),
+                _["field1"](eq,100)
+            );
+            
+    // define container for validation
+    std::map<std::string,std::string> m1{
+        {"field1","value1"},
+        {"field2","value2"},
+        {"field3","value3"}
+    };
+
+    // try to unset element
+    unset_validated(m1,_["field1"],v1,err);
+    assert(err); // fail
+    assert(err.message()==std::string("field1 must exist"));
+    assert(m1.find("field1")!=m1.end()); // element was not unset
+    
+    return 0;
+}
+```
+
+#### resize_validated
+
+Default implementation of `resize_validated` uses `resize()` method of a member. To use `resize_validated` with custom types a template specialization of `resize_member_t` must be defined. See example in `validator/prevalidation/resize_validated.hpp` header.
+
+Note that only "size", "length" and "empty" properties as well as comparison and lexicographical operators are validated before this operation. If other operators are used to validate content, then they are not checked. For example, resizing string with `validator(_[string_field](regex_match,"Hello world!"))` will not emit error even in case the validation condition is not met. 
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/prevalidation/resize_validated.hpp>
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+    error_report err;
+    
+    // define validator
+    auto v1=validator(
+                _["field1"](empty(flag,false)),
+                _["field2"](size(gte,5) ^AND^ value(ne,"Invalid value")),
+                _["field5"](length(gte,4)),
+                _["field6"](NOT(length(lt,4)))
+            );
+
+    // define container for validation
+    std::map<std::string,std::string> m1{
+        {"field1","value1"},
+        {"field2","value2"},
+        {"field3","value3"},
+        {"field4","value4"},
+        {"field5","value5"},
+        {"field6","value6"}
+    };
+
+    // try to resize element
+    resize_validated(m1,_["field1"],0,v1,err);
+    assert(err); // fail
+    assert(err.message()==std::string("field1 must be not empty"));
+    assert(m1.find("field1")->second.size()==6); // size was not changed
+
+    return 0;
+}
+```
+
+#### clear_validated
+
+Default implementation of `clear_validated` uses `clear()` method of a member. To use `resize_validated` with custom types a template specialization of `clear_member_t` must be defined. See example in `validator/prevalidation/clear_validated.hpp` header.
+
+Note that only "size", "length" and "empty" properties as well as comparison and lexicographical operators are validated before this operation. If other operators are used to validate content, then they are not checked. For example, resizing string with `validator(_[string_field](regex_match,"Hello world!"))` will not emit error even in case the validation condition is not met. 
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/prevalidation/clear_validated.hpp>
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+    error_report err;
+    
+    // define validator
+    auto v1=validator(
+                _["field1"](empty(flag,false)),
+                _["field2"](size(gte,5) ^AND^ value(ne,"Invalid value")),
+                _["field5"](length(gte,4)),
+                _["field6"](NOT(length(lt,4)))
+            );
+
+    // define container for validation
+    std::map<std::string,std::string> m1{
+        {"field1","value1"},
+        {"field2","value2"},
+        {"field3","value3"},
+        {"field4","value4"},
+        {"field5","value5"},
+        {"field6","value6"}
+    };
+
+    // try to clear element
+    clear_validated(m1,_["field1"],v1,err);
+    assert(err); // fail
+    assert(err.message()==std::string("field1 must be not empty"));
+    assert(!m1.find("field1")->second.empty()); // element was not cleared
+
+    return 0;
+}
 ```
 
 ## Members
@@ -1950,7 +2115,7 @@ int main()
 ### Validation of trees
 
 Validator can be used for validation of tree nodes. To validate trees a special keyword `tree` must be used as a key in [member's](#member) path. A `tree` key has three parameters `tree(aggregation,node_child_getter,node_children_count)`, where:
-- `aggregation` is a mode of [element aggregation](#element-aggregations) - [ALL](#ALL) or [ANY](#ANY). In the former case each node must satisfy validation conditions, in the latter case at least one node must satisfy validation conditions.
+- `aggregation` is a mode of [element aggregation](#element-aggregations) - [ALL](#all) or [ANY](#any). In the former case each node must satisfy validation conditions, in the latter case at least one node must satisfy validation conditions.
 - `node_child_getter` is a [variadic property](#variadic-properties) of a node to access the node's child by index. Variadic property must have only one argument of index type.
 - `node_children_count` is a [property](#properties) of a node to figure out number of the node's children.
 
@@ -2054,10 +2219,11 @@ int main()
 
 [Adapters](#adapter) perform actual processing of validation conditions specified in [validators](#validator). To invoke validation with a specific adapter a [validator](#validator) must be applied to the adapter. Adapters implemented in the `cpp-validator` library use [operators](#operator) as callable objects to check validation conditions. However, adapters of other types can also be implemented, e.g. one can implement an adapter that constructs SQL queries that are equivalent to validation conditions specified in [validators](#validator).
 
-There are three built-in adapter types implemented in `cpp-validator` library:
+There are a few built-in adapter types implemented in `cpp-validator` library:
 - [default adapter](#default-adapter) that applies validation to an [object](#object) by invoking [operators](#operator) one by one as specified in a [validator](#validator);
 - [reporting adapter](#reporting-adapter) that does the same as [default adapter](#default-adapter) with addition of constructing a [report](#report) describing an error if validation fails;
-- [single member adapter](single-member-adapter) that validates only one [member](#member) and constructs a [report](#report) if validation fails.
+- [prevalidation adapter](#prevalidation-adapter) that validates only one [member](#member) and constructs a [report](#report) if validation fails;
+- [filtering adapter](#partial-validation) used to filter member paths before validation.
 
 ### Default adapter
 
@@ -2065,26 +2231,28 @@ There are three built-in adapter types implemented in `cpp-validator` library:
 
 *Default adapter* supports implicit check of [member existence](#member-existence).
 
-### Single member adapter
+### Prevalidation adapter
 
-*Single member adapter* validates only a single member. This adapter is best suitable for [pre-validation](#pre-validation). *Single member adapter* is constructed by calling `make_single_member_adapter()` helper that can have one of the following signatures:
-- `make_single_member_adapter(member_path,val,reporter)` where
+#### Adapter creation and usage
+
+*Prevalidation adapter* validates only a single member before updating. *Prevalidation adapter* is constructed by calling `make_prevalidation_adapter()` helper that can have one of the following signatures:
+- `make_prevalidation_adapter(member_path,val,reporter)` where
     - `member_path` is a [member](#member) specified in [member notation](#member-notation);
     - `val` is a variable to validate;
     - `reporter` is a custom [reporter](#reporter) used for [report](#report) construction if validation fails;
-- `make_single_member_adapter(member_path,val,dst)` where
+- `make_prevalidation_adapter(member_path,val,dst)` where
     - `member_path` is a [member](#member) specified in [member notation](#member-notation);
     - `val` is a variable to validate;
     - `dst` destination object (e.g. string) where to put the validation [report](#report) to constructed with the default [reporter](#reporter) if validation fails.
 
-If the [member](#member) used in a *single member adapter* is not found in a [validator](#validator) then the validation will be considered as successful.
+If the [member](#member) used in a *prevalidation adapter* is not found in a [validator](#validator) then the validation will be considered as successful.
 
 See example of object setter with validation below.
 
 ```cpp
 #include <iostream>
 #include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/single_member_adapter.hpp>
+#include <dracosha/validator/adapters/prevalidation_adapter.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 // define Foo type
@@ -2119,7 +2287,7 @@ Foo foo_instance;
 auto bar_value_setter = [&v,&foo_instance] (std::string val)
 {
     std::string report;
-    auto sa=make_single_member_adapter(_[bar_value],val,report);
+    auto sa=make_prevalidation_adapter(_[bar_value],val,report);
     if (!v.apply(sa))
     {
         std::cerr << report << std::endl;
@@ -2142,6 +2310,52 @@ ok=bar_value_setter("unknown");
  */
 
 return 0;
+}
+```
+
+#### Element aggregations with prevalidation adapter
+
+If validator contains [ANY](#any) aggregation there can be some ambiguity how to handle it when pre-validating a single element: should this element satisfy the condition or some other element already satisfied the condition and this element can be skipped? By default, prevalidation adapter interprets `ANY` as always satisfied, i.e. it is assumed that some other element might satisfy the condition. To change the behaviour to strict checking use `strict_any()` wrapper around the value to be validated, i.e. instead of 
+- `make_prevalidation_adapter(member_to_set,value_to_set,report);`
+
+use
+
+- `make_prevalidation_adapter(member_to_set,strict_any(value_to_set),report);`.
+
+For [ALL](#all) aggregation the condition is always strictly checked.
+
+#### Bulk prevalidation
+
+Prevalidation adapter can be used to prevalidate a number of values at once. To check multiple values they must be wrapped with [range](#range) helper, see example below. In this case `strict_any` is applied to the entire set of values, i.e. validation succeeds if at least one element satisfies the conditions.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/adapters/prevalidation_adapter.hpp>
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+int main()
+{
+    // vector of values to validate
+    auto vec1=std::vector<int>{1,2,3,10};
+    std::string rep1;
+    // prevalidation adapter to validate a number of values with strict_any
+    auto pa1=make_prevalidation_adapter(_["field1"]["field1_1"],strict_any(range(vec1)),rep1);
+    
+    // validate success
+    auto v1=validator(
+                _["field1"]["field1_1"](ANY(value(gte,9))),
+                _["field2"](size(gte,100))
+            );
+    assert(v1.apply(pa1)); // succeeds because one element is ok
+    
+    // validate failure
+    auto v2=validator(
+                _["field1"]["field1_1"](ANY(value(gte,50))),
+                _["field2"](size(gte,100))
+            );
+    assert(!v2.apply(pa1)); // fails because no elements satisfied condition
+    
+    return 0;
 }
 ```
 
@@ -2304,7 +2518,7 @@ int main()
 
 ## Reporting
 
-`cpp-library` can construct text [reports](#report) describing validation errors. To enable construction of error [reports](#report) either [reporting adapter](#reporing-adapter) or [single member adapter](#single-member-adapter) should be used. [Reports](#report) can be customized with help of custom [reporters](#reporter) given to the corresponding adapters.
+`cpp-library` can construct text [reports](#report) describing validation errors. To enable construction of error [reports](#report) either [reporting adapter](#reporing-adapter) or [prevalidation adapter](#prevalidation-adapter) should be used. [Reports](#report) can be customized with help of custom [reporters](#reporter) given to the corresponding adapters.
 
 ### Reporting adapter
 
