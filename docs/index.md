@@ -1675,6 +1675,109 @@ auto v2=validator(
     );
 ```
 
+### Validation of trees
+
+Validator can be used for validation of tree nodes. To validate trees a special keyword `tree` must be used as a key in [member](#member) path. A `tree` key has three parameters `tree(aggregation,node_child_getter,node_children_count)`, where:
+- `aggregation` is a mode of [element aggregation](#element-aggregations) - [ALL](#ALL) or [ANY](#ANY). In the former case each node must satisfy validation conditions, in the latter case at least one node must satisfy validation conditions.
+- `node_child_getter` is a [variadic property](#variadic-properties) of a node to access a node's child by index. Variadic property must have only one argument of index type.
+- `node_children_count` is a [property](#properties) of a node to figure out number of the node's children.
+
+See example below.
+
+```cpp
+#include <dracosha/validator/validator.hpp>
+#include <dracosha/validator/variadic_property.hpp>
+#include <dracosha/validator/aggregation/tree.hpp>
+#include <dracosha/validator/adapters/reporting_adapter.hpp>
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+
+// define tree node
+struct TreeNode
+{
+    TreeNode(std::string name) : _name(std::move(name))
+    {}
+
+    void add_child(std::shared_ptr<TreeNode> child)
+    {
+        _children.push_back(std::move(child));
+    }
+
+    const TreeNode& child(size_t index) const
+    {
+        return *_children.at(index);
+    }
+
+    auto mutable_child(size_t index)
+    {
+        return _children.at(index);
+    }
+
+    size_t child_count() const noexcept
+    {
+        return _children.size();
+    }
+
+    std::string name() const
+    {
+        return _name;
+    }
+
+    std::vector<std::shared_ptr<TreeNode>> _children;
+    std::string _name;
+};
+
+// name proeprty is used to access name of a node
+DRACOSHA_VALIDATOR_PROPERTY(name)
+// child_count property is used to get number of the node's children
+DRACOSHA_VALIDATOR_PROPERTY(child_count)
+// child is a variadic property for accessing a node's child by index
+DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(child)
+
+int main()
+{
+    // define tree validator
+    auto v1=validator(
+            _[tree(ALL,child,child_count)][name](gte,"Node")
+         );
+
+    // tree with one top level node satisfying validation conditions
+    TreeNode tr1("Node 0");
+    assert(v1.apply(tr1));
+
+    // tree with one top level node not satisfying validation conditions
+    TreeNode tr2("0");
+    assert(!v1.apply(tr2));
+
+    // populate top node with children
+    tr1.add_child(std::make_shared<TreeNode>("Node 0.0"));
+    assert(v1.apply(tr1));
+    tr1.add_child(std::make_shared<TreeNode>("Node 0.1"));
+    assert(v1.apply(tr1));
+    tr1.add_child(std::make_shared<TreeNode>("Node 0.2"));
+    assert(v1.apply(tr1));
+
+    // populate nested nodes
+    tr1.mutable_child(0)->add_child(std::make_shared<TreeNode>("Node 0.0.0"));
+    assert(v1.apply(tr1));
+    tr1.mutable_child(0)->add_child(std::make_shared<TreeNode>("Node 0.0.1"));
+    assert(v1.apply(tr1));
+    tr1.mutable_child(1)->add_child(std::make_shared<TreeNode>("Node 0.1.0"));
+    assert(v1.apply(tr1));
+    tr1.mutable_child(2)->add_child(std::make_shared<TreeNode>("Node 0.2.0"));
+    assert(v1.apply(tr1));
+
+    // validate nested node that doesn't satisfy validation conditions and construct report
+    std::string rep;
+    auto ra1=make_reporting_adapter(tr1,rep);
+    tr1.mutable_child(2)->add_child(std::make_shared<TreeNode>("0.2.1"));
+    assert(!v1.apply(ra1));
+    assert(rep==std::string("name of each tree node must be greater than or equal to Node"));
+    
+    return 0;
+}
+```
+
 ## Adapters
 
 [Adapters](#adapter) perform actual processing of validation conditions specified in [validators](#validator). To invoke validation with a specific adapter a [validator](#validator) must be applied to the adapter. Adapters implemented in the `cpp-validator` library use [operators](#operator) as callable objects to check validation conditions. However, adapters of other types can also be implemented, e.g. one can implement an adapter that constructs SQL queries that are equivalent to validation conditions specified in [validators](#validator).
@@ -1809,8 +1912,6 @@ struct pointer_as_reference_t<QSharedPointer<T>>
 
 DRACOSHA_VALIDATOR_NAMESPACE_END
 ```
-
-## Validation of trees
 
 ## Partial validation
 
