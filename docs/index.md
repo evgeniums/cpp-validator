@@ -19,6 +19,7 @@
 			* [Property of object's member](#property-of-objects-member)
 			* [Mixed](#mixed)
 		* [Dynamically allocated validator](#dynamically-allocated-validator)
+	* [Nested validators](#nested-validators)
 	* [Using validator for data validation](#using-validator-for-data-validation)
 		* [Post-validation](#post-validation)
 			* [validate() without report and without exception](#validate-without-report-and-without-exception)
@@ -27,6 +28,10 @@
 			* [Apply validator to adapter](#apply-validator-to-adapter)
 			* [Apply validator to object](#apply-validator-to-object)
 		* [Pre-validation](#pre-validation)
+			* [set_validated](#set_validated)
+			* [unset_validated](#unset_validated)
+			* [resize_validated](#resize_validated)
+			* [clear_validated](#clear_validated)
 	* [Members](#members)
 		* [Member notation](#member-notation)
 			* [Single level members](#single-level-members)
@@ -39,7 +44,15 @@
 			* [*size*](#size)
 			* [*length*](#length)
 			* [*empty*](#empty)
+			* [*h_size*](#h_size)
+			* [*first* and *second*](#first-and-second)
 		* [Adding new property](#adding-new-property)
+		* [Properties of heterogeneous containers](#properties-of-heterogeneous-containers)
+			* [Implicit heterogeneous property](#implicit-heterogeneous-property)
+			* [Explicit heterogeneous property](#explicit-heterogeneous-property)
+		* [Variadic properties](#variadic-properties)
+			* [Properties with arguments](#properties-with-arguments)
+			* [Variadic properties with aggregations](#variadic-properties-with-aggregations)
 	* [Operators](#operators)
 		* [Special operators](#special-operators)
 			* [*exists*](#exists)
@@ -65,10 +78,18 @@
 		* [Element aggregations](#element-aggregations)
 			* [ANY](#any)
 			* [ALL](#all)
+			* [Aggregation modifiers](#aggregation-modifiers)
+		* [Validation of trees](#validation-of-trees)
 	* [Adapters](#adapters)
 		* [Default adapter](#default-adapter)
-		* [Single member adapter](#single-member-adapter)
+		* [Prevalidation adapter](#prevalidation-adapter)
+			* [Adapter creation and usage](#adapter-creation-and-usage)
+			* [Element aggregations with prevalidation adapter](#element-aggregations-with-prevalidation-adapter)
+			* [Bulk prevalidation](#bulk-prevalidation)
 		* [Adding new adapter](#adding-new-adapter)
+	* [Validation of pointers](#validation-of-pointers)
+	* [Partial validation](#partial-validation)
+	* [Validation of transformed or evaluated values](#validation-of-transformed-or-evaluated-values)
 	* [Reporting](#reporting)
 		* [Reporting adapter](#reporting-adapter)
 		* [Customization of reports](#customization-of-reports)
@@ -87,6 +108,11 @@
 			* [Repository of translators](#repository-of-translators)
 			* [Adding new locale](#adding-new-locale)
 			* [Localization example](#localization-example)
+* [Performance considerations](#performance-considerations)
+	* [Validation overhead](#validation-overhead)
+	* [Zero copy](#zero-copy)
+	* [Checking member existence before validation](#checking-member-existence-before-validation)
+	* [Validation with text reports](#validation-with-text-reports)
 * [Building and installation](#building-and-installation)
 	* [Supported platforms and compilers](#supported-platforms-and-compilers)
 	* [Dependencies](#dependencies)
@@ -96,6 +122,7 @@
 * [Contributing](#contributing)
 
 [//]: # (TOC End)
+
 
 ----
 
@@ -743,7 +770,7 @@ int main()
 
 Default implementation of `resize_validated` uses `resize()` method of a member. To use `resize_validated` with custom types a template specialization of `resize_member_t` must be defined. See example in `validator/prevalidation/resize_validated.hpp` header.
 
-Note that only "size", "length" and "empty" properties as well as comparison and lexicographical operators are validated before this operation. If other operators are used to validate content, then they are not checked. For example, resizing string with `validator(_[string_field](regex_match,"Hello world!"))` will not emit error even in case the validation condition is not met. 
+Note that only [size](#size), [length](#length) and [empty](#empty) properties as well as [comparison](builtin_operators.md#comparison-operators) and [lexicographical](builtin_operators.md#lexicographical-operators) operators are validated before this operation. If other operators are used to validate content, then they are not checked. For example, resizing string with `validator(_[string_field](regex_match,"Hello world!"))` will not emit error even in case the validation condition is not met. 
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -787,7 +814,7 @@ int main()
 
 Default implementation of `clear_validated` uses `clear()` method of a member. To use `resize_validated` with custom types a template specialization of `clear_member_t` must be defined. See example in `validator/prevalidation/clear_validated.hpp` header.
 
-Note that only "size", "length" and "empty" properties as well as comparison and lexicographical operators are validated before this operation. If other operators are used to validate content, then they are not checked. For example, resizing string with `validator(_[string_field](regex_match,"Hello world!"))` will not emit error even in case the validation condition is not met. 
+Note that only [size](#size), [length](#length) and [empty](#empty) properties as well as [comparison](builtin_operators.md#comparison-operators) and [lexicographical](builtin_operators.md#lexicographical-operators) operators are validated before this operation. If other operators are used to validate content, then they are not checked. For example, resizing string with `validator(_[string_field](regex_match,"Hello world!"))` will not emit error even in case the validation condition is not met. 
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
