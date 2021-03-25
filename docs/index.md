@@ -813,7 +813,7 @@ See examples of different property notations in section [Validator with properti
 
 #### *h_size*
 
-`h_size` property is used to validate size of heterogeneous container. If object is not heterogeneous container then `h_size` is zero. The library can detect size of two type of heterogeneous containers: `std::tuple` and `hana::tuple`. A custom type can be added by defining specialization of `heterogeneous_size_t` template struct that must be of `size_t` integral constant type. See example below.
+`h_size` property is used to validate size of heterogeneous container. If object is not a heterogeneous container then `h_size` is zero. The library can detect size of two type of heterogeneous containers: `std::tuple` and `hana::tuple`. A custom type can be added by defining specialization of `heterogeneous_size_t` template struct that must be of `size_t` integral constant type. See example below.
 
 ```cpp
 #include <utility>
@@ -1738,7 +1738,39 @@ Base `adapter` template class is defined in `validator/adapters/adapter.hpp` hea
 
 Examples of *custom adapter traits* implementation can be found in `validator/adapters/impl/default_adapter_impl.hpp`, `validator/adapters/impl/reporting_adapter_impl.hpp` and `validator/adapters/impl/single_member_adapter_impl.hpp`.
 
-Examples of *custom adapter* implementation can be found in `validator/adapters/default_adapter.hpp`, `validator/adapters/reporting_adapter.hpp` and `validator/adapters/single_member_adapter.hpp`. 
+Examples of *adapter* implementations can be found in `validator/adapters/default_adapter.hpp`, `validator/adapters/reporting_adapter.hpp` and `validator/adapters/single_member_adapter.hpp`. 
+
+## Validation of pointers
+
+Normally, validator is used to validate references to variables. Even when validating [nested members](#nested-members) it is expected that there is a reference to a value at each stage of the member's path. 
+
+In addition, pointered values are also supported. If validator sees a pointer then it dereferences the pointer and uses that dereferenced value for validation. Null pointers can be checked with [member existence](#member-existence) - null pointers are assumed to be not existing members.
+
+Validator internally supports plain pointers and `std::shared_ptr` pointers. For custom smart pointers define specialization of `pointer_as_reference_t` template struct. Note that to support null pointer detection a custom smart pointer must be capable of casting to `bool`.
+
+```cpp
+#include <QSharedPointer>
+#include <dracosha/validator/utils/pointer_as_reference.hpp>
+
+DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+
+/**
+ * Dereference QSharedPointer pointer.
+ */
+template <typename T>
+struct pointer_as_reference_t<QSharedPointer<T>>
+{
+    using is_pointer=hana::true_;
+
+    template <typename T1>
+    auto operator () (T1&& v) const -> decltype(auto)
+    {
+       return *v;
+    }
+};
+
+DRACOSHA_VALIDATOR_NAMESPACE_END
+```
 
 ## Validation of trees
 
@@ -2447,7 +2479,7 @@ rep.clear();
 
 Normally, validator should add very little overhead compared to manual coding of the same checks because significant part of preparations is made and optimized at compilation time.
 
-Still, there are some considerations that must be taken into account.
+Still, there are some considerations that should be taken into account.
 For example, have a look at four validators below. All of them logically do the same verification: a value of nested member must be greater or equal to 100 and less or equal 1000. Nevertheless, the first validator has the worst performance and the fourth validator has the best performance. The second and the third validators are equivalent.
 
 ```cpp
