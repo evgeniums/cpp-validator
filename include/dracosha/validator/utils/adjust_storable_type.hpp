@@ -38,6 +38,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
 template <typename T, typename=hana::when<true>>
 struct adjust_storable_type
 {
+    using type=object_wrapper<T>;
 };
 
 /**
@@ -73,23 +74,6 @@ struct adjust_storable_type<T,
                     >
 {
     using type=std::decay_t<T>;
-};
-
-/**
- * @brief Adjust all the rest types that must be stored within object_wrapper.
- */
-template <typename T>
-struct adjust_storable_type<T,
-                        hana::when<
-                            !std::is_base_of<adjust_storable_ignore,std::decay_t<T>>::value
-                            &&
-                            !std::is_constructible<const char*,T>::value
-                            &&
-                            !is_constant_size<std::decay_t<T>>::value
-                        >
-                    >
-{
-    using type=object_wrapper<T>;
 };
 
 /**
