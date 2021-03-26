@@ -142,13 +142,22 @@ class member
         }
 
         /**
-         * @brief Callable operator.
+         * @brief Callable operator in case member is rvalue.
          */
         template <typename ... Args>
-        auto operator() (Args&&... args)
+        auto operator() (Args&&... args) &&
         {
             return detail::member_helper<Args...>(std::move(*this),std::forward<Args>(args)...);
         }
+
+        /*
+        * @brief Callable operator in case member is lvalue.
+        */
+       template <typename ... Args>
+       auto operator() (Args&&... args) const &
+       {
+           return detail::member_helper<Args...>(*this,std::forward<Args>(args)...);
+       }
 
         /**
          * @brief Create member of parent type.
