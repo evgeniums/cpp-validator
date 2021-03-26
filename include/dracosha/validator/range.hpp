@@ -55,7 +55,7 @@ struct range_t
     template <typename T1>
     range_t(
             T1&& container,
-            size_t max_report_elements=std::numeric_limits<size_t>::max()
+            size_t max_report_elements=(std::numeric_limits<size_t>::max)()
         ) : container(std::forward<T1>(container)),
             max_report_elements(max_report_elements)
     {}
