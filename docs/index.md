@@ -1262,7 +1262,7 @@ int main()
 
 #### Properties with arguments
 
-Ordinary [properties](#properties) do not have arguments. To validate [object](#object) methods with arguments one shoud use `variadic properties`. A variadic property is defined similar to ordinary property using one of the macros:
+Ordinary [properties](#properties) do not have arguments. To validate [object](#object) methods with arguments one shoud use `variadic properties`. A variadic property is defined similar to ordinary property but using one of the following macros:
 - `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(method)` defines variadic property corresponding to object's `method`;
 - `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(method,has_method)` defines variadic property corresponding to object's `method` and `has_method` used to check if object has the variadic property with provided arguments;
 - `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_FLAG(method,flag_descriprion,negative_flag_description)` defines variadic property corresponding to object's `method` that can be used with [flag](#flag) operator.
@@ -1271,7 +1271,7 @@ A variadic property defined with one of the macros listed above can be used "as 
 - `auto property_notation=variadic_property(arg1,arg2);`
 - `auto member_notation=_[variadic_property][arg1][arg2];`
 
-When used with member notation the arguments passed to variadic property must follow the property's key in the member's path. In this case special intermediate closures will be created at each stage of member's path until number of required arguments is reached thus using [currying](https://en.wikipedia.org/wiki/Currying) technique. 
+When used with member notation the arguments passed to variadic property must follow the property's key in the member's path. In this case special intermediate closures will be created at each level of member's path until number of required arguments is reached thus using [currying](https://en.wikipedia.org/wiki/Currying) technique. 
 
 The arguments following the variadic property in the member's path can be provided either "as is" or wrapped into `varg(argument)`. In the latter case the variadic property will be presented in more natural way in text reports:
 
@@ -1320,7 +1320,7 @@ int main()
     // define object
     WithChild o1;
     
-    // define validation adapter with test reports
+    // define validation adapter with text reports
     std::string rep;
     auto ra1=make_reporting_adapter(o1,rep);
 
@@ -1665,7 +1665,7 @@ constexpr simple_eq_t simple_eq{};
 
 ## Operands
 
-Value of an [operand](#operand) is given as the second argument to an [operator](#operator) and is meant to be used as a validation sample. An [operand](#operand) can be one of the following list:
+Value of an [operand](#operand) is given as the second argument to an [operator](#operator) and is meant to be used as a validation sample. An [operand](#operand) can be one of the following:
 - constant or `lvalue` or `rvalue` [variable](#variables);
 - [lazy](#lazy-operands) operand;
 - [other member](#other-members) of the [object](#object) under validation;
@@ -1675,7 +1675,9 @@ Value of an [operand](#operand) is given as the second argument to an [operator]
 
 ### Variables
 
-The most common case is when an [operand](#operand) is either constant or `lvalue` or `rvalue` variable. See examples below.
+The most common case is when an [operand](#operand) is either constant or `lvalue` or `rvalue` variable. Note, that `lvalue` variable is used by reference and a user is responsible for the operand to stay valid during validator's life time.
+
+See examples below.
 
 ```cpp
 // operand is constant
@@ -2015,7 +2017,7 @@ auto v1_2=validator(
         ANY(value(eq,"unknown") ^OR^ size(gte,5))
     );
 
-// at least one element of cntainer at "key1" element must be equal to "unknown" 
+// at least one element of container at "key1" element must be equal to "unknown" 
 // or must have size greater or equal to 5
 // member notation
 auto v2_1=validator(
@@ -2271,7 +2273,7 @@ There are a few built-in adapter types implemented in `cpp-validator` library:
     - `val` is a variable to validate;
     - `dst` destination object (e.g. string) where to put the validation [report](#report) to constructed with the default [reporter](#reporter) if validation fails.
 
-If the [member](#member) used in a *prevalidation adapter* is not found in a [validator](#validator) then the validation will be considered as successful.
+If the [member](#member) used in a *prevalidation adapter* is not found in a [validator](#validator) then the validation will be considered successful.
 
 See example of object setter with validation below.
 
@@ -2389,13 +2391,13 @@ int main()
 
 Base `adapter` template class is defined in `validator/adapters/adapter.hpp` header file. To implement a *custom adapter* the *custom adapter traits* must be implemented that will be used as a template argument in the base `adapter` template class. In addition, if the *custom adapter* supports implicit check of [member existence](#member-existence) then it also must inherit from `check_member_exists_traits_proxy` template class and the *custom adapter traits* must inherit from `with_check_member_exists` template class.
 
-Examples of *custom adapter traits* implementation can be found in `validator/adapters/impl/default_adapter_impl.hpp`, `validator/adapters/impl/reporting_adapter_impl.hpp` and `validator/adapters/impl/single_member_adapter_impl.hpp`.
+Examples of *custom adapter traits* implementation can be found in `validator/adapters/impl/default_adapter_impl.hpp`, `validator/reporting/reporting_adapter_impl.hpp` and `validator/prevalidation/prevalidation_adapter_impl.hpp`.
 
-Examples of *adapter* implementations can be found in `validator/adapters/default_adapter.hpp`, `validator/adapters/reporting_adapter.hpp` and `validator/adapters/single_member_adapter.hpp`. 
+Examples of *adapter* implementations can be found in `validator/adapters/default_adapter.hpp`, `validator/adapters/reporting_adapter.hpp` and `validator/adapters/prevalidation_adapter.hpp`. 
 
 ## Validation of pointers
 
-Normally, validator is used to validate references to variables. Even when validating [nested members](#nested-members) it is expected that there is a reference to a value at each stage of the member's path. 
+Normally, validator is used to validate references to variables. Even when validating [nested members](#nested-members) it is expected that there is a reference to a value at each level of the member's path. 
 
 In addition, pointered values are also supported. If validator sees a pointer then it dereferences the pointer and uses that dereferenced value for validation. Null pointers can be checked with [member existence](#member-existence) - null pointers are assumed to be not existing members.
 
@@ -2427,7 +2429,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_END
 
 ## Partial validation
 
-Sometimes a validator can be too strict and only part of its rules needs to be checked on certain object. In this case a filtering validation adapter can be used to check only specific [members](#member) ignoring other paths. There are three forms of defining a filter for such validation:
+Sometimes a validator can be too strict and only a part of its rules needs to be checked on certain object. In this case a filtering validation adapter can be used to check only specific [members](#member) ignoring other paths. There are three forms of defining a filter for such validation:
 - use `include_paths()` to list explicitly only paths that must be validated;
 - use `exclude_paths()` to list explicitly paths that must be ignored;
 - use `include_and_exclude_paths()` to list explicitly paths that must be validated and specify sub-paths that must be excluded from validaton.
@@ -3242,7 +3244,7 @@ rep.clear();
 Normally, validator should add very little overhead compared to manual coding of the same checks because significant part of preparations is made and optimized at compilation time.
 
 Still, there are some considerations that should be taken into account.
-For example, have a look at four validators below. All of them logically do the same verification: a value of nested member must be greater or equal to 100 and less or equal 1000. Nevertheless, the first validator has the worst performance and the fourth validator has the best performance. The second and the third validators are equivalent.
+For example, have a look at four validators below. All of them logically do the same verification: a value of nested member must be greater or equal to 100 and less or equal to 1000. Nevertheless, the first validator has the worst performance and the fourth validator has the best performance. The second and the third validators are equivalent.
 
 ```cpp
     auto v1=validator(
@@ -3266,10 +3268,10 @@ For example, have a look at four validators below. All of them logically do the 
     );
 ```
 
-- The first validator extracts a value of the nested member twice because each member in validator is evaluated independently. If object is a nested container with huge number of elements then that extraction can be noticeably expensive.
+- The first validator extracts a value of the nested member twice because each member in a validator is evaluated independently. If object is a nested container with huge number of elements then that extraction overhead can be noticeable.
 - The second validator extracts a value only once and then invokes two operators one by one which is quite fast but can be a little bit more expensive than the forth variant.
-- The third validator pre-extracts intermediate value of a partial member's path and then invokes nested validator that finishes value extraction and applies final validation. As a result, full actual validation procedure and its speed are the same as in case with the second validator.
-- The fourth validator extracts a value once and invokes single operator which is the most effective way to solve this sample task. 
+- The third validator pre-extracts intermediate value of a partial member's path and then invokes nested validator that finishes value extraction and applies final validation. As a result, full actual validation procedure and its speed are the same as with the second validator.
+- The fourth validator extracts a value once and invokes a single "atomic" operator which is the most effective way to solve this sample task. 
 
 Though, it is a rare case when two operators can be narrowed down to a single operator.
 In general, a rule of thumb is to use [logical aggregations](#logical-aggregations) and/or [nested validators](#nested-validators) at a member level to avoid repetitive value extractions at the same member path.
@@ -3319,7 +3321,7 @@ By default only types compatibility is checked before validation. This can lead 
 
 ## Validation with text reports
 
-Building text reports sometimes can add meaningful overhead because construction of the reports can be rather complicated at certain cases. Therefore, in applications with very strong requirements to performance and minimal delays it is recommended to use validation with reporting only when text reports are really needed or use double run - first, validate data without text report, and then, use validation with text reports only on already failed data just to construct a report.
+Building text reports sometimes can add meaningful overhead because construction of the reports can be rather complicated at certain cases. Therefore, in applications with very strong requirements to performance and minimal delays it is recommended to use validation with reporting only when text reports are really needed or use double run - first, validate data without text report, and then use validation with text reports only on already failed data just to construct a report.
 
 # Building and installation
 
@@ -3331,7 +3333,7 @@ For the rest build systems ensure that `include` subfolder of `cpp-library` is a
 
 ## Supported platforms and compilers
 
-A compiler must support at least C\+\+14 or C\+\+17 standards to build `cpp-validator` library. The library was tested with the following platforms and compilers:
+A compiler must support at least C\+\+14 or C\+\+17 standards to build `cpp-validator` library. The library was tested with the following platforms and minimal compiler versions:
 
 - `Windows`:
     - `MSVC` 14.2;
