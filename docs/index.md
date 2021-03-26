@@ -19,7 +19,7 @@
 			* [Property of object's member](#property-of-objects-member)
 			* [Mixed](#mixed)
 		* [Dynamically allocated validator](#dynamically-allocated-validator)
-	* [Nested validators](#nested-validators)
+	    * [Nested validators](#nested-validators)
 	* [Using validator for data validation](#using-validator-for-data-validation)
 		* [Post-validation](#post-validation)
 			* [validate() without report and without exception](#validate-without-report-and-without-exception)
