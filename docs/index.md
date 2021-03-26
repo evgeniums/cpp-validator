@@ -388,7 +388,7 @@ int main()
 }
 ```
 
-## Nested validators
+### Nested validators
 
 Once defined validator can be reused by other validators. For example, if there is already a validator that validates objects of certain type this validator can be used within other validators for validation of containers of objects of that type.
 
@@ -650,6 +650,7 @@ See examples below.
 ```cpp
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/validate.hpp>
+#include <dracosha/validator/prevalidation/set_validated.hpp>
 
 // define structure with member variables and member setter method
 struct Foo
