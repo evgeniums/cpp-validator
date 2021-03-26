@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(CheckPointers)
         BOOST_CHECK(!v2.apply(o2));
     };
 
-    BOOST_TEST_CONTEXT("plain pointer")
+    BOOST_TEST_CONTEXT("raw pointer")
     {
         PointerName o1("Hello world");
         PointerName o2("He");
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(CheckNullPointers)
         BOOST_CHECK(!v3.apply(a1));
     };
 
-    BOOST_TEST_CONTEXT("plain pointer")
+    BOOST_TEST_CONTEXT("raw pointer")
     {
         PointerName o1("Hello world");
         check(o1);

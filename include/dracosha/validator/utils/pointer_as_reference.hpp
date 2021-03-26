@@ -43,7 +43,7 @@ struct pointer_as_reference_t
     }
 };
 /**
- * Dereference plain pointer.
+ * Dereference raw pointer.
  */
 template <typename T>
 struct pointer_as_reference_t<T,
