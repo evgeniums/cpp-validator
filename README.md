@@ -2,18 +2,18 @@
 
 ## Motivation
 
-It is quite a common task to check if data satisfies specific constraints. For example, server backend must check validity of commands that come from the clients. Another example is a requirement to validate input data in application user interface and show the messages describing validation errors.
+It is quite a common task to check if data satisfies specific constraints. For example, server backend must check validity of commands that come from the clients. Another example is a requirement to validate input data entered in the user interface and then show messages describing validation errors.
 
-A typical approach for implementing complex data validation is writing nested *if-conditions* or chained invocations of partial validation methods. Declarations of the constraints can become intermixed with their implementations so that the constraints are spread over the code which makes it hard to watch and maintain them. Requirement to construct and show messages describing validation errors makes everything still more complicated.
+A typical approach for implementing complex data validation is writing nested *if-conditions* or chained invocations of partial validation methods. Declarations of the constraints could become intermixed with their implementations so that they would spread over the code which makes it harder to maintain them. Requirement to construct and show error messages could make everything still more complicated.
 
-`cpp-validator` library allows one to declare data constraints with clean statements in certain points of code and apply them in other points of code on demand. If needed, the validation error messages are automatically constructed with taking into account the user's locale.
+`cpp-validator` library allows one to declare data constraints with clean statements in certain points of code and apply them in other points of code on demand. If needed, the validation error messages are automatically constructed by taking into account the user's locale.
 
 Minimal example:
 
 ```cpp
 // define validator
 auto v1=validator(
-        _[key1][key1_1][key1_2](gt,100),
+        _[key1][key1_1][key1_1_1](gt,100),
         _[key2][key2_1](value(ne,"UNKNOWN") ^AND^ size(lte,32))
     );
 
@@ -36,16 +36,16 @@ The library can be used to validate:
 - nested containers and objects;
 - heterogeneous containers such as pairs and tuples;
 - trees;
-- transformed values or results of evaluations.
+- results of evaluations or value transformations.
 
 Basic usage of the library includes two steps:
 
 - first, define a validator using almost declarative syntax;
 - then, apply the validator to data that must be validated and check the results.
 
-The library is suitable for both *post-validation* and *pre-validation*. *Post-validation* stands for validating the object that is already populated with the data. *Pre-validation* stands for validating the data before writing it to the object. The same validator declaration can be used in both cases.
+The library is suitable for both *post-validation* and *pre-validation*. *Post-validation* stands for validating the object that is already populated with the data. *Pre-validation* stands for validating the data before updating the object. The same validator declaration can be used in both cases.
 
-There are a lot of options for `cpp-validator` extension and customization. During validation a text report describing an error can be constructed. Reports can be widely customised and translated to supported languages.
+There are a lot of options for `cpp-validator` extension and customization. During validation a text report describing an error can be constructed. Reports can be widely customised and translated to desired languages.
 
 The library was tested with *Clang*, *GCC* and *MSVC* compilers that support *C\++14* or *C\++17* standards. Tested operating systems include *Linux*, *Windows*, *macOS*, *iOS* and *Android* platforms.
 
