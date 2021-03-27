@@ -47,7 +47,7 @@ The library is suitable for both *post-validation* and *pre-validation*. *Post-v
 
 There are a lot of options for `cpp-validator` extension and customization. During validation a text report describing an error can be constructed. Reports can be widely customised and translated to desired languages.
 
-The library was tested with *Clang*, *GCC* and *MSVC* compilers that support *C\++14* or *C\++17* standards. Tested operating systems include *Linux*, *Windows*, *macOS*, *iOS* and *Android* platforms.
+The library is tested with *Clang*, *GCC* and *MSVC* compilers that support *C\++14* or *C\++17* standards. Tested operating systems include *Linux*, *Windows*, *macOS*, *iOS* and *Android* platforms.
 
 For more details see [Documentation](docs/index.md).
 
@@ -58,8 +58,8 @@ For more details see [Documentation](docs/index.md).
 ```cpp
 // define compound validator of nested container elements
 auto v=validator(
+                _["field1"][0](lt,100),
                 _["field1"][1](in,range({10,20,30,40,50})),
-                _["field1"][2](lt,100),
                 _["field2"](exists,false),
                 _["field3"](empty(flag,true))
             );
