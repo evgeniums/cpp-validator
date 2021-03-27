@@ -53,6 +53,37 @@ For more details see [Documentation](docs/index.md).
 
 ## Some examples of basic usage
 
+### Check nested container elements and print report
+
+```cpp
+// define compound validator of nested container elements
+auto v=validator(
+                _["field1"][1](in,range({10,20,30,40,50})),
+                _["field1"][2](lt,100),
+                _["field2"](exists,false),
+                _["field3"](empty(flag,true))
+            );
+                
+error_report err;
+
+// apply validator to container and construct error message
+
+std::map<std::string,std::map<size_t,size_t>> nested_map={
+            {"field1",{{1,5},{2,50}}},
+            {"field3",{}}
+        };
+validate(nested_map,v,err);
+if (err)
+{
+    std::cerr << err.message() << std::endl;
+    /* prints:
+    
+    "element #1 of field1 must be in range [10, 20, 30, 40, 50]"
+    
+    */
+}
+```
+
 ### Check if value is greater than constant
 
 Error as an argument.
@@ -200,38 +231,6 @@ if (err)
     
     */
 }
-```
-
-### Check nested container elements and print report
-
-```cpp
-// define compound validator of nested container elements
-auto v=validator(
-                _["field1"][1](in,range({10,20,30,40,50})),
-                _["field1"][2](lt,100),
-                _["field2"](exists,false),
-                _["field3"](empty(flag,true))
-            );
-                
-error_report err;
-
-// apply validator to container and construct validation error message
-
-std::map<std::string,std::map<size_t,size_t>> nested_map={
-            {"field1",{{1,5},{2,50}}},
-            {"field3",{}}
-        };
-validate(nested_map,v,err);
-if (err)
-{
-    std::cerr << err.message() << std::endl;
-    /* prints:
-    
-    "element #1 of field1 must be in range [10, 20, 30, 40, 50]"
-    
-    */
-}
-    
 ```
 
 ### Check custom object property and print report

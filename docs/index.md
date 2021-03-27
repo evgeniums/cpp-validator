@@ -2272,7 +2272,7 @@ There are a few built-in adapter types implemented in `cpp-validator` library:
 - `make_prevalidation_adapter(member_path,val,dst)` where
     - `member_path` is a [member](#member) specified in [member notation](#member-notation);
     - `val` is a variable to validate;
-    - `dst` destination object (e.g. string) where to put the validation [report](#report) to constructed with the default [reporter](#reporter) if validation fails.
+    - `dst` destination object (e.g. string) where to put the validation [report](#report) to, the report will be constructed with the default [reporter](#reporter) if validation fails.
 
 If the [member](#member) used in a *prevalidation adapter* is not found in a [validator](#validator) then the validation will be considered successful.
 
@@ -3318,7 +3318,7 @@ auto v3=validator(
 
 ## Checking member existence before validation
 
-By default only types compatibility is checked before validation. This can lead to exceptions or other errors or undefined behaviour in case the validation operation is requsted on the member that doesn't exist. To avoid such problems explicit or implicit checks of member existence can be used, see [Member existence](#member-existence). Though, those checks can add some overhead because a value might be looked up twice - the first one is to check exictence and the second one is to extract a value for validation. So, it depends on the use case whether to enable or not enable pre-checking of member existence.
+By default only types compatibility is checked before validation. This can lead to exceptions or other errors or undefined behaviour in case the validation operation is requsted on the member that doesn't exist. To avoid such problems explicit or implicit checks of member existence can be used, see [Member existence](#member-existence). Though, those checks can add some overhead because a value might be looked up twice - the first one is to check existence and the second one is to extract a value for validation. So, it depends on the use case whether to enable or not enable pre-checking of member existence.
 
 ## Validation with text reports
 
@@ -3398,7 +3398,7 @@ Ensure that variables in a script fit your environment and edit the following pa
 - `MSVC_COMPILER` (Windows only) - string representing version of MSVC compiler (e.g. *v142*);
 - `COMPILER_VERSION` (Windows only) - version of MSVC compiler (e.g. *14.2*).
 
-Run a script corresponding to your platform from a folder where source folder `cpp-validator` resides (i.e. go to folder `cpp-validator/../`).
+Run a script corresponding to your platform from a folder where source folder `cpp-validator` resides, for example go to folder `cpp-validator/../` and run `cpp-validator/sample-build/linux-clang.sh`.
 
 # License
 
