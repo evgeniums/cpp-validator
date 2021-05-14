@@ -1,3 +1,5 @@
+#undef NDEBUG
+
 #include <map>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>

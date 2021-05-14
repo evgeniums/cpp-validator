@@ -1602,6 +1602,7 @@ See [in](#in) operator.
 `_n` is an [operator](#operator) wrapper that negates wrapped [operator](#operator). See example below.
 
 ```cpp
+#include <map>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/operators.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
@@ -1614,13 +1615,13 @@ std::map<std::string,uint32_t> m1={{"key1",100}};
 
 // validator with original operator
 auto v1=validator(
-    ["key1"](eq,100)
+    _["key1"](eq,100)
 );
 assert(v1.apply(m1));
 
 // validator with negated operator
 auto v2=validator(
-    ["key1"](_n(eq),100)
+    _["key1"](_n(eq),100)
 );
 assert(!v2.apply(m1));
 
@@ -1738,6 +1739,7 @@ return 0;
 Other [member](#member) of the same [object](#object) can be used as an [operand](#operand). For example, one can check if two [members](#members) of the same object match. See example below.
 
 ```cpp
+#include <map>
 #include <dracosha/validator/validator.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -1760,7 +1762,6 @@ assert(v1.apply(m1));
 
 return 0;
 }
-
 ```
 
 ### Sample objects
@@ -1768,6 +1769,7 @@ return 0;
 [Members](#member) of other object can be used as [operands](#operand) for validation. A [member](#member) with the same [member path](#nested-members) of sample object is used as [operand](#operand) in validation conditions for a given [member](#member). To construct such [operand](#operand) a sample object must be placed within round brackets following underscore symbol, e.g. `_(sample_object)`. See example below.
 
 ```cpp
+#include <map>
 #include <dracosha/validator/validator.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -1795,7 +1797,6 @@ assert(v1.apply(m1));
 
 return 0;
 }
-
 ```
 
 ### Intervals
@@ -3313,8 +3314,8 @@ auto v3=validator(
 );
 
 // "key4" and "value4" are implicitly moved to validator and validator is responsible for their contents
-auto v3=validator(
-    _["key4")](eq,"value4")
+auto v4=validator(
+    _["key4"](eq,"value4")
 );
 ```
 

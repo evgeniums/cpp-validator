@@ -1,3 +1,5 @@
+#undef NDEBUG
+
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/validate.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;

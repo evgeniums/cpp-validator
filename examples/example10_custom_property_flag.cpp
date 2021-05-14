@@ -1,3 +1,5 @@
+#undef NDEBUG
+
 #include <iostream>
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/validator.hpp>

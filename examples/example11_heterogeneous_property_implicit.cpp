@@ -1,3 +1,5 @@
+#undef NDEBUG
+
 #include <dracosha/validator/heterogeneous_property.hpp>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/validate.hpp>

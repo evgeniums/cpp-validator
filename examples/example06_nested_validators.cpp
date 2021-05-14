@@ -1,3 +1,5 @@
+#undef NDEBUG
+
 #include <map>
 #include <set>
 

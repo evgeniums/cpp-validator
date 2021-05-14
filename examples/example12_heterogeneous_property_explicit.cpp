@@ -1,3 +1,5 @@
+#undef NDEBUG
+
 #include <dracosha/validator/heterogeneous_property.hpp>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/validate.hpp>
@@ -26,13 +28,13 @@ int main()
     validate(t1,v1,err);
     assert(err);
     std::cerr << err.message() << std::endl;
-    assert(err.message()==std::sting("one must be greater than 100"));
+    assert(err.message()==std::string("one must be greater than 100"));
 
     auto t2=hana::make_tuple(200,50,"hello");
     validate(t2,v2,err);
     assert(err);
     std::cerr << err.message() << std::endl;
-    assert(err.message()==std::sting("zero must be less than 100"));
+    assert(err.message()==std::string("zero must be less than 100"));
 
     std::cout << "Example 12 done" << std::endl;
     return 0;
