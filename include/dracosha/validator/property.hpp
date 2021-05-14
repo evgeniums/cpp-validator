@@ -62,8 +62,8 @@ auto property(Tv&& val, Tp&& prop) -> decltype(auto)
 
 //-------------------------------------------------------------
 
-#define DRACOSHA_VALIDATOR_HAS_PROPERTY_FN(val,prop) hana::is_valid([](auto&& v) -> decltype((void)v.prop()){})(val)
-#define DRACOSHA_VALIDATOR_HAS_PROPERTY(val,prop) hana::is_valid([](auto&& v) -> decltype((void)v.prop){})(val)
+#define DRACOSHA_VALIDATOR_HAS_PROPERTY_FN(val,prop) DRACOSHA_VALIDATOR_NAMESPACE::hana::is_valid([](auto&& v) -> decltype((void)v.prop()){})(val)
+#define DRACOSHA_VALIDATOR_HAS_PROPERTY(val,prop) DRACOSHA_VALIDATOR_NAMESPACE::hana::is_valid([](auto&& v) -> decltype((void)v.prop){})(val)
 
 /**
   @brief Define property that can be used with validator.
@@ -75,22 +75,22 @@ auto property(Tv&& val, Tp&& prop) -> decltype(auto)
     template <typename Tv> \
     auto try_get_##prop (Tv&& v) -> decltype(auto) \
     { \
-      return hana::if_(DRACOSHA_VALIDATOR_HAS_PROPERTY_FN(v,prop), \
+      return DRACOSHA_VALIDATOR_NAMESPACE::hana::if_(DRACOSHA_VALIDATOR_HAS_PROPERTY_FN(v,prop), \
         [](auto&& x) -> decltype(auto) { return x.prop(); }, \
         [](auto&& vv) -> decltype(auto)  { \
-                return hana::if_(DRACOSHA_VALIDATOR_HAS_PROPERTY(vv,prop), \
+                return DRACOSHA_VALIDATOR_NAMESPACE::hana::if_(DRACOSHA_VALIDATOR_HAS_PROPERTY(vv,prop), \
                   [](auto&& x) -> decltype(auto) { return x.prop; }, \
-                  [](auto&& x) -> decltype(auto) { return hana::id(std::forward<decltype(x)>(x)); } \
+                  [](auto&& x) -> decltype(auto) { return DRACOSHA_VALIDATOR_NAMESPACE::hana::id(std::forward<decltype(x)>(x)); } \
                 )(std::forward<decltype(vv)>(vv)); \
             } \
       )(std::forward<decltype(v)>(v)); \
     }; \
-    DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_fn_##prop = hana::is_valid([](auto v) -> decltype( \
-                                                                        (void)hana::traits::declval(v).prop() \
+    DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_fn_##prop = DRACOSHA_VALIDATOR_NAMESPACE::hana::is_valid([](auto v) -> decltype( \
+                                                                        (void)DRACOSHA_VALIDATOR_NAMESPACE::hana::traits::declval(v).prop() \
                                                                     ) \
                                                                 {}); \
-    DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_##prop = hana::is_valid([](auto v) -> decltype( \
-                                                                        (void)hana::traits::declval(v).prop \
+    DRACOSHA_VALIDATOR_INLINE_LAMBDA auto has_##prop = DRACOSHA_VALIDATOR_NAMESPACE::hana::is_valid([](auto v) -> decltype( \
+                                                                        (void)DRACOSHA_VALIDATOR_NAMESPACE::hana::traits::declval(v).prop \
                                                                     ) \
                                                                 {}); \
     struct type_p_##prop : public DRACOSHA_VALIDATOR_NAMESPACE::basic_property \
@@ -105,11 +105,11 @@ auto property(Tv&& val, Tp&& prop) -> decltype(auto)
         template <typename T> \
         constexpr static bool has() \
         { \
-            return hana::if_( \
-                        has_fn_##prop(hana::template type_c<T>), \
+            return DRACOSHA_VALIDATOR_NAMESPACE::hana::if_( \
+                        has_fn_##prop(DRACOSHA_VALIDATOR_NAMESPACE::hana::template type_c<T>), \
                             true, \
-                            hana::if_( \
-                                has_##prop(hana::template type_c<T>), \
+                            DRACOSHA_VALIDATOR_NAMESPACE::hana::if_( \
+                                has_##prop(DRACOSHA_VALIDATOR_NAMESPACE::hana::template type_c<T>), \
                                     true, \
                                     false \
                         )); \
@@ -159,7 +159,7 @@ auto property(Tv&& val, Tp&& prop) -> decltype(auto)
 
 #define DRACOSHA_VALIDATOR_PROPERTY(prop) DRACOSHA_VALIDATOR_PROPERTY_FLAG(prop,nullptr,nullptr)
 
-#define DRACOSHA_VALIDATOR_PROPERTY_TYPE(prop) decltype(_[prop])
+#define DRACOSHA_VALIDATOR_PROPERTY_TYPE(prop) decltype(DRACOSHA_VALIDATOR_NAMESPACE::_[prop])
 
 //-------------------------------------------------------------
 
