@@ -651,16 +651,17 @@ See examples below.
 ```cpp
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/validate.hpp>
+#include <dracosha/validator/operators/lexicographical.hpp>
 #include <dracosha/validator/prevalidation/set_validated.hpp>
 
 // define structure with member variables and member setter method
 struct Foo
 {
     std::string bar_value;
-    
+
     uint32_t other_value;
     size_t some_size;
-    
+
     void set_bar_value(std::string val)
     {
         bar_value=std::move(val);
@@ -694,39 +695,34 @@ using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 int main()
 {
+    // define validator of custom properties
+    auto v=validator(
+        _[bar_value](ilex_ne,"UNKNOWN"), // case insensitive lexicographical not equal
+        _[other_value](gte,1000)
+    );
 
-// define validator of custom properties
-auto v=validator(
-    _[bar_value](ilex_ne,"UNKNOWN"), // case insensitive lexicographical not equal
-    _[other_value](gte,1000)
-);
+    Foo foo_instance;
 
-Foo foo_instance;
+    error_report err;
 
-error_report err;
+    // call setter with valid data
+    set_validated(foo_instance,_[bar_value],"Hello world",v,err);
+    assert(!err);
 
-// call setter with valid data
-set_validated(foo_instance,bar_value,"Hello world",v,err);
-if (!err)
-{
-    // object's member is set
+    // call setter with invalid data
+    set_validated(foo_instance,_[bar_value],"unknown",v,err);
+    assert(err);
+    if (err)
+    {
+        // object's member is not set
+        std::cerr << err.message() << std::endl;
+        assert(err.message()==std::string("bar_value must be not equal to UNKNOWN"));
+    }
+
+    std::cout << "Example 26 done" << std::endl;
+    return 0;
 }
 
-// call setter with invalid data
-set_validated(foo_instance,bar_value,"unknown",v,err);
-if (err)
-{
-    // object's member is not set
-    std::cerr << err.message() << std::endl;
-    /* prints:
-     
-     "bar_value must be not equal to UNKNOWN"
-     
-     */
-}
-
-return 0;
-} 
 ```
 
 #### unset_validated
@@ -2094,6 +2090,7 @@ To use aggregation with modifier the modifier must be provided as an argument to
 See examples below.
 
 ```cpp
+#include <map>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/properties/pair.hpp>
 
@@ -2511,6 +2508,8 @@ See example below.
 ```cpp
 #include <dracosha/validator/value_transformer.hpp>
 #include <dracosha/validator/validator.hpp>
+
+using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 namespace {
 // define handler that returns a size of provided string
