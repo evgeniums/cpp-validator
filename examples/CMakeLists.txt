@@ -5,7 +5,7 @@ SET(SOURCES
     example02_validate_with_report.cpp
     example03_validate_with_exception.cpp
     example04_apply_validator.cpp
-    example05_dynamic_validator._allocation.cpp
+    example05_dynamic_validator_allocation.cpp
     example06_nested_validators.cpp
     example07_nested_members.cpp
     example08_member_existence.cpp
