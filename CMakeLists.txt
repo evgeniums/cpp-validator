@@ -222,8 +222,8 @@ ELSE (DRACOSHA_VALIDATOR_SRC)
 
     MESSAGE(STATUS "Use standalone cpp-validator library")
 
-    OPTION(VALIDATOR_WITH_TESTS "Build tests for cpp-validator library" ON)
-    OPTION(VALIDATOR_WITH_EXAMPLES "Build examples for cpp-validator library" ON)
+    OPTION(VALIDATOR_WITH_TESTS "Build tests for cpp-validator library" OFF)
+    OPTION(VALIDATOR_WITH_EXAMPLES "Build examples for cpp-validator library" OFF)
 
     FIND_PACKAGE(Boost 1.65 REQUIRED)
 

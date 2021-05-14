@@ -3374,14 +3374,15 @@ To use `cpp-validator` library with `CMake` build system do the following:
     TARGET_LINK_LIBRARIES(${PROJECT_NAME} dracoshavalidator ${Boost_LIBRARIES})
     ```
 - configure the following optional `CMake` parameters if needed:
-    - `VALIDATOR_WITH_FMT` - *On*|*Off* - enable [fmt](https://github.com/fmtlib/fmt) library for [report](#report) [formatting](#backend-formatter) - default is **On**;
+    - `VALIDATOR_WITH_FMT` - *ON*|*OFF* - enable [fmt](https://github.com/fmtlib/fmt) library for [report](#report) [formatting](#backend-formatter) - default is *ON*;
     - `FMT_ROOT` - path to folder where [fmt](https://github.com/fmtlib/fmt) library is installed;
     - `FMT_INCLUDE_DIRECTORY` - path to headers of [fmt](https://github.com/fmtlib/fmt) library if `FMT_ROOT` is not set;
-    - `FMT_HEADER_ONLY` - *Off*|*On* - mode of [fmt](https://github.com/fmtlib/fmt) library - default **Off**;
+    - `FMT_HEADER_ONLY` - *OFF*|*ON* - mode of [fmt](https://github.com/fmtlib/fmt) library - default is *OFF*;
     - `FMT_LIB_DIR` - path to folder with built [fmt](https://github.com/fmtlib/fmt) library if `FMT_ROOT` is not set and `FMT_HEADER_ONLY` is off;
-    - `VALIDATOR_WITH_TESTS` - *Off*|*On* - enable tests building - default is **Off**;
+    - `VALIDATOR_WITH_TESTS` - *OFF*|*ON* - build with tests - default is *OFF*;
+    - `VALIDATOR_WITH_EXAMPLES` - *OFF*|*ON* - build with examples - default is *OFF*.
 
-## Building and running tests
+## Building and running tests or examples
 
 Sample scripts for tests building and running are located in `sample-build` folder:
 - `win-msvc.bat` to build and run tests on Windows with MSVC compiler;
