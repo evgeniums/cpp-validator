@@ -222,9 +222,10 @@ ELSE (DRACOSHA_VALIDATOR_SRC)
 
     MESSAGE(STATUS "Use standalone cpp-validator library")
 
-    FIND_PACKAGE(Boost 1.65 REQUIRED)
+    OPTION(VALIDATOR_WITH_TESTS "Build tests for cpp-validator library" ON)
+    OPTION(VALIDATOR_WITH_EXAMPLES "Build examples for cpp-validator library" ON)
 
-    OPTION(VALIDATOR_WITH_TESTS "Build tests for cpp-validator library" OFF)
+    FIND_PACKAGE(Boost 1.65 REQUIRED)
 
     OPTION(VALIDATOR_WITH_FMT "Use libfmt backend for formatting" On)
 
@@ -234,15 +235,13 @@ ELSE (DRACOSHA_VALIDATOR_SRC)
     IF(WIN32)
         IF(MSVC)
             TARGET_COMPILE_OPTIONS(${PROJECT_NAME} INTERFACE "/Zc:ternary")
-        ELSE()
+        ELSE(MSVC)
             TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} INTERFACE -D_WIN32_WINNT=0x0600 -Dstrcasecmp=stricmp)
         ENDIF(MSVC)
+    ELSE (WIN32)
+          TARGET_COMPILE_OPTIONS(${PROJECT_NAME} INTERFACE -fstack-protector-all -fno-omit-frame-pointer)
     ENDIF(WIN32)
     
-    IF(NOT MSVC)
-        TARGET_COMPILE_OPTIONS(${PROJECT_NAME} INTERFACE -fstack-protector-all -fno-omit-frame-pointer)
-    ENDIF(NOT MSVC)
-
     IF (VALIDATOR_WITH_FMT)
 
         MESSAGE(STATUS "Use libfmt for formatting in cpp-validator library")
@@ -288,10 +287,19 @@ ELSE (DRACOSHA_VALIDATOR_SRC)
 
     IF (VALIDATOR_WITH_TESTS)
 
+        ENABLE_TESTING(true)
         MESSAGE(STATUS "Build tests for cpp-validator library")
         ADD_SUBDIRECTORY(test)
 
     ENDIF(VALIDATOR_WITH_TESTS)
+
+    IF (VALIDATOR_WITH_EXAMPLES)
+
+        MESSAGE(STATUS "Build examples for cpp-validator library")
+        ENABLE_TESTING(true)
+        ADD_SUBDIRECTORY(examples)
+
+    ENDIF(VALIDATOR_WITH_EXAMPLES)
 
     INSTALL(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/dracosha" DESTINATION include)
 

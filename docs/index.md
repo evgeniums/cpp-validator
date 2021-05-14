@@ -360,6 +360,7 @@ Validators can be dynamically allocated on the memory heap. There are two forms 
 See examples below.
 
 ```cpp
+#include <map>
 #include <dracosha/validator/validator.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -456,7 +457,7 @@ if (err)
   // validation failed
 }
 
-validate(200,v,err))
+validate(200,v,err);
 if (!err)
 {
   // validation succeeded
@@ -492,7 +493,7 @@ if (err)
     */
 }
 
-validate(200,v,err))
+validate(200,v,err);
 if (!err)
 {
   // validation succeeded
@@ -967,6 +968,7 @@ Method `set_unknown_member_mode` instructs adapter what to do if a member is not
 See examples below.
 
 ```cpp
+#include <map>
 #include <dracosha/validator/validator.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -1122,7 +1124,7 @@ If a [property](#property) is of boolean type and must be capable of being used 
 #include <iostream>
 #include <dracosha/validator/property.hpp>
 #include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapter/reporting_adapter.hpp>
+#include <dracosha/validator/adapters/reporting_adapter.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 // structure with red_color() getter method
@@ -1135,11 +1137,11 @@ struct Foo
     }
 };
 
+// define flaggable red_color property
+DRACOSHA_VALIDATOR_PROPERTY_FLAG(red_color,"Must be red","Must be not red")
+
 int main()
 {
-
-// define flaggable red_color property
-DRACOSHA_VALIDATOR_PROPERTY_FLAG(red_color,"Must be red","Must be not red");
 
 // validator with red_color property
 auto v=validator(
