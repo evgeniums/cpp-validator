@@ -34,6 +34,7 @@ cmake -A %MSVC_BUILD_ARCH% -T %MSVC_TOOLSET% ^
     -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% ^
     -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ^
     -DVALIDATOR_WITH_TESTS=On ^
+    -DVALIDATOR_WITH_EXAMPLES=On ^
     %SRC_DIR%
 
 cmake --build . --config Release -- /m:1 /p:UseMultiToolTask=true /p:MultiProcMaxCount=8 /fileLogger

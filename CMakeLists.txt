@@ -287,18 +287,18 @@ ELSE (DRACOSHA_VALIDATOR_SRC)
 
     IF (VALIDATOR_WITH_TESTS)
 
-        ENABLE_TESTING(true)
         MESSAGE(STATUS "Build tests for cpp-validator library")
+        ENABLE_TESTING(true)
         ADD_SUBDIRECTORY(test)
 
     ENDIF(VALIDATOR_WITH_TESTS)
 
     IF (VALIDATOR_WITH_EXAMPLES)
-
         MESSAGE(STATUS "Build examples for cpp-validator library")
         ENABLE_TESTING(true)
         ADD_SUBDIRECTORY(examples)
-
+    ELSE (VALIDATOR_WITH_EXAMPLES)
+        MESSAGE(STATUS "Skip building examples for cpp-validator library")
     ENDIF(VALIDATOR_WITH_EXAMPLES)
 
     INSTALL(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/dracosha" DESTINATION include)
