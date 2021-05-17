@@ -25,9 +25,11 @@ cmake -G "CodeBlocks - Unix Makefiles" \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
     -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
     -DVALIDATOR_WITH_TESTS=On \
+    -DVALIDATOR_WITH_EXAMPLES=On \
     -DVALIDATOR_WITH_FMT=On \
     $SRC_DIR
 make -j8
+ctest -VV
 cd -
 
-$BUILD_DIR/test/dracoshavalidator-test --log_level=test_suite
+#$BUILD_DIR/test/dracoshavalidator-test --log_level=test_suite
