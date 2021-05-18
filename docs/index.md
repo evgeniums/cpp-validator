@@ -615,6 +615,7 @@ return 0;
 Default implementation of `set_validated` uses square brackets operator to set a member as an element of a container.
 
 ```cpp
+#include <map>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/prevalidation/set_validated.hpp>
 
@@ -731,6 +732,7 @@ Default implementation of `unset_validated` uses `erase()` method of container. 
 To use `unset_validator` with custom types a template specialization of `unset_member_t` must be defined. See example in `validator/prevalidation/unset_validated.hpp` header.
 
 ```cpp
+#include <map>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/prevalidation/unset_validated.hpp>
 
@@ -770,6 +772,7 @@ Default implementation of `resize_validated` uses `resize()` method of a member.
 Note that only [size](#size), [length](#length) and [empty](#empty) properties as well as [comparison](builtin_operators.md#comparison-operators) and [lexicographical](builtin_operators.md#lexicographical-operators) operators are validated before this operation. If other operators are used to validate content, then they are not checked. For example, resizing string with `validator(_[string_field](regex_match,"Hello world!"))` will not emit error even in case the validation condition is not met. 
 
 ```cpp
+#include <map>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/prevalidation/resize_validated.hpp>
 
@@ -913,6 +916,7 @@ auto member_path_nested_container=_["element1"]["element1_1"]["element1_1_1"];
 ```
 
 ```cpp
+#include <map>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
@@ -1261,7 +1265,7 @@ int main()
 
 #### Properties with arguments
 
-Ordinary [properties](#properties) do not have arguments. To validate [object](#object) methods with arguments one shoud use `variadic properties`. A variadic property is defined similar to ordinary property but using one of the following macros:
+Ordinary [properties](#properties) do not have arguments. To validate [object](#object) methods with arguments one shoud use `variadic properties`. A variadic property is defined similar to an ordinary property but only using a different set of macros:
 - `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(method)` defines variadic property corresponding to object's `method`;
 - `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(method,has_method)` defines variadic property corresponding to object's `method` and `has_method` used to check if object has the variadic property with provided arguments;
 - `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_FLAG(method,flag_descriprion,negative_flag_description)` defines variadic property corresponding to object's `method` that can be used with [flag](#flag) operator.
@@ -1445,6 +1449,7 @@ int main()
 Operator `exists` is used to check explicitly if an [object](#object) contains some [member](#member). See example below.
 
 ```cpp
+#include <map>
 #include <dracosha/validator/validator.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
@@ -1476,6 +1481,7 @@ return 0;
 Operator `contains` is used to check if the variable that is under validation contains an element that matches the [operand](#operand). See example below.
 
 ```cpp
+#include <map>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/operator/contains.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
@@ -2193,7 +2199,7 @@ struct TreeNode
     std::string _name;
 };
 
-// name proeprty is used to access name of a node
+// name property is used to access name of a node
 DRACOSHA_VALIDATOR_PROPERTY(name)
 // child_count property is used to get number of the node's children
 DRACOSHA_VALIDATOR_PROPERTY(child_count)
@@ -2805,6 +2811,7 @@ To override entire error message a reporting *hint* must be attached to the vali
 See examples below.
 
 ```cpp
+#include <map>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
@@ -2852,6 +2859,7 @@ return 0;
 To override description of a member validation condition a temporary member validator object must be called with string *hint* as an argument, e.g. `_["key1"](gt,100)("reporting hint")`. See examples below.
 
 ```cpp
+#include <map>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/adapters/reporting_adapter.hpp>
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
@@ -3148,6 +3156,7 @@ Another example of custom locale can be found in `validator/reporting/locale/ru.
 Below is an example of custom localization for Russian language. This example uses some grammatical categories of Russian language listed in `grammar_ru` enumeration.
 
 ```cpp
+#include <map>
 #include <iostream>
 #include <dracosha/validator/validator.hpp>
 #include <dracosha/validator/reporting/extend_translator.hpp>
@@ -3272,7 +3281,7 @@ For example, have a look at four validators below. All of them logically do the 
 ```
 
 - The first validator extracts a value of the nested member twice because each member in a validator is evaluated independently. If object is a nested container with huge number of elements then that extraction overhead can be noticeable.
-- The second validator extracts a value only once and then invokes two operators one by one which is quite fast but can be a little bit more expensive than the forth variant.
+- The second validator extracts a value only once and then invokes two operators one by one which is quite fast but can be a little bit more expensive than the fourth variant.
 - The third validator pre-extracts intermediate value of a partial member's path and then invokes nested validator that finishes value extraction and applies final validation. As a result, full actual validation procedure and its speed are the same as with the second validator.
 - The fourth validator extracts a value once and invokes a single "atomic" operator which is the most effective way to solve this sample task. 
 
@@ -3332,7 +3341,7 @@ Building text reports sometimes can add meaningful overhead because construction
 
 For `CMake` build system there is `CMakeLists.txt` project file in the library's root folder. Add `cpp-library` folder as a subdirectory to your `CMake` project and configure build parameters, see [CMake configuration](#cmake-configuration).
 
-For the rest build systems ensure that `include` subfolder of `cpp-library` is available for your compiler in the list of include paths. [Boost](http://boost.org) libraries must also be in the paths. To use [fmt](https://github.com/fmtlib/fmt) library as a [backend formatter](#backend-formatter) add definition of macro `DRACOSHA_VALIDATOR_FMT` to compiler command line and ensure that [fmt](https://github.com/fmtlib/fmt) library is available in compiler's paths. When compiling with `MSVC` don't forget to add `/Zc:ternary` compiler flag.
+For the rest build systems ensure that `include` subfolder of `cpp-library` is available for your compiler in the list of include paths. [Boost](http://boost.org) libraries must also be in the paths. To use [fmt](https://github.com/fmtlib/fmt) library as a [backend formatter](#backend-formatter) add definition of macro `DRACOSHA_VALIDATOR_FMT` to compiler command line and ensure that [fmt](https://github.com/fmtlib/fmt) library is available in compiler's paths. When compiling with `MSVC` compiler flags `/Zc:ternary` and `/Zc:__cplusplus` are required.
 
 ## Supported platforms and compilers
 
@@ -3382,7 +3391,7 @@ To use `cpp-validator` library with `CMake` build system do the following:
     - `VALIDATOR_WITH_TESTS` - *OFF*|*ON* - build with tests - default is *OFF*;
     - `VALIDATOR_WITH_EXAMPLES` - *OFF*|*ON* - build with examples - default is *OFF*.
 
-## Building and running tests or examples
+## Building and running tests and examples
 
 Sample scripts for tests building and running are located in `sample-build` folder:
 - `win-msvc.bat` to build and run tests on Windows with MSVC compiler;
