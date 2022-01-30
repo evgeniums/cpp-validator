@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(TestOptional)
     c.emplace(cref(b));
 
     BOOST_REQUIRE(c.has_value());
-    BOOST_CHECK_EQUAL(c.value(),a);
+    BOOST_CHECK_EQUAL(static_cast<int>(c.value()),a);
 }
 
 namespace {
