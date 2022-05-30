@@ -205,7 +205,7 @@ To construct a validator one should describe validation conditions using five gr
     * whole object;
     * [member(s)](#member) of the object.
 
-2. [Property](#property) of selected object's part that must be verified. By default a special pseudo property *value* is used which means that validation must be applied to the variable "as is". The library provides a few other predefined properties such as *size*, *length* and *empty*. Custom properties can also be defined, see [Properties](#properties).
+2. [Property](#property) of selected object's part that must be verified. By default a special pseudo property *value* is used which means that validation must be applied to the variable itself. The library provides a few other predefined properties such as *size*, *length* and *empty*. Custom properties can also be defined, see [Properties](#properties).
 
 3. [Operator(s)](#operator) that must be used for validation.
 
@@ -902,7 +902,7 @@ auto member_string_key=_["some_member"];
 ```
 #### Nested members
 
-To validate members of nested objects or containers a compound member notation must be used, where name of the member at each level is placed within square brackets and appended to the upper member resulting in a `member path`. See examples below.
+To validate members of nested objects or containers a hierarchical member notation must be used, where name of the member at each level is placed within square brackets and appended to the upper member resulting in a `member path`. See examples below.
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -957,7 +957,7 @@ Special operator [exists](#exists) can be used to check explicitly if an [object
 
 There is also a [contains](#contains) operator added to the library for convenience to validate members of container types.
 
-A [member](#member) existence can also be checked implicitly before applying validation conditions to the [member](#member). This check is performed by an [adapter](#adapter) if the [adapter](#adapter) supports that. [Default adapter](#default-adapter) and [reporting adapter](#reporting-adapter) provide this feature which can be configured with  `set_check_member_exists_before_validation` and `set_unknown_member_mode` adapter methods.
+A [member](#member) existence can also be checked implicitly before applying validation to the [member](#member). Check of member existence is performed by an [adapter](#adapter) if the [adapter](#adapter) supports that. [Default adapter](#default-adapter) and [reporting adapter](#reporting-adapter) provide this feature which can be configured with  `set_check_member_exists_before_validation` and `set_unknown_member_mode` adapter methods.
 
 Method `set_check_member_exists_before_validation` enables/disables implicit check of member existence. By default this option is disabled which improves validation performance but can sometimes cause exceptions or other undefined errors. Note that some basic check of property existence or type compatibility might be performed statically at compile time regardless of this flag.
 
@@ -1029,7 +1029,7 @@ See examples of different property notations in section [Validator with properti
 
 #### *value*
 
-`value` property stands for the variable itself. This is a special pseudo property which means that validation must be applied to the variable "as is". See examples how the `value` property can be used in section [validator with aggregations](#validator-with-aggregations).
+`value` property stands for the variable itself. This is a special pseudo property which means that validation must be applied to the whole variable. See examples how the `value` property can be used in section [validator with aggregations](#validator-with-aggregations).
 
 #### *size*
 
@@ -1068,7 +1068,7 @@ DRACOSHA_VALIDATOR_NAMESPACE_END
 
 A new [property](#property) can be added using special macros defined in `cpp-validator` library. 
 
-A [property](#property) of non-boolean type must be defined using `DRACOSHA_VALIDATOR_PROPERTY` macro with one argument for name of the [property](#property).
+A [property](#property) of non-boolean type must be defined using `DRACOSHA_VALIDATOR_PROPERTY(property_name)` macro with one argument for name of the [property](#property).
 
 ```cpp
 #include <dracosha/validator/property.hpp>
@@ -1115,7 +1115,7 @@ return 0;
 }
 ```
 
-If a [property](#property) is of boolean type and must be capable of being used with [flag](#flag) operator then the property must be defined with `DRACOSHA_VALIDATOR_PROPERTY_FLAG` macro that has three arguments:
+If a [property](#property) is of boolean type and must be capable of being used with [flag](#flag) operator then the property must be defined with `DRACOSHA_VALIDATOR_PROPERTY_FLAG(property_name,positive_flag_descriprion,negative_flag_description)` macro that has three arguments:
 1. name of the [property](#property);
 2. description of positive [flag](#flag);
 3. description of negative [flag](#flag).
@@ -1170,7 +1170,7 @@ return 0;
 
 ### Properties of heterogeneous containers
 
-To validate elements of heterogeneous containers a special kind of properties should be used. A `heterogeneous property` wraps an index of a tuple element. [Element aggregations](#element-aggregations) can be used with heterogeneous properties in the same way as with ordinary properties if [h_size](h_size) of validated container is not equal to zero.
+To validate elements of heterogeneous containers a special kind of properties should be used. A `heterogeneous property` wraps an index of a tuple element. [Element aggregations](#element-aggregations) can be used with heterogeneous properties in the same way as with ordinary properties. Note that element aggregation can be used with heterogeneous containers whose [h_size](h_size) is greater than zero.
 
 A heterogeneous property can be defined either implicitly or explicitly.
 
@@ -1268,9 +1268,10 @@ int main()
 Ordinary [properties](#properties) do not have arguments. To validate [object](#object) methods with arguments one shoud use `variadic properties`. A variadic property is defined similar to an ordinary property but only using a different set of macros:
 - `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(method)` defines variadic property corresponding to object's `method`;
 - `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(method,has_method)` defines variadic property corresponding to object's `method` and `has_method` used to check if object has the variadic property with provided arguments;
-- `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_FLAG(method,flag_descriprion,negative_flag_description)` defines variadic property corresponding to object's `method` that can be used with [flag](#flag) operator.
+- `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_FLAG(method,flag_descriprion,negative_flag_description)` defines variadic property corresponding to object's `method` that can be used with [flag](#flag) operator;
+- `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HF(method,has_method,flag_descriprion,negative_flag_description)` defines variadic property corresponding to object's `method` and `has_method` that can be used with [flag](#flag) operator.
 
-A variadic property defined with one of the macros listed above can be used "as is" either in property notation or member notation:
+A variadic property defined with one of the macros listed above can be used either in property notation or member notation:
 - `auto property_notation=variadic_property(arg1,arg2);`
 - `auto member_notation=_[variadic_property][arg1][arg2];`
 
@@ -1278,8 +1279,8 @@ When used with member notation the arguments passed to variadic property must fo
 
 The arguments following the variadic property in the member's path can be provided either "as is" or wrapped into `varg(argument)`. In the latter case the variadic property will be presented in more natural way in text reports:
 
-- `auto member_notation=_[variadic_property][1][2];` will result in "2 of 1 of variadic_property" in the text report;
-- `auto member_notation=_[variadic_property][varg(1)][varg(2)];` will result in "variadic_property(1,2)" in the text report;
+- `auto member_notation=_[variadic_property][1][2];` will result in "*2 of 1 of variadic_property*" in the text report;
+- `auto member_notation=_[variadic_property][varg(1)][varg(2)];` will result in "*variadic_property(1,2)*" in the text report;
 
 See examples below.
 
@@ -1290,38 +1291,38 @@ See examples below.
 using namespace DRACOSHA_VALIDATOR_NAMESPACE;
 
 // define a structure with variadic properties
-struct WithChild
+struct WithPlusProperties
 {
     // method with one argument
-    int child(int val) const noexcept
+    int plus_one(int val) const noexcept
     {
         return val+1;
     }
 
     // method with two arguments
-    int child_word(int val, const std::string& word) const noexcept
+    int val_plus_word_size(int val, const std::string& word) const noexcept
     {
         return val+static_cast<int>(word.size());
     }
 
-    // method to check if object "has" child_world with provided arguments
-    bool has_child_word(int val, const std::string& word) const noexcept
+    // method to check if val_plus_word_size can be used with provided arguments
+    bool has_val_plus_word_size(int val, const std::string& word) const noexcept
     {
         return val>10 && word.size()>=5;
     }
 };
 
 // define variadic property
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(child)
+DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(plus_one)
 // define variadic property to be used as "exists" checker
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(has_child_word)
+DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(has_val_plus_word_size)
 // define variadic property with "exists" checker
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(child_word,has_child_word)
+DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(val_plus_word_size,has_val_plus_word_size)
 
 int main()
 {
     // define object
-    WithChild o1;
+    WithPlusProperties o1;
     
     // define validation adapter with text reports
     std::string rep;
@@ -1329,43 +1330,43 @@ int main()
 
     // variadic property with single argument and member notation
     auto v1=validator(
-        _[child][varg(1)](eq,30)
+        _[plus_one][varg(1)](eq,30)
     );
     assert(!v1.apply(ra1));
-    assert(rep==std::string("child(1) must be equal to 30"));
+    assert(rep==std::string("plus_one(1) must be equal to 30"));
     rep.clear();
     
     // variadic property with single argument and property notation
     auto v2=validator(
-        child(1)(eq,30)
+        plus_one(1)(eq,30)
     );
     assert(!v2.apply(ra1));
-    assert(rep==std::string("child(1) must be equal to 30"));
+    assert(rep==std::string("plus_one(1) must be equal to 30"));
     rep.clear();
 
     // variadic property with two arguments and member notation
     auto v3=validator(
-        _[child_word][varg(20)][varg("hello")](eq,30)
+        _[val_plus_word_size][varg(20)][varg("hello")](eq,30)
     );
     assert(!v3.apply(ra1));
-    assert(rep==std::string("child_word(20,hello) must be equal to 30"));
+    assert(rep==std::string("val_plus_word_size(20,hello) must be equal to 30"));
     rep.clear();
 
     // variadic property with two arguments and property notation
     auto v4=validator(
-        child_word(20,"hello")(eq,30)
+        val_plus_word_size(20,"hello")(eq,30)
     );
     assert(!v4.apply(ra1));
-    assert(rep==std::string("child_word(20,hello) must be equal to 30"));
+    assert(rep==std::string("val_plus_word_size(20,hello) must be equal to 30"));
     rep.clear();
     
     // check if variadic property exists
     auto v5=validator(
-        _[child_word][20]["hello"](exists,true)
+        _[val_plus_word_size][20]["hello"](exists,true)
     );
     assert(v5.apply(o1));
     auto v6=validator(
-        _[child_word][5]["hello"](exists,true)
+        _[val_plus_word_size][5]["hello"](exists,true)
     );
     assert(!v6.apply(o1));
     
@@ -1506,11 +1507,11 @@ return 0;
 
 #### *flag*
 
-Operator `flag` is a special case of equality operator for boolean arguments. The main purpose of defining separate operator `flag` in addition to operator [eq](builtin_operators.md#eq) is more flexible [reports](#report) construction. With operator [eq](builtin_operators.md#eq) a [report](#report) would always use "must be equal to" string. With operator `flag` report strings can be customized depending on the [property](#property) or explicitly preset strings, e.g. "must be checked" or "must be set" and so on can be used in different places.
+Operator `flag` is a special case of equality operator for boolean arguments. The main purpose of defining separate operator `flag` in addition to operator [eq](builtin_operators.md#eq) is more flexible [reports](#report) construction. With operator [eq](builtin_operators.md#eq) a [report](#report) would always use "must be equal to" string. With operator `flag` report strings can be customized depending on either the [property](#property) definition or explicitly preset strings, e.g. "must be checked" or "must be set" would be used in reports instead of "must be equal to true".
 
 There are three ways of string customization for `flag` operator.
 
-1. Define [custom property](#adding-new-property) using `DRACOSHA_VALIDATOR_PROPERTY_FLAG` macro where the second argument is a reporting string for `<custom property>(flag,true)` condition and the third argument is a reporting string for `<custom property>(flag,false)` condition. See [example](#adding-new-property).
+1. Define [custom property](#adding-new-property) using `DRACOSHA_VALIDATOR_PROPERTY_FLAG(property_name,flag_descriprion,nwgative_flag_description)` macro where the second argument is a reporting string for `<custom property>(flag,true)` condition and the third argument is a reporting string for `<custom property>(flag,false)` condition. See [example](#adding-new-property).
 
 2. Use `flag` operator with one of string presets, e.g. `value(flag(flag_on_off),true)` will result in reporting string "must be on" and `value(flag(flag_on_off),false)` will result in reporting string "must be off". The following preset flag strings are defined in `validator/reporting/flag_presets.hpp` header file:
 
@@ -1641,8 +1642,8 @@ Adding a new [operator](#operator) consists of the following steps.
 
 1. Define `struct` that inherits from template class `op` with the name of the defined struct as a template argument.
 2. Define callable `operator ()` in the struct with two template arguments.
-3. Define `description` and `n_description` as `constexpr static const char*` variables of the the struct that will be used as human readable error descriptions in [report](#report) if this operator returns `false` during validation: `description` is used for the operator itself and `n_description` is used for negation of this operator.
-4. Define `constexpr` callable object with type of the new struct. This object will be used in [validators](#validator).
+3. Define `description` and `n_description` as `constexpr static const char*` variables of the struct that will be used as human readable error descriptions in [report](#report): `description` is used for the operator itself and `n_description` is used for negation of this operator.
+4. Define `constexpr` callable object of this struct type. This object will be used in [validators](#validator).
 
 See example below.
 
@@ -1679,15 +1680,18 @@ Value of an [operand](#operand) is given as the second argument to an [operator]
 - [interval](#intervals);
 - [range](#ranges).
 
-### Variables
+### Variables and constants
 
-The most common case is when an [operand](#operand) is either constant or `lvalue` or `rvalue` variable. Note, that `lvalue` variable is used by reference and a user is responsible for the operand to stay valid during validator's life time.
+The most common case is when an [operand](#operand) is either constant or `lvalue` variable or `rvalue` variable. Note, that `lvalue` variable is used by reference and a user is responsible for the operand to stay valid during validator's life time.
 
 See examples below.
 
 ```cpp
 // operand is constant
-auto v1=validator(gt,100);
+constexpr const int constant_operand=100;
+auto v1=validator(gt,constant_operand);
+// or
+auto v1_1=validator(gt,100);
 
 // operand is lvalue
 int lval_operand=100;
@@ -1864,7 +1868,7 @@ If [decorator](#decorator) is used then only part within braces including the br
 
 ### Ranges
 
-Range [operand](#operand) is a searchable set of elements. Range [operand](#operand) can be used only with [in](#in) and [nin](#nin) operators. With [in](#in) operator it is used to check if a variable matches one of the elements in the `range`.
+Range [operand](#operand) is a searchable set of elements. Range [operand](#operand) can be used only with [in](#in) and [nin](#nin) operators. With [in](#in) operator it is used to check if a variable matches one of the elements in the `range`. With [nin](#nin) it is used to check if a variable does not match any element in the `range`.
 
 Range can be specified using one of the following ways:
 
@@ -1878,17 +1882,17 @@ Range can be specified using one of the following ways:
     std::vector<int> vec={1,2,3,4,5};
     auto v1=validator(in,range(vec,sorted));
     ```
-- construct range in-line, e.g. 
+- construct range inline, e.g. 
     ```cpp
     auto v1=validator(in,range({10,5,9,100}));
     ```
-- construct sorted range in-line, e.g. 
+- construct sorted range inline, e.g. 
     ```cpp
     auto v1=validator(in,range({1,2,3,4,5},sorted));
     ```
-Sorted and unsorted ranges differ in processing: for sorted ranges `std::binary_search` is used while for unsorted ranges `std::find_if` is used which is slower than `std::binary_search`.
+Sorted and unsorted ranges differ in processing: for sorted ranges `std::binary_search` is used whereas `std::find_if` is used for unsorted ranges which is slower than `std::binary_search`.
 
-In [reporting](#report) a `range` is formatted as "range [x[0], x[1], ... , x[N]]", where x[i] denotes i-th element of the container. To limit a number of elements in a [report](#report) one should use `range` with additional integer argument that stands for `max_report_elements`. If  `max_report_elements` is set then at most `max_report_elements` will be used in [report](#report) formatting and ", ... " will be appended to the end of the list. See examples below.
+In [reporting](#report) a `range` is formatted as "range [x[0], x[1], ... , x[N]]", where x[i] denotes i-th element of the container. To limit a number of elements in a [report](#report) one should use `range` with additional integer argument that stands for `max_report_elements`. If  `max_report_elements` is set then at most `max_report_elements` will be used in [report](#report) formatting and ellipsis ", ... " will be appended to the end of the list. See examples below.
 
 ```cpp
 std::vector<size_t> vec{1,2,3,4,5,6,7,8,9,10};
@@ -2262,7 +2266,7 @@ There are a few built-in adapter types implemented in `cpp-validator` library:
 
 ### Default adapter
 
-*Default adapter* wraps *lvalue* reference to the [object](#object) to be validated and invokes [operators](#operator) one by one as specified in a [validator](#validator). To make a *default adapter* call `make_default_adapter(object_to_validate)` with the [object](#object) as an argument. If a [validator](#validator) is applied directly to the [object](#object) then *default adapter* is constructed implicitly. See examples in [Using validator for data validation](#using-validator-for-data-validation) section.
+*Default adapter* wraps *lvalue* reference to the [object](#object) to be validated and invokes [operators](#operator) one by one as specified in a [validator](#validator). To create a *default adapter* call `make_default_adapter(object_to_validate)` with the [object](#object) as an argument. If a [validator](#validator) is applied directly to the [object](#object) then *default adapter* is constructed implicitly. See examples in [Using validator for data validation](#using-validator-for-data-validation) section.
 
 *Default adapter* supports implicit check of [member existence](#member-existence).
 
@@ -3281,16 +3285,16 @@ For example, have a look at four validators below. All of them logically do the 
 ```
 
 - The first validator extracts a value of the nested member twice because each member in a validator is evaluated independently. If object is a nested container with huge number of elements then that extraction overhead can be noticeable.
-- The second validator extracts a value only once and then invokes two operators one by one which is quite fast but can be a little bit more expensive than the fourth variant.
+- The second validator extracts a value only once and then invokes two operators one by one using logical aggregation which is quite fast but can be a little bit more expensive than the fourth variant.
 - The third validator pre-extracts intermediate value of a partial member's path and then invokes nested validator that finishes value extraction and applies final validation. As a result, full actual validation procedure and its speed are the same as with the second validator.
 - The fourth validator extracts a value once and invokes a single "atomic" operator which is the most effective way to solve this sample task. 
 
-Though, it is a rare case when two operators can be narrowed down to a single operator.
+Though, it is a rare case when two operators can be narrowed down to a single operator like in the forth case.
 In general, a rule of thumb is to use [logical aggregations](#logical-aggregations) and/or [nested validators](#nested-validators) at a member level to avoid repetitive value extractions at the same member path.
 
 ## Zero copy
 
-A `validator` tries to do as little data copying as possible. All variables provided to validators are used by references. Thus, a user is responsible for the variables to stay valid during life time of a validator. If it is not possible then a variable must be explicitly moved or copied to a validator. Note that moved/copied values owned by the validator can be implicitly copied or moved multiple times during some validator operations - for example, when a nested member is constructed the keys of parent member path are moved or copied to the elements of the child member path. Therefore, it is still recommended to use validators with variables by references.
+A `validator` tries to do as little data copying as possible. All variables provided to validators are used by references. Thus, a user is responsible for the variables to stay valid during life time of a validator. If it is not possible then a variable must be explicitly moved or copied to a validator. Note that moved/copied values owned by the validator can be implicitly copied or moved multiple times during some validator operations - for example, when a nested member is constructed the keys of parent member path are moved or copied to the elements of the child member path.
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -3333,7 +3337,7 @@ By default only types compatibility is checked before validation. This can lead 
 
 ## Validation with text reports
 
-Building text reports sometimes can add meaningful overhead because construction of the reports can be rather complicated at certain cases. Therefore, in applications with very strong requirements to performance and minimal delays it is recommended to use validation with reporting only when text reports are really needed or use double run - first, validate data without text report, and then use validation with text reports only on already failed data just to construct a report.
+Building text reports sometimes can add meaningful overhead because construction of the reports can be rather complicated at certain cases. Therefore, in some scenarios it is reasonable to use double run of validation: first, validate data without text report, and then use validation with text reports only on already failed data just to construct a report.
 
 # Building and installation
 
