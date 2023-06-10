@@ -1,23 +1,24 @@
 # C++ Data Validation Library (*cpp-validator*)
 ----
 # Table of Contents
-[//]: # (TOC Begin)
+<!-- Start Document Outline -->
+
 * [Introduction](#introduction)
 * [Definitions](#definitions)
 * [Usage](#usage)
 	* [Validator construction](#validator-construction)
 		* [Components of validator](#components-of-validator)
 		* [Basic validator](#basic-validator)
-			* [Whole object](#whole-object)
-			* [Object's member](#objects-member)
+			* [Basic validator for whole object](#basic-validator-for-whole-object)
+			* [Basic validator for object's member](#basic-validator-for-objects-member)
 		* [Validator with properties](#validator-with-properties)
-			* [Whole object](#whole-object)
-			* [Object's member](#objects-member)
+			* [Validator with properties for whole object](#validator-with-properties-for-whole-object)
+			* [Validator with properties for object's member](#validator-with-properties-for-objects-member)
 		* [Validator with aggregations](#validator-with-aggregations)
-			* [Whole object](#whole-object)
-			* [Object's member](#objects-member)
-			* [Property of object's member](#property-of-objects-member)
-			* [Mixed](#mixed)
+			* [Validator with aggregations for whole object](#validator-with-aggregations-for-whole-object)
+			* [Validator with aggregations for object's member](#validator-with-aggregations-for-objects-member)
+			* [Validator with aggregations for property of object's member](#validator-with-aggregations-for-property-of-objects-member)
+			* [Mixed validator with aggregations](#mixed-validator-with-aggregations)
 		* [Dynamically allocated validator](#dynamically-allocated-validator)
 		* [Nested validators](#nested-validators)
 	* [Using validator for data validation](#using-validator-for-data-validation)
@@ -40,12 +41,12 @@
 	* [Properties](#properties)
 		* [Property notations](#property-notations)
 		* [Built-in properties](#built-in-properties)
-			* [*value*](#value)
-			* [*size*](#size)
-			* [*length*](#length)
-			* [*empty*](#empty)
-			* [*h_size*](#h_size)
-			* [*first* and *second*](#first-and-second)
+			* [value](#value)
+			* [size](#size)
+			* [length](#length)
+			* [empty](#empty)
+			* [h_size](#h_size)
+			* [first and second](#first-and-second)
 		* [Adding new property](#adding-new-property)
 		* [Properties of heterogeneous containers](#properties-of-heterogeneous-containers)
 			* [Implicit heterogeneous property](#implicit-heterogeneous-property)
@@ -55,16 +56,16 @@
 			* [Variadic properties with aggregations](#variadic-properties-with-aggregations)
 	* [Operators](#operators)
 		* [Special operators](#special-operators)
-			* [*exists*](#exists)
-			* [*contains*](#contains)
-			* [*flag*](#flag)
-			* [*in*](#in)
-			* [*nin*](#nin)
-			* [*_n* (negation)](#n-negation)
+			* [exists](#exists)
+			* [contains](#contains)
+			* [flag](#flag)
+			* [in](#in)
+			* [nin](#nin)
+			* [_n (negation)](#_n-negation)
 		* [Built-in operators](#built-in-operators)
 		* [Adding new operator](#adding-new-operator)
 	* [Operands](#operands)
-		* [Variables](#variables)
+		* [Variables and constants](#variables-and-constants)
 		* [Lazy operands](#lazy-operands)
 		* [Other members](#other-members)
 		* [Sample objects](#sample-objects)
@@ -121,8 +122,7 @@
 * [License](#license)
 * [Contributing](#contributing)
 
-[//]: # (TOC End)
-
+<!-- End Document Outline -->
 ----
 
 # Introduction
@@ -205,7 +205,7 @@ To construct a validator one should describe validation conditions using five gr
     * whole object;
     * [member(s)](#member) of the object.
 
-2. [Property](#property) of selected object's part that must be verified. By default a special pseudo property *value* is used which means that validation must be applied to the variable itself. The library provides a few other predefined properties such as *size*, *length* and *empty*. Custom properties can also be defined, see [Properties](#properties).
+2. [Property](#property) of selected object's part that must be checked. By default a special pseudo property *value* is used which means that validation must be applied to the variable itself. The library provides a few other predefined properties such as *size*, *length* and *empty*. Custom properties can also be defined, see [Properties](#properties).
 
 3. [Operator(s)](#operator) that must be used for validation.
 
@@ -217,7 +217,7 @@ To construct a validator one should describe validation conditions using five gr
 
 ### Basic validator
 
-#### Whole object
+#### Basic validator for whole object
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -227,7 +227,7 @@ auto v=validator(gt,100);
 ```
 The example above defines validation condition "variable must be greater than 100" where *gt* is an [operator](#operator) and *100* is an [operand](#operand).
 
-#### Object's member
+#### Basic validator for object's member
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -241,7 +241,7 @@ The example above defines validation condition "field1 of variable must be great
 
 ### Validator with properties
 
-#### Whole object
+#### Validator with properties for whole object
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -259,7 +259,7 @@ auto v2=validator(
 ```
 Validators *v1* and *v2* in the example above both define validation condition "size of variable must be greater than 100" where *size* is a [property](#property), *gt* is an [operator](#operator) and *100* is an [operand](#operand). The first validator is described using property notation and the second validator is described using member notation.
 
-#### Object's member
+#### Validator with properties for object's member
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -279,7 +279,7 @@ Validators *v1* and *v2* in the example above both define validation condition "
 
 ### Validator with aggregations
 
-#### Whole object
+#### Validator with aggregations for whole object
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -298,7 +298,7 @@ auto v2=validator(
 ```
 The example above defines validation condition "variable must be greater than 100 AND less than 200" where *value* is a pseudo property meaning variable itself, *gt* and *lt* are [operators](#operator), *100* and *200* are [operands](#operand), and *\^AND\^* is [aggregation](#aggregation).
 
-#### Object's member
+#### Validator with aggregations for object's member
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -312,7 +312,7 @@ auto v=validator(
 ```
 The example above defines validation condition "field1 of variable must be greater than 100 AND less than 200" where *field1* is a member of variable, *value* is a pseudo [property](#property) standing for member *field1* of variable, *gt* and *lt* are [operators](#operator), *100* and *200* are [operands](#operand), and *\^AND\^* is [aggregation](#aggregation).
 
-#### Property of object's member
+#### Validator with aggregations for property of object's member
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -326,7 +326,7 @@ auto v=validator(
 ```
 The example above defines validation condition "field1 of variable must be equal to "value1" OR size of field1 of variable is less than 3" where *field1* is a member of variable, *value* is a pseudo [property](#property) standing for member *field1* of variable, *size* is a [property](#property) of member *field1*, *eq* and *lt* are [operators](#operator), *"value1"* and *3* are [operands](#operand), and *\^OR\^* is [aggregation](#aggregation).
 
-#### Mixed
+#### Mixed validator with aggregations
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
@@ -856,7 +856,7 @@ int main()
 
 ## Members
 
-Members are used to define what parts of [objects](#object) must be validated. A [member](#member) can point to one of the following:
+Members are used to specify what parts of [objects](#object) must be validated. A [member](#member) can point to one of the following:
 - member variable of C++ object;
 - member method of C++ object, where the method must be of getter type, i.e. it must be without arguments and must return a value;
 - element of container.
