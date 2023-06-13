@@ -326,7 +326,7 @@ auto v=validator(
 ```
 The example above defines validation condition "field1 of variable must be equal to "value1" OR size of field1 of variable is less than 3" where *field1* is a member of variable, *value* is a pseudo [property](#property) standing for member *field1* of variable, *size* is a [property](#property) of member *field1*, *eq* and *lt* are [operators](#operator), *"value1"* and *3* are [operands](#operand), and *\^OR\^* is [aggregation](#aggregation).
 
-#### Mixed validator with aggregations
+#### Validator with mixed aggregations
 
 ```cpp
 #include <dracosha/validator/validator.hpp>
