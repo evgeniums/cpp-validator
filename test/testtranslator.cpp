@@ -12,7 +12,7 @@
 
 using namespace HATN_VALIDATOR_NAMESPACE;
 
-BOOST_AUTO_TEST_SUITE(TestTranslator)
+BOOST_AUTO_TEST_SUITE(TestValidationTranslator)
 
 BOOST_AUTO_TEST_CASE(CheckNoTranslator)
 {
