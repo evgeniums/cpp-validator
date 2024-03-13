@@ -37,19 +37,19 @@ using namespace DRACOSHA_VALIDATOR_NAMESPACE;
  * @brief Define fmt formatter of concrete_phrase.
  */
 template <>
-struct formatter<concrete_phrase>
+struct formatter<concrete_phrase> : formatter<string_view>
 {
     template <typename FormatContext>
-    auto format(const concrete_phrase& ph, FormatContext& ctx) {
+    auto format(const concrete_phrase& ph, FormatContext& ctx) const {
         return format_to(ctx.out(),ph.text());
     }
 };
 
 template <typename T>
-struct formatter<object_wrapper<T>>
+struct formatter<object_wrapper<T>> : formatter<string_view>
 {
     template <typename T1, typename FormatContext>
-    auto format(const T1& v, FormatContext& ctx) {
+    auto format(const T1& v, FormatContext& ctx) const {
         return format_to(ctx.out(),"{}",unwrap_object(v));
     }
 };
