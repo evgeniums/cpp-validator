@@ -1,224 +1,224 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 3.12)
-PROJECT(dracoshavalidator)
+PROJECT(hatnvalidator)
 
 SET (HEADERS
-    include/dracosha/validator/version.hpp
-    include/dracosha/validator/config.hpp
-    include/dracosha/validator/ignore_compiler_warnings.hpp
+    include/hatn/validator/version.hpp
+    include/hatn/validator/config.hpp
+    include/hatn/validator/ignore_compiler_warnings.hpp
 
-    include/dracosha/validator/status.hpp
+    include/hatn/validator/status.hpp
 
-    include/dracosha/validator/utils/hana_to_std_tuple.hpp
-    include/dracosha/validator/utils/safe_compare.hpp
-    include/dracosha/validator/utils/adjust_storable_type.hpp
-    include/dracosha/validator/utils/adjust_storable_ignore.hpp
-    include/dracosha/validator/utils/enable_to_string.hpp
-    include/dracosha/validator/utils/make_types_tuple.hpp
-    include/dracosha/validator/utils/reference_wrapper.hpp
-    include/dracosha/validator/utils/string_view.hpp
-    include/dracosha/validator/utils/object_wrapper.hpp
-    include/dracosha/validator/utils/unwrap_object.hpp
-    include/dracosha/validator/utils/wrap_object.hpp
-    include/dracosha/validator/utils/is_container.hpp
-    include/dracosha/validator/utils/is_pair.hpp
-    include/dracosha/validator/utils/get_it.hpp    
-    include/dracosha/validator/utils/feature_bitmask.hpp
-    include/dracosha/validator/utils/invoke_and.hpp
-    include/dracosha/validator/utils/invoke_or.hpp
-    include/dracosha/validator/utils/value_as_container.hpp
-    include/dracosha/validator/utils/conditional_fold.hpp
-    include/dracosha/validator/utils/to_string.hpp
-    include/dracosha/validator/utils/class_method_args.hpp
-    include/dracosha/validator/utils/optional.hpp
-    include/dracosha/validator/utils/copy.hpp
-    include/dracosha/validator/utils/heterogeneous_size.hpp
-    include/dracosha/validator/utils/foreach_if.hpp
-    include/dracosha/validator/utils/pointer_as_reference.hpp
+    include/hatn/validator/utils/hana_to_std_tuple.hpp
+    include/hatn/validator/utils/safe_compare.hpp
+    include/hatn/validator/utils/adjust_storable_type.hpp
+    include/hatn/validator/utils/adjust_storable_ignore.hpp
+    include/hatn/validator/utils/enable_to_string.hpp
+    include/hatn/validator/utils/make_types_tuple.hpp
+    include/hatn/validator/utils/reference_wrapper.hpp
+    include/hatn/validator/utils/string_view.hpp
+    include/hatn/validator/utils/object_wrapper.hpp
+    include/hatn/validator/utils/unwrap_object.hpp
+    include/hatn/validator/utils/wrap_object.hpp
+    include/hatn/validator/utils/is_container.hpp
+    include/hatn/validator/utils/is_pair.hpp
+    include/hatn/validator/utils/get_it.hpp
+    include/hatn/validator/utils/feature_bitmask.hpp
+    include/hatn/validator/utils/invoke_and.hpp
+    include/hatn/validator/utils/invoke_or.hpp
+    include/hatn/validator/utils/value_as_container.hpp
+    include/hatn/validator/utils/conditional_fold.hpp
+    include/hatn/validator/utils/to_string.hpp
+    include/hatn/validator/utils/class_method_args.hpp
+    include/hatn/validator/utils/optional.hpp
+    include/hatn/validator/utils/copy.hpp
+    include/hatn/validator/utils/heterogeneous_size.hpp
+    include/hatn/validator/utils/foreach_if.hpp
+    include/hatn/validator/utils/pointer_as_reference.hpp
 
-    include/dracosha/validator/adapter.hpp
-    include/dracosha/validator/property.hpp
-    include/dracosha/validator/basic_property.hpp
-    include/dracosha/validator/can_get.hpp
-    include/dracosha/validator/get.hpp
-    include/dracosha/validator/can_check_contains.hpp
-    include/dracosha/validator/check_contains.hpp
-    include/dracosha/validator/check_member.hpp
-    include/dracosha/validator/check_exists.hpp
-    include/dracosha/validator/lazy.hpp
-    include/dracosha/validator/extract.hpp
-    include/dracosha/validator/get_member.hpp
-    include/dracosha/validator/validate.hpp
-    include/dracosha/validator/property_validator.hpp
-    include/dracosha/validator/apply.hpp
-    include/dracosha/validator/member.hpp
-    include/dracosha/validator/operand.hpp
-    include/dracosha/validator/master_sample.hpp
-    include/dracosha/validator/validator.hpp
-    include/dracosha/validator/make_validator.hpp
-    include/dracosha/validator/dispatcher.hpp
-    include/dracosha/validator/check_member_path.hpp
-    include/dracosha/validator/with_check_member_exists.hpp
-    include/dracosha/validator/check_member_exists_traits_proxy.hpp
-    include/dracosha/validator/validators.hpp
-    include/dracosha/validator/member_property.hpp
-    include/dracosha/validator/interval.hpp
-    include/dracosha/validator/range.hpp
-    include/dracosha/validator/error.hpp
-    include/dracosha/validator/member_path.hpp
-    include/dracosha/validator/variadic_property.hpp
-    include/dracosha/validator/variadic_arg.hpp
-    include/dracosha/validator/embedded_object.hpp
-    include/dracosha/validator/base_validator.hpp
-    include/dracosha/validator/heterogeneous_property.hpp
-    include/dracosha/validator/value_transformer.hpp
-    include/dracosha/validator/member_with_name.hpp
-    include/dracosha/validator/member_with_name_list.hpp
-    include/dracosha/validator/make_member.hpp
-    include/dracosha/validator/prepend_super_member.hpp
-    include/dracosha/validator/prepend_super_member.ipp
-    include/dracosha/validator/variadic_arg_tag.hpp
-    include/dracosha/validator/generate_paths.hpp
-    include/dracosha/validator/apply_generated_paths.hpp
-    include/dracosha/validator/apply_member_path.hpp
-    include/dracosha/validator/apply_generated_paths.ipp
-    include/dracosha/validator/apply_member_path.ipp
-    include/dracosha/validator/invoke_member_if_exists.hpp
-    include/dracosha/validator/filter_member.hpp
-    include/dracosha/validator/filter_path.hpp
-    include/dracosha/validator/compact_variadic_property.hpp
+    include/hatn/validator/adapter.hpp
+    include/hatn/validator/property.hpp
+    include/hatn/validator/basic_property.hpp
+    include/hatn/validator/can_get.hpp
+    include/hatn/validator/get.hpp
+    include/hatn/validator/can_check_contains.hpp
+    include/hatn/validator/check_contains.hpp
+    include/hatn/validator/check_member.hpp
+    include/hatn/validator/check_exists.hpp
+    include/hatn/validator/lazy.hpp
+    include/hatn/validator/extract.hpp
+    include/hatn/validator/get_member.hpp
+    include/hatn/validator/validate.hpp
+    include/hatn/validator/property_validator.hpp
+    include/hatn/validator/apply.hpp
+    include/hatn/validator/member.hpp
+    include/hatn/validator/operand.hpp
+    include/hatn/validator/master_sample.hpp
+    include/hatn/validator/validator.hpp
+    include/hatn/validator/make_validator.hpp
+    include/hatn/validator/dispatcher.hpp
+    include/hatn/validator/check_member_path.hpp
+    include/hatn/validator/with_check_member_exists.hpp
+    include/hatn/validator/check_member_exists_traits_proxy.hpp
+    include/hatn/validator/validators.hpp
+    include/hatn/validator/member_property.hpp
+    include/hatn/validator/interval.hpp
+    include/hatn/validator/range.hpp
+    include/hatn/validator/error.hpp
+    include/hatn/validator/member_path.hpp
+    include/hatn/validator/variadic_property.hpp
+    include/hatn/validator/variadic_arg.hpp
+    include/hatn/validator/embedded_object.hpp
+    include/hatn/validator/base_validator.hpp
+    include/hatn/validator/heterogeneous_property.hpp
+    include/hatn/validator/value_transformer.hpp
+    include/hatn/validator/member_with_name.hpp
+    include/hatn/validator/member_with_name_list.hpp
+    include/hatn/validator/make_member.hpp
+    include/hatn/validator/prepend_super_member.hpp
+    include/hatn/validator/prepend_super_member.ipp
+    include/hatn/validator/variadic_arg_tag.hpp
+    include/hatn/validator/generate_paths.hpp
+    include/hatn/validator/apply_generated_paths.hpp
+    include/hatn/validator/apply_member_path.hpp
+    include/hatn/validator/apply_generated_paths.ipp
+    include/hatn/validator/apply_member_path.ipp
+    include/hatn/validator/invoke_member_if_exists.hpp
+    include/hatn/validator/filter_member.hpp
+    include/hatn/validator/filter_path.hpp
+    include/hatn/validator/compact_variadic_property.hpp
 
-    include/dracosha/validator/aggregation/and.hpp
-    include/dracosha/validator/aggregation/or.hpp
-    include/dracosha/validator/aggregation/not.hpp
-    include/dracosha/validator/aggregation/any.hpp
-    include/dracosha/validator/aggregation/all.hpp
-    include/dracosha/validator/aggregation/aggregation.hpp
-    include/dracosha/validator/aggregation/aggregation.ipp
-    include/dracosha/validator/aggregation/element_aggregation.hpp
-    include/dracosha/validator/aggregation/element_aggregation.ipp
-    include/dracosha/validator/aggregation/wrap_it.hpp
-    include/dracosha/validator/aggregation/wrap_index.hpp
-    include/dracosha/validator/aggregation/wrap_heterogeneous_index.hpp
-    include/dracosha/validator/aggregation/tree.hpp
+    include/hatn/validator/aggregation/and.hpp
+    include/hatn/validator/aggregation/or.hpp
+    include/hatn/validator/aggregation/not.hpp
+    include/hatn/validator/aggregation/any.hpp
+    include/hatn/validator/aggregation/all.hpp
+    include/hatn/validator/aggregation/aggregation.hpp
+    include/hatn/validator/aggregation/aggregation.ipp
+    include/hatn/validator/aggregation/element_aggregation.hpp
+    include/hatn/validator/aggregation/element_aggregation.ipp
+    include/hatn/validator/aggregation/wrap_it.hpp
+    include/hatn/validator/aggregation/wrap_index.hpp
+    include/hatn/validator/aggregation/wrap_heterogeneous_index.hpp
+    include/hatn/validator/aggregation/tree.hpp
 
-    include/dracosha/validator/operators/operator.hpp
-    include/dracosha/validator/operators/exists.hpp
-    include/dracosha/validator/operators/comparison.hpp
-    include/dracosha/validator/operators/logical.hpp
-    include/dracosha/validator/operators/invert_op.hpp
-    include/dracosha/validator/operators/flag.hpp
-    include/dracosha/validator/operators/wrap_op.hpp
-    include/dracosha/validator/operators/contains.hpp
-    include/dracosha/validator/operators/in.hpp
-    include/dracosha/validator/operators/lexicographical.hpp
-    include/dracosha/validator/operators/lex_in.hpp
-    include/dracosha/validator/operators/regex.hpp
-    include/dracosha/validator/operators/op_report_without_operand.hpp
-    include/dracosha/validator/operators/string_patterns.hpp
-    include/dracosha/validator/operators/number_patterns.hpp
-    include/dracosha/validator/operators.hpp
+    include/hatn/validator/operators/operator.hpp
+    include/hatn/validator/operators/exists.hpp
+    include/hatn/validator/operators/comparison.hpp
+    include/hatn/validator/operators/logical.hpp
+    include/hatn/validator/operators/invert_op.hpp
+    include/hatn/validator/operators/flag.hpp
+    include/hatn/validator/operators/wrap_op.hpp
+    include/hatn/validator/operators/contains.hpp
+    include/hatn/validator/operators/in.hpp
+    include/hatn/validator/operators/lexicographical.hpp
+    include/hatn/validator/operators/lex_in.hpp
+    include/hatn/validator/operators/regex.hpp
+    include/hatn/validator/operators/op_report_without_operand.hpp
+    include/hatn/validator/operators/string_patterns.hpp
+    include/hatn/validator/operators/number_patterns.hpp
+    include/hatn/validator/operators.hpp
 
-    include/dracosha/validator/properties/value.hpp
-    include/dracosha/validator/properties/size.hpp
-    include/dracosha/validator/properties/length.hpp
-    include/dracosha/validator/properties/empty.hpp
-    include/dracosha/validator/properties/pair.hpp
-    include/dracosha/validator/properties/h_size.hpp
-    include/dracosha/validator/properties.hpp
+    include/hatn/validator/properties/value.hpp
+    include/hatn/validator/properties/size.hpp
+    include/hatn/validator/properties/length.hpp
+    include/hatn/validator/properties/empty.hpp
+    include/hatn/validator/properties/pair.hpp
+    include/hatn/validator/properties/h_size.hpp
+    include/hatn/validator/properties.hpp
 
-    include/dracosha/validator/adapters/adapter_traits_wrapper.hpp
-    include/dracosha/validator/adapters/prevalidation_adapter.hpp
-    include/dracosha/validator/adapters/default_adapter.hpp
-    include/dracosha/validator/adapters/reporting_adapter.hpp
-    include/dracosha/validator/adapters/impl/default_adapter_impl.hpp
-    include/dracosha/validator/adapters/impl/intermediate_adapter_traits.hpp
-    include/dracosha/validator/adapters/make_intermediate_adapter.hpp
+    include/hatn/validator/adapters/adapter_traits_wrapper.hpp
+    include/hatn/validator/adapters/prevalidation_adapter.hpp
+    include/hatn/validator/adapters/default_adapter.hpp
+    include/hatn/validator/adapters/reporting_adapter.hpp
+    include/hatn/validator/adapters/impl/default_adapter_impl.hpp
+    include/hatn/validator/adapters/impl/intermediate_adapter_traits.hpp
+    include/hatn/validator/adapters/make_intermediate_adapter.hpp
 
-    include/dracosha/validator/reporting/reporting_adapter_impl.hpp
-    include/dracosha/validator/reporting/reporter.hpp
-    include/dracosha/validator/reporting/formatter.hpp
-    include/dracosha/validator/reporting/member_operand.hpp
-    include/dracosha/validator/reporting/member_names.hpp
-    include/dracosha/validator/reporting/strings.hpp
-    include/dracosha/validator/reporting/translator.hpp
-    include/dracosha/validator/reporting/translator_repository.hpp
-    include/dracosha/validator/reporting/no_translator.hpp
-    include/dracosha/validator/reporting/mapped_translator.hpp
-    include/dracosha/validator/reporting/operand_formatter.hpp
-    include/dracosha/validator/reporting/order_and_presentation.hpp
-    include/dracosha/validator/reporting/report_aggregation.hpp
-    include/dracosha/validator/reporting/aggregation_strings.hpp
-    include/dracosha/validator/reporting/single_member_name.hpp
-    include/dracosha/validator/reporting/nested_member_name.hpp
-    include/dracosha/validator/reporting/backend_formatter.hpp
-    include/dracosha/validator/reporting/decorator.hpp
-    include/dracosha/validator/reporting/quotes_decorator.hpp
-    include/dracosha/validator/reporting/flag_presets.hpp
-    include/dracosha/validator/reporting/grammar_categories.hpp
-    include/dracosha/validator/reporting/concrete_phrase.hpp
-    include/dracosha/validator/reporting/translate.hpp
-    include/dracosha/validator/reporting/property_member_name.hpp
-    include/dracosha/validator/reporting/phrase_translator.hpp
-    include/dracosha/validator/reporting/reporter_with_object_name.hpp
-    include/dracosha/validator/reporting/extend_translator.hpp
-    include/dracosha/validator/reporting/phrase_grammar_cats.hpp
-    include/dracosha/validator/reporting/prepare_operand_for_formatter.hpp
-    include/dracosha/validator/reporting/format_bool_operand.hpp
-    include/dracosha/validator/reporting/format_operand.hpp
-    include/dracosha/validator/reporting/format_join_grammar_cats.hpp
-    include/dracosha/validator/reporting/prepare_property_formatting.hpp
+    include/hatn/validator/reporting/reporting_adapter_impl.hpp
+    include/hatn/validator/reporting/reporter.hpp
+    include/hatn/validator/reporting/formatter.hpp
+    include/hatn/validator/reporting/member_operand.hpp
+    include/hatn/validator/reporting/member_names.hpp
+    include/hatn/validator/reporting/strings.hpp
+    include/hatn/validator/reporting/translator.hpp
+    include/hatn/validator/reporting/translator_repository.hpp
+    include/hatn/validator/reporting/no_translator.hpp
+    include/hatn/validator/reporting/mapped_translator.hpp
+    include/hatn/validator/reporting/operand_formatter.hpp
+    include/hatn/validator/reporting/order_and_presentation.hpp
+    include/hatn/validator/reporting/report_aggregation.hpp
+    include/hatn/validator/reporting/aggregation_strings.hpp
+    include/hatn/validator/reporting/single_member_name.hpp
+    include/hatn/validator/reporting/nested_member_name.hpp
+    include/hatn/validator/reporting/backend_formatter.hpp
+    include/hatn/validator/reporting/decorator.hpp
+    include/hatn/validator/reporting/quotes_decorator.hpp
+    include/hatn/validator/reporting/flag_presets.hpp
+    include/hatn/validator/reporting/grammar_categories.hpp
+    include/hatn/validator/reporting/concrete_phrase.hpp
+    include/hatn/validator/reporting/translate.hpp
+    include/hatn/validator/reporting/property_member_name.hpp
+    include/hatn/validator/reporting/phrase_translator.hpp
+    include/hatn/validator/reporting/reporter_with_object_name.hpp
+    include/hatn/validator/reporting/extend_translator.hpp
+    include/hatn/validator/reporting/phrase_grammar_cats.hpp
+    include/hatn/validator/reporting/prepare_operand_for_formatter.hpp
+    include/hatn/validator/reporting/format_bool_operand.hpp
+    include/hatn/validator/reporting/format_operand.hpp
+    include/hatn/validator/reporting/format_join_grammar_cats.hpp
+    include/hatn/validator/reporting/prepare_property_formatting.hpp
 
-    include/dracosha/validator/reporting/locale/sample_locale.hpp
-    include/dracosha/validator/reporting/locale/ru.hpp
+    include/hatn/validator/reporting/locale/sample_locale.hpp
+    include/hatn/validator/reporting/locale/ru.hpp
 
-    include/dracosha/validator/prevalidation/set_validated.hpp
-    include/dracosha/validator/prevalidation/unset_validated.hpp
-    include/dracosha/validator/prevalidation/resize_validated.hpp
-    include/dracosha/validator/prevalidation/clear_validated.hpp
-    include/dracosha/validator/prevalidation/prevalidation_adapter_tag.hpp
-    include/dracosha/validator/prevalidation/prevalidation_adapter_impl.hpp
-    include/dracosha/validator/prevalidation/strict_any.hpp
-    include/dracosha/validator/prevalidation/validate_empty.hpp
-    include/dracosha/validator/prevalidation/validate_value.hpp
-    include/dracosha/validator/prevalidation/true_if_empty.hpp
-    include/dracosha/validator/prevalidation/true_if_size.hpp
+    include/hatn/validator/prevalidation/set_validated.hpp
+    include/hatn/validator/prevalidation/unset_validated.hpp
+    include/hatn/validator/prevalidation/resize_validated.hpp
+    include/hatn/validator/prevalidation/clear_validated.hpp
+    include/hatn/validator/prevalidation/prevalidation_adapter_tag.hpp
+    include/hatn/validator/prevalidation/prevalidation_adapter_impl.hpp
+    include/hatn/validator/prevalidation/strict_any.hpp
+    include/hatn/validator/prevalidation/validate_empty.hpp
+    include/hatn/validator/prevalidation/validate_value.hpp
+    include/hatn/validator/prevalidation/true_if_empty.hpp
+    include/hatn/validator/prevalidation/true_if_size.hpp
 
-    include/dracosha/validator/detail/has_method.hpp
-    include/dracosha/validator/detail/has_property.hpp
-    include/dracosha/validator/detail/get_impl.hpp
-    include/dracosha/validator/detail/aggregate_and.hpp
-    include/dracosha/validator/detail/aggregate_or.hpp
-    include/dracosha/validator/detail/aggregate_any.hpp
-    include/dracosha/validator/detail/aggregate_all.hpp
-    include/dracosha/validator/detail/logical_not.hpp
-    include/dracosha/validator/detail/dispatcher_impl.hpp
-    include/dracosha/validator/detail/formatter_fmt.hpp
-    include/dracosha/validator/detail/reorder_and_present.hpp
-    include/dracosha/validator/detail/formatter_std.hpp
-    include/dracosha/validator/detail/backend_formatter_helper.hpp
-    include/dracosha/validator/detail/hint_helper.hpp
-    include/dracosha/validator/detail/member_helper.hpp
-    include/dracosha/validator/detail/member_helper.ipp
+    include/hatn/validator/detail/has_method.hpp
+    include/hatn/validator/detail/has_property.hpp
+    include/hatn/validator/detail/get_impl.hpp
+    include/hatn/validator/detail/aggregate_and.hpp
+    include/hatn/validator/detail/aggregate_or.hpp
+    include/hatn/validator/detail/aggregate_any.hpp
+    include/hatn/validator/detail/aggregate_all.hpp
+    include/hatn/validator/detail/logical_not.hpp
+    include/hatn/validator/detail/dispatcher_impl.hpp
+    include/hatn/validator/detail/formatter_fmt.hpp
+    include/hatn/validator/detail/reorder_and_present.hpp
+    include/hatn/validator/detail/formatter_std.hpp
+    include/hatn/validator/detail/backend_formatter_helper.hpp
+    include/hatn/validator/detail/hint_helper.hpp
+    include/hatn/validator/detail/member_helper.hpp
+    include/hatn/validator/detail/member_helper.ipp
 )
 
 ADD_CUSTOM_TARGET(headers SOURCES ${HEADERS})
 
-IF (DRACOSHA_VALIDATOR_SRC)
+IF (HATN_VALIDATOR_SRC)
 
-    MESSAGE(STATUS "Use cpp-validator library as part of Dracosha library")
+    MESSAGE(STATUS "Use cpp-validator library as part of hatn library")
 
-    BUILD_DRACOSHA_MODULE()
+    BUILD_HATN_MODULE()
 
-    INCLUDE(dracosha/deps/fmt)
+    INCLUDE(hatn/deps/fmt)
     TARGET_LINK_LIBRARIES(${PROJECT_NAME} INTERFACE fmt)
 
     IF (INSTALL_DEV)
-        INCLUDE(dracosha/Install)
+        INCLUDE(hatn/Install)
     ENDIF (INSTALL_DEV)
 
-    TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} INTERFACE -DDRACOSHA_VALIDATOR_FMT)
+    TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} INTERFACE -DHATN_VALIDATOR_FMT)
 
-ELSE (DRACOSHA_VALIDATOR_SRC)
+ELSE (HATN_VALIDATOR_SRC)
 
     MESSAGE(STATUS "Use standalone cpp-validator library")
 
@@ -251,7 +251,7 @@ ELSE (DRACOSHA_VALIDATOR_SRC)
     IF (VALIDATOR_WITH_FMT)
 
         MESSAGE(STATUS "Use libfmt for formatting in cpp-validator library")
-        TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} INTERFACE -DDRACOSHA_VALIDATOR_FMT)
+        TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} INTERFACE -DHATN_VALIDATOR_FMT)
 
         IF (NOT FMT_ROOT)
             SET (FMT_ROOT $ENV{FMT_ROOT})
@@ -307,6 +307,6 @@ ELSE (DRACOSHA_VALIDATOR_SRC)
         MESSAGE(STATUS "Skip building examples for cpp-validator library")
     ENDIF(VALIDATOR_WITH_EXAMPLES)
 
-    INSTALL(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/dracosha" DESTINATION include)
+    INSTALL(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/hatn" DESTINATION include)
 
-ENDIF(DRACOSHA_VALIDATOR_SRC)
+ENDIF(HATN_VALIDATOR_SRC)

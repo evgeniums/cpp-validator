@@ -1,12 +1,12 @@
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/base_validator.hpp>
-#include <dracosha/validator/operators/exists.hpp>
-#include <dracosha/validator/properties/size.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/base_validator.hpp>
+#include <hatn/validator/operators/exists.hpp>
+#include <hatn/validator/properties/size.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestOperatorExists)
 #if 1
@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(CheckWithCheckExists)
     auto v2=value(eq,true);
     static_assert(!decltype(v2)::with_check_exists::value,"");
 
-#ifdef _DRACOSHA_ALWAYS_UNDEF
+#ifdef _HATN_ALWAYS_UNDEF
     // static assertion
     auto v3_0=size(exists,true);
 #endif
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(CheckWithCheckExists)
     static_assert(decltype(v20)::with_check_exists::value,"");
 
     // with_check_exists is not propagated across member validator
-#ifdef _DRACOSHA_ALWAYS_UNDEF
+#ifdef _HATN_ALWAYS_UNDEF
     auto v21=_["hello"](v1);
     static_assert(decltype(v21)::with_check_exists::value,"");
     auto v22=_["hello"](v2);
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(CheckOperandOfExist)
     auto v2=value(exists,false);
     BOOST_CHECK(!v2.check_exists_operand);
 
-#ifdef _DRACOSHA_ALWAYS_UNDEF
+#ifdef _HATN_ALWAYS_UNDEF
     // static assert because std::string is not convertible to bool
     auto v3_0=value(exists,std::string("hello"));
 
@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE(CheckOperandOfExist)
     BOOST_CHECK(!v18.check_exists_operand);
 
     // check_exists_operand is not propagated across member validator
-#ifdef _DRACOSHA_ALWAYS_UNDEF
+#ifdef _HATN_ALWAYS_UNDEF
     auto v19=validator(_["key"](v7));
     BOOST_CHECK(v19.check_exists_operand);
     auto v20=validator(_["key"](v8));

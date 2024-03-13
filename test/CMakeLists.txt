@@ -1,4 +1,4 @@
-PROJECT(dracoshavalidator-test)
+PROJECT(hatnvalidator-test)
 
 SET (Boost_USE_STATIC_LIBS OFF CACHE BOOL "Boost static libs")
 
@@ -14,7 +14,7 @@ SET (VALIDATOR_TEST_SRC ${CMAKE_CURRENT_SOURCE_DIR})
 
 INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/test.cmake)
 
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} dracoshavalidator ${Boost_LIBRARIES})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} hatnvalidator ${Boost_LIBRARIES})
 
 IF (MSVC)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")

@@ -1,9 +1,9 @@
 #undef NDEBUG
 
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/validate.hpp>
-#include <dracosha/validator/operators/lexicographical.hpp>
-#include <dracosha/validator/prevalidation/set_validated.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/validate.hpp>
+#include <hatn/validator/operators/lexicographical.hpp>
+#include <hatn/validator/prevalidation/set_validated.hpp>
 
 // define structure with member variables and member setter method
 struct Foo
@@ -20,14 +20,14 @@ struct Foo
 };
 
 // define custom properties
-DRACOSHA_VALIDATOR_PROPERTY(bar_value);
-DRACOSHA_VALIDATOR_PROPERTY(other_value);
+HATN_VALIDATOR_PROPERTY(bar_value);
+HATN_VALIDATOR_PROPERTY(other_value);
 
 // template specialization for setting bar_value member of Foo
-DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+HATN_VALIDATOR_NAMESPACE_BEGIN
 
 template <>
-struct set_member_t<Foo,DRACOSHA_VALIDATOR_PROPERTY_TYPE(bar_value)>
+struct set_member_t<Foo,HATN_VALIDATOR_PROPERTY_TYPE(bar_value)>
 {
     template <typename ObjectT, typename MemberT, typename ValueT>
     void operator() (
@@ -40,9 +40,9 @@ struct set_member_t<Foo,DRACOSHA_VALIDATOR_PROPERTY_TYPE(bar_value)>
     }
 };
 
-DRACOSHA_VALIDATOR_NAMESPACE_END
+HATN_VALIDATOR_NAMESPACE_END
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {

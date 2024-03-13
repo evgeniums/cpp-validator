@@ -1,8 +1,8 @@
 #undef NDEBUG
 
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/lazy.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/lazy.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {

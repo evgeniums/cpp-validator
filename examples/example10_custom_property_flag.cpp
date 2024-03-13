@@ -1,10 +1,10 @@
 #undef NDEBUG
 
 #include <iostream>
-#include <dracosha/validator/property.hpp>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/property.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // structure with red_color() getter method
 struct Foo
@@ -17,7 +17,7 @@ struct Foo
 };
 
 // define flaggable red_color property
-DRACOSHA_VALIDATOR_PROPERTY_FLAG(red_color,"Must be red","Must be not red")
+HATN_VALIDATOR_PROPERTY_FLAG(red_color,"Must be red","Must be not red")
 
 int main()
 {

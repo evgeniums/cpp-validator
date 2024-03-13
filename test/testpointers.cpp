@@ -2,9 +2,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/validator.hpp>
+#include <hatn/validator/validator.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestPointers)
 
@@ -46,8 +46,8 @@ struct SharedPointerName
     std::shared_ptr<std::string> _name;
 };
 
-DRACOSHA_VALIDATOR_PROPERTY(name)
-DRACOSHA_VALIDATOR_PROPERTY(name_null)
+HATN_VALIDATOR_PROPERTY(name)
+HATN_VALIDATOR_PROPERTY(name_null)
 
 }
 #if 1

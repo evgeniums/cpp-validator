@@ -1,10 +1,10 @@
 #undef NDEBUG
 
-#include <dracosha/validator/heterogeneous_property.hpp>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/validate.hpp>
+#include <hatn/validator/heterogeneous_property.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/validate.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {

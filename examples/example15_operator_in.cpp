@@ -1,10 +1,10 @@
 #undef NDEBUG
 
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/operators.hpp>
-#include <dracosha/validator/range.hpp>
-#include <dracosha/validator/interval.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/operators.hpp>
+#include <hatn/validator/range.hpp>
+#include <hatn/validator/interval.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {

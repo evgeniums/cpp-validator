@@ -3,11 +3,11 @@
 #include <map>
 #include <set>
 
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/default_adapter.hpp>
-#include <dracosha/validator/filter_path.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/default_adapter.hpp>
+#include <hatn/validator/filter_path.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {

@@ -1,19 +1,19 @@
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/config.hpp>
-#ifdef DRACOSHA_VALIDATOR_FMT
-#undef DRACOSHA_VALIDATOR_FMT
+#include <hatn/validator/config.hpp>
+#ifdef HATN_VALIDATOR_FMT
+#undef HATN_VALIDATOR_FMT
 #endif
 
-#include <dracosha/validator/reporting/formatter.hpp>
-#include <dracosha/validator/reporting/mapped_translator.hpp>
-#include <dracosha/validator/reporting/translator_repository.hpp>
+#include <hatn/validator/reporting/formatter.hpp>
+#include <hatn/validator/reporting/mapped_translator.hpp>
+#include <hatn/validator/reporting/translator_repository.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestStdFormatter)
 
-#define DRACOSHA_VALIDATOR_TEST_FORMATTER
+#define HATN_VALIDATOR_TEST_FORMATTER
 #include "testformatter.cpp"
 
 namespace

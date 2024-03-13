@@ -2,12 +2,12 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/aggregation/tree.hpp>
-#include <dracosha/validator/variadic_property.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/aggregation/tree.hpp>
+#include <hatn/validator/variadic_property.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestTree)
 
@@ -47,9 +47,9 @@ struct TreeNode
     std::string _name;
 };
 
-DRACOSHA_VALIDATOR_PROPERTY(name)
-DRACOSHA_VALIDATOR_PROPERTY(child_count)
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(child)
+HATN_VALIDATOR_PROPERTY(name)
+HATN_VALIDATOR_PROPERTY(child_count)
+HATN_VALIDATOR_VARIADIC_PROPERTY(child)
 
 }
 

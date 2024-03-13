@@ -1,11 +1,11 @@
 #undef NDEBUG
 
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/prevalidation/set_validated.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/prevalidation/set_validated.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
-DRACOSHA_VALIDATOR_PROPERTY(field1)
+HATN_VALIDATOR_PROPERTY(field1)
 
 int main()
 {

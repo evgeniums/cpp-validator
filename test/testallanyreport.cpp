@@ -1,9 +1,9 @@
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestReporting)
 

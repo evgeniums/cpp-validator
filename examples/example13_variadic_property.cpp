@@ -1,9 +1,9 @@
 #undef NDEBUG
 
-#include <dracosha/validator/variadic_property.hpp>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/variadic_property.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // define a structure with variadic properties
 struct WithChild
@@ -28,11 +28,11 @@ struct WithChild
 };
 
 // define variadic property
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(child)
+HATN_VALIDATOR_VARIADIC_PROPERTY(child)
 // define variadic property to be used as "exists" checker
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(has_child_word)
+HATN_VALIDATOR_VARIADIC_PROPERTY(has_child_word)
 // define variadic property with "exists" checker
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(child_word,has_child_word)
+HATN_VALIDATOR_VARIADIC_PROPERTY_HAS(child_word,has_child_word)
 
 int main()
 {

@@ -1,10 +1,10 @@
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/reporting/reporter.hpp>
-#include <dracosha/validator/reporting/reporter_with_object_name.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/reporting/reporter.hpp>
+#include <hatn/validator/reporting/reporter_with_object_name.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestReporter)
 

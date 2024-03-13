@@ -1,11 +1,11 @@
 #undef NDEBUG
 
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/variadic_property.hpp>
-#include <dracosha/validator/aggregation/tree.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/variadic_property.hpp>
+#include <hatn/validator/aggregation/tree.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // define tree node
 struct TreeNode
@@ -43,11 +43,11 @@ struct TreeNode
 };
 
 // name proeprty is used to access name of a node
-DRACOSHA_VALIDATOR_PROPERTY(name)
+HATN_VALIDATOR_PROPERTY(name)
 // child_count property is used to get number of the node's children
-DRACOSHA_VALIDATOR_PROPERTY(child_count)
+HATN_VALIDATOR_PROPERTY(child_count)
 // child is a variadic property for accessing a node's child by index
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(child)
+HATN_VALIDATOR_VARIADIC_PROPERTY(child)
 
 int main()
 {

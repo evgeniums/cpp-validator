@@ -1,9 +1,9 @@
 #include <set>
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/validator.hpp>
+#include <hatn/validator/validator.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 namespace
 {

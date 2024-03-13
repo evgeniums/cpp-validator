@@ -2,18 +2,18 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/reporting/strings.hpp>
-#include <dracosha/validator/reporting/member_names.hpp>
-#include <dracosha/validator/reporting/operand_formatter.hpp>
-#include <dracosha/validator/properties/value.hpp>
-#include <dracosha/validator/properties/size.hpp>
-#include <dracosha/validator/reporting/mapped_translator.hpp>
-#include <dracosha/validator/reporting/translator_repository.hpp>
-#include <dracosha/validator/reporting/quotes_decorator.hpp>
-#include <dracosha/validator/utils/reference_wrapper.hpp>
-#include <dracosha/validator/validator.hpp>
+#include <hatn/validator/reporting/strings.hpp>
+#include <hatn/validator/reporting/member_names.hpp>
+#include <hatn/validator/reporting/operand_formatter.hpp>
+#include <hatn/validator/properties/value.hpp>
+#include <hatn/validator/properties/size.hpp>
+#include <hatn/validator/reporting/mapped_translator.hpp>
+#include <hatn/validator/reporting/translator_repository.hpp>
+#include <hatn/validator/reporting/quotes_decorator.hpp>
+#include <hatn/validator/utils/reference_wrapper.hpp>
+#include <hatn/validator/validator.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 namespace {
 

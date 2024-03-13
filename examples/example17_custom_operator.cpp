@@ -1,9 +1,9 @@
 #undef NDEBUG
 
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/validate.hpp>
-#include <dracosha/validator/operators/operator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/validate.hpp>
+#include <hatn/validator/operators/operator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // new operator implementation
 struct simple_eq_t : public op<simple_eq_t>

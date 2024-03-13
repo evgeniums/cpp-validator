@@ -1,7 +1,7 @@
 #undef NDEBUG
 
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {

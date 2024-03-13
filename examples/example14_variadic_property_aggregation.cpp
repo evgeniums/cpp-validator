@@ -1,8 +1,8 @@
 #undef NDEBUG
 
-#include <dracosha/validator/variadic_property.hpp>
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/variadic_property.hpp>
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // sample struct
 struct Matrix
@@ -24,11 +24,11 @@ struct Matrix
 };
 
 // define variadic property
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(element)
+HATN_VALIDATOR_VARIADIC_PROPERTY(element)
 
 // define "end" properties
-DRACOSHA_VALIDATOR_PROPERTY(count_i)
-DRACOSHA_VALIDATOR_PROPERTY(count_j)
+HATN_VALIDATOR_PROPERTY(count_i)
+HATN_VALIDATOR_PROPERTY(count_j)
 
 int main()
 {

@@ -1,9 +1,9 @@
 #undef NDEBUG
 
-#include <dracosha/validator/value_transformer.hpp>
-#include <dracosha/validator/validator.hpp>
+#include <hatn/validator/value_transformer.hpp>
+#include <hatn/validator/validator.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 namespace {
 // define handler that returns a size of provided string

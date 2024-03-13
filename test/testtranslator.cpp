@@ -1,16 +1,16 @@
 #include <string>
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/reporting/translator.hpp>
-#include <dracosha/validator/reporting/no_translator.hpp>
-#include <dracosha/validator/reporting/mapped_translator.hpp>
-#include <dracosha/validator/reporting/phrase_translator.hpp>
-#include <dracosha/validator/reporting/translator_repository.hpp>
-#include <dracosha/validator/reporting/member_operand.hpp>
+#include <hatn/validator/reporting/translator.hpp>
+#include <hatn/validator/reporting/no_translator.hpp>
+#include <hatn/validator/reporting/mapped_translator.hpp>
+#include <hatn/validator/reporting/phrase_translator.hpp>
+#include <hatn/validator/reporting/translator_repository.hpp>
+#include <hatn/validator/reporting/member_operand.hpp>
 
-#include <dracosha/validator/reporting/locale/sample_locale.hpp>
+#include <hatn/validator/reporting/locale/sample_locale.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestTranslator)
 

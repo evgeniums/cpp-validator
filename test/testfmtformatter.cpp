@@ -4,14 +4,14 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/config.hpp>
-#include <dracosha/validator/reporting/formatter.hpp>
-#include <dracosha/validator/properties.hpp>
-#include <dracosha/validator/reporting/mapped_translator.hpp>
-#include <dracosha/validator/reporting/translator_repository.hpp>
-#include <dracosha/validator/utils/hana_to_std_tuple.hpp>
+#include <hatn/validator/config.hpp>
+#include <hatn/validator/reporting/formatter.hpp>
+#include <hatn/validator/properties.hpp>
+#include <hatn/validator/reporting/mapped_translator.hpp>
+#include <hatn/validator/reporting/translator_repository.hpp>
+#include <hatn/validator/utils/hana_to_std_tuple.hpp>
 
-#ifdef DRACOSHA_VALIDATOR_FMT
+#ifdef HATN_VALIDATOR_FMT
 
 #include <fmt/format.h>
 
@@ -30,7 +30,7 @@ struct NonCopyable
 };
 }
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestFmtFormatter)
 
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(CheckFmtString)
     BOOST_CHECK_EQUAL(str5,std::string("field1 of field2 of field3"));
 }
 
-#define DRACOSHA_VALIDATOR_TEST_FORMATTER
+#define HATN_VALIDATOR_TEST_FORMATTER
 #include "testformatter.cpp"
 
 namespace

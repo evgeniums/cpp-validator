@@ -1,4 +1,4 @@
-PROJECT(dracoshavalidator-examples)
+PROJECT(hatnvalidator-examples)
 
 SET(SOURCES
     example01_validate.cpp
@@ -34,7 +34,7 @@ ENABLE_TESTING(true)
 FOREACH(SRC ${SOURCES} )
     STRING(REPLACE ".cpp" "" EXEC_NAME ${SRC})
     ADD_EXECUTABLE(${EXEC_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/${SRC})
-    TARGET_LINK_LIBRARIES(${EXEC_NAME} dracoshavalidator)
+    TARGET_LINK_LIBRARIES(${EXEC_NAME} hatnvalidator)
 
     ADD_TEST(NAME ${EXEC_NAME} COMMAND ${EXEC_NAME})
     SET_TESTS_PROPERTIES(${EXEC_NAME} PROPERTIES LABELS "examples")

@@ -4,21 +4,21 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/utils/reference_wrapper.hpp>
-#include <dracosha/validator/utils/optional.hpp>
-#include <dracosha/validator/utils/class_method_args.hpp>
-#include <dracosha/validator/check_member_path.hpp>
-#include <dracosha/validator/get_member.hpp>
-#include <dracosha/validator/check_exists.hpp>
-#include <dracosha/validator/member.hpp>
-#include <dracosha/validator/variadic_property.hpp>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
-#include <dracosha/validator/reporting/quotes_decorator.hpp>
-#include <dracosha/validator/reporting/phrase_translator.hpp>
-#include <dracosha/validator/compact_variadic_property.hpp>
+#include <hatn/validator/utils/reference_wrapper.hpp>
+#include <hatn/validator/utils/optional.hpp>
+#include <hatn/validator/utils/class_method_args.hpp>
+#include <hatn/validator/check_member_path.hpp>
+#include <hatn/validator/get_member.hpp>
+#include <hatn/validator/check_exists.hpp>
+#include <hatn/validator/member.hpp>
+#include <hatn/validator/variadic_property.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
+#include <hatn/validator/reporting/quotes_decorator.hpp>
+#include <hatn/validator/reporting/phrase_translator.hpp>
+#include <hatn/validator/compact_variadic_property.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 namespace {
 
@@ -326,18 +326,18 @@ struct WithoutChild
 {
 };
 
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(child)
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(child_word)
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(my_map)
+HATN_VALIDATOR_VARIADIC_PROPERTY(child)
+HATN_VALIDATOR_VARIADIC_PROPERTY(child_word)
+HATN_VALIDATOR_VARIADIC_PROPERTY(my_map)
 
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(has_safe_child_word)
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(safe_child_word,has_safe_child_word)
+HATN_VALIDATOR_VARIADIC_PROPERTY(has_safe_child_word)
+HATN_VALIDATOR_VARIADIC_PROPERTY_HAS(safe_child_word,has_safe_child_word)
 
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_FLAG(sum_gte_10,"must be 10 and more","must be less than 10")
+HATN_VALIDATOR_VARIADIC_PROPERTY_FLAG(sum_gte_10,"must be 10 and more","must be less than 10")
 
-DRACOSHA_VALIDATOR_PROPERTY(child_count)
-DRACOSHA_VALIDATOR_PROPERTY(max_a)
-DRACOSHA_VALIDATOR_PROPERTY(max_b)
+HATN_VALIDATOR_PROPERTY(child_count)
+HATN_VALIDATOR_PROPERTY(max_a)
+HATN_VALIDATOR_PROPERTY(max_b)
 
 }
 #if 1

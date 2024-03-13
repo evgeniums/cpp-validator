@@ -1,10 +1,10 @@
 #undef NDEBUG
 
 #include <map>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/properties/pair.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/properties/pair.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {

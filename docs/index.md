@@ -220,8 +220,8 @@ To construct a validator one should describe validation conditions using five gr
 #### Basic validator for whole object
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 auto v=validator(gt,100);
 ```
@@ -230,8 +230,8 @@ The example above defines validation condition "variable must be greater than 10
 #### Basic validator for object's member
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 auto v=validator(
         _["field1"](gt,100)
@@ -244,8 +244,8 @@ The example above defines validation condition "field1 of variable must be great
 #### Validator with properties for whole object
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // property notation
 auto v1=validator(
@@ -262,8 +262,8 @@ Validators *v1* and *v2* in the example above both define validation condition "
 #### Validator with properties for object's member
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // property notation
 auto v1=validator(
@@ -282,8 +282,8 @@ Validators *v1* and *v2* in the example above both define validation condition "
 #### Validator with aggregations for whole object
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // implicit AND
 auto v1=validator(
@@ -301,8 +301,8 @@ The example above defines validation condition "variable must be greater than 10
 #### Validator with aggregations for object's member
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 auto v=validator(
         _["field1"](
@@ -315,8 +315,8 @@ The example above defines validation condition "field1 of variable must be great
 #### Validator with aggregations for property of object's member
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 auto v=validator(
         _["field1"](
@@ -329,8 +329,8 @@ The example above defines validation condition "field1 of variable must be equal
 #### Validator with mixed aggregations
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // implicit AND
 auto v1=validator(
@@ -361,8 +361,8 @@ See examples below.
 
 ```cpp
 #include <map>
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -397,8 +397,8 @@ Once defined validator can be reused by other validators. For example, if there 
 #include <map>
 #include <set>
 
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -438,9 +438,9 @@ Also validation can be performed by calling `apply()` method of [validator](#val
 #### validate() without report and without exception
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/validate.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/validate.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -470,9 +470,9 @@ return 0;
 #### validate() with report but without exception
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/validate.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/validate.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -506,9 +506,9 @@ return 0;
 #### validate() with exception
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/validate.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/validate.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -541,8 +541,8 @@ return 0;
 
 Data validation is performed by [adapters](#adapter). When a [validator](#validator) is applied to an [adapter](#adapter) the [adapter](#adapter) *reads* validation conditions from the [validator](#validator) and processes them depending on [adapter](#adapter) implementation. See more about adapters in [Adapters](#adapters) section.
 ```cpp
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -574,8 +574,8 @@ return 0;
 
 A [validator](#validator) can be applied directly to a variable that must be validated. In this case a [default adapter](#default-adapter) will be used implicitly.
 ```cpp
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -616,10 +616,10 @@ Default implementation of `set_validated` uses square brackets operator to set a
 
 ```cpp
 #include <map>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/prevalidation/set_validated.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/prevalidation/set_validated.hpp>
 
-DRACOSHA_VALIDATOR_PROPERTY(field1)
+HATN_VALIDATOR_PROPERTY(field1)
 
 int main()
 {
@@ -645,15 +645,15 @@ int main()
 }    
 ```
 
-To use `set_validated` with custom [properties](#property) a template specialization of property setter `set_member_t` in `DRACOSHA_VALIDATOR_NAMESPACE` must be defined first. `set_validated` can be used both with and without exceptions.
+To use `set_validated` with custom [properties](#property) a template specialization of property setter `set_member_t` in `HATN_VALIDATOR_NAMESPACE` must be defined first. `set_validated` can be used both with and without exceptions.
 
 See examples below.
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/validate.hpp>
-#include <dracosha/validator/operators/lexicographical.hpp>
-#include <dracosha/validator/prevalidation/set_validated.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/validate.hpp>
+#include <hatn/validator/operators/lexicographical.hpp>
+#include <hatn/validator/prevalidation/set_validated.hpp>
 
 // define structure with member variables and member setter method
 struct Foo
@@ -670,14 +670,14 @@ struct Foo
 };
 
 // define custom properties
-DRACOSHA_VALIDATOR_PROPERTY(bar_value);
-DRACOSHA_VALIDATOR_PROPERTY(other_value);
+HATN_VALIDATOR_PROPERTY(bar_value);
+HATN_VALIDATOR_PROPERTY(other_value);
 
 // template specialization for setting bar_value member of Foo
-DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+HATN_VALIDATOR_NAMESPACE_BEGIN
 
 template <>
-struct set_member_t<Foo,DRACOSHA_VALIDATOR_PROPERTY_TYPE(bar_value)>
+struct set_member_t<Foo,HATN_VALIDATOR_PROPERTY_TYPE(bar_value)>
 {
     template <typename ObjectT, typename MemberT, typename ValueT>
     void operator() (
@@ -690,9 +690,9 @@ struct set_member_t<Foo,DRACOSHA_VALIDATOR_PROPERTY_TYPE(bar_value)>
     }
 };
 
-DRACOSHA_VALIDATOR_NAMESPACE_END
+HATN_VALIDATOR_NAMESPACE_END
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -733,10 +733,10 @@ To use `unset_validator` with custom types a template specialization of `unset_m
 
 ```cpp
 #include <map>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/prevalidation/unset_validated.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/prevalidation/unset_validated.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -773,10 +773,10 @@ Note that only [size](#size), [length](#length) and [empty](#empty) properties a
 
 ```cpp
 #include <map>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/prevalidation/resize_validated.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/prevalidation/resize_validated.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -817,10 +817,10 @@ Default implementation of `clear_validated` uses `clear()` method of a member. T
 Note that only [size](#size), [length](#length) and [empty](#empty) properties as well as [comparison](builtin_operators.md#comparison-operators) and [lexicographical](builtin_operators.md#lexicographical-operators) operators are validated before this operation. If other operators are used to validate content, then they are not checked. For example, resizing string with `validator(_[string_field](regex_match,"Hello world!"))` will not emit error even in case the validation condition is not met. 
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/prevalidation/clear_validated.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/prevalidation/clear_validated.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -866,8 +866,8 @@ Members are used to specify what parts of [objects](#object) must be validated. 
 Member notation is used to define validation conditions for a certain [member](#member). With member notation a temporary callable object is constructed which will define the validation conditions for that member when invoked with validation operators and operands.
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // define member with member notation
 auto member_callable=_[member_id];
@@ -888,8 +888,8 @@ A [member](#member) name must be placed within square brackets that follow an un
 If a member name is a literal key of an element in container then it must be surrounded with quotes. See examples below.
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // member is a property
 auto member_property=_[size];
@@ -905,8 +905,8 @@ auto member_string_key=_["some_member"];
 To validate members of nested objects or containers a hierarchical member notation must be used, where name of the member at each level is placed within square brackets and appended to the upper member resulting in a `member path`. See examples below.
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // 3 levels
 auto member_path_3_levels=_[level1][level2][level3];
@@ -917,9 +917,9 @@ auto member_path_nested_container=_["element1"]["element1_1"]["element1_1_1"];
 
 ```cpp
 #include <map>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -969,8 +969,8 @@ See examples below.
 
 ```cpp
 #include <map>
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -1049,16 +1049,16 @@ See examples of different property notations in section [Validator with properti
 
 ```cpp
 #include <utility>
-#include "dracosha/validator/utils/heterogeneous_size.hpp"
+#include "hatn/validator/utils/heterogeneous_size.hpp"
 
-DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+HATN_VALIDATOR_NAMESPACE_BEGIN
 
 // template specialization for std:pair
 template <typename T>
 struct heterogeneous_size_t<std::pair<T>> : public hana::size_t<2>
 {};
 
-DRACOSHA_VALIDATOR_NAMESPACE_END
+HATN_VALIDATOR_NAMESPACE_END
 ```
 #### *first* and *second*
 
@@ -1068,12 +1068,12 @@ DRACOSHA_VALIDATOR_NAMESPACE_END
 
 A new [property](#property) can be added using special macros defined in `cpp-validator` library. 
 
-A [property](#property) of non-boolean type must be defined using `DRACOSHA_VALIDATOR_PROPERTY(property_name)` macro with one argument for name of the [property](#property).
+A [property](#property) of non-boolean type must be defined using `HATN_VALIDATOR_PROPERTY(property_name)` macro with one argument for name of the [property](#property).
 
 ```cpp
-#include <dracosha/validator/property.hpp>
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/property.hpp>
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // structure with two properties
 struct Foo
@@ -1093,10 +1093,10 @@ struct Foo
 };
 
 // define property corresponding to member variable
-DRACOSHA_VALIDATOR_PROPERTY(var1);
+HATN_VALIDATOR_PROPERTY(var1);
 
 // define property corresponding to getter method
-DRACOSHA_VALIDATOR_PROPERTY(get_var2);
+HATN_VALIDATOR_PROPERTY(get_var2);
 
 int main()
 {
@@ -1115,17 +1115,17 @@ return 0;
 }
 ```
 
-If a [property](#property) is of boolean type and must be capable of being used with [flag](#flag) operator then the property must be defined with `DRACOSHA_VALIDATOR_PROPERTY_FLAG(property_name,positive_flag_descriprion,negative_flag_description)` macro that has three arguments:
+If a [property](#property) is of boolean type and must be capable of being used with [flag](#flag) operator then the property must be defined with `HATN_VALIDATOR_PROPERTY_FLAG(property_name,positive_flag_descriprion,negative_flag_description)` macro that has three arguments:
 1. name of the [property](#property);
 2. description of positive [flag](#flag);
 3. description of negative [flag](#flag).
 
 ```cpp
 #include <iostream>
-#include <dracosha/validator/property.hpp>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/property.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // structure with red_color() getter method
 struct Foo
@@ -1138,7 +1138,7 @@ struct Foo
 };
 
 // define flaggable red_color property
-DRACOSHA_VALIDATOR_PROPERTY_FLAG(red_color,"Must be red","Must be not red")
+HATN_VALIDATOR_PROPERTY_FLAG(red_color,"Must be red","Must be not red")
 
 int main()
 {
@@ -1181,11 +1181,11 @@ Heterogeneous property is defined implicitly when an integral constant is used a
 See example below.
 
 ```cpp
-#include <dracosha/validator/heterogeneous_property.hpp>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/validate.hpp>
+#include <hatn/validator/heterogeneous_property.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/validate.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -1218,21 +1218,21 @@ int main()
 
 #### Explicit heterogeneous property
 
-Explicit heterogeneous property can be used if the property must have distinct name and/or [flag](#flag) descriptions. To define explicit heterogeneous property use either macro `DRACOSHA_VALIDATOR_HETEROGENEOUS_PROPERTY(name,element_index)` or macro `DRACOSHA_VALIDATOR_HETEROGENEOUS_PROPERTY_FLAG(name,element_index,flag_description,negative_flag_description)`.
+Explicit heterogeneous property can be used if the property must have distinct name and/or [flag](#flag) descriptions. To define explicit heterogeneous property use either macro `HATN_VALIDATOR_HETEROGENEOUS_PROPERTY(name,element_index)` or macro `HATN_VALIDATOR_HETEROGENEOUS_PROPERTY_FLAG(name,element_index,flag_description,negative_flag_description)`.
 
 See example below.
 
 ```cpp
-#include <dracosha/validator/heterogeneous_property.hpp>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/validate.hpp>
+#include <hatn/validator/heterogeneous_property.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/validate.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // define property "zero" with index 0
-DRACOSHA_VALIDATOR_HETEROGENEOUS_PROPERTY(zero,0)
+HATN_VALIDATOR_HETEROGENEOUS_PROPERTY(zero,0)
 // define property "one" with index 1
-DRACOSHA_VALIDATOR_HETEROGENEOUS_PROPERTY(one,1)
+HATN_VALIDATOR_HETEROGENEOUS_PROPERTY(one,1)
 
 int main()
 {
@@ -1266,10 +1266,10 @@ int main()
 #### Properties with arguments
 
 Ordinary [properties](#properties) do not have arguments. To validate [object](#object) methods with arguments one shoud use `variadic properties`. A variadic property is defined similar to an ordinary property but only using a different set of macros:
-- `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(method)` defines variadic property corresponding to object's `method`;
-- `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(method,has_method)` defines variadic property corresponding to object's `method` and `has_method` used to check if object has the variadic property with provided arguments;
-- `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_FLAG(method,flag_descriprion,negative_flag_description)` defines variadic property corresponding to object's `method` that can be used with [flag](#flag) operator;
-- `DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HF(method,has_method,flag_descriprion,negative_flag_description)` defines variadic property corresponding to object's `method` and `has_method` that can be used with [flag](#flag) operator.
+- `HATN_VALIDATOR_VARIADIC_PROPERTY(method)` defines variadic property corresponding to object's `method`;
+- `HATN_VALIDATOR_VARIADIC_PROPERTY_HAS(method,has_method)` defines variadic property corresponding to object's `method` and `has_method` used to check if object has the variadic property with provided arguments;
+- `HATN_VALIDATOR_VARIADIC_PROPERTY_FLAG(method,flag_descriprion,negative_flag_description)` defines variadic property corresponding to object's `method` that can be used with [flag](#flag) operator;
+- `HATN_VALIDATOR_VARIADIC_PROPERTY_HF(method,has_method,flag_descriprion,negative_flag_description)` defines variadic property corresponding to object's `method` and `has_method` that can be used with [flag](#flag) operator.
 
 A variadic property defined with one of the macros listed above can be used either in property notation or member notation:
 - `auto property_notation=variadic_property(arg1,arg2);`
@@ -1285,10 +1285,10 @@ The arguments following the variadic property in the member's path can be provid
 See examples below.
 
 ```cpp
-#include <dracosha/validator/variadic_property.hpp>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/variadic_property.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // define a structure with variadic properties
 struct WithPlusProperties
@@ -1313,11 +1313,11 @@ struct WithPlusProperties
 };
 
 // define variadic property
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(plus_one)
+HATN_VALIDATOR_VARIADIC_PROPERTY(plus_one)
 // define variadic property to be used as "exists" checker
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(has_val_plus_word_size)
+HATN_VALIDATOR_VARIADIC_PROPERTY(has_val_plus_word_size)
 // define variadic property with "exists" checker
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY_HAS(val_plus_word_size,has_val_plus_word_size)
+HATN_VALIDATOR_VARIADIC_PROPERTY_HAS(val_plus_word_size,has_val_plus_word_size)
 
 int main()
 {
@@ -1385,9 +1385,9 @@ Variadic properties can be used with [element aggregations](#element-aggregation
 See example below.
 
 ```cpp
-#include <dracosha/validator/variadic_property.hpp>
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/variadic_property.hpp>
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // sample struct
 struct Matrix
@@ -1409,11 +1409,11 @@ struct Matrix
 };
 
 // define variadic property
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(element)
+HATN_VALIDATOR_VARIADIC_PROPERTY(element)
 
 // define "end" properties
-DRACOSHA_VALIDATOR_PROPERTY(count_i)
-DRACOSHA_VALIDATOR_PROPERTY(count_j)
+HATN_VALIDATOR_PROPERTY(count_i)
+HATN_VALIDATOR_PROPERTY(count_j)
 
 int main()
 {
@@ -1451,8 +1451,8 @@ Operator `exists` is used to check explicitly if an [object](#object) contains s
 
 ```cpp
 #include <map>
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -1483,9 +1483,9 @@ Operator `contains` is used to check if the variable that is under validation co
 
 ```cpp
 #include <map>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/operator/contains.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/operator/contains.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -1511,7 +1511,7 @@ Operator `flag` is a special case of equality operator for boolean arguments. Th
 
 There are three ways of string customization for `flag` operator.
 
-1. Define [custom property](#adding-new-property) using `DRACOSHA_VALIDATOR_PROPERTY_FLAG(property_name,flag_descriprion,nwgative_flag_description)` macro where the second argument is a reporting string for `<custom property>(flag,true)` condition and the third argument is a reporting string for `<custom property>(flag,false)` condition. See [example](#adding-new-property).
+1. Define [custom property](#adding-new-property) using `HATN_VALIDATOR_PROPERTY_FLAG(property_name,flag_descriprion,nwgative_flag_description)` macro where the second argument is a reporting string for `<custom property>(flag,true)` condition and the third argument is a reporting string for `<custom property>(flag,false)` condition. See [example](#adding-new-property).
 
 2. Use `flag` operator with one of string presets, e.g. `value(flag(flag_on_off),true)` will result in reporting string "must be on" and `value(flag(flag_on_off),false)` will result in reporting string "must be off". The following preset flag strings are defined in `validator/reporting/flag_presets.hpp` header file:
 
@@ -1527,11 +1527,11 @@ Examples of `flag` operator.
 ```cpp
 #include <vector>
 #include <iostream>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/operator/flag.hpp>
-#include <dracosha/validator/reporting/flag_presets.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/operator/flag.hpp>
+#include <hatn/validator/reporting/flag_presets.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -1572,11 +1572,11 @@ return 0;
 Operator `in` is used to check if corresponding argument fits into [range](#range) or [interval](#interval). Operator `nin` is a [negation](#_n-negation) of the `in` operator. See examples below.
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/operators.hpp>
-#include <dracosha/validator/range.hpp>
-#include <dracosha/validator/interval.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/operators.hpp>
+#include <hatn/validator/range.hpp>
+#include <hatn/validator/interval.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -1606,9 +1606,9 @@ See [in](#in) operator.
 
 ```cpp
 #include <map>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/operators.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/operators.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -1648,8 +1648,8 @@ Adding a new [operator](#operator) consists of the following steps.
 See example below.
 
 ```cpp
-#include <dracosha/validator/operators/operator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/operators/operator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // new operator implementation
 struct simple_eq_t : public op<simple_eq_t>
@@ -1707,9 +1707,9 @@ auto v3=validator(gt,std::move(rval_operand));
 If value of an [operand](#operand) must be evaluated at the moment of [validator](#validator) applying then `lazy` wrapper must be used. `lazy` wraps a callable object (e.g. lambda) that will be invoked later when the [validator](#validator) is applied. See example below.
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/lazy.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/lazy.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -1746,8 +1746,8 @@ Other [member](#member) of the same [object](#object) can be used as an [operand
 
 ```cpp
 #include <map>
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -1776,8 +1776,8 @@ return 0;
 
 ```cpp
 #include <map>
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -1823,10 +1823,10 @@ Notation of interval operand consists of keyword `interval` followed by `from` e
 See examples below.
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/interval.hpp>
-#include <dracosha/validator/operators/in.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/interval.hpp>
+#include <hatn/validator/operators/in.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main
 {
@@ -2101,10 +2101,10 @@ See examples below.
 
 ```cpp
 #include <map>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/properties/pair.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/properties/pair.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -2161,12 +2161,12 @@ Validator can be used for validation of tree nodes. To validate trees a special 
 See example below.
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/variadic_property.hpp>
-#include <dracosha/validator/aggregation/tree.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/variadic_property.hpp>
+#include <hatn/validator/aggregation/tree.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // define tree node
 struct TreeNode
@@ -2204,11 +2204,11 @@ struct TreeNode
 };
 
 // name property is used to access name of a node
-DRACOSHA_VALIDATOR_PROPERTY(name)
+HATN_VALIDATOR_PROPERTY(name)
 // child_count property is used to get number of the node's children
-DRACOSHA_VALIDATOR_PROPERTY(child_count)
+HATN_VALIDATOR_PROPERTY(child_count)
 // child is a variadic property for accessing a node's child by index
-DRACOSHA_VALIDATOR_VARIADIC_PROPERTY(child)
+HATN_VALIDATOR_VARIADIC_PROPERTY(child)
 
 int main()
 {
@@ -2290,9 +2290,9 @@ See example of object setter with validation below.
 
 ```cpp
 #include <iostream>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/prevalidation_adapter.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/prevalidation_adapter.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // define Foo type
 struct Foo
@@ -2307,10 +2307,10 @@ struct Foo
 };
 
 // define bar_value property
-DRACOSHA_VALIDATOR_PROPERTY(bar_value);
+HATN_VALIDATOR_PROPERTY(bar_value);
 
 // define other_value property
-DRACOSHA_VALIDATOR_PROPERTY(other_value);
+HATN_VALIDATOR_PROPERTY(other_value);
 
 int main
 {
@@ -2368,9 +2368,9 @@ For [ALL](#all) aggregation the condition is always strictly checked.
 Prevalidation adapter can be used to prevalidate a number of values at once. To check multiple values they must be wrapped with [range](#range) helper, see example below. In this case `strict_any` is applied to the entire set of values, i.e. validation succeeds if at least one element satisfies the conditions.
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/prevalidation_adapter.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/prevalidation_adapter.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -2416,9 +2416,9 @@ Validator internally supports plain pointers and `std::shared_ptr` pointers. For
 
 ```cpp
 #include <QSharedPointer>
-#include <dracosha/validator/utils/pointer_as_reference.hpp>
+#include <hatn/validator/utils/pointer_as_reference.hpp>
 
-DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+HATN_VALIDATOR_NAMESPACE_BEGIN
 
 /**
  * Dereference QSharedPointer pointer.
@@ -2435,7 +2435,7 @@ struct pointer_as_reference_t<QSharedPointer<T>>
     }
 };
 
-DRACOSHA_VALIDATOR_NAMESPACE_END
+HATN_VALIDATOR_NAMESPACE_END
 ```
 
 ## Partial validation
@@ -2451,11 +2451,11 @@ See examples below.
 #include <map>
 #include <set>
 
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/default_adapter.hpp>
-#include <dracosha/validator/filter_path.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/default_adapter.hpp>
+#include <hatn/validator/filter_path.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -2516,10 +2516,10 @@ There is also an extended version of this helper to construct value transforming
 See example below.
 
 ```cpp
-#include <dracosha/validator/value_transformer.hpp>
-#include <dracosha/validator/validator.hpp>
+#include <hatn/validator/value_transformer.hpp>
+#include <hatn/validator/validator.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 namespace {
 // define handler that returns a size of provided string
@@ -2574,9 +2574,9 @@ int main()
 See example below.
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -2663,7 +2663,7 @@ Strings prepared with either top-level *formatter* or partial formatters can be 
 - *(preferred)* [fmt](https://github.com/fmtlib/fmt) based backend formatter;
 - `std::stringstream` based backend formatter.
 
-To use [fmt](https://github.com/fmtlib/fmt) for strings formatting define `DRACOSHA_VALIDATOR_FMT` macro, see [Building and installation](#building-and-installation) for details of formatter configuration.
+To use [fmt](https://github.com/fmtlib/fmt) for strings formatting define `HATN_VALIDATOR_FMT` macro, see [Building and installation](#building-and-installation) for details of formatter configuration.
 
 ##### Members formatter
 
@@ -2783,8 +2783,8 @@ Adding a new `decorator` consists of the following steps.
 See example below.
 
 ```cpp
-#include <dracosha/validator/reporting/decorator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/reporting/decorator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // define decorator for marking text bold with <b>...</b> tag
 struct bold_decorator_t
@@ -2816,9 +2816,9 @@ See examples below.
 
 ```cpp
 #include <map>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -2864,9 +2864,9 @@ To override description of a member validation condition a temporary member vali
 
 ```cpp
 #include <map>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -2915,9 +2915,9 @@ return 0;
 To override [member name](#members-formatter) a temporary [member notation](#member-notation) object must be called with string *hint* as an argument, e.g. `_["key1"]("reporting hint")(gt,100)`. See example below.
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -2949,9 +2949,9 @@ return 0;
 To override description of an [operator](#operator) the operator must be wrapped as `_(operator,custom_description)`. To override description of [negated](#_n-negation) operator the `_n(operator,custom_description)` must be used with two arguments. See examples below.
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -3004,9 +3004,9 @@ return 0;
 To override [operand formatting](#operands-formatting) the operand must be wrapped as `_(operand,custom_description)`. See example below.
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 int main()
 {
@@ -3162,11 +3162,11 @@ Below is an example of custom localization for Russian language. This example us
 ```cpp
 #include <map>
 #include <iostream>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/reporting/extend_translator.hpp>
-#include <dracosha/validator/reporting/locale/ru.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/reporting/extend_translator.hpp>
+#include <hatn/validator/reporting/locale/ru.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // define custom trasnlator of container keys for Russian language taking into account some Russian grammatical categories
 phrase_translator custom_key_translator;
@@ -3297,10 +3297,10 @@ In general, a rule of thumb is to use [logical aggregations](#logical-aggregatio
 A `validator` tries to do as little data copying as possible. All variables provided to validators are used by references. Thus, a user is responsible for the variables to stay valid during life time of a validator. If it is not possible then a variable must be explicitly moved or copied to a validator. Note that moved/copied values owned by the validator can be implicitly copied or moved multiple times during some validator operations - for example, when a nested member is constructed the keys of parent member path are moved or copied to the elements of the child member path.
 
 ```cpp
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/utils/copy.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/utils/copy.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // ....
 
@@ -3345,7 +3345,7 @@ Building text reports sometimes can add meaningful overhead because construction
 
 For `CMake` build system there is `CMakeLists.txt` project file in the library's root folder. Add `cpp-library` folder as a subdirectory to your `CMake` project and configure build parameters, see [CMake configuration](#cmake-configuration).
 
-For the rest build systems ensure that `include` subfolder of `cpp-library` is available for your compiler in the list of include paths. [Boost](http://boost.org) libraries must also be in the paths. To use [fmt](https://github.com/fmtlib/fmt) library as a [backend formatter](#backend-formatter) add definition of macro `DRACOSHA_VALIDATOR_FMT` to compiler command line and ensure that [fmt](https://github.com/fmtlib/fmt) library is available in compiler's paths. When compiling with `MSVC` compiler flags `/Zc:ternary` and `/Zc:__cplusplus` are required.
+For the rest build systems ensure that `include` subfolder of `cpp-library` is available for your compiler in the list of include paths. [Boost](http://boost.org) libraries must also be in the paths. To use [fmt](https://github.com/fmtlib/fmt) library as a [backend formatter](#backend-formatter) add definition of macro `HATN_VALIDATOR_FMT` to compiler command line and ensure that [fmt](https://github.com/fmtlib/fmt) library is available in compiler's paths. When compiling with `MSVC` compiler flags `/Zc:ternary` and `/Zc:__cplusplus` are required.
 
 ## Supported platforms and compilers
 
@@ -3382,9 +3382,9 @@ To use `cpp-validator` library with `CMake` build system do the following:
     ```
     ADD_SUBDIRECTORY(cpp-validator)
     ```
-- add `dracoshavalidator` library dependency to your project:
+- add `hatnvalidator` library dependency to your project:
     ```
-    TARGET_LINK_LIBRARIES(${PROJECT_NAME} dracoshavalidator ${Boost_LIBRARIES})
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME} hatnvalidator ${Boost_LIBRARIES})
     ```
 - configure the following optional `CMake` parameters if needed:
     - `VALIDATOR_WITH_FMT` - *ON*|*OFF* - enable [fmt](https://github.com/fmtlib/fmt) library for [report](#report) [formatting](#backend-formatter) - default is *ON*;

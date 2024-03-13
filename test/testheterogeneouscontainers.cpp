@@ -1,17 +1,17 @@
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/utils/heterogeneous_size.hpp>
-#include <dracosha/validator/heterogeneous_property.hpp>
-#include <dracosha/validator/property.hpp>
-#include <dracosha/validator/utils/adjust_storable_type.hpp>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/reporting_adapter.hpp>
-#include <dracosha/validator/properties/h_size.hpp>
-#include <dracosha/validator/utils/foreach_if.hpp>
-#include <dracosha/validator/utils/conditional_fold.hpp>
-#include <dracosha/validator/validate.hpp>
+#include <hatn/validator/utils/heterogeneous_size.hpp>
+#include <hatn/validator/heterogeneous_property.hpp>
+#include <hatn/validator/property.hpp>
+#include <hatn/validator/utils/adjust_storable_type.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
+#include <hatn/validator/properties/h_size.hpp>
+#include <hatn/validator/utils/foreach_if.hpp>
+#include <hatn/validator/utils/conditional_fold.hpp>
+#include <hatn/validator/validate.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestHeterogeneousContainers)
 
@@ -47,10 +47,10 @@ BOOST_AUTO_TEST_CASE(CheckHasProperty)
 
 namespace {
 
-DRACOSHA_VALIDATOR_HETEROGENEOUS_PROPERTY(zero,0)
-DRACOSHA_VALIDATOR_HETEROGENEOUS_PROPERTY(one,1)
-DRACOSHA_VALIDATOR_HETEROGENEOUS_PROPERTY(two,2)
-DRACOSHA_VALIDATOR_HETEROGENEOUS_PROPERTY(three,3)
+HATN_VALIDATOR_HETEROGENEOUS_PROPERTY(zero,0)
+HATN_VALIDATOR_HETEROGENEOUS_PROPERTY(one,1)
+HATN_VALIDATOR_HETEROGENEOUS_PROPERTY(two,2)
+HATN_VALIDATOR_HETEROGENEOUS_PROPERTY(three,3)
 }
 
 BOOST_AUTO_TEST_CASE(CheckGetProperty)

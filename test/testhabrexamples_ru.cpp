@@ -3,14 +3,14 @@
 #include <iostream>
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/validate.hpp>
-#include <dracosha/validator/prevalidation/set_validated.hpp>
-#include <dracosha/validator/operators/lexicographical.hpp>
-#include <dracosha/validator/reporting/extend_translator.hpp>
-#include <dracosha/validator/reporting/locale/ru.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/validate.hpp>
+#include <hatn/validator/prevalidation/set_validated.hpp>
+#include <hatn/validator/operators/lexicographical.hpp>
+#include <hatn/validator/reporting/extend_translator.hpp>
+#include <hatn/validator/reporting/locale/ru.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // структура с переменными и методом вида setter
 struct Foo
@@ -27,14 +27,14 @@ struct Foo
 };
 
 // зарегистрировать кастомные свойства
-DRACOSHA_VALIDATOR_PROPERTY(bar_value);
-DRACOSHA_VALIDATOR_PROPERTY(other_value);
+HATN_VALIDATOR_PROPERTY(bar_value);
+HATN_VALIDATOR_PROPERTY(other_value);
 
 // специализация шаблона класса set_member_t для записи свойства bar_value структуры Foo
-DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+HATN_VALIDATOR_NAMESPACE_BEGIN
 
 template <>
-struct set_member_t<Foo,DRACOSHA_VALIDATOR_PROPERTY_TYPE(bar_value)>
+struct set_member_t<Foo,HATN_VALIDATOR_PROPERTY_TYPE(bar_value)>
 {
     template <typename ObjectT, typename MemberT, typename ValueT>
     void operator() (
@@ -47,7 +47,7 @@ struct set_member_t<Foo,DRACOSHA_VALIDATOR_PROPERTY_TYPE(bar_value)>
     }
 };
 
-DRACOSHA_VALIDATOR_NAMESPACE_END
+HATN_VALIDATOR_NAMESPACE_END
 
 BOOST_AUTO_TEST_SUITE(TestHabrExamples)
 
@@ -238,7 +238,7 @@ BOOST_AUTO_TEST_CASE(CheckHabrexample6)
 }
 
 // зарегистрировать новое свойство red_color
-DRACOSHA_VALIDATOR_PROPERTY_FLAG(red_color,"Must be red","Must be not red");
+HATN_VALIDATOR_PROPERTY_FLAG(red_color,"Must be red","Must be not red");
 
 BOOST_AUTO_TEST_CASE(CheckHabrexample7)
 {

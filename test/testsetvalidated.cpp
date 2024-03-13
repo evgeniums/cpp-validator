@@ -3,12 +3,12 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/prevalidation/set_validated.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/prevalidation/set_validated.hpp>
 
 namespace hana=boost::hana;
 
-DRACOSHA_VALIDATOR_PROPERTY(field1)
+HATN_VALIDATOR_PROPERTY(field1)
 
 namespace {
 struct TestSetValidatorStruct
@@ -17,10 +17,10 @@ struct TestSetValidatorStruct
 };
 }
 
-DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+HATN_VALIDATOR_NAMESPACE_BEGIN
 
 template <>
-struct set_member_t<TestSetValidatorStruct,DRACOSHA_VALIDATOR_PROPERTY_TYPE(field1)>
+struct set_member_t<TestSetValidatorStruct,HATN_VALIDATOR_PROPERTY_TYPE(field1)>
 {
     template <typename ObjectT, typename MemberT, typename ValueT>
     void operator() (
@@ -33,13 +33,13 @@ struct set_member_t<TestSetValidatorStruct,DRACOSHA_VALIDATOR_PROPERTY_TYPE(fiel
     }
 };
 
-DRACOSHA_VALIDATOR_NAMESPACE_END
+HATN_VALIDATOR_NAMESPACE_END
 
 namespace validator_ns {
 
-namespace vld=DRACOSHA_VALIDATOR_NAMESPACE;
+namespace vld=HATN_VALIDATOR_NAMESPACE;
 
-DRACOSHA_VALIDATOR_PROPERTY(GetX);
+HATN_VALIDATOR_PROPERTY(GetX);
 
 auto MyClassValidator=vld::validator(
    vld::_[GetX](vld::in,vld::interval(0,500))
@@ -70,7 +70,7 @@ public:
 };
 }
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestPrevalidation)
 

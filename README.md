@@ -244,7 +244,7 @@ struct Foo
 };
 
 // define custom property
-DRACOSHA_VALIDATOR_PROPERTY_FLAG(red_color,"Must be red","Must be not red");
+HATN_VALIDATOR_PROPERTY_FLAG(red_color,"Must be red","Must be not red");
 
 // define validator of custom property
 auto v=validator(
@@ -286,14 +286,14 @@ struct Foo
 };
 
 // define custom properties
-DRACOSHA_VALIDATOR_PROPERTY(bar_value);
-DRACOSHA_VALIDATOR_PROPERTY(other_value);
+HATN_VALIDATOR_PROPERTY(bar_value);
+HATN_VALIDATOR_PROPERTY(other_value);
 
 // template specialization for setting bar_value member of Foo
-DRACOSHA_VALIDATOR_NAMESPACE_BEGIN
+HATN_VALIDATOR_NAMESPACE_BEGIN
 
 template <>
-struct set_member_t<Foo,DRACOSHA_VALIDATOR_PROPERTY_TYPE(bar_value)>
+struct set_member_t<Foo,HATN_VALIDATOR_PROPERTY_TYPE(bar_value)>
 {
     template <typename ObjectT, typename MemberT, typename ValueT>
     void operator() (
@@ -306,9 +306,9 @@ struct set_member_t<Foo,DRACOSHA_VALIDATOR_PROPERTY_TYPE(bar_value)>
     }
 };
 
-DRACOSHA_VALIDATOR_NAMESPACE_END
+HATN_VALIDATOR_NAMESPACE_END
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // define validator of custom properties
 auto v=validator(

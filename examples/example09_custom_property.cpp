@@ -1,8 +1,8 @@
 #undef NDEBUG
 
-#include <dracosha/validator/property.hpp>
-#include <dracosha/validator/validator.hpp>
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+#include <hatn/validator/property.hpp>
+#include <hatn/validator/validator.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 // structure with two properties
 struct Foo
@@ -22,10 +22,10 @@ struct Foo
 };
 
 // define property corresponding to member variable
-DRACOSHA_VALIDATOR_PROPERTY(var1);
+HATN_VALIDATOR_PROPERTY(var1);
 
 // define property corresponding to getter method
-DRACOSHA_VALIDATOR_PROPERTY(get_var2);
+HATN_VALIDATOR_PROPERTY(get_var2);
 
 int main()
 {

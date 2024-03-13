@@ -32,4 +32,4 @@ make -j8
 ctest -VV
 cd -
 
-#$BUILD_DIR/test/dracoshavalidator-test --log_level=test_suite
+#$BUILD_DIR/test/hatnvalidator-test --log_level=test_suite

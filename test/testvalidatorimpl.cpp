@@ -4,13 +4,13 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/utils/make_types_tuple.hpp>
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/utils/wrap_object.hpp>
-#include <dracosha/validator/utils/conditional_fold.hpp>
-#include <dracosha/validator/utils/copy.hpp>
+#include <hatn/validator/utils/make_types_tuple.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/utils/wrap_object.hpp>
+#include <hatn/validator/utils/conditional_fold.hpp>
+#include <hatn/validator/utils/copy.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestValidatorImpl)
 
@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE(CheckMakeMember)
     auto m14=_[TestStruct2{}][10];
     BOOST_TEST_MESSAGE("Key as rvalue end");
 
-#ifdef _DRACOSHA_ALWAYS_UNDEF
+#ifdef _HATN_ALWAYS_UNDEF
     // must fail
     std::ignore=make_member(hana::tuple<>());
 #endif

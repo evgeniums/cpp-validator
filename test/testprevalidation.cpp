@@ -3,17 +3,17 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/validator.hpp>
-#include <dracosha/validator/adapters/prevalidation_adapter.hpp>
-#include <dracosha/validator/prevalidation/set_validated.hpp>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/prevalidation_adapter.hpp>
+#include <hatn/validator/prevalidation/set_validated.hpp>
 
 namespace hana=boost::hana;
 
 namespace
 {
 
-DRACOSHA_VALIDATOR_PROPERTY(val1)
-DRACOSHA_VALIDATOR_PROPERTY(val2)
+HATN_VALIDATOR_PROPERTY(val1)
+HATN_VALIDATOR_PROPERTY(val2)
 
 struct NonCopyable
 {
@@ -29,7 +29,7 @@ struct NonCopyable
 };
 }
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestPrevalidation)
 

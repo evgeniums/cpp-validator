@@ -1,9 +1,9 @@
 #include <boost/test/unit_test.hpp>
 
-#include <dracosha/validator/utils/invoke_or.hpp>
-#include <dracosha/validator/utils/invoke_and.hpp>
+#include <hatn/validator/utils/invoke_or.hpp>
+#include <hatn/validator/utils/invoke_and.hpp>
 
-using namespace DRACOSHA_VALIDATOR_NAMESPACE;
+using namespace HATN_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestInvokeAndOr)
 
