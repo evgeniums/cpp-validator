@@ -28,8 +28,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 HATN_VALIDATOR_NAMESPACE_BEGIN
 
-struct wrap_index_tag;
-
 /**
  * @brief Wrapper of index for element aggregation of variadic properties.
  */
