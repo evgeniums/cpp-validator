@@ -15,8 +15,7 @@ SET (VALIDATOR_TEST_SOURCES
     ${VALIDATOR_TEST_SRC}/testlexicographical.cpp
     ${VALIDATOR_TEST_SRC}/testoperatorin.cpp
     ${VALIDATOR_TEST_SRC}/testregex.cpp
-    ${VALIDATOR_TEST_SRC}/teststrnumbers.cpp
-    ${VALIDATOR_TEST_SRC}/testhabrexamples_ru.cpp
+    ${VALIDATOR_TEST_SRC}/teststrnumbers.cpp    
     ${VALIDATOR_TEST_SRC}/testvalidatoronheap.cpp
     ${VALIDATOR_TEST_SRC}/testinvokeandor.cpp
     ${VALIDATOR_TEST_SRC}/testprevalidation.cpp
@@ -36,7 +35,17 @@ SET (VALIDATOR_TEST_SOURCES
     ${VALIDATOR_TEST_SRC}/testpointers.cpp
 )
 
-TARGET_SOURCES(${PROJECT_NAME} PUBLIC ${VALIDATOR_TEST_SOURCES})
+IF (BUILD_VALIDATOR_HABR_EXAMPLES)
+    ADD_COMPILE_DEFINITIONS(-DBUILD_HABR_EXAMPLES)
+    SET(VALIDATOR_TEST_SOURCES ${VALIDATOR_TEST_SOURCES} ${VALIDATOR_TEST_SRC}/testhabrexamples_ru.cpp)
+ENDIF()
+
+IF (HATN_VALIDATOR_SRC)
+    SET(TEST_SOURCES ${VALIDATOR_TEST_SOURCES})
+    ADD_HATN_CTESTS(validator)
+ELSE()
+    TARGET_SOURCES(${PROJECT_NAME} PRIVATE ${VALIDATOR_TEST_SOURCES})
+ENDIF()
 
 IF (MINGW)
     # Fix string table overflow when compiling in debug mode
