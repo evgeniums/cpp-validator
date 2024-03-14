@@ -34,7 +34,7 @@ Distributed under the Boost Software License, Version 1.0.
 HATN_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
-DCS_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+HATN_IGNORE_MAYBE_UNINITIALIZED_BEGIN
 struct try_get_member_t
 {
     template <typename Tobj, typename Tkey>
@@ -76,7 +76,7 @@ struct try_get_member_t
         )(std::forward<Tobj>(obj_wrapper),std::forward<Tkey>(key));
     }
 };
-DCS_IGNORE_MAYBE_UNINITIALIZED_END
+HATN_IGNORE_MAYBE_UNINITIALIZED_END
 
 constexpr try_get_member_t try_get_member{};
 

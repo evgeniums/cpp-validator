@@ -31,6 +31,8 @@ namespace hana=boost::hana;
 HATN_VALIDATOR_NAMESPACE_END
 
 #define HATN_VALIDATOR_NAMESPACE hatn::validator
+#define HATN_VALIDATOR_USING using namespace hatn::validator;
+#define HATN_VALIDATOR_NS validator
 
 #if __cplusplus >= 201703L
     #define HATN_VALIDATOR_INLINE_LAMBDA inline
