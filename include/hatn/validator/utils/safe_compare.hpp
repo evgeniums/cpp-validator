@@ -31,6 +31,8 @@ HATN_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
+struct wrap_index_tag;
+
 template <typename T>
 struct is_bool : public std::is_same<T,bool>
 {
@@ -320,6 +322,8 @@ struct safe_compare
 template <typename LeftT, typename RightT>
 struct safe_compare<LeftT,RightT,
                         std::enable_if_t<
+                            !hana::is_a<wrap_index_tag,LeftT>&&
+                            !hana::is_a<wrap_index_tag,RightT>&&
                             std::is_signed<LeftT>::value &&
                             !std::is_floating_point<LeftT>::value &&
                             std::is_unsigned<RightT>::value &&
@@ -374,6 +378,8 @@ struct safe_compare<LeftT,RightT,
 template <typename LeftT, typename RightT>
 struct safe_compare<LeftT, RightT,
         std::enable_if_t<
+            !hana::is_a<wrap_index_tag,LeftT>&&
+            !hana::is_a<wrap_index_tag,RightT>&&
             std::is_unsigned<LeftT>::value &&
             std::is_signed<RightT>::value &&
             !std::is_floating_point<RightT>::value &&
