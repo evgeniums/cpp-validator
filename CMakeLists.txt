@@ -34,6 +34,7 @@ SET (HEADERS
     include/hatn/validator/utils/heterogeneous_size.hpp
     include/hatn/validator/utils/foreach_if.hpp
     include/hatn/validator/utils/pointer_as_reference.hpp
+    include/hatn/validator/utils/has_reset.hpp
 
     include/hatn/validator/adapter.hpp
     include/hatn/validator/property.hpp
@@ -167,6 +168,8 @@ SET (HEADERS
     include/hatn/validator/reporting/format_operand.hpp
     include/hatn/validator/reporting/format_join_grammar_cats.hpp
     include/hatn/validator/reporting/prepare_property_formatting.hpp
+    include/hatn/validator/reporting/dotted_member_names.hpp
+    include/hatn/validator/reporting/original_member_names.hpp
 
     include/hatn/validator/reporting/locale/sample_locale.hpp
     include/hatn/validator/reporting/locale/ru.hpp
