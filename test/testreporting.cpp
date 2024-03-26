@@ -57,8 +57,17 @@ BOOST_AUTO_TEST_CASE(CheckValidationReport)
 
     std::string rep1;
     auto ra1=make_reporting_adapter(m1,rep1);
+    const auto& reporter=ra1.traits().reporter();
+    const auto& members=reporter.failed_members();
+    BOOST_CHECK(members.empty());
+    BOOST_CHECK_EQUAL(members.size(),0);
+
     BOOST_CHECK(!v1.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("field1 must be greater than or equal to 10"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     auto v2=validator(
@@ -66,15 +75,26 @@ BOOST_AUTO_TEST_CASE(CheckValidationReport)
             );
     BOOST_CHECK(!v2.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("length of field1 must be greater than or equal to 10"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     std::vector<size_t> vec1={10,20,30,40,50};
     auto ra2=make_reporting_adapter(vec1,rep1);
+    const auto& members2=ra2.traits().reporter().failed_members();
+    BOOST_CHECK(members2.empty());
+    BOOST_CHECK_EQUAL(members2.size(),0);
     auto v3=validator(
                 _[1](gte,100)
             );
     BOOST_CHECK(!v3.apply(ra2));
     BOOST_CHECK_EQUAL(rep1,std::string("element #1 must be greater than or equal to 100"));
+    BOOST_REQUIRE(!members2.empty());
+    BOOST_CHECK_EQUAL(members2.size(),1);
+    BOOST_CHECK_EQUAL(members2[0],"1");
+    ra1.reset();
     rep1.clear();
 }
 
@@ -83,12 +103,19 @@ BOOST_AUTO_TEST_CASE(CheckValidationExistsReport)
     std::map<std::string,size_t> m1={{"field1",1}};
     std::string rep1;
     auto ra1=make_reporting_adapter(m1,rep1);
+    const auto& members=ra1.traits().reporter().failed_members();
+    BOOST_CHECK(members.empty());
+    BOOST_CHECK_EQUAL(members.size(),0);
 
     auto v1=validator(
                 _["field2"](exists,true)
             );
     BOOST_CHECK(!v1.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"field2 must exist");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field2");
+    ra1.reset();
     rep1.clear();
 
     auto v2=validator(
@@ -96,6 +123,10 @@ BOOST_AUTO_TEST_CASE(CheckValidationExistsReport)
             );
     BOOST_CHECK(!v2.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"field1 must not exist");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     auto v3=validator(
@@ -109,6 +140,10 @@ BOOST_AUTO_TEST_CASE(CheckValidationExistsReport)
             );
     BOOST_CHECK(!v4.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"field2 should exist");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field2");
+    ra1.reset();
     rep1.clear();
 }
 
@@ -117,12 +152,19 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportAggregation)
     std::map<std::string,std::string> m1={{"field1","value1"}};
     std::string rep1;
     auto ra1=make_reporting_adapter(m1,rep1);
+    const auto& members=ra1.traits().reporter().failed_members();
+    BOOST_CHECK(members.empty());
+    BOOST_CHECK_EQUAL(members.size(),0);
 
     auto v1=validator(
                 _["field1"](value(gte,"z1000") ^OR^ length(lt,3))
             );
     BOOST_CHECK(!v1.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("field1 must be greater than or equal to z1000 OR length of field1 must be less than 3"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     auto v2=validator(
@@ -131,6 +173,10 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportAggregation)
             );
     BOOST_CHECK(!v2.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("size of field1 must be greater than or equal to 100"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     auto v3=validator(
@@ -140,6 +186,10 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportAggregation)
             );
     BOOST_CHECK(!v3.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("field1 must be greater than or equal to xxxxxx OR size of field1 must be greater than or equal to 100 OR field1 must be greater than or equal to zzzzzzzzzzzz"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     auto v4=validator(
@@ -149,6 +199,10 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportAggregation)
             );
     BOOST_CHECK(!v4.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("field1 must be greater than or equal to xxxxxx OR size of field1 must be greater than or equal to 100"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     auto v5=validator(
@@ -158,6 +212,10 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportAggregation)
             );
     BOOST_CHECK(!v5.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("field1 must be greater than or equal to xxxxxx OR field1 must be greater than or equal to zzzzzzzzzzzz"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 }
 
@@ -166,12 +224,20 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportNot)
     std::map<std::string,size_t> m1={{"field1",10}};
     std::string rep1;
     auto ra1=make_reporting_adapter(m1,rep1);
+    const auto& reporter=ra1.traits().reporter();
+    const auto& members=reporter.failed_members();
+    BOOST_CHECK(members.empty());
+    BOOST_CHECK_EQUAL(members.size(),0);
 
     auto v1=validator(
                 NOT(_["field1"](eq,10))
             );
     BOOST_CHECK(!v1.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("NOT field1 must be equal to 10"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     auto v2=validator(
@@ -179,6 +245,10 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportNot)
             );
     BOOST_CHECK(!v2.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("NOT field1 must be greater than or equal to 1"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     auto v3=validator(
@@ -189,6 +259,10 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportNot)
             );
     BOOST_CHECK(!v3.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("NOT (field1 must be equal to 10 AND field1 must be greater than or equal to 8)"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     // validator reports only the first matched condition for nested OR operator
@@ -201,6 +275,10 @@ BOOST_AUTO_TEST_CASE(CheckValidationReportNot)
             );
     BOOST_CHECK(!v4.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("NOT field1 must be equal to 10"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 }
 
@@ -211,6 +289,9 @@ BOOST_AUTO_TEST_CASE(CheckNestedValidationReport)
         };
     std::string rep1;
     auto ra1=make_reporting_adapter(m1,rep1);
+    const auto& members=ra1.traits().reporter().failed_members();
+    BOOST_CHECK(members.empty());
+    BOOST_CHECK_EQUAL(members.size(),0);
 
     auto v1=validator(
                 _[size](gte,0),
@@ -224,12 +305,19 @@ BOOST_AUTO_TEST_CASE(CheckNestedValidationReport)
             );
     BOOST_CHECK(!v2.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"element #1 of field1 must be less than 5");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1.1");
+    ra1.reset();
     rep1.clear();
 
     auto v3=validator(
                 _[100](lt,5)
             );
     BOOST_CHECK(v3.apply(ra1));
+    BOOST_CHECK(members.empty());
+    BOOST_CHECK_EQUAL(members.size(),0);
+    ra1.reset();
     rep1.clear();
 }
 
@@ -242,12 +330,18 @@ BOOST_AUTO_TEST_CASE(CheckOtherFieldReport)
         };
     std::string rep1;
     auto ra1=make_reporting_adapter(m1,rep1);
+    const auto& members=ra1.traits().reporter().failed_members();
+    BOOST_CHECK(members.empty());
+    BOOST_CHECK_EQUAL(members.size(),0);
 
     auto v1=validator(
                 _["field1"](gt,_["field2"]),
                 _["field2"](eq,_["field3"])
             );
     BOOST_CHECK(v1.apply(ra1));
+    BOOST_CHECK(members.empty());
+    BOOST_CHECK_EQUAL(members.size(),0);
+    ra1.reset();
     rep1.clear();
 
     auto v2=validator(
@@ -255,6 +349,11 @@ BOOST_AUTO_TEST_CASE(CheckOtherFieldReport)
             );
     BOOST_CHECK(!v2.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"field2 must be greater than field3 OR field3 must be equal to field1");
+    BOOST_CHECK(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),2);
+    BOOST_CHECK_EQUAL(members[0],"field2");
+    BOOST_CHECK_EQUAL(members[1],"field3");
+    ra1.reset();
     rep1.clear();
 }
 
@@ -272,12 +371,18 @@ BOOST_AUTO_TEST_CASE(CheckSampleObjectReport)
         };
     std::string rep1;
     auto ra1=make_reporting_adapter(m1,rep1);
+    const auto& members=ra1.traits().reporter().failed_members();
+    BOOST_CHECK(members.empty());
+    BOOST_CHECK_EQUAL(members.size(),0);
 
     auto v1=validator(
                 _["field1"](gte,_(m2)),
                 _["field2"](eq,_(m2))
             );
     BOOST_CHECK(v1.apply(ra1));
+    BOOST_CHECK(members.empty());
+    BOOST_CHECK_EQUAL(members.size(),0);
+    ra1.reset();
     rep1.clear();
 
     auto v2=validator(
@@ -285,6 +390,11 @@ BOOST_AUTO_TEST_CASE(CheckSampleObjectReport)
             );
     BOOST_CHECK(!v2.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"field2 must be greater than field2 of sample OR field3 must be less than field3 of sample");
+    BOOST_CHECK(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),2);
+    BOOST_CHECK_EQUAL(members[0],"field2");
+    BOOST_CHECK_EQUAL(members[1],"field3");
+    ra1.reset();
     rep1.clear();
 
     auto v3=validator(
@@ -292,6 +402,11 @@ BOOST_AUTO_TEST_CASE(CheckSampleObjectReport)
             );
     BOOST_CHECK(!v3.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"field2 must be greater than field2 of m2 OR field3 must be less than field3 of m2");
+    BOOST_CHECK(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),2);
+    BOOST_CHECK_EQUAL(members[0],"field2");
+    BOOST_CHECK_EQUAL(members[1],"field3");
+    ra1.reset();
     rep1.clear();
 
     std::map<size_t,size_t> m3={
@@ -304,11 +419,16 @@ BOOST_AUTO_TEST_CASE(CheckSampleObjectReport)
         {2,20}
     };
     auto ra2=make_reporting_adapter(m4,rep1);
+    const auto& members2=ra2.traits().reporter().failed_members();
     auto v4=validator(
                 _[1](gt,_(_(m3),"m3"))
             );
     BOOST_CHECK(!v4.apply(ra2));
     BOOST_CHECK_EQUAL(rep1,"element #1 must be greater than element #1 of m3");
+    BOOST_REQUIRE(!members2.empty());
+    BOOST_CHECK_EQUAL(members2.size(),1);
+    BOOST_CHECK_EQUAL(members2[0],"1");
+    ra2.reset();
     rep1.clear();
 
     std::map<std::string,size_t> m5={
@@ -459,11 +579,16 @@ BOOST_AUTO_TEST_CASE(CheckContainsValidationReport)
             }
         };
     auto ra2=make_reporting_adapter(m2,rep1);
+    const auto& members=ra2.traits().reporter().failed_members();
     auto v2=validator(
                 _["field1"](contains,30)
             );
     BOOST_CHECK(!v2.apply(ra2));
     BOOST_CHECK_EQUAL(rep1,std::string("field1 must contain element #30"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 }
 

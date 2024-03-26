@@ -23,6 +23,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <hatn/validator/config.hpp>
 #include <hatn/validator/reporting/report_aggregation.hpp>
+#include <hatn/validator/reporting/member_names.hpp>
+#include <hatn/validator/reporting/dotted_member_names.hpp>
 #include <hatn/validator/reporting/formatter.hpp>
 
 HATN_VALIDATOR_NAMESPACE_BEGIN
@@ -60,6 +62,14 @@ class reporter
                     _not_count(0),
                     _explicit_reporting_count(0)
         {}
+
+        void reset()
+        {
+            _not_count=0;
+            _explicit_reporting_count=0;
+            _members.clear();
+            _stack.clear();
+        }
 
         /**
          * @brief Open validation step for aggregation operator.
@@ -177,10 +187,18 @@ class reporter
         template <typename T2, typename OpT, typename MemberT>
         void validate_exists(const MemberT& member, const OpT& op, const T2& b)
         {
-            if (skip_part() || skip_explicit_report())
+            if (skip_part())
             {
                 return;
             }
+
+            add_failed_member(member);
+
+            if (skip_explicit_report())
+            {
+                return;
+            }
+
             auto wrapper=wrap_backend_formatter(current(),_dst);
             _formatter.validate_exists(wrapper,member,op,b);
         }
@@ -195,10 +213,18 @@ class reporter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
         {
-            if (skip_part() || skip_explicit_report())
+            if (skip_part())
             {
                 return;
             }
+
+            add_failed_member(member);
+
+            if (skip_explicit_report())
+            {
+                return;
+            }
+
             auto wrapper=wrap_backend_formatter(current(),_dst);
             _formatter.validate(wrapper,member,prop,op,b);
         }
@@ -213,10 +239,18 @@ class reporter
         template <typename T2, typename OpT, typename PropT, typename MemberT>
         void validate_with_other_member(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
         {
-            if (skip_part() || skip_explicit_report())
+            if (skip_part())
             {
                 return;
             }
+
+            add_failed_member(member);
+
+            if (skip_explicit_report())
+            {
+                return;
+            }
+
             auto wrapper=wrap_backend_formatter(current(),_dst);
             _formatter.validate_with_other_member(wrapper,member,prop,op,b);
         }
@@ -232,10 +266,18 @@ class reporter
         template <typename T2, typename OpT, typename PropT, typename MemberT, typename MemberSampleT>
         void validate_with_master_sample(const MemberT& member, const PropT& prop, const OpT& op, const MemberSampleT& member_sample, const T2& b)
         {
-            if (skip_part() || skip_explicit_report())
+            if (skip_part())
             {
                 return;
             }
+
+            add_failed_member(member);
+
+            if (skip_explicit_report())
+            {
+                return;
+            }
+
             auto wrapper=wrap_backend_formatter(current(),_dst);
             _formatter.validate_with_master_sample(wrapper,member,prop,op,member_sample,b);
         }
@@ -283,6 +325,21 @@ class reporter
                 auto wrapper=wrap_backend_formatter(current(),_dst);
                 wrapper.append(description);
             }
+        }
+
+        template <typename MemberT>
+        void add_failed_member(const MemberT& member)
+        {
+            std::string m=dotted_member_names(member);
+            if (std::find(std::begin(_members),std::end(_members),m)==std::end(_members))
+            {
+                _members.push_back(std::move(m));
+            }
+        }
+
+        const std::vector<std::string>& failed_members() const
+        {
+            return _members;
         }
 
     private:
@@ -361,6 +418,8 @@ class reporter
         std::vector<report_aggregation<typename DstT::type>> _stack;
         size_t _not_count;
         size_t _explicit_reporting_count;
+
+        std::vector<std::string> _members;
 };
 
 /**

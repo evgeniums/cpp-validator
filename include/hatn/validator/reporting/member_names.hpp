@@ -156,6 +156,13 @@ struct default_member_names_traits_t
      * Default is reverse order.
      */
     constexpr static const bool is_reverse_member_property_order=true;
+
+    /**
+     * @brief Check if explicit names can be used.
+     *
+     * Default is allowed.
+     */
+    constexpr static const bool is_allow_explicit_member_names=true;
 };
 constexpr default_member_names_traits_t default_member_names_traits{};
 
@@ -276,47 +283,6 @@ auto make_decorated_member_names(OriginalMemberNamesT&& original_mn, DecoratorT&
                 )
             );
 }
-
-/**
- * @brief Traits to format nested members as dot separated names decorated with brackets.
- *
- * For example: ["field1"]["subfield1_1"]["subfield1_1_1"] will be formatted as [field1].[subfield1_1].[subfield1_1_1]
- */
-struct dotted_member_names_traits_t
-{
-    /**
-     * @brief Get string for conjunction of nested member names.
-     * @return String "." to use to join nested member names in the member's path.
-     */
-    static auto member_names_conjunction()
-    {
-        return ".";
-    }
-
-    static auto member_property_conjunction()
-    {
-        return ".";
-    }
-
-    /**
-     * @brief Check if nested memebr names must be joined in reverse order.
-     */
-    constexpr static const bool is_reverse_member_names_order=false;
-
-    /**
-     * @brief Check if property of a memebr must be joined in reverse order.
-     */
-    constexpr static const bool is_reverse_member_property_order=false;
-
-    brackets_decorator_t decorator;
-};
-
-/**
-  @brief Formatter of member names in direct dotted format.
-
-  For example: ["field1"]["subfield1_1"]["subfield1_1_1"] will be formatted as [field1].[subfield1_1].[subfield1_1_1]
-*/
-constexpr member_names<dotted_member_names_traits_t> dotted_member_names{dotted_member_names_traits_t{}};
 
 //-------------------------------------------------------------
 

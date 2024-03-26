@@ -268,7 +268,10 @@ auto join_member_names(T&& id, const TraitsT& traits, grammar_categories grammar
 {
     // extract member path if member has explicit names
     auto&& member=hana::if_(
-                std::is_base_of<member_with_name_list_tag,std::decay_t<T>>{},
+                hana::and_(
+                    std::is_base_of<member_with_name_list_tag,std::decay_t<T>>{},
+                    hana::bool_<TraitsT::is_allow_explicit_member_names>{}
+                ),
                 [](auto&& id)
                 {
                     // make pseudo member with preset names in path
@@ -330,7 +333,7 @@ struct nested_member_name_t
 template <typename T, typename TraitsT>
 struct nested_member_name_t<T,TraitsT,
             hana::when<
-                        std::is_base_of<member_with_name_tag,T>::value
+                        (std::is_base_of<member_with_name_tag,T>::value && TraitsT::is_allow_explicit_member_names)
                         &&
                         !std::is_base_of<member_with_name_list_tag,T>::value
                         &&
@@ -350,7 +353,7 @@ struct nested_member_name_t<T,TraitsT,
 template <typename T, typename TraitsT>
 struct nested_member_name_t<T,TraitsT,
             hana::when<
-                std::is_base_of<member_with_name_tag,T>::value
+                (std::is_base_of<member_with_name_tag,T>::value && TraitsT::is_allow_explicit_member_names)
                 &&
                 std::is_same<decltype(std::declval<T>().name()),concrete_phrase>::value
             >

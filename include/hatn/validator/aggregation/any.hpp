@@ -156,6 +156,7 @@ struct any_t : public element_aggregation_with_modifier<ModifierT>,
                public any_aggregation_t
 {
     using type=any_tag;
+    using aggregation_type=string_any_t;
 
     template <typename ... Ops>
     constexpr auto operator() (Ops&&... ops) const

@@ -48,7 +48,7 @@ struct tree_t : public adjust_storable_ignore,
 {
     using hana_tag=tree_tag;
 
-    AggregationT aggregation;
+    AggregationT _aggregation;
     PropertyT property;
     MaxArgT max_arg;
 
@@ -58,7 +58,12 @@ struct tree_t : public adjust_storable_ignore,
      */
     std::string name() const
     {
-        return aggregation.string()(*this);
+        return _aggregation.string()(*this);
+    }
+
+    const auto& aggregation() const
+    {
+        return _aggregation;
     }
 
     /**
@@ -69,7 +74,7 @@ struct tree_t : public adjust_storable_ignore,
      */
     template <typename AggregationT1, typename PropertyT1, typename MaxArgT1>
     tree_t(AggregationT1&& aggr, PropertyT1&& prop, MaxArgT1&& mx_arg)
-        : aggregation(std::forward<AggregationT1>(aggr)),
+        : _aggregation(std::forward<AggregationT1>(aggr)),
           property(std::forward<PropertyT1>(prop)),
           max_arg(std::forward<MaxArgT1>(mx_arg))
     {}
@@ -176,7 +181,7 @@ struct generate_paths_t<KeyT,hana::when<hana::is_a<tree_tag,KeyT>>>
             [](auto&& used_path_size, auto&& path, auto&& adapter, auto&& handler,
                auto&& upper_path, auto&& tree_key)
             {
-                auto pred=hana::partial(tree_key.aggregation.predicate(),adapter);
+                auto pred=hana::partial(tree_key.aggregation().predicate(),adapter);
 
                 // handle top node
                 auto tmp_adapter=make_intermediate_adapter(adapter,upper_path,used_path_size);
@@ -189,8 +194,8 @@ struct generate_paths_t<KeyT,hana::when<hana::is_a<tree_tag,KeyT>>>
                 }
 
                 // iterate over children nodes
-                aggregate_report<AdapterT>::open(next_adapter,tree_key.aggregation.string(),upper_path);
-                auto aggregation_varg=varg(tree_key.aggregation,tree_key.max_arg);
+                aggregate_report<AdapterT>::open(next_adapter,tree_key.aggregation().string(),upper_path);
+                auto aggregation_varg=varg(tree_key.aggregation(),tree_key.max_arg);
                 auto result=each_tree_node(
                                 tree_key,
                                 next_adapter,

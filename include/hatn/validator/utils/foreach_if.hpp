@@ -30,13 +30,13 @@ HATN_VALIDATOR_NAMESPACE_BEGIN
 namespace detail {
 
 /**
- * @brief Implementations of of foreach_if().
+ * @brief Implementations of foreach_if().
  */
 template <typename IndexT>
 struct foreach_if_t
 {
     template <typename T, typename HandlerT, typename PredicateT>
-    static auto each(const T& obj, const PredicateT& pred, const HandlerT& fn)
+    static auto each(T&& obj, const PredicateT& pred, const HandlerT& fn)
     {
         auto index=IndexT{};
         auto&& val=get_heterogeneous_property(obj,index);
@@ -76,7 +76,7 @@ struct foreach_if_impl
      * @return Accumulated result of handler invocations.
      */
     template <typename T, typename PredicateT, typename InitT, typename HandlerT>
-    auto operator () (const T& obj, const PredicateT& pred, InitT&& init, const HandlerT& handler) const
+    auto operator () (T&& obj, const PredicateT& pred, InitT&& init, const HandlerT& handler) const
     {
         return hana::eval_if(
             is_heterogeneous_container(obj),
@@ -99,7 +99,7 @@ struct foreach_if_impl
      * @return Accumulated result of handler invocations or false if object is not a heterogeneous container.
      */
     template <typename T, typename PredicateT, typename HandlerT>
-    auto operator () (const T& obj, const PredicateT& pred, const HandlerT& handler) const
+    auto operator () (T&& obj, const PredicateT& pred, const HandlerT& handler) const
     {
         return (*this)(obj,pred,false,handler);
     }

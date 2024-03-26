@@ -47,7 +47,7 @@ constexpr string_element_t string_element{};
 //-------------------------------------------------------------
 
 /**
- * @brief Check if traits have suitable operator ()(const T&) for name transforming in case when they don't.
+ * @brief Check if traits have suitable operator ()(const T&) or ()(T) for name transforming.
  */
 template <typename T, typename TraitsT, typename=void>
 struct can_single_member_name
@@ -56,7 +56,7 @@ struct can_single_member_name
 };
 
 /**
- * @brief Check if traits have suitable operator ()(const T&) for name transforming.
+ * @brief Check if traits have suitable operator ()(const T&) or ()(T) for name transforming.
  */
 template <typename T, typename TraitsT>
 struct can_single_member_name<T,TraitsT,
@@ -117,6 +117,22 @@ struct single_member_name_t<T,TraitsT,hana::when<can_single_member_name<unwrap_o
     }
 };
 
+template <typename T, typename TraitsT>
+struct single_member_name_t<T,TraitsT,hana::when<
+                                        decltype(hana::is_a<wrap_iterator_tag,T>)::value
+                                        &&
+                                        std::is_same<
+                                            decltype((void)std::declval<TraitsT>().format_aggregation(std::declval<T>().aggregation())),
+                                            void
+                                        >::value
+                            >>
+{
+    auto operator() (const T& id, const TraitsT& traits, grammar_categories grammar_cats) const -> decltype(auto)
+    {
+        return decorate(traits,translate(traits,traits.format_aggregation(unwrap_object(id).aggregation()),grammar_cats));
+    }
+};
+
 /**
  * @brief Helper for single member name formatting when traits can not be used and id is of integral type.
  *
@@ -158,7 +174,9 @@ constexpr auto single_member_name(const T& id, const TraitsT& traits, grammar_ca
     return single_member_name_inst<T,TraitsT>(id,traits,grammar_cats);
 }
 
-//! @todo Move it to separate file.
+/**
+ * @brief Specialization of single_member_name_t class for heterogeneous index.
+ */
 template <typename T, typename TraitsT>
 struct single_member_name_t<T,TraitsT,
                                 hana::when<

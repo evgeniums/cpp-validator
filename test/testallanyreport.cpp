@@ -9,6 +9,15 @@ BOOST_AUTO_TEST_SUITE(TestReporting)
 
 BOOST_AUTO_TEST_CASE(CheckAggregationAnyReport)
 {
+    // std::string anyDotted=dotted_member_names(ANY);
+    // BOOST_CHECK_EQUAL("ANY",anyDotted);
+
+    // anyDotted=dotted_member_names(_[ANY]);
+    // BOOST_CHECK_EQUAL("ANY",anyDotted);
+
+    // anyDotted=dotted_member_names(_["field1"][ANY]);
+    // BOOST_CHECK_EQUAL("field1.ANY",anyDotted);
+
     std::string rep1;
 
     std::map<std::string,std::map<size_t,std::string>> m1={
@@ -22,12 +31,17 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAnyReport)
             }
         };
     auto ra1=make_reporting_adapter(m1,rep1);
+    const auto& members=ra1.traits().reporter().failed_members();
 
     auto v1=validator(
                 _["field1"](ANY(value(gte,"zzz")))
             );
     BOOST_CHECK(!v1.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"at least one element of field1 must be greater than or equal to zzz");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1.ANY");
+    ra1.reset();
     rep1.clear();
 
     auto v2=validator(
@@ -42,6 +56,10 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAnyReport)
             );
     BOOST_CHECK(!v3.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"at least one element of field1 must be greater than or equal to zzz OR size of at least one element of field1 must be equal to 100");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1.ANY");
+    ra1.reset();
     rep1.clear();
 
     std::map<size_t,std::string> m2={
@@ -114,12 +132,17 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAllReport)
 
     std::string rep1;
     auto ra1=make_reporting_adapter(m1,rep1);
+    const auto& members=ra1.traits().reporter().failed_members();
 
     auto v1=validator(
                 _["field1"](ALL(value(gte,"value3")))
             );
     BOOST_CHECK(!v1.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"each element of field1 must be greater than or equal to value3");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1.ALL");
+    ra1.reset();
     rep1.clear();
 
     auto v2=validator(
@@ -127,6 +150,10 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAllReport)
             );
     BOOST_CHECK(!v2.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"size of each element of field1 must be greater than or equal to 100");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1.ALL");
+    ra1.reset();
     rep1.clear();
 
     auto v3=validator(
@@ -134,6 +161,10 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAllReport)
             );
     BOOST_CHECK(!v3.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"each element of field1 must be greater than or equal to zzz OR size of each element of field1 must be equal to 100");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1.ALL");
+    ra1.reset();
     rep1.clear();
 
     std::map<size_t,std::string> m2={
@@ -183,11 +214,16 @@ BOOST_AUTO_TEST_CASE(CheckAggregationAllReport)
         }
     };
     auto ra4=make_reporting_adapter(m4,rep1);
+    const auto& members4=ra4.traits().reporter().failed_members();
     auto v8=validator(
                 _[5](ALL(size(gte,1) ^AND^ ALL(value(lt,50))))
             );
     BOOST_CHECK(!v8.apply(ra4));
     BOOST_CHECK_EQUAL(rep1,"each element of each element of element #5 must be less than 50");
+    BOOST_REQUIRE(!members4.empty());
+    BOOST_CHECK_EQUAL(members4.size(),1);
+    BOOST_CHECK_EQUAL(members4[0],"5.ALL.ALL");
+    ra1.reset();
     rep1.clear();
 }
 

@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <hatn/validator/adapters/impl/default_adapter_impl.hpp>
 #include <hatn/validator/aggregation/any.hpp>
 #include <hatn/validator/aggregation/all.hpp>
+#include <hatn/validator/utils/has_reset.hpp>
 
 HATN_VALIDATOR_NAMESPACE_BEGIN
 
@@ -62,6 +63,22 @@ class reporting_adapter_impl : public reporting_adapter_tag
         auto& next_adapter_impl()
         {
             return _next_adapter_impl;
+        }
+
+        void reset()
+        {
+            _reporter.reset();
+
+            auto self=this;
+            hana::eval_if(
+                has_reset(hana::template type_c<NextAdapterImplT>),
+                [&](auto _)
+                {
+                    _(self)->_next_adapter_impl.reset();
+                },
+                [](auto)
+                {}
+            );
         }
 
         template <typename AdapterT, typename T2, typename OpT>

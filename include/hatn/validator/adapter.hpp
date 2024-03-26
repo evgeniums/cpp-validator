@@ -25,6 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <hatn/validator/check_member_exists_traits_proxy.hpp>
 #include <hatn/validator/embedded_object.hpp>
 #include <hatn/validator/apply.hpp>
+#include <hatn/validator/utils/has_reset.hpp>
 #include <hatn/validator/adapters/make_intermediate_adapter.hpp>
 
 HATN_VALIDATOR_NAMESPACE_BEGIN
@@ -164,6 +165,20 @@ class adapter : public check_member_exists_traits_proxy<adapter<TraitsT>>
         const TraitsT& traits() const noexcept
         {
             return _traits;
+        }
+
+        void reset()
+        {
+            auto self=this;
+            hana::eval_if(
+                has_reset(hana::template type_c<TraitsT>),
+                [&](auto _)
+                {
+                    _(self)->_traits.reset();
+                },
+                [](auto)
+                {}
+            );
         }
 
         /**

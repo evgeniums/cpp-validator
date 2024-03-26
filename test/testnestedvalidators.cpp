@@ -10,7 +10,6 @@ using namespace HATN_VALIDATOR_NAMESPACE;
 
 BOOST_AUTO_TEST_SUITE(TestNestedValidators)
 
-#if 1
 BOOST_AUTO_TEST_CASE(TestWithoutMember)
 {
     auto v1=validator(
@@ -103,6 +102,7 @@ BOOST_AUTO_TEST_CASE(TestMemberWithReport)
     BOOST_CHECK(v2.apply(m1));
 
     auto a1=make_reporting_adapter(m1,rep);
+    const auto& members=a1.traits().reporter().failed_members();
     auto v3=validator(
         _["level2"](exists,false)
     );
@@ -111,6 +111,10 @@ BOOST_AUTO_TEST_CASE(TestMemberWithReport)
     );
     BOOST_CHECK(!v4.apply(a1));
     BOOST_CHECK_EQUAL(rep,std::string("level2 of level1 must not exist"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"level1.level2");
+    a1.reset();
     rep.clear();
 
     // custom member names in reports with nested validators
@@ -122,6 +126,10 @@ BOOST_AUTO_TEST_CASE(TestMemberWithReport)
     );
     BOOST_CHECK(!v6.apply(a1));
     BOOST_CHECK_EQUAL(rep,std::string("name2 of name1 must not exist"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"level1.level2");
+    a1.reset();
     rep.clear();
 
     auto v7=validator(
@@ -132,6 +140,10 @@ BOOST_AUTO_TEST_CASE(TestMemberWithReport)
     );
     BOOST_CHECK(!v8.apply(a1));
     BOOST_CHECK_EQUAL(rep,std::string("level2 of name1 must not exist"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"level1.level2");
+    a1.reset();
     rep.clear();
 
     auto v9=validator(
@@ -142,12 +154,13 @@ BOOST_AUTO_TEST_CASE(TestMemberWithReport)
     );
     BOOST_CHECK(!v10.apply(a1));
     BOOST_CHECK_EQUAL(rep,std::string("name2 of level1 must not exist"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"level1.level2");
+    a1.reset();
     rep.clear();
 
 }
-#endif
-
-#if 1
 
 BOOST_AUTO_TEST_CASE(TestPropertyOfMemberWithHint)
 {
@@ -156,6 +169,7 @@ BOOST_AUTO_TEST_CASE(TestPropertyOfMemberWithHint)
         {"level1",{"level2"}}
     };
     auto a1=make_reporting_adapter(m1,rep);
+    const auto& members=a1.traits().reporter().failed_members();
 
     auto v1=validator(
         _["level2"]("name2")(size(gt,10))
@@ -165,6 +179,10 @@ BOOST_AUTO_TEST_CASE(TestPropertyOfMemberWithHint)
     );
     BOOST_CHECK(!v2.apply(a1));
     BOOST_CHECK_EQUAL(rep,std::string("size of name2 of name1 must be greater than 10"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"level1.level2");
+    a1.reset();
     rep.clear();
 
     auto v3=validator(
@@ -182,11 +200,13 @@ BOOST_AUTO_TEST_CASE(TestPropertyOfMemberWithHint)
     );
     BOOST_CHECK(!v5.apply(a1));
     BOOST_CHECK_EQUAL(rep,std::string("size of level2 of name1 must be greater than 10"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"level1.level2");
+    a1.reset();
     rep.clear();
 }
-#endif
 
-#if 1
 BOOST_AUTO_TEST_CASE(TestAggregationWithReport)
 {
     std::string rep;
@@ -204,6 +224,8 @@ BOOST_AUTO_TEST_CASE(TestAggregationWithReport)
     BOOST_CHECK(v2.apply(m1));
 
     auto a1=make_reporting_adapter(m1,rep);
+    const auto& members=a1.traits().reporter().failed_members();
+
     auto v3=validator(
         _["level2"](exists,false)
     );
@@ -212,6 +234,10 @@ BOOST_AUTO_TEST_CASE(TestAggregationWithReport)
     );
     BOOST_CHECK(!v4.apply(a1));
     BOOST_CHECK_EQUAL(rep,std::string("level2 of each element must not exist"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"ALL.level2");
+    a1.reset();
     rep.clear();
 
     auto v5=validator(
@@ -226,9 +252,15 @@ BOOST_AUTO_TEST_CASE(TestAggregationWithReport)
         {"level1",{"level2_1"}}
     };
     auto a2=make_reporting_adapter(m2,rep);
+    const auto& members2=a2.traits().reporter().failed_members();
+
     BOOST_CHECK(!v6.apply(a2));
     BOOST_CHECK_EQUAL(rep,std::string("each element of level1 must be equal to level2"));
+    BOOST_REQUIRE(!members2.empty());
+    BOOST_CHECK_EQUAL(members2.size(),1);
+    BOOST_CHECK_EQUAL(members2[0],"level1.ALL");
+    a1.reset();
     rep.clear();
 }
-#endif
+
 BOOST_AUTO_TEST_SUITE_END()

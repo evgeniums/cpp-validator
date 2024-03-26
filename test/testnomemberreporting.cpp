@@ -17,18 +17,26 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberIgnoreReport)
     std::string rep1;
     auto ra1=make_reporting_adapter(m1,rep1);
     ra1.set_check_member_exists_before_validation(true);
+    const auto& reporter=ra1.traits().reporter();
+    const auto& members=reporter.failed_members();
+    BOOST_CHECK(members.empty());
+    BOOST_CHECK_EQUAL(members.size(),0);
 
     auto v1=validator(
                 _["field1"](gte,9),
                 _["field2"](eq,100)
             );
     BOOST_CHECK(v1.apply(ra1));
+    BOOST_CHECK(members.empty());
+    BOOST_CHECK_EQUAL(members.size(),0);
+    ra1.reset();
     rep1.clear();
 
     auto v2=validator(
                 _["field2"](gt,100)
             );
     BOOST_CHECK(v2.apply(ra1));
+    ra1.reset();
     rep1.clear();
 
     auto v3=validator(
@@ -36,12 +44,19 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberIgnoreReport)
             );
     BOOST_CHECK(!v3.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"field1 must be equal to 20");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     auto v4=validator(
                 _["field2"](value(gt,100) ^OR^ value(eq,20))
             );
     BOOST_CHECK(v4.apply(ra1));
+    BOOST_CHECK(members.empty());
+    BOOST_CHECK_EQUAL(members.size(),0);
+    ra1.reset();
     rep1.clear();
 
     auto v5=validator(
@@ -49,6 +64,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberIgnoreReport)
                 _["field1"](gte,9)
             );
     BOOST_CHECK(v5.apply(ra1));
+    ra1.reset();
     rep1.clear();
 
     auto v6=validator(
@@ -57,6 +73,10 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberIgnoreReport)
             );
     BOOST_CHECK(!v6.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"field1 must be greater than or equal to 100");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 }
 
@@ -70,6 +90,7 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberAbortReport)
     auto ra1=make_reporting_adapter(m1,rep1);
     ra1.set_check_member_exists_before_validation(true);
     ra1.set_unknown_member_mode(if_member_not_found::abort);
+    const auto& members=ra1.traits().reporter().failed_members();
 
     auto v1=validator(
                 _["field1"](gte,9),
@@ -77,6 +98,10 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberAbortReport)
             );
     BOOST_CHECK(!v1.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"field2 must exist");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field2");
+    ra1.reset();
     rep1.clear();
 
     auto v2=validator(
@@ -84,6 +109,10 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberAbortReport)
             );
     BOOST_CHECK(!v2.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"field2 must exist");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field2");
+    ra1.reset();
     rep1.clear();
 
     auto v3=validator(
@@ -91,6 +120,11 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberAbortReport)
             );
     BOOST_CHECK(!v3.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"field2 must exist OR field1 must be equal to 20");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),2);
+    BOOST_CHECK_EQUAL(members[0],"field2");
+    BOOST_CHECK_EQUAL(members[1],"field1");
+    ra1.reset();
     rep1.clear();
 
     auto v4=validator(
@@ -98,6 +132,10 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberAbortReport)
             );
     BOOST_CHECK(!v4.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"field2 must exist");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field2");
+    ra1.reset();
     rep1.clear();
 
     auto v5=validator(
@@ -106,6 +144,10 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberAbortReport)
             );
     BOOST_CHECK(!v5.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"field2 must exist");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field2");
+    ra1.reset();
     rep1.clear();
 
     auto v6=validator(
@@ -114,6 +156,10 @@ BOOST_AUTO_TEST_CASE(CheckNotExistingMemberAbortReport)
             );
     BOOST_CHECK(!v6.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,"field2 must exist");
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field2");
+    ra1.reset();
     rep1.clear();
 }
 

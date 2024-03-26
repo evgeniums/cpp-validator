@@ -81,6 +81,11 @@ struct wrap_it_t : public AggregationT::type,
         );
     }
 
+    const auto& aggregation() const
+    {
+        return _aggregation_type;
+    }
+
     /**
      * @brief Get iterator name.
      * @return Iterator name to use in report.

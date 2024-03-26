@@ -33,12 +33,17 @@ BOOST_AUTO_TEST_CASE(CheckCustomDescriptions)
     std::string rep1;
     std::vector<size_t> vec1={10,20,30,40,50};
     auto ra1=make_reporting_adapter(vec1,rep1);
+    const auto& members=ra1.traits().reporter().failed_members();
 
     auto v1=validator(
                 _[1](gte,_(100,"one hundred"))
             );
     BOOST_CHECK(!v1.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("element #1 must be greater than or equal to one hundred"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"1");
+    ra1.reset();
     rep1.clear();
 
     auto v2=validator(
@@ -46,6 +51,10 @@ BOOST_AUTO_TEST_CASE(CheckCustomDescriptions)
             );
     BOOST_CHECK(!v2.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("first element must be greater than or equal to one hundred"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"1");
+    ra1.reset();
     rep1.clear();
 
     auto v3=validator(
@@ -53,6 +62,10 @@ BOOST_AUTO_TEST_CASE(CheckCustomDescriptions)
             );
     BOOST_CHECK(!v3.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("first element must be not less than one hundred"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"1");
+    ra1.reset();
     rep1.clear();
 
     auto v4=validator(
@@ -64,6 +77,10 @@ BOOST_AUTO_TEST_CASE(CheckCustomDescriptions)
             );
     BOOST_CHECK(!v4.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("first element must be not less than one hundred OR first element must be the same as one"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"1");
+    ra1.reset();
     rep1.clear();
 
     auto v5=validator(
@@ -75,6 +92,10 @@ BOOST_AUTO_TEST_CASE(CheckCustomDescriptions)
             );
     BOOST_CHECK(!v5.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("first element must be less than five OR first element must not be the same as twenty"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"1");
+    ra1.reset();
     rep1.clear();
 
     auto v6=validator(
@@ -104,6 +125,10 @@ BOOST_AUTO_TEST_CASE(CheckCustomDescriptions)
             );
     BOOST_CHECK(!v8.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("first element must be less than five OR first element must be not equal to twenty"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"1");
+    ra1.reset();
     rep1.clear();
 
     auto v9=validator(
@@ -115,6 +140,10 @@ BOOST_AUTO_TEST_CASE(CheckCustomDescriptions)
             );
     BOOST_CHECK(!v9.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("first element must be greater than or equal to five thousands OR first element must be equal to two hundreds"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"1");
+    ra1.reset();
     rep1.clear();
 }
 
@@ -123,12 +152,17 @@ BOOST_AUTO_TEST_CASE(CheckExplicitValidationReport)
     std::map<std::string,size_t> m1={{"field1",1}};
     std::string rep1;
     auto ra1=make_reporting_adapter(m1,rep1);
+    const auto& members=ra1.traits().reporter().failed_members();
 
     auto v1=validator(
                 _["field1"](gte,10)
             )("Explicit description");
     BOOST_CHECK(!v1.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("Explicit description"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     auto v1_1=validator(
@@ -136,6 +170,10 @@ BOOST_AUTO_TEST_CASE(CheckExplicitValidationReport)
             ).hint("Explicit description");
     BOOST_CHECK(!v1_1.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("Explicit description"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     auto v2=validator(
@@ -143,6 +181,10 @@ BOOST_AUTO_TEST_CASE(CheckExplicitValidationReport)
             );
     BOOST_CHECK(!v2.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("Explicit description"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     auto v3=validator(
@@ -152,6 +194,10 @@ BOOST_AUTO_TEST_CASE(CheckExplicitValidationReport)
             );
     BOOST_CHECK(!v3.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("Explicit description 1 OR Explicit description 2"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     auto v4=validator(
@@ -161,6 +207,10 @@ BOOST_AUTO_TEST_CASE(CheckExplicitValidationReport)
             )("Explicit description");
     BOOST_CHECK(!v4.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("Explicit description"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     auto v5=validator(
@@ -170,10 +220,15 @@ BOOST_AUTO_TEST_CASE(CheckExplicitValidationReport)
             );
     BOOST_CHECK(!v5.apply(ra1));
     BOOST_CHECK_EQUAL(rep1,std::string("Explicit description 1 OR Explicit description 2"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
     rep1.clear();
 
     std::map<std::string,std::vector<size_t>> m2={{"field1",{1,2,3,4,5}}};
     auto ra2=make_reporting_adapter(m2,rep1);
+    const auto& members2=ra2.traits().reporter().failed_members();
     auto v6=validator(
                 _["field1"](ANY(value(gte,10) ^OR^ value(eq,15)))("Explicit description 1")
                 ^OR^
@@ -181,6 +236,11 @@ BOOST_AUTO_TEST_CASE(CheckExplicitValidationReport)
             );
     BOOST_CHECK(!v6.apply(ra2));
     BOOST_CHECK_EQUAL(rep1,std::string("Explicit description 1 OR Explicit description 2"));
+    BOOST_REQUIRE(!members2.empty());
+    BOOST_CHECK_EQUAL(members2.size(),2);
+    BOOST_CHECK_EQUAL(members2[0],"field1.ANY");
+    BOOST_CHECK_EQUAL(members2[1],"field1");
+    ra2.reset();
     rep1.clear();
 
     auto a3=make_default_adapter(m2);

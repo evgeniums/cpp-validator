@@ -12,6 +12,8 @@
 #include <hatn/validator/reporting/quotes_decorator.hpp>
 #include <hatn/validator/utils/reference_wrapper.hpp>
 #include <hatn/validator/validator.hpp>
+#include <hatn/validator/reporting/dotted_member_names.hpp>
+#include <hatn/validator/reporting/original_member_names.hpp>
 
 using namespace HATN_VALIDATOR_NAMESPACE;
 
@@ -123,6 +125,15 @@ BOOST_AUTO_TEST_CASE(CheckTranslatedStrings)
     translator_env env;
     auto strings=env.strings();
     env.check(strings,true);
+}
+
+BOOST_AUTO_TEST_CASE(CheckSingleMemberName)
+{
+    auto m1=_["key1"];
+
+    const auto& mn=get_default_member_names();
+    auto s1=single_member_name(m1,mn);
+    BOOST_CHECK_EQUAL(std::string(s1),"key1");
 }
 
 BOOST_AUTO_TEST_CASE(CheckMemberNames)
@@ -325,6 +336,15 @@ BOOST_AUTO_TEST_CASE(CheckNestedMember)
 
     std::string str6=dotted_member_names(member3);
     BOOST_CHECK_EQUAL(str6,std::string("[field1].[field2].[size]"));
+
+    std::string str7=original_member_names(member1);
+    BOOST_CHECK_EQUAL(str7,std::string("[field1]"));
+
+    std::string str8=original_member_names(member2);
+    BOOST_CHECK_EQUAL(str8,std::string("[field1][field2]"));
+
+    std::string str9=original_member_names(member3);
+    BOOST_CHECK_EQUAL(str9,std::string("[field1][field2][size]"));
 }
 
 BOOST_AUTO_TEST_CASE(CheckExplicitMemberName)
