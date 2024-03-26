@@ -91,8 +91,6 @@ struct TestStruct
 
 BOOST_AUTO_TEST_SUITE(TestVariadicProperty)
 
-#if 1
-
 BOOST_AUTO_TEST_CASE(TestArgs)
 {
     TestStruct ts1;
@@ -250,7 +248,7 @@ BOOST_AUTO_TEST_CASE(TestCheckExistsWithOptional)
 
     BOOST_CHECK(!check_exists(m1,hana::make_tuple("key1",10,20)));
 }
-#endif
+
 namespace {
 
 struct WithChild
@@ -340,7 +338,7 @@ HATN_VALIDATOR_PROPERTY(max_a)
 HATN_VALIDATOR_PROPERTY(max_b)
 
 }
-#if 1
+
 BOOST_AUTO_TEST_CASE(TestPropertyAlwaysExistArg1)
 {
     static_assert(has_property<WithChild,decltype(child)>(),"");
@@ -530,6 +528,7 @@ BOOST_AUTO_TEST_CASE(TestFlag)
     std::vector<WithChild> vec7;
     vec7.resize(10);
     auto ra7=make_reporting_adapter(vec7,rep);
+    const auto& members7=ra7.traits().reporter().failed_members();
 
     auto v7=validator(
         _[5](sum_gte_10(12,7)(flag,false))
@@ -571,6 +570,10 @@ BOOST_AUTO_TEST_CASE(TestFlag)
     );
     BOOST_CHECK(!v11.apply(ra7));
     BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(12,7) of element #5 must be unset"));
+    BOOST_REQUIRE(!members7.empty());
+    BOOST_CHECK_EQUAL(members7.size(),1);
+    BOOST_CHECK_EQUAL(members7[0],"5");
+    ra7.reset();
     rep.clear();
 }
 
@@ -627,7 +630,7 @@ BOOST_AUTO_TEST_CASE(TestCompactVariadicProperty)
     BOOST_CHECK_EQUAL(rep,std::string("\"sum_gte_10(12,7)\" of \"element #5\" must be equal to false"));
     rep.clear();
 }
-#endif
+
 BOOST_AUTO_TEST_CASE(TestAllAny)
 {
     WithChild o1;
@@ -747,16 +750,21 @@ BOOST_AUTO_TEST_CASE(TestAllAny)
     BOOST_CHECK_EQUAL(rep,std::string("ever every translated_child must be greater than or equal to 5"));
     rep.clear();
 }
-#if 1
+
 BOOST_AUTO_TEST_CASE(TestAllAnyMultiArg)
 {
     WithChild o1;
     std::string rep;
     auto a1=make_reporting_adapter(o1,rep);
+    const auto& members=a1.traits().reporter().failed_members();
 
     auto v1=_[sum_gte_10][varg(ALL,max_a)][varg(ALL,max_b)](eq,true);
     BOOST_CHECK(!v1.apply(a1));
     BOOST_CHECK_EQUAL(rep,std::string("sum_gte_10(ALL,ALL) must be equal to true"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"sum_gte_10(ALL,ALL)");
+    a1.reset();
     rep.clear();
 
     auto v2=_[sum_gte_10][varg(ANY,max_a)][varg(ANY,max_b)](eq,true);
@@ -798,7 +806,5 @@ BOOST_AUTO_TEST_CASE(TestAllAnyMultiArg)
     BOOST_CHECK(v11.apply(a1));
     rep.clear();
 }
-
-#endif
 
 BOOST_AUTO_TEST_SUITE_END()
