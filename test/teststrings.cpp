@@ -329,13 +329,13 @@ BOOST_AUTO_TEST_CASE(CheckNestedMember)
     BOOST_CHECK_EQUAL(str3,std::string("size of field2 of field1"));
 
     std::string str4=dotted_member_names(member1);
-    BOOST_CHECK_EQUAL(str4,std::string("[field1]"));
+    BOOST_CHECK_EQUAL(str4,std::string("field1"));
 
     std::string str5=dotted_member_names(member2);
-    BOOST_CHECK_EQUAL(str5,std::string("[field1].[field2]"));
+    BOOST_CHECK_EQUAL(str5,std::string("field1.field2"));
 
     std::string str6=dotted_member_names(member3);
-    BOOST_CHECK_EQUAL(str6,std::string("[field1].[field2].[size]"));
+    BOOST_CHECK_EQUAL(str6,std::string("field1.field2.size"));
 
     std::string str7=original_member_names(member1);
     BOOST_CHECK_EQUAL(str7,std::string("[field1]"));
