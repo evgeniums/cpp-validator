@@ -170,6 +170,16 @@ BOOST_AUTO_TEST_CASE(TestNestedAll)
     }};
     BOOST_CHECK(!v3.apply(m5));
 
+    auto ra5=make_reporting_adapter(m5,rep);
+    const auto& members=ra5.traits().reporter().failed_members();
+
+    BOOST_CHECK(!v3.apply(ra5));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"level1.ALL.level3.ALL");
+    ra5.reset();
+    rep.clear();
+
     std::map<std::string,
              std::map<std::string,
                       std::map<std::string,std::set<std::string>>
@@ -532,11 +542,22 @@ BOOST_AUTO_TEST_CASE(TestAllWithModifiers)
         {"key","val3"}
     };
 
+    std::string rep;
+    auto ra2=make_reporting_adapter(m2,rep);
+    const auto& members=ra2.traits().reporter().failed_members();
+
     auto v1=validator(
         _[ALL(keys)](gt,"key")
     );
     BOOST_CHECK(v1.apply(m1));
     BOOST_CHECK(!v1.apply(m2));
+
+    BOOST_CHECK(!v1.apply(ra2));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"ALL(keys)");
+    ra2.reset();
+    rep.clear();
 
     auto v2=validator(
         _[ALL(values)](gt,"value")
@@ -559,7 +580,6 @@ BOOST_AUTO_TEST_CASE(TestAllWithModifiers)
     );
     BOOST_CHECK(v4.apply(m1));
     BOOST_CHECK(!v4.apply(m2));
-
     static_assert(std::is_base_of<all_tag,decltype(ALL(iterators))>::value,"");
 
     auto v5=validator(
@@ -573,6 +593,14 @@ BOOST_AUTO_TEST_CASE(TestAllWithModifiers)
     );
     BOOST_CHECK(v6.apply(m1));
     BOOST_CHECK(!v6.apply(m2));
+
+    BOOST_CHECK(!v6.apply(ra2));
+    BOOST_CHECK_EQUAL(rep,std::string("second of each iterator must be greater than value"));
+    BOOST_REQUIRE(!members.empty());
+    BOOST_CHECK_EQUAL(members.size(),1);
+    BOOST_CHECK_EQUAL(members[0],"ALL(iterators).second");
+    ra2.reset();
+    rep.clear();
 }
 
 BOOST_AUTO_TEST_CASE(TestAnyWithModifiers)

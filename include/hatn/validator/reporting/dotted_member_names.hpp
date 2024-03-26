@@ -19,6 +19,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef HATN_VALIDATOR_DOTTED_MEMBER_NAMES_HPP
 #define HATN_VALIDATOR_DOTTED_MEMBER_NAMES_HPP
 
+#include <hatn/validator/reporting/backend_formatter.hpp>
 #include <hatn/validator/reporting/member_names.hpp>
 
 HATN_VALIDATOR_NAMESPACE_BEGIN
@@ -51,10 +52,40 @@ struct dotted_member_names_traits_t
         return std::to_string(index);
     }
 
-    template <typename T>
-    std::string format_aggregation(const T& aggregation) const
+    template <typename AggregationT, typename ModifierT>
+    std::string format_aggregation(const AggregationT& aggregation, ModifierT&&) const
     {
-        return std::string(aggregation.name);
+        return hana::eval_if(
+            std::is_same<std::decay_t<ModifierT>,keys_t>{},
+            [&](auto _)
+            {
+                std::string str;
+                backend_formatter.append(str,_(aggregation).name,"(keys)");
+                return str;
+            },
+            [&](auto _)
+            {
+                return hana::eval_if(
+                    std::is_same<std::decay_t<ModifierT>,iterators_t>{},
+                    [&](auto _)
+                    {
+                        std::string str;
+                        backend_formatter.append(str,_(aggregation).name,"(iterators)");
+                        return str;
+                    },
+                    [&](auto _)
+                    {
+                        return std::string(_(aggregation).name);
+                    }
+                );
+            }
+        );
+    }
+
+    template <typename T>
+    std::string format_tree(T&& tree) const
+    {
+        return tree.member_name();
     }
 
     /**

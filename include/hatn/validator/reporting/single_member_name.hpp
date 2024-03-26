@@ -122,14 +122,31 @@ struct single_member_name_t<T,TraitsT,hana::when<
                                         decltype(hana::is_a<wrap_iterator_tag,T>)::value
                                         &&
                                         std::is_same<
-                                            decltype((void)std::declval<TraitsT>().format_aggregation(std::declval<T>().aggregation())),
+                                            decltype((void)std::declval<TraitsT>().format_aggregation(std::declval<T>().aggregation(),std::declval<T>().modifier())),
                                             void
                                         >::value
                             >>
 {
     auto operator() (const T& id, const TraitsT& traits, grammar_categories grammar_cats) const -> decltype(auto)
     {
-        return decorate(traits,translate(traits,traits.format_aggregation(unwrap_object(id).aggregation()),grammar_cats));
+        auto&& arg=unwrap_object(id);
+        return decorate(traits,translate(traits,traits.format_aggregation(arg.aggregation(),arg.modifier()),grammar_cats));
+    }
+};
+
+template <typename T, typename TraitsT>
+struct single_member_name_t<T,TraitsT,hana::when<
+                                            decltype(hana::is_a<tree_tag,T>)::value
+                                            &&
+                                            std::is_same<
+                                                decltype((void)std::declval<TraitsT>().format_tree(std::declval<T>())),
+                                                void
+                                                >::value
+                                            >>
+{
+    auto operator() (const T& id, const TraitsT& traits, grammar_categories grammar_cats) const -> decltype(auto)
+    {
+        return decorate(traits,translate(traits,traits.format_tree(unwrap_object(id)),grammar_cats));
     }
 };
 

@@ -86,12 +86,14 @@ BOOST_AUTO_TEST_CASE(CheckTreeAll)
     const auto& members=ra1.traits().reporter().failed_members();
 
     tr1.mutable_child(2)->add_child(std::make_shared<TreeNode>("0.2.1"));
+
     BOOST_CHECK(!v1.apply(ra1));
     BOOST_CHECK_EQUAL(rep,std::string("name of each tree node must be greater than or equal to Node"));
     BOOST_REQUIRE(!members.empty());
     BOOST_CHECK_EQUAL(members.size(),1);
-    BOOST_CHECK_EQUAL(members[0],"tree.ALL");
+    BOOST_CHECK_EQUAL(members[0],"tree(ALL,child,child_count).name");
     ra1.reset();
+    rep.clear();
 }
 
 BOOST_AUTO_TEST_CASE(CheckTreeAny)

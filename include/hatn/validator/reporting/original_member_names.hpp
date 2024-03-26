@@ -19,7 +19,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef HATN_VALIDATOR_ORIGINAL_MEMBER_NAMES_HPP
 #define HATN_VALIDATOR_ORIGINAL_MEMBER_NAMES_HPP
 
-#include <hatn/validator/reporting/member_names.hpp>
+#include <hatn/validator/reporting/dotted_member_names.hpp>
 
 HATN_VALIDATOR_NAMESPACE_BEGIN
 
@@ -30,7 +30,7 @@ HATN_VALIDATOR_NAMESPACE_BEGIN
  *
  * For example: ["field1"]["subfield1_1"]["subfield1_1_1"] will be formatted as [field1][subfield1_1][subfield1_1_1]
  */
-struct original_member_names_traits_t
+struct original_member_names_traits_t : public dotted_member_names_traits_t
 {
     /**
      * @brief Get string for conjunction of nested member names.
@@ -45,34 +45,6 @@ struct original_member_names_traits_t
     {
         return "";
     }
-
-    std::string operator ()(size_t index) const
-    {
-        return std::to_string(index);
-    }
-
-    template <typename T>
-    std::string format_aggregation(const T& aggregation) const
-    {
-        return std::string(aggregation.name);
-    }
-
-    /**
-     * @brief Check if nested memebr names must be joined in reverse order.
-     */
-    constexpr static const bool is_reverse_member_names_order=false;
-
-    /**
-     * @brief Check if property of a memebr must be joined in reverse order.
-     */
-    constexpr static const bool is_reverse_member_property_order=false;
-
-    /**
-     * @brief Check if explicit names can be used.
-     *
-     * Default is allowed.
-     */
-    constexpr static const bool is_allow_explicit_member_names=false;
 
     brackets_decorator_t decorator;
 };

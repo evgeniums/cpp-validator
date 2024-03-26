@@ -25,6 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <hatn/validator/variadic_arg.hpp>
 #include <hatn/validator/adapters/make_intermediate_adapter.hpp>
 #include <hatn/validator/aggregation/aggregation.ipp>
+#include <hatn/validator/reporting/backend_formatter.hpp>
 
 HATN_VALIDATOR_NAMESPACE_BEGIN
 
@@ -33,7 +34,10 @@ HATN_VALIDATOR_NAMESPACE_BEGIN
 /**
  * @brief Base struct for tree aggregations.
  */
-struct tree_base{};
+struct tree_base
+{
+    constexpr static const char* name="tree";
+};
 /**
  * @brief Tag for tree aggregations.
  */
@@ -48,6 +52,8 @@ struct tree_t : public adjust_storable_ignore,
 {
     using hana_tag=tree_tag;
 
+    static_assert(decltype(hana::is_a<property_tag,MaxArgT>)::value,"Second argument of tree node must be a property");
+
     AggregationT _aggregation;
     PropertyT property;
     MaxArgT max_arg;
@@ -61,9 +67,25 @@ struct tree_t : public adjust_storable_ignore,
         return _aggregation.string()(*this);
     }
 
+    /**
+     * @brief Member name of the tree aggregation to use in failed members collecting.
+     * @return String description.
+     */
+    std::string member_name() const
+    {
+        std::string str;
+        backend_formatter.append(str,tree_base::name,"(",_aggregation.string().name,",",property.name(),",",max_arg.name(),")");
+        return str;
+    }
+
     const auto& aggregation() const
     {
         return _aggregation;
+    }
+
+    int modifier() const
+    {
+        return 0;
     }
 
     /**

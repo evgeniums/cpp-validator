@@ -63,12 +63,14 @@ struct string_any_t : public aggregate_op<string_any_t>,
     constexpr static const char* conjunction_token="";
 
     constexpr static const char* name="ANY";
+
     constexpr static const char* base_phrase="at least one";
 
     constexpr static const char* description="at least one element";
     constexpr static const char* iterator_description="at least one iterator";
     constexpr static const char* key_description="at least one key";
     constexpr static const char* tree_description="at least one tree node";
+
 
     constexpr static const char* name_str()
     {
