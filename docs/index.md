@@ -2601,6 +2601,52 @@ return 0;
 
 *Reporting adapter* supports implicit check of [member existence](#member-existence).
 
+### Getting list of failed members
+
+Reporting adapter constructs a list of failed members. Note that adapter stops validation when it finds the first error, therefore in most cases the list of failed members would contain only one member. The list can contain more members only if validator includes [OR](#or) condition involving a few members. Method `const std<vector>& failed_members() const` of reporter of reporting adapter traits is used to access the list of failed members. See example below.
+
+```cpp
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/reporting_adapter.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
+
+int main()
+{
+
+auto v=validator(
+    ["key1"]["key1_1"](gt,100),
+    ["key2"]["key2_1"](lte,1000)
+);
+                
+std::string report;
+std::map<std::string,std::map<std::string,int>> m{
+    {
+        "key1",
+        {{"key1_1",10}}
+    },
+    {
+        "key2",
+        {{"key2_1",100}}
+    }
+};
+auto ra=make_reporting_adapter(m,report);
+
+if (!v.apply(ra))
+{
+    std::cerr << report << std::endl;
+    /* prints:
+    "key1_1 of key1 must be greater than 100"
+    */
+}
+const std::vector<std::string>& failed_members=ra.traits().reporter().failed_members();
+
+assert(failed_members.size()==1);
+assert(failed_members[0]==std::string("key1.key1_1"));
+
+return 0;
+}
+```
+
 ### Customization of reports
 
 [Reports](#report) can be customized with help of custom [reporters](#reporter) that are given to adapters supporting [reports](#reports) construction.
@@ -2671,7 +2717,12 @@ To use [fmt](https://github.com/fmtlib/fmt) for strings formatting define `HATN_
 
 Default implementation of *member names formatter* joins member names in reverse order using *of* conjunctive, e.g. `["field1"]["subfield1_1"]["subfield1_1_1"]` will be formatted as "*subfield1_1_1 of subfield1_1 of field1*". Default member names formatter can be obtained with `get_default_member_names()`.
 
-There is also `dotted_member_names` formatter that displays member names similar to their declaration, e.g. `["field1"]["subfield1_1"]["subfield1_1_1"]` will be formatted as "*[field1].[subfield1_1].[subfield1_1_1]*".
+There are two more additional formatters of member names built-in the validator library:
+
+* `dotted_member_names` formatter that displays member names in direct order joined with period (.), e.g. `["field1"]["subfield1_1"]["subfield1_1_1"]` will be formatted as `"field1.subfield1_1.subfield1_1_1"`;
+
+* `original_member_names` formatter that displays member names similar to their declaration, e.g. `["field1"]["subfield1_1"]["subfield1_1_1"]` will be formatted as `"[field1][subfield1_1][subfield1_1_1]"`.
+
 
 If [localization](#localization) of member names must be supported then original *member names formatter* must be wrapped with *locale-aware member names formatter* using one of `make_translated_member_names()` helpers.
 
