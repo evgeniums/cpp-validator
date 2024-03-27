@@ -43,14 +43,14 @@ HATN_VALIDATOR_NAMESPACE_BEGIN
  * A translator should be added to the repository with the full list of all forms of locale names
  * this translator is suitable for. See example below.
 
-\code{.cpp}
+@code{.cpp}
 
   // translator_en_us will be used for all "en_US" locales as well as for generic "en" language
   repository.add_translator(translator_en_us,{"en","en_US","en_US.UTF-8"});
   // translator_en_gb will be used for all "en_GB" locales but for the generic "en" language the translator_en_us will be used
   repository.add_translator(translator_en_gb,{"en_GB","en_GB.UTF-8"});
 
-\endcode
+@endcode
 
  */
 class translator_repository
