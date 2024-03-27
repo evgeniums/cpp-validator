@@ -66,6 +66,16 @@ auto make_member(Ts&& path)
 }
 
 /**
+ * @brief Make member from keys.
+ * @param keys Keys of the nested path.
+ */
+template <typename ...Ts>
+auto path(Ts&& ...keys)
+{
+    return make_member(hana::make_tuple(std::forward<Ts>(keys)...));
+}
+
+/**
  * @brief Make new member inherting given member.
  * @param path Path of new member.
  * @param member Member to inherit from.

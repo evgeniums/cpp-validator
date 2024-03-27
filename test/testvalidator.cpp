@@ -392,15 +392,31 @@ BOOST_AUTO_TEST_CASE(CheckNestedValidation)
             );
     BOOST_CHECK(v1.apply(a1));
 
+    auto v1_1=validator(
+        path(size)(gte,0),
+        path("field1",1)(gte,10)
+        );
+    BOOST_CHECK(v1_1.apply(a1));
+
     auto v2=validator(
                 _["field1"][1](lt,5)
             );
     BOOST_CHECK(!v2.apply(a1));
 
+    auto v2_1=validator(
+        path("field1",1)(lt,5)
+        );
+    BOOST_CHECK(!v2_1.apply(a1));
+
     auto v3=validator(
                 _[100](lt,5)
             );
     BOOST_CHECK(v3.apply(a1));
+
+    auto v3_1=validator(
+        path(100)(lt,5)
+        );
+    BOOST_CHECK(v3_1.apply(a1));
 }
 
 BOOST_AUTO_TEST_CASE(CheckOtherField)
