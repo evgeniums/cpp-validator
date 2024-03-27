@@ -583,11 +583,66 @@ BOOST_AUTO_TEST_CASE(CheckContainsValidationReport)
     auto v2=validator(
                 _["field1"](contains,30)
             );
-    BOOST_CHECK(!v2.apply(ra2));
+    auto ret=v2.apply(ra2);
+    BOOST_CHECK(!ret);
+    BOOST_CHECK(ret.fail());
     BOOST_CHECK_EQUAL(rep1,std::string("field1 must contain element #30"));
     BOOST_REQUIRE(!members.empty());
     BOOST_CHECK_EQUAL(members.size(),1);
     BOOST_CHECK_EQUAL(members[0],"field1");
+    ra1.reset();
+    rep1.clear();
+}
+
+BOOST_AUTO_TEST_CASE(CheckCollectAllFailedMembers)
+{
+    std::string rep1;
+
+    std::map<std::string,size_t> m1={
+        {"field1",1},
+        {"field2",2},
+        {"field3",3},
+        {"field4",4}
+    };
+
+    auto ra1=make_collect_failed_members_adapter(m1,rep1);
+    const auto& members1=ra1.traits().reporter().failed_members();
+
+    auto v0=validator(
+        _["field1"](eq,1),
+        _["field4"](lt,5)
+        );
+    auto ret=v0.apply(ra1);
+    BOOST_CHECK_EQUAL(int(ret.value()),int(status::code::success));
+    BOOST_CHECK(ret.success());
+    ra1.reset();
+
+    auto v1=validator(
+            _["field1"](eq,10),
+            _["field4"](gte,5)
+        );
+    ret=v1.apply(ra1);
+    BOOST_CHECK_EQUAL(int(ret.value()),int(status::code::ignore));
+    BOOST_CHECK(ret.ignore());
+    BOOST_CHECK(rep1.empty());
+    BOOST_REQUIRE(!members1.empty());
+    BOOST_CHECK_EQUAL(members1.size(),2);
+    BOOST_CHECK_EQUAL(members1[0],"field1");
+    BOOST_CHECK_EQUAL(members1[1],"field4");
+    ra1.reset();
+    rep1.clear();
+
+    auto v2=validator(
+            _["field1"](eq,10)
+            ||
+            _["field4"](gte,5)
+        );
+    ret=v2.apply(ra1);
+    BOOST_CHECK(ret.ignore());
+    BOOST_REQUIRE(!members1.empty());
+    BOOST_CHECK_EQUAL(members1.size(),2);
+    BOOST_CHECK_EQUAL(members1[0],"field1");
+    BOOST_CHECK_EQUAL(members1[1],"field4");
     ra1.reset();
     rep1.clear();
 }

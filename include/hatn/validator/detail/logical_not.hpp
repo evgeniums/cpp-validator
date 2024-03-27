@@ -41,7 +41,7 @@ struct logical_not_t
      * @return Logical NOT of result of intermediate validator.
      */
     template <typename T, typename OpT>
-    constexpr bool operator ()(T&& a,OpT&& op) const
+    constexpr status operator ()(T&& a,OpT&& op) const
     {
         return dispatcher.validate_not(std::forward<decltype(a)>(a),std::forward<decltype(op)>(op));
     }
@@ -54,7 +54,7 @@ struct logical_not_t
      * @return Logical NOT of result of intermediate validator.
      */
     template <typename T, typename OpT, typename MemberT>
-    constexpr bool operator () (T&& a,MemberT&& member,OpT&& op) const
+    constexpr status operator () (T&& a,MemberT&& member,OpT&& op) const
     {
         return dispatcher.validate_not(std::forward<decltype(a)>(a),std::forward<decltype(member)>(member),std::forward<decltype(op)>(op));
     }

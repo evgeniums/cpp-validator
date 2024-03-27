@@ -90,6 +90,21 @@ class status
             return val!=_code;
         }
 
+        bool success() const noexcept
+        {
+            return _code==code::success;
+        }
+
+        bool fail() const noexcept
+        {
+            return _code==code::fail;
+        }
+
+        bool ignore() const noexcept
+        {
+            return _code==code::ignore;
+        }
+
     private:
 
         code _code;

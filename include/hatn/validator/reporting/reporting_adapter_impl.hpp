@@ -34,7 +34,7 @@ struct reporting_adapter_tag{};
 /**
  * @brief Implementation of reporting adapter.
  */
-template <typename ReporterT, typename NextAdapterImplT>
+template <typename ReporterT, typename NextAdapterImplT, typename CollectAllFailedMembers=hana::false_>
 class reporting_adapter_impl : public reporting_adapter_tag
 {
     public:
@@ -81,6 +81,15 @@ class reporting_adapter_impl : public reporting_adapter_tag
             );
         }
 
+        status checkMemberReturn(status st) const noexcept
+        {
+            return hana::if_(
+                CollectAllFailedMembers{},
+                st.value()==status::code::success? status::code::success : status::code::ignore,
+                st
+            );
+        }
+
         template <typename AdapterT, typename T2, typename OpT>
         status validate_operator(AdapterT&& adpt, OpT&& op, T2&& b)
         {
@@ -111,7 +120,7 @@ class reporting_adapter_impl : public reporting_adapter_tag
             {
                 _reporter.validate_exists(member,op,b);
             }
-            return ok;
+            return checkMemberReturn(ok);
         }
 
         template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
@@ -122,7 +131,7 @@ class reporting_adapter_impl : public reporting_adapter_tag
             {
                 _reporter.validate(member,prop,op,b);
             }
-            return ok;
+            return checkMemberReturn(ok);
         }
 
         template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
@@ -133,7 +142,7 @@ class reporting_adapter_impl : public reporting_adapter_tag
             {
                 _reporter.validate_with_other_member(member,prop,op,b);
             }
-            return ok;
+            return checkMemberReturn(ok);
         }
 
         template <typename AdapterT, typename T2, typename OpT, typename PropT, typename MemberT>
@@ -144,7 +153,7 @@ class reporting_adapter_impl : public reporting_adapter_tag
             {
                 _reporter.validate_with_master_sample(member,prop,op,member,b);
             }
-            return ok;
+            return checkMemberReturn(ok);
         }
 
         template <typename AdapterT, typename OpsT>

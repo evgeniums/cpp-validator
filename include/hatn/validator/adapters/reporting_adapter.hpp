@@ -36,11 +36,11 @@ HATN_VALIDATOR_NAMESPACE_BEGIN
 /**
  * @brief Traits of reporting adapter.
  */
-template <typename T, typename ReporterT>
+template <typename T, typename ReporterT, typename CollectAllFailedMembers=hana::false_>
 struct reporting_adapter_traits : public adapter_traits,
                                   public object_wrapper<T>,
                                   public with_check_member_exists<reporting_adapter_traits<T,ReporterT>>,
-                                  public reporting_adapter_impl<ReporterT,default_adapter_impl>
+                                  public reporting_adapter_impl<ReporterT,default_adapter_impl,CollectAllFailedMembers>
 {
     public:
 
@@ -56,25 +56,25 @@ struct reporting_adapter_traits : public adapter_traits,
                 )
             : object_wrapper<T>(std::forward<T>(obj)),
               with_check_member_exists<reporting_adapter_traits<T,ReporterT>>(*this),
-              reporting_adapter_impl<ReporterT,default_adapter_impl>(std::forward<ReporterT>(reporter))
+              reporting_adapter_impl<ReporterT,default_adapter_impl,CollectAllFailedMembers>(std::forward<ReporterT>(reporter))
         {}
 };
 
 /**
  * @brief Reporting adapter that constructs report if validation fails.
  */
-template <typename T, typename ReporterT>
-class reporting_adapter : public adapter<reporting_adapter_traits<T,ReporterT>>
+template <typename T, typename ReporterT, typename CollectAllFailedMembers=hana::false_>
+class reporting_adapter : public adapter<reporting_adapter_traits<T,ReporterT,CollectAllFailedMembers>>
 {
     public:
 
         using reporter_type=ReporterT;
 
-        using adapter<reporting_adapter_traits<T,ReporterT>>::adapter;
+        using adapter<reporting_adapter_traits<T,ReporterT,CollectAllFailedMembers>>::adapter;
 };
 
 /**
- * @brief Create reporting adapter using default adapter.
+ * @brief Create reporting adapter based on default adapter.
  * @param reporter Reporter.
  * @param obj Object to validate.
  * @return Reporting adapter.
@@ -91,7 +91,7 @@ auto make_reporting_adapter(ObjT&& obj,
 }
 
 /**
- * @brief Create reporting adapter using default reporter and default adapter.
+ * @brief Create reporting adapter based on default adapter and using default reporter.
  * @param dst Destination object where to put report.
  * @param obj Object to validate.
  * @return Reporting adapter.
@@ -105,6 +105,21 @@ auto make_reporting_adapter(ObjT&& obj,
                             =nullptr)
 {
     return make_reporting_adapter(std::forward<ObjT>(obj),make_reporter(dst));
+}
+
+/**
+ * @brief Create adapter that collects all failed member names with default reporter.
+ * @param dst Destination object holding report.
+ * @param obj Object to validate.
+ * @return Adapter.
+ *
+ * Note that when validation fails this adapter will return status::ignore and empty report.
+ * When validation succeeds the adapter must return status::success.
+ */
+template <typename ObjT, typename DstT>
+auto make_collect_failed_members_adapter(ObjT&& obj, DstT& dst)
+{
+    return reporting_adapter<ObjT,decltype(make_reporter(dst)),hana::true_>(std::forward<ObjT>(obj),make_reporter(dst));
 }
 
 //-------------------------------------------------------------

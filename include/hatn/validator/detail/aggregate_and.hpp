@@ -41,7 +41,7 @@ struct aggregate_and_t
      * @return Logical AND of results of intermediate validators.
      */
     template <typename T, typename OpsT>
-    constexpr bool operator ()(T&& a,OpsT&& ops) const
+    constexpr status operator ()(T&& a,OpsT&& ops) const
     {
         return dispatcher.validate_and(std::forward<decltype(a)>(a),std::forward<decltype(ops)>(ops));
     }
@@ -54,7 +54,7 @@ struct aggregate_and_t
      * @return Logical AND of results of intermediate validators.
      */
     template <typename T, typename OpsT, typename MemberT>
-    constexpr bool operator () (T&& a,MemberT&& member,OpsT&& ops) const
+    constexpr status operator () (T&& a,MemberT&& member,OpsT&& ops) const
     {
         return dispatcher.validate_and(std::forward<decltype(a)>(a),std::forward<decltype(member)>(member),std::forward<decltype(ops)>(ops));
     }
