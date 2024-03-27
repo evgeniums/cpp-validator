@@ -1950,7 +1950,7 @@ If [decorator](#decorator) is used then only the part within braces including th
 [Aggregations](#aggregation) can be used in one of the following notations:
 - `functional notation` where validation conditions are given as list of arguments in aggregation callable object, e.g. `AND(op1,op2,op3)`;
 - `infix notation` where validation conditions are joined using aggregation conjunctive made up of aggregation keyword surrounded with `^`, e.g. `op1 ^AND^ op2 ^AND^ op3`;
-- `C++ notation` used for logical aggregation: `&&`, `||`, `!`.`
+- `C++ notation` used for logical aggregation: `&&`, `||`, `!`.
 
 ### Logical aggregations
 
