@@ -3,6 +3,7 @@
 # Table of Contents
 <!-- Start Document Outline -->
 
+* [Table of Contents](#table-of-contents)
 * [Introduction](#introduction)
 * [Definitions](#definitions)
 * [Usage](#usage)
@@ -18,7 +19,7 @@
 			* [Validator with aggregations for whole object](#validator-with-aggregations-for-whole-object)
 			* [Validator with aggregations for object's member](#validator-with-aggregations-for-objects-member)
 			* [Validator with aggregations for property of object's member](#validator-with-aggregations-for-property-of-objects-member)
-			* [Mixed validator with aggregations](#mixed-validator-with-aggregations)
+			* [Validator with mixed aggregations](#validator-with-mixed-aggregations)
 		* [Dynamically allocated validator](#dynamically-allocated-validator)
 		* [Nested validators](#nested-validators)
 	* [Using validator for data validation](#using-validator-for-data-validation)
@@ -37,6 +38,7 @@
 		* [Member notation](#member-notation)
 			* [Single level members](#single-level-members)
 			* [Nested members](#nested-members)
+		* [Helpers for member construction](#helpers-for-member-construction)
 		* [Member existence](#member-existence)
 	* [Properties](#properties)
 		* [Property notations](#property-notations)
@@ -82,7 +84,9 @@
 			* [Aggregation modifiers](#aggregation-modifiers)
 		* [Validation of trees](#validation-of-trees)
 	* [Adapters](#adapters)
+		* [List of built-in adapters](#list-of-built-in-adapters)
 		* [Default adapter](#default-adapter)
+		* [Failed members adapter](#failed-members-adapter)
 		* [Prevalidation adapter](#prevalidation-adapter)
 			* [Adapter creation and usage](#adapter-creation-and-usage)
 			* [Element aggregations with prevalidation adapter](#element-aggregations-with-prevalidation-adapter)
@@ -93,6 +97,7 @@
 	* [Validation of transformed or evaluated values](#validation-of-transformed-or-evaluated-values)
 	* [Reporting](#reporting)
 		* [Reporting adapter](#reporting-adapter)
+		* [Getting list of failed members](#getting-list-of-failed-members)
 		* [Customization of reports](#customization-of-reports)
 			* [Report construction](#report-construction)
 			* [Formatters](#formatters)
@@ -949,6 +954,31 @@ if (!v.apply(ra))
 
 return 0;
 }
+```
+
+### Helpers for member construction
+
+In addition to [member notation](#member-notation) members can be constructed with one of two helpers:
+
+ * `path(keys...)` makes a member from variadic list of keys representing member's path;
+ * `make_member(tuple)` makes a member from tuple of keys representing member's path, where either `std::tuple` or `boost::hana::tuple` can be used as an argument.
+
+See example below.
+
+```cpp
+
+// all member definitions below are equvalent
+auto m1_0=_[size];
+auto m1_1=path(size);
+auto m1_2=make_member(std::make_tuple(size));
+auto m1_3=make_member(boost::hana::make_tuple(size));
+
+// all member definitions below are equvalent
+auto m2_0=_["key1"][size];
+auto m2_1=path("key1",size);
+auto m2_2=make_member(std::make_tuple("key1",size));
+auto m2_3=make_member(boost::hana::make_tuple("key1",size));
+
 ```
 
 ### Member existence
@@ -1919,7 +1949,8 @@ If [decorator](#decorator) is used then only the part within braces including th
 
 [Aggregations](#aggregation) can be used in one of the following notations:
 - `functional notation` where validation conditions are given as list of arguments in aggregation callable object, e.g. `AND(op1,op2,op3)`;
-- `infix notation` where validation conditions are joined using aggregation conjunctive made up of aggregation keyword surrounded with `^`, e.g. `op1 ^AND^ op2 ^AND^ op3`.
+- `infix notation` where validation conditions are joined using aggregation conjunctive made up of aggregation keyword surrounded with `^`, e.g. `op1 ^AND^ op2 ^AND^ op3`;
+- `C++ notation` used for logical aggregation: `&&`, `||`, `!`.`
 
 ### Logical aggregations
 
@@ -1927,7 +1958,7 @@ Logical aggregation is a combination of validating [operators](#operator) or oth
 
 #### AND
 
-`AND` aggregation is used when all validation conditions must be satisfied. In addition to `functional notation` and `infix notation` the `AND` aggregation can be implicitly invoked when validation conditions in a [validator](#validator) for the whole object are separated with commas. See examples below.
+`AND` aggregation is used when all validation conditions must be satisfied. In addition to all types of notations listed above the `AND` aggregation will be implicitly applied when validation conditions in a [validator](#validator) for the whole object are separated with commas. See examples below.
 
 ```cpp
 // validator is satisfied when variable is greater than 1 and less than 100
@@ -1948,16 +1979,26 @@ auto v3=validator(
         value(lt,100)
     );
 
+// C++ notation in validation condition of whole object
+auto v4=validator(
+        value(gt,1) && value(lt,100)
+    );
+
 // validator is satisfied when "key1" element of variable is greater than 1 and less than 100
 
 // functional notation in validation condition of a member
-auto v4=validator(
+auto v5=validator(
         _["key1"](AND(value(gt,1),value(lt,100)))
     );
 
 // infix notation in validation condition of a member
-auto v5=validator(
+auto v6=validator(
         _["key1"](value(gt,1) ^AND^ value(lt,100))
+    );
+    
+// C++ notation in validation condition of a member
+auto v7=validator(
+        _["key1"](value(gt,1) && value(lt,100))
     );
 ```
 
@@ -1978,22 +2019,32 @@ auto v2=validator(
         value(eq,1) ^OR^ value(eq,100)
     );
 
+// C++ notation in validation condition of whole object
+auto v3=validator(
+        value(eq,1) || value(eq,100)
+    );
+
 // validator is satisfied when "key1" element of variable is equal to 1 or is equal to 100
 
 // functional notation in validation condition of a member
-auto v3=validator(
+auto v4=validator(
         _["key1"](OR(value(eq,1),value(eq,100)))
     );
 
 // infix notation in validation condition of a member
-auto v4=validator(
+auto v5=validator(
         _["key1"](value(eq,1) ^OR^ value(eq,100))
+    );
+    
+// C++ notation in validation condition of a member
+auto v6=validator(
+        _["key1"](value(eq,1) || value(eq,100))
     );
 ```
 
 #### NOT
 
-`NOT` aggregation is used to negate the whole expression. `NOT` aggregation can use only `functional notation` with single argument. See examples below.
+`NOT` aggregation is used to negate the whole expression. `NOT` aggregation can use either `functional notation` with single argument or `C++ notation`. See examples below.
 
 ```cpp
 // validator is satisfied when variable is not equal to 1 and not equal to 100
@@ -2001,9 +2052,19 @@ auto v1=validator(
         NOT(value(eq,1) ^OR^ value(eq,100))
     );
 
+// C++ notation for "validator is satisfied when variable is not equal to 1 and not equal to 100"
+auto v2=validator(
+        !(value(eq,1) || value(eq,100))
+    );
+
 // validator is satisfied when "key1" element of variable is not equal to 1 and is not equal to 100
-auto v4=validator(
+auto v3=validator(
         _["key1"](NOT(value(eq,1) ^OR^ value(eq,100)))
+    );
+    
+// C++ notation for "validator is satisfied when "key1" element of variable is not equal to 1 and is not equal to 100"
+auto v4=validator(
+        _["key1"](!(value(eq,1) || value(eq,100)))
     );
 ```
 
@@ -2258,9 +2319,12 @@ int main()
 
 [Adapters](#adapter) perform actual processing of validation conditions specified in [validators](#validator). To invoke validation with a specific adapter a [validator](#validator) must be applied to the adapter. Adapters implemented in the `cpp-validator` library use [operators](#operator) as callable objects to check validation conditions. However, adapters of other types can also be implemented, e.g. one can implement an adapter that constructs SQL queries that are equivalent to validation conditions specified in [validators](#validator).
 
+### List of built-in adapters
+
 There are a few built-in adapter types implemented in `cpp-validator` library:
 - [default adapter](#default-adapter) that applies validation to an [object](#object) by invoking [operators](#operator) one by one as specified in a [validator](#validator);
 - [reporting adapter](#reporting-adapter) that does the same as [default adapter](#default-adapter) with addition of constructing a [report](#report) describing an error if validation fails;
+- [failed members adapter](#failed-members-adapter) that collects names of object's members that didn't path validation;
 - [prevalidation adapter](#prevalidation-adapter) that validates only one [member](#member) and constructs a [report](#report) if validation fails;
 - [filtering adapter](#partial-validation) used to filter member paths before validation.
 
@@ -2269,6 +2333,71 @@ There are a few built-in adapter types implemented in `cpp-validator` library:
 *Default adapter* wraps *lvalue* reference to the [object](#object) to be validated and invokes [operators](#operator) one by one as specified in a [validator](#validator). To create a *default adapter* call `make_default_adapter(object_to_validate)` with the [object](#object) as an argument. If a [validator](#validator) is applied directly to the [object](#object) then *default adapter* is constructed implicitly. See examples in [Using validator for data validation](#using-validator-for-data-validation) section.
 
 *Default adapter* supports implicit check of [member existence](#member-existence).
+
+### Failed members adapter
+
+Failed members adapter is used to collect all members that did not pass the validation.
+This adapter is defined in `hatn/validator/adapters/reporting_adapter.hpp` header. Call `make_failed_members_adapter(obj)` to make adapter for object that must be validated. The list of failed member names can be accessed via `adapter.traits().reporter().failed_members()` after validation.
+
+There are a few notes about using failed members adapter.
+
+ * `Note 1.` When validation with this adapter fails then `validator.apply()` returns either `status::ignore` or `status::success`, i.e. its result is useless. In order to figure out actual validation result check if the list of failed members is empty. If it is empty then validation succeeded, if it is not empty then validation failed.
+ 
+ * `Note 2.` Use with care with validators that check member existence before checking value - if the member does not exist then undefined behaviour is possible, e.g. an exception can be thrown or even the application crashes.
+ 
+ * `Note 3.` If validator is too complicated, e.g. it includes [NOT](*not*) aggregation or some other deeply nested conditions, then failed member collecting might not work properly - some members might be missing while some other members might be excessive.
+ 
+ * `Note 4.` This adapter keeps data after validation completes. To reuse it again `adapter.reset()` must be called before next use.
+
+```cpp
+
+#include <iostream>
+#include <hatn/validator/validator.hpp>
+#include <hatn/validator/adapters/failed_members_adapter.hpp>
+using namespace HATN_VALIDATOR_NAMESPACE;
+
+int main()
+{
+    // prepare
+    std::map<std::string,size_t> m1={
+        {"field1",1},
+        {"field2",2},
+        {"field3",3},
+        {"field4",4}
+    };
+    auto ra1=make_failed_members_adapter(m1);
+    const auto& members1=ra1.traits().reporter().failed_members();
+    
+    // validation ok
+    auto v1=validator(
+        _["field1"](eq,1),
+        _["field4"](lt,5)
+        );
+    auto ret=v1.apply(ra1);
+    assert(ret.success()); // DO NOT COUNT ON THIS because success() might be returned when validation failed (see below)
+    assert(members1.empty()); // members are empty for success validation
+    ra1.reset(); // do not forget to reset adapter before next use
+    
+    // validation fails
+    auto v2=validator(
+        _["field2"](value(lte,5) && value(gt,2))
+        ||
+        (_["field4"](gte,5) && _["field5"](exists,true) && _["field3"](eq,3))
+        );
+    ret=v2.apply(ra1);
+    assert(ret.success()); // success() for failed validation, DO NOT COUNT ON THIS!
+    assert(!members1.empty()); // members are not empty for failed validation
+    assert(members1.size()=3);
+    assert(members1[0]==std::string("field2"));
+    assert(members1[1]==std::string("field4"));
+    assert(members1[2]==std::string("field5"));
+    ra1.reset();
+
+    // done    
+    return 0;
+}
+
+```
 
 ### Prevalidation adapter
 
@@ -2603,7 +2732,9 @@ return 0;
 
 ### Getting list of failed members
 
-Reporting adapter constructs a list of failed members. Note that adapter stops validation when it finds the first error, therefore in most cases the list of failed members would contain only one member. The list can contain more members only if validator includes [OR](#or) condition involving a few members. Method `const std<vector>& failed_members() const` of reporter of reporting adapter traits is used to access the list of failed members. See example below.
+Reporting adapter constructs a list of failed members. Method `const std<vector>& failed_members() const` of reporter of reporting adapter traits is used to access the list of failed members. See example below.
+
+Note that this adapter stops validation when it finds the first error, therefore in most cases the list of failed members would contain only one member. The list can contain more members only if validator includes [OR](#or) condition involving a few members. To get list of all failed members use [failed members adapter](#failed-members-adapter).
 
 ```cpp
 #include <hatn/validator/validator.hpp>
