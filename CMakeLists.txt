@@ -134,6 +134,7 @@ SET (HEADERS
     include/hatn/validator/adapters/impl/default_adapter_impl.hpp
     include/hatn/validator/adapters/impl/intermediate_adapter_traits.hpp
     include/hatn/validator/adapters/make_intermediate_adapter.hpp
+    include/hatn/validator/adapters/failed_members_adapter.hpp
 
     include/hatn/validator/reporting/reporting_adapter_impl.hpp
     include/hatn/validator/reporting/reporter.hpp
@@ -170,6 +171,7 @@ SET (HEADERS
     include/hatn/validator/reporting/prepare_property_formatting.hpp
     include/hatn/validator/reporting/dotted_member_names.hpp
     include/hatn/validator/reporting/original_member_names.hpp
+    include/hatn/validator/reporting/failed_members_reporter.hpp
 
     include/hatn/validator/reporting/locale/sample_locale.hpp
     include/hatn/validator/reporting/locale/ru.hpp

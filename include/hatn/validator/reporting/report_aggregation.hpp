@@ -32,10 +32,9 @@ HATN_VALIDATOR_NAMESPACE_BEGIN
 struct report_aggregation_tag;
 
 /**
- * @brief Descriptor of aggregation operator used in validation report.
+ * @brief Descriptor of base aggregation operator used in validation report.
  */
-template <typename DstT>
-struct report_aggregation
+struct empty_report_aggregation
 {
     using hana_tag=report_aggregation_tag;
 
@@ -44,24 +43,38 @@ struct report_aggregation
      * @param aggregation Aggregation operation.
      * @param member Member the operation is applied to.
      */
-    report_aggregation(
+    empty_report_aggregation(
             aggregation_op aggregation,
             std::string member=std::string()
         ) : aggregation(std::move(aggregation)),
             member(std::move(member)),
             single(true),
             any_all_count(
-                    static_cast<size_t>(aggregation.id==aggregation_id::ANY || aggregation.id==aggregation_id::ALL)
-                )
+                static_cast<size_t>(aggregation.id==aggregation_id::ANY || aggregation.id==aggregation_id::ALL)
+            ),
+            parts_count(0)
     {}
 
     aggregation_op aggregation;
 
     std::string member;
-    std::vector<DstT> parts;
 
     bool single;
     size_t any_all_count;
+
+    int parts_count;
+};
+
+
+/**
+ * @brief Descriptor of aggregation operator used in validation report.
+ */
+template <typename DstT>
+struct report_aggregation : public empty_report_aggregation
+{
+    using empty_report_aggregation::empty_report_aggregation;
+
+    std::vector<DstT> parts;
 };
 
 //-------------------------------------------------------------

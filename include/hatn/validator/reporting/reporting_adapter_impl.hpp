@@ -131,6 +131,10 @@ class reporting_adapter_impl : public reporting_adapter_tag
             {
                 _reporter.validate(member,prop,op,b);
             }
+            else if (ok)
+            {
+                _reporter.member_ok(member);
+            }
             return checkMemberReturn(ok);
         }
 

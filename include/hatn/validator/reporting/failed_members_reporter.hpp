@@ -8,42 +8,31 @@ Distributed under the Boost Software License, Version 1.0.
 
 /****************************************************************************/
 
-/** @file validator/reporting/reporter.hpp
+/** @file validator/reporting/failed_members_reporter.hpp
 *
-*  Defines reporter.
+*  Defines reporter that collects failed memners.
 *
 */
 
 /****************************************************************************/
 
-#ifndef HATN_VALIDATOR_REPORTER_HPP
-#define HATN_VALIDATOR_REPORTER_HPP
+#ifndef HATN_VALIDATOR_REPORTER_FAILED_MEMBERS_HPP
+#define HATN_VALIDATOR_REPORTER_FAILED_MEMBERS_HPP
 
-#include <vector>
+#include <set>
 
 #include <hatn/validator/config.hpp>
-#include <hatn/validator/reporting/report_aggregation.hpp>
-#include <hatn/validator/reporting/member_names.hpp>
-#include <hatn/validator/reporting/dotted_member_names.hpp>
-#include <hatn/validator/reporting/formatter.hpp>
+#include <hatn/validator/reporting/reporter.hpp>
 
 HATN_VALIDATOR_NAMESPACE_BEGIN
 
 //-------------------------------------------------------------
 
-struct reporter_tag;
-
 /**
- * @brief Reporter constructs a report regarding the failure.
+ * @brief Reporter collects failed member names.
  *
- * A report will be put to the destination object which is usually a sring but
- * formatter backends can also support other container types. Destination object
- * is wrapped into backend formatter that knows how to format data to that object.
- *
- * Actual formatting is performed by the formatter object.
  */
-template <typename DstT, typename FormatterT>
-class reporter
+class failed_members_reporter
 {
     public:
 
@@ -51,16 +40,10 @@ class reporter
 
         /**
          * @brief Constructor.
-         * @param dst Destination object wrapped into backend formatter.
-         * @param formatter Formatter to use for reports formatting.
          */
-        reporter(
-                    DstT dst,
-                    FormatterT&& formatter
-                ) : _dst(std::move(dst)),
-                    _formatter(std::forward<FormatterT>(formatter)),
-                    _not_count(0),
-                    _explicit_reporting_count(0)
+        failed_members_reporter(
+            ) : _not_count(0),
+                _explicit_reporting_count(0)
         {}
 
         void reset()
@@ -105,8 +88,6 @@ class reporter
             {
                 ++_not_count;
             }
-            _stack.emplace_back(std::forward<AggregationT>(aggregation),
-                                _formatter.member_to_string(std::forward<MemberT>(member)));
         }
 
         /**
@@ -135,8 +116,7 @@ class reporter
                 if (!ok || current_not())
                 {
                     update_brackets();
-                    auto wrapper=wrap_backend_formatter(report_dst(),_dst);
-                    _formatter.aggregate(wrapper,back);
+                    report_dst();
                 }
                 if (back.aggregation.id==aggregation_id::NOT)
                 {
@@ -152,14 +132,14 @@ class reporter
          *  @param b Sample argument for validation.
          */
         template <typename T2, typename OpT>
-        void validate_operator(const OpT& op, const T2& b)
+        void validate_operator(const OpT&, const T2&)
         {
             if (skip_part() || skip_explicit_report())
             {
                 return;
             }
-            auto wrapper=wrap_backend_formatter(current(),_dst);
-            _formatter.validate_operator(wrapper,op,b);
+
+            current();
         }
 
         /**
@@ -169,14 +149,13 @@ class reporter
          *  @param b Sample argument for validation.
          */
         template <typename T2, typename OpT, typename PropT>
-        void validate_property(const PropT& prop, const OpT& op, const T2& b)
+        void validate_property(const PropT&, const OpT&, const T2&)
         {
             if (skip_part() || skip_explicit_report())
             {
                 return;
             }
-            auto wrapper=wrap_backend_formatter(current(),_dst);
-            _formatter.validate_property(wrapper,prop,op,b);
+            current();
         }
 
         /**
@@ -185,7 +164,7 @@ class reporter
          *  @param b Boolean flag, when true check if member exists, when false check if member does not exist.
          */
         template <typename T2, typename OpT, typename MemberT>
-        void validate_exists(const MemberT& member, const OpT& op, const T2& b)
+        void validate_exists(const MemberT& member, const OpT&, const T2&)
         {
             if (skip_part())
             {
@@ -199,8 +178,7 @@ class reporter
                 return;
             }
 
-            auto wrapper=wrap_backend_formatter(current(),_dst);
-            _formatter.validate_exists(wrapper,member,op,b);
+            current();
         }
 
         /**
@@ -211,7 +189,7 @@ class reporter
          *  @param b Sample argument for validation.
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT>
-        void validate(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
+        void validate(const MemberT& member, const PropT&, const OpT&, const T2&)
         {
             if (skip_part())
             {
@@ -225,8 +203,7 @@ class reporter
                 return;
             }
 
-            auto wrapper=wrap_backend_formatter(current(),_dst);
-            _formatter.validate(wrapper,member,prop,op,b);
+            current();
         }
 
         template <typename MemberT>
@@ -243,7 +220,7 @@ class reporter
          *  @param b Descriptor of sample member of the same object.
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT>
-        void validate_with_other_member(const MemberT& member, const PropT& prop, const OpT& op, const T2& b)
+        void validate_with_other_member(const MemberT& member, const PropT&, const OpT&, const T2&)
         {
             if (skip_part())
             {
@@ -257,8 +234,7 @@ class reporter
                 return;
             }
 
-            auto wrapper=wrap_backend_formatter(current(),_dst);
-            _formatter.validate_with_other_member(wrapper,member,prop,op,b);
+            current();
         }
 
         /**
@@ -270,7 +246,7 @@ class reporter
          *  @param b Sample object whose member must be used as argument passed to validation operator.
          */
         template <typename T2, typename OpT, typename PropT, typename MemberT, typename MemberSampleT>
-        void validate_with_master_sample(const MemberT& member, const PropT& prop, const OpT& op, const MemberSampleT& member_sample, const T2& b)
+        void validate_with_master_sample(const MemberT& member, const PropT&, const OpT&, const MemberSampleT&, const T2&)
         {
             if (skip_part())
             {
@@ -284,18 +260,7 @@ class reporter
                 return;
             }
 
-            auto wrapper=wrap_backend_formatter(current(),_dst);
-            _formatter.validate_with_master_sample(wrapper,member,prop,op,member_sample,b);
-        }
-
-        /**
-         * @brief Get object where the reports go to.
-         * @return Reference to destination object.
-         */
-        template <typename T>
-        T& destination()
-        {
-            return _dst;
+            current();
         }
 
         /**
@@ -319,18 +284,9 @@ class reporter
          * @brief End report that uses reporting hint and ignores reportings from all next levels.
          * @param description Reporting hint that overrides report of the current level.
          */
-        void end_explicit_report(const std::string& description)
+        void end_explicit_report(const std::string&)
         {
             --_explicit_reporting_count;
-            if (skip_part())
-            {
-                return;
-            }
-            if (_explicit_reporting_count==0)
-            {
-                auto wrapper=wrap_backend_formatter(current(),_dst);
-                wrapper.append(description);
-            }
         }
 
         template <typename MemberT>
@@ -361,6 +317,22 @@ class reporter
 
     private:
 
+        void current()
+        {
+            if (!_stack.empty())
+            {
+                _stack.back().parts_count++;
+            }
+        }
+
+        void report_dst()
+        {
+            if (_stack.size()>1)
+            {
+                _stack.at(_stack.size()-2).parts_count++;
+            }
+        }
+
         bool skip_explicit_report() const noexcept
         {
             return _explicit_reporting_count!=0;
@@ -376,7 +348,7 @@ class reporter
                     back.aggregation.id==aggregation_id::ALL
                     )
                 {
-                    return !back.parts.empty();
+                    return back.parts_count!=0;
                 }
             }
             return false;
@@ -392,79 +364,33 @@ class reporter
             return false;
         }
 
-        typename DstT::type& current()
-        {
-            if (!_stack.empty())
-            {
-                _stack.back().parts.emplace_back();
-                return _stack.back().parts.back();
-            }
-            return _dst;
-        }
-
-        typename DstT::type& report_dst()
-        {
-            if (_stack.size()>1)
-            {
-                _stack.at(_stack.size()-2).parts.emplace_back();
-                return _stack.at(_stack.size()-2).parts.back();
-            }
-            return _dst;
-        }
-
         void update_brackets()
         {
             if (_stack.size()>1
-                    &&
+                &&
                 (
-                    (_stack.at(_stack.size()-2).parts.size()>1
+                    (_stack.at(_stack.size()-2).parts_count>1
                      ||
                      _stack.at(_stack.size()-2).aggregation.id==aggregation_id::NOT
                      )
-                        &&
-                    _stack.back().parts.size()>1
+                    &&
+                    _stack.back().parts_count>1
+                    )
                 )
-            )
             {
                 _stack.back().single=false;
             }
         }
 
-        DstT _dst;
-        FormatterT _formatter;
-        std::vector<report_aggregation<typename DstT::type>> _stack;
+        std::vector<empty_report_aggregation> _stack;
         size_t _not_count;
         size_t _explicit_reporting_count;
 
         std::vector<std::string> _members;
 };
 
-/**
- * @brief Make a reporter with formatter.
- * @param dst Destination object where to put reports.
- * @param formatter Formatter to use for reports formatting.
- * @return Reporter wrapping the destination object.
- */
-template <typename DstT, typename FormatterT>
-auto make_reporter(DstT& dst, FormatterT&& formatter)
-{
-    auto wrapper=wrap_backend_formatter(dst);
-    return reporter<decltype(wrapper),FormatterT>(std::move(wrapper),std::forward<FormatterT>(formatter));
-}
-
-/**
- * @brief Make a reporter with default formatter.
- * @param dst Destination object where to put reports.
- * @return Reporter wrapping the destination object.
- */
-template <typename DstT>
-auto make_reporter(DstT& dst)
-{
-    return make_reporter(dst,get_default_formatter());
-}
-
 //-------------------------------------------------------------
 
 HATN_VALIDATOR_NAMESPACE_END
 
-#endif // HATN_VALIDATOR_REPORTER_HPP
+#endif // HATN_VALIDATOR_REPORTER_FAILED_MEMBERS_HPP

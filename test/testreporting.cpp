@@ -2,6 +2,7 @@
 
 #include <hatn/validator/validator.hpp>
 #include <hatn/validator/adapters/reporting_adapter.hpp>
+#include <hatn/validator/adapters/failed_members_adapter.hpp>
 #include <hatn/validator/detail/hint_helper.hpp>
 
 using namespace HATN_VALIDATOR_NAMESPACE;
@@ -605,7 +606,7 @@ BOOST_AUTO_TEST_CASE(CheckCollectAllFailedMembers)
         {"field4",4}
     };
 
-    auto ra1=make_collect_failed_members_adapter(m1,rep1);
+    auto ra1=make_failed_members_adapter(m1);
     const auto& members1=ra1.traits().reporter().failed_members();
 
     auto v0=validator(
@@ -614,7 +615,8 @@ BOOST_AUTO_TEST_CASE(CheckCollectAllFailedMembers)
         );
     auto ret=v0.apply(ra1);
     BOOST_CHECK_EQUAL(int(ret.value()),int(status::code::success));
-    BOOST_CHECK(ret.success());
+    BOOST_CHECK(ret.success()); // do not count on this because success() maybe returned when validation failed
+    BOOST_REQUIRE(members1.empty()); // members are empty for success validation
     ra1.reset();
 
     auto v1=validator(
@@ -624,13 +626,11 @@ BOOST_AUTO_TEST_CASE(CheckCollectAllFailedMembers)
     ret=v1.apply(ra1);
     BOOST_CHECK_EQUAL(int(ret.value()),int(status::code::ignore));
     BOOST_CHECK(ret.ignore());
-    BOOST_CHECK(rep1.empty());
     BOOST_REQUIRE(!members1.empty());
     BOOST_CHECK_EQUAL(members1.size(),2);
     BOOST_CHECK_EQUAL(members1[0],"field1");
     BOOST_CHECK_EQUAL(members1[1],"field4");
     ra1.reset();
-    rep1.clear();
 
     auto v2=validator(
             _["field1"](eq,10)
@@ -644,7 +644,44 @@ BOOST_AUTO_TEST_CASE(CheckCollectAllFailedMembers)
     BOOST_CHECK_EQUAL(members1[0],"field1");
     BOOST_CHECK_EQUAL(members1[1],"field4");
     ra1.reset();
-    rep1.clear();
+
+    auto v3=validator(
+        _["field1"](eq,10)
+        ||
+        (_["field4"](gte,5) && _["field5"](exists,true) && _["field3"](eq,3))
+        );
+    ret=v3.apply(ra1);
+    BOOST_CHECK(ret.success()); // can return success for actual failure
+    BOOST_REQUIRE(!members1.empty()); // members are not empty for failed validation
+    BOOST_CHECK_EQUAL(members1.size(),3);
+    BOOST_CHECK_EQUAL(members1[0],"field1");
+    BOOST_CHECK_EQUAL(members1[1],"field4");
+    BOOST_CHECK_EQUAL(members1[2],"field5");
+    ra1.reset();
+
+    // validation succeeds
+    auto v4=validator(
+        _["field1"](value(eq,10) || value(eq,1))
+        ||
+        (_["field4"](gte,5) && _["field5"](exists,true) && _["field3"](eq,3))
+        );
+    ret=v4.apply(ra1);
+    BOOST_REQUIRE(members1.empty()); // members are empty because validation succeeded
+    ra1.reset();
+
+    // validation failes
+    auto v5=validator(
+        _["field2"](value(lte,5) && value(gt,2))
+        ||
+        (_["field4"](gte,5) && _["field5"](exists,true) && _["field3"](eq,3))
+        );
+    ret=v5.apply(ra1);
+    BOOST_REQUIRE(!members1.empty()); // members are not empty for failed validation
+    BOOST_CHECK_EQUAL(members1.size(),3);
+    BOOST_CHECK_EQUAL(members1[0],"field2");
+    BOOST_CHECK_EQUAL(members1[1],"field4");
+    BOOST_CHECK_EQUAL(members1[2],"field5");
+    ra1.reset();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

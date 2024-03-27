@@ -27,10 +27,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 HATN_VALIDATOR_NAMESPACE_BEGIN
 
-/**
- * @todo Implement adapter that collects all errors in a single run.
- */
-
 //-------------------------------------------------------------
 
 /**
@@ -105,21 +101,6 @@ auto make_reporting_adapter(ObjT&& obj,
                             =nullptr)
 {
     return make_reporting_adapter(std::forward<ObjT>(obj),make_reporter(dst));
-}
-
-/**
- * @brief Create adapter that collects all failed member names with default reporter.
- * @param dst Destination object holding report.
- * @param obj Object to validate.
- * @return Adapter.
- *
- * Note that when validation fails this adapter will return status::ignore and empty report.
- * When validation succeeds the adapter must return status::success.
- */
-template <typename ObjT, typename DstT>
-auto make_collect_failed_members_adapter(ObjT&& obj, DstT& dst)
-{
-    return reporting_adapter<ObjT,decltype(make_reporter(dst)),hana::true_>(std::forward<ObjT>(obj),make_reporter(dst));
 }
 
 //-------------------------------------------------------------
