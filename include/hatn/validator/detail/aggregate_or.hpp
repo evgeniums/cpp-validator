@@ -40,7 +40,7 @@ struct aggregate_or_t
      * @return Logical OR of results of intermediate validators.
      */
     template <typename T, typename OpsT>
-    constexpr status operator ()(T&& a,OpsT&& ops) const
+    status operator ()(T&& a,OpsT&& ops) const
     {
         return dispatcher.validate_or(std::forward<decltype(a)>(a),std::forward<decltype(ops)>(ops));
     }
@@ -53,7 +53,7 @@ struct aggregate_or_t
      * @return Logical OR of results of intermediate validators.
      */
     template <typename T, typename OpsT, typename MemberT>
-    constexpr status operator () (T&& a,MemberT&& member,OpsT&& ops) const
+    status operator () (T&& a,MemberT&& member,OpsT&& ops) const
     {
         return dispatcher.validate_or(std::forward<decltype(a)>(a),std::forward<decltype(member)>(member),std::forward<decltype(ops)>(ops));
     }
