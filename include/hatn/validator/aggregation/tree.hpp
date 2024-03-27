@@ -37,6 +37,10 @@ HATN_VALIDATOR_NAMESPACE_BEGIN
 struct tree_base
 {
     constexpr static const char* name="tree";
+    constexpr static const char* name_str() noexcept
+    {
+        return name;
+    }
 };
 /**
  * @brief Tag for tree aggregations.
@@ -74,7 +78,7 @@ struct tree_t : public adjust_storable_ignore,
     std::string member_name() const
     {
         std::string str;
-        backend_formatter.append(str,tree_base::name,"(",_aggregation.string().name,",",property.name(),",",max_arg.name(),")");
+        backend_formatter.append(str,tree_base::name_str(),"(",_aggregation.string().name_str(),",",property.name(),",",max_arg.name(),")");
         return str;
     }
 

@@ -60,7 +60,7 @@ struct dotted_member_names_traits_t
             [&](auto _)
             {
                 std::string str;
-                backend_formatter.append(str,_(aggregation).name,"(keys)");
+                backend_formatter.append(str,_(aggregation).name_str(),"(keys)");
                 return str;
             },
             [&](auto _)
@@ -70,12 +70,12 @@ struct dotted_member_names_traits_t
                     [&](auto _)
                     {
                         std::string str;
-                        backend_formatter.append(str,_(aggregation).name,"(iterators)");
+                        backend_formatter.append(str,_(aggregation).name_str(),"(iterators)");
                         return str;
                     },
                     [&](auto _)
                     {
-                        return std::string(_(aggregation).name);
+                        return std::string(_(aggregation).name_str());
                     }
                 );
             }

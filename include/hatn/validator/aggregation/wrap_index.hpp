@@ -55,7 +55,7 @@ struct wrap_index_t : public AggregationT::type,
 
     std::string name() const
     {
-        return _aggregation_type.name;
+        return _aggregation_type.name_str();
     }
 
     template <typename T1>
