@@ -44,4 +44,30 @@ Distributed under the Boost Software License, Version 1.0.
 
 #endif // HATN_IGNORE_MAYBE_UNINITIALIZED_BEGIN
 
+#ifndef HATN_IGNORE_PARENTHESES_BEGIN
+
+#if __GNUC__
+#if defined(__has_warning)
+#if __has_warning("-Wparentheses")
+#define HATN_IGNORE_PARENTHESES
+#endif
+#else
+#define HATN_IGNORE_PARENTHESES
+#endif
+#endif // __GNUC__
+
+#ifdef HATN_IGNORE_PARENTHESES
+#define HATN_IGNORE_PARENTHESES_BEGIN \
+    _Pragma("GCC diagnostic push") \
+    _Pragma("GCC diagnostic ignored \"-Wparentheses\"")
+#define HATN_IGNORE_PARENTHESES_END \
+    _Pragma("GCC diagnostic pop")
+#else
+#define HATN_IGNORE_PARENTHESES_BEGIN
+#define HATN_IGNORE_PARENTHESES_END
+#endif // HATN_IGNORE_PARENTHESES
+
+#endif // HATN_IGNORE_PARENTHESES_BEGIN
+
+
 #endif // HATN_VALIDATOR_IGNORE_COMPILER_WARNINGS_HPP

@@ -59,6 +59,30 @@ struct not_t
 */
 constexpr not_t NOT{};
 
+template <typename HandlerT, typename ExistsOperatorT>
+auto validator_t<HandlerT,ExistsOperatorT>::operator !()
+{
+    return NOT(std::move(*this));
+}
+
+template <typename ValidatorT, typename HintT>
+auto validator_with_hint_t<ValidatorT,HintT>::operator !()
+{
+    return NOT(std::move(*this));
+}
+
+template <typename MemberT, typename ValidatorT, typename ExistsOperatorT>
+auto validator_with_member_t<MemberT,ValidatorT,ExistsOperatorT>::operator !()
+{
+    return NOT(std::move(*this));
+}
+
+template <typename HandlerT, typename WithCheckExistsT, typename ExistsOperatorT>
+auto base_validator<HandlerT,WithCheckExistsT,ExistsOperatorT>::operator !()
+{
+    return NOT(std::move(*this));
+}
+
 //-------------------------------------------------------------
 
 /**

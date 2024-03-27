@@ -102,9 +102,9 @@ BOOST_AUTO_TEST_CASE(TestInvokeAnd)
 
     count=0;
     auto andSuccess2=invoke_and(
-                    DCS_FN(funcSuccess(count,status)),
-                    DCS_FN(funcSuccess(count,status)),
-                    DCS_FN(funcSuccess(count,status))
+                    HATN_FN(funcSuccess(count,status)),
+                    HATN_FN(funcSuccess(count,status)),
+                    HATN_FN(funcSuccess(count,status))
                 );
     static_assert(std::is_same<decltype(andSuccess2),Result>::value,"Invalid return type");
     BOOST_CHECK(andSuccess2);
@@ -113,11 +113,11 @@ BOOST_AUTO_TEST_CASE(TestInvokeAnd)
 
     count=0;
     auto andFail2=invoke_and(
-                    DCS_FN(funcSuccess(count,status)),
-                    DCS_FN(funcSuccess(count,status)),
-                    DCS_FN(funcFail(count,status)),
-                    DCS_FN(funcSuccess(count,status)),
-                    DCS_FN(funcSuccess(count,status))
+                    HATN_FN(funcSuccess(count,status)),
+                    HATN_FN(funcSuccess(count,status)),
+                    HATN_FN(funcFail(count,status)),
+                    HATN_FN(funcSuccess(count,status)),
+                    HATN_FN(funcSuccess(count,status))
                 );
     BOOST_CHECK(!andFail2);
     BOOST_CHECK_EQUAL(count,2);
@@ -155,9 +155,9 @@ BOOST_AUTO_TEST_CASE(TestInvokeAndInverse)
 
     count=0;
     auto andSuccess2=invoke_and_inverse(
-                    DCS_FN(funcSuccessInverse(count,status)),
-                    DCS_FN(funcSuccessInverse(count,status)),
-                    DCS_FN(funcSuccessInverse(count,status))
+                    HATN_FN(funcSuccessInverse(count,status)),
+                    HATN_FN(funcSuccessInverse(count,status)),
+                    HATN_FN(funcSuccessInverse(count,status))
                 );
     static_assert(std::is_same<decltype(andSuccess2),ResultInverse>::value,"Invalid return type");
     BOOST_CHECK(!andSuccess2);
@@ -166,11 +166,11 @@ BOOST_AUTO_TEST_CASE(TestInvokeAndInverse)
 
     count=0;
     auto andFail2=invoke_and_inverse(
-                    DCS_FN(funcSuccessInverse(count,status)),
-                    DCS_FN(funcSuccessInverse(count,status)),
-                    DCS_FN(funcFailInverse(count,status)),
-                    DCS_FN(funcSuccessInverse(count,status)),
-                    DCS_FN(funcSuccessInverse(count,status))
+                    HATN_FN(funcSuccessInverse(count,status)),
+                    HATN_FN(funcSuccessInverse(count,status)),
+                    HATN_FN(funcFailInverse(count,status)),
+                    HATN_FN(funcSuccessInverse(count,status)),
+                    HATN_FN(funcSuccessInverse(count,status))
                 );
     BOOST_CHECK(andFail2);
     BOOST_CHECK_EQUAL(count,2);
@@ -214,12 +214,12 @@ BOOST_AUTO_TEST_CASE(TestInvokeOr)
     count=0;
     failCount=0;
     auto orSuccess2=invoke_or(
-                    DCS_FN(funcFail(count,status)),
-                    DCS_FN(funcFail(count,status)),
-                    DCS_FN(funcSuccess(count,status)),
-                    DCS_FN(funcSuccess(count,status)),
-                    DCS_FN(funcSuccess(count,status)),
-                    DCS_FN(funcFail(count,status))
+                    HATN_FN(funcFail(count,status)),
+                    HATN_FN(funcFail(count,status)),
+                    HATN_FN(funcSuccess(count,status)),
+                    HATN_FN(funcSuccess(count,status)),
+                    HATN_FN(funcSuccess(count,status)),
+                    HATN_FN(funcFail(count,status))
                 );
     static_assert(std::is_same<decltype(orSuccess2),Result>::value,"Invalid return type");
     BOOST_CHECK(orSuccess2);
@@ -229,9 +229,9 @@ BOOST_AUTO_TEST_CASE(TestInvokeOr)
     count=0;
     failCount=0;
     auto orFail2=invoke_or(
-                    DCS_FN(funcFail(count,status)),
-                    DCS_FN(funcFail(count,status)),
-                    DCS_FN(funcFail(count,status))
+                    HATN_FN(funcFail(count,status)),
+                    HATN_FN(funcFail(count,status)),
+                    HATN_FN(funcFail(count,status))
                 );
     BOOST_CHECK(!orFail2);
     BOOST_CHECK_EQUAL(count,0);
@@ -275,12 +275,12 @@ BOOST_AUTO_TEST_CASE(TestInvokeOrInverse)
     count=0;
     failCount=0;
     auto orSuccess2=invoke_or_inverse(
-                    DCS_FN(funcFailInverse(count,status)),
-                    DCS_FN(funcFailInverse(count,status)),
-                    DCS_FN(funcSuccessInverse(count,status)),
-                    DCS_FN(funcSuccessInverse(count,status)),
-                    DCS_FN(funcSuccessInverse(count,status)),
-                    DCS_FN(funcFailInverse(count,status))
+                    HATN_FN(funcFailInverse(count,status)),
+                    HATN_FN(funcFailInverse(count,status)),
+                    HATN_FN(funcSuccessInverse(count,status)),
+                    HATN_FN(funcSuccessInverse(count,status)),
+                    HATN_FN(funcSuccessInverse(count,status)),
+                    HATN_FN(funcFailInverse(count,status))
                 );
     static_assert(std::is_same<decltype(orSuccess2),ResultInverse>::value,"Invalid return type");
     BOOST_CHECK(!orSuccess2);
@@ -290,9 +290,9 @@ BOOST_AUTO_TEST_CASE(TestInvokeOrInverse)
     count=0;
     failCount=0;
     auto orFail2=invoke_or_inverse(
-                    DCS_FN(funcFailInverse(count,status)),
-                    DCS_FN(funcFailInverse(count,status)),
-                    DCS_FN(funcFailInverse(count,status))
+                    HATN_FN(funcFailInverse(count,status)),
+                    HATN_FN(funcFailInverse(count,status)),
+                    HATN_FN(funcFailInverse(count,status))
                 );
     BOOST_CHECK(orFail2);
     BOOST_CHECK_EQUAL(count,0);

@@ -66,6 +66,14 @@ struct base_validator
         return fn(std::forward<Args>(args)...);
     }
 
+    template <typename T>
+    auto operator && (T&& v);
+
+    template <typename T>
+    auto operator || (T&& v);
+
+    auto operator !();
+
     HandlerT fn;
     const bool check_exists_operand;
     const ExistsOperatorT exists_operator;

@@ -46,6 +46,34 @@ HATN_VALIDATOR_INLINE_LAMBDA auto AND=hana::infix([](auto&& ...xs) -> decltype(a
            );
 });
 
+template <typename HandlerT, typename ExistsOperatorT>
+template <typename T>
+auto validator_t<HandlerT,ExistsOperatorT>::operator && (T&& v)
+{
+    return AND(std::move(*this),std::forward<T>(v));
+}
+
+template <typename ValidatorT, typename HintT>
+template <typename T>
+auto validator_with_hint_t<ValidatorT,HintT>::operator && (T&& v)
+{
+    return AND(std::move(*this),std::forward<T>(v));
+}
+
+template <typename MemberT, typename ValidatorT, typename ExistsOperatorT>
+template <typename T>
+auto validator_with_member_t<MemberT,ValidatorT,ExistsOperatorT>::operator && (T&& v)
+{
+    return AND(std::move(*this),std::forward<T>(v));
+}
+
+template <typename HandlerT, typename WithCheckExistsT, typename ExistsOperatorT>
+template <typename T>
+auto base_validator<HandlerT,WithCheckExistsT,ExistsOperatorT>::operator && (T&& v)
+{
+    return AND(std::move(*this),std::forward<T>(v));
+}
+
 /**
  * @brief Helper to create logical pseudo operator AND on heap.
  * @param xs Intermediate validators whose result must be forwarded to logical AND.

@@ -109,7 +109,9 @@ BOOST_AUTO_TEST_CASE(CheckLazyValidation)
 
 BOOST_AUTO_TEST_CASE(CheckValidationAggregation)
 {
-    std::map<std::string,std::string> m1={{"field1","value1"}};
+    HATN_IGNORE_PARENTHESES_BEGIN
+
+    std::map<std::string,std::string> m1={{"field1","value1"},{"field2","value2"}};
     auto a1=make_default_adapter(m1);
 
     auto v1=validator(
@@ -143,6 +145,131 @@ BOOST_AUTO_TEST_CASE(CheckValidationAggregation)
                 _["field1"](size(gte,1) ^AND^ value(gte,"zzzzzzzzzzzz"))
             );
     BOOST_CHECK(!v5.apply(a1));
+
+    auto v6=validator(
+        _["field1"](gte,"xxxxxx")
+        ||
+        _["field1"](size(gte,100) && value(gte,"zzzzzzzzzzzz"))
+        );
+    BOOST_CHECK(!v6.apply(a1));
+
+    auto v7=validator(
+        _["field1"](gte,"val")
+        &&
+        _["field2"](eq,"value2")
+        );
+    BOOST_CHECK(v7.apply(a1));
+
+    auto v8=validator(
+        _["field1"](gte,"val")
+        &&
+        _["field2"](eq,"value1")
+        );
+    BOOST_CHECK(!v8.apply(a1));
+
+    int count=0;
+    auto val=[&count]()
+    {
+        count++;
+        return "value2";
+    };
+    auto v9=validator(
+        _["field1"](gte,"val")
+        ||
+        _["field2"](eq,lazy(val))
+        );
+    BOOST_CHECK(v9.apply(a1));
+    BOOST_CHECK_EQUAL(0,count);
+
+    count=0;
+    auto v10=validator(
+        _["field1"](gte,"val")
+        &&
+        _["field2"](eq,lazy(val))
+        );
+    BOOST_CHECK(v10.apply(a1));
+    BOOST_CHECK_EQUAL(1,count);
+
+    count=0;
+    auto v11=validator(
+        (
+        _["field1"](eq,"field2")
+        &&
+        _["field2"](eq,"field1")
+        )
+            ||
+        _["field2"](eq,lazy(val))
+        );
+    BOOST_CHECK(v11.apply(a1));
+    BOOST_CHECK_EQUAL(1,count);
+
+    count=0;
+    auto v12=validator(
+        _["field1"](eq,"field2")
+        &&
+        _["field2"](eq,"field1")
+        ||
+        _["field2"](eq,lazy(val))
+        );
+    BOOST_CHECK(v12.apply(a1));
+    BOOST_CHECK_EQUAL(1,count);
+
+    count=0;
+    auto v13=validator(
+        _["field1"](eq,"field2")
+           ^AND^
+        _["field2"](eq,"field1")
+        );
+    BOOST_CHECK(!v13.apply(a1));
+    BOOST_CHECK_EQUAL(0,count);
+
+    count=0;
+    auto v14=validator(
+        _["field1"](eq,"field2")
+        ^AND^
+        _["field2"](eq,"field1")
+        ^OR^
+        _["field2"](eq,lazy(val))
+        );
+    BOOST_CHECK(v14.apply(a1));
+    BOOST_CHECK_EQUAL(1,count);
+
+    count=0;
+    auto v15=validator(
+        _["field1"](eq,"field2")
+            &&
+        (
+        _["field2"](eq,"field1")
+        ||
+        _["field2"](eq,lazy(val))
+        )
+        );
+    BOOST_CHECK(!v15.apply(a1));
+    BOOST_CHECK_EQUAL(0,count);
+
+    count=0;
+    auto v16=validator(
+        (
+            _["field2"](eq,"field1")
+            ||
+            _["field2"](eq,lazy(val))
+        )
+            &&
+            _["field1"](eq,"field2")
+        );
+    BOOST_CHECK(!v16.apply(a1));
+    BOOST_CHECK_EQUAL(1,count);
+
+    count=0;
+    auto v17=validator(
+        _["field1"](gte,"xxxxxx")
+        ||
+        _["field2"](size(gte,1) && value(gte,"zzzzzzzzzzzz") || value(eq,lazy(val)))
+        );
+    BOOST_CHECK(v17.apply(a1));
+    BOOST_CHECK_EQUAL(1,count);
+
+    HATN_IGNORE_PARENTHESES_END
 }
 
 BOOST_AUTO_TEST_CASE(CheckLazyValidationAggregation)
@@ -202,10 +329,20 @@ BOOST_AUTO_TEST_CASE(CheckValidationNot)
             );
     BOOST_CHECK(!v1.apply(a1));
 
+    auto v1_1=validator(
+        !(_["field1"](eq,10))
+        );
+    BOOST_CHECK(!v1_1.apply(a1));
+
     auto v2=validator(
                 _["field1"](NOT(value(gte,1)))
             );
     BOOST_CHECK(!v2.apply(a1));
+
+    auto v2_1=validator(
+        _["field1"](!(value(gte,1)))
+        );
+    BOOST_CHECK(!v2_1.apply(a1));
 
     auto v3=validator(
                 NOT(
@@ -215,6 +352,14 @@ BOOST_AUTO_TEST_CASE(CheckValidationNot)
             );
     BOOST_CHECK(!v3.apply(a1));
 
+    auto v3_1=validator(
+        !(
+            _["field1"](eq,10),
+            _["field1"](gte,8)
+            )
+        );
+    BOOST_CHECK(!v3_1.apply(a1));
+
     auto v4=validator(
                 NOT(
                     _["field1"](eq,10)
@@ -223,6 +368,15 @@ BOOST_AUTO_TEST_CASE(CheckValidationNot)
                 )
             );
     BOOST_CHECK(!v4.apply(a1));
+
+    auto v4_1=validator(
+        !(
+            _["field1"](eq,10)
+            ||
+            _["field1"](gte,100)
+            )
+        );
+    BOOST_CHECK(!v4_1.apply(a1));
 }
 
 BOOST_AUTO_TEST_CASE(CheckNestedValidation)

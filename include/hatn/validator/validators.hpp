@@ -76,6 +76,14 @@ class validator_with_hint_t : public ValidatorT
             return adpt.hint_after(adpt,ret,_hint);
         }
 
+        template <typename T>
+        auto operator && (T&& v);
+
+        template <typename T>
+        auto operator || (T&& v);
+
+        auto operator !();
+
     private:
 
         hint_type _hint;
@@ -155,6 +163,14 @@ class validator_t
         {
             return hint(std::forward<T>(h));
         }
+
+        template <typename T>
+        auto operator && (T&& v);
+
+        template <typename T>
+        auto operator || (T&& v);
+
+        auto operator !();
 
     private:
 
@@ -243,6 +259,14 @@ class validator_with_member_t
         {
             return hint(std::forward<T>(h));
         }
+
+        template <typename T>
+        auto operator && (T&& v);
+
+        template <typename T>
+        auto operator || (T&& v);
+
+        auto operator !();
 
     private:
 

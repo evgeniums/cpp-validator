@@ -46,6 +46,34 @@ HATN_VALIDATOR_INLINE_LAMBDA auto OR=hana::infix([](auto&& ...xs) -> decltype(au
            );
 });
 
+template <typename HandlerT, typename ExistsOperatorT>
+template <typename T>
+auto validator_t<HandlerT,ExistsOperatorT>::operator || (T&& v)
+{
+    return OR(std::move(*this),std::forward<T>(v));
+}
+
+template <typename ValidatorT, typename HintT>
+template <typename T>
+auto validator_with_hint_t<ValidatorT,HintT>::operator || (T&& v)
+{
+    return OR(std::move(*this),std::forward<T>(v));
+}
+
+template <typename MemberT, typename ValidatorT, typename ExistsOperatorT>
+template <typename T>
+auto validator_with_member_t<MemberT,ValidatorT,ExistsOperatorT>::operator || (T&& v)
+{
+    return OR(std::move(*this),std::forward<T>(v));
+}
+
+template <typename HandlerT, typename WithCheckExistsT, typename ExistsOperatorT>
+template <typename T>
+auto base_validator<HandlerT,WithCheckExistsT,ExistsOperatorT>::operator || (T&& v)
+{
+    return OR(std::move(*this),std::forward<T>(v));
+}
+
 //-------------------------------------------------------------
 
 /**
