@@ -38,10 +38,12 @@ HATN_VALIDATOR_NAMESPACE_BEGIN
  * In order to figure out actual validation result check if the list of failed members is empty. If it is empty then validation succeeded, if it is not empty then validation failed.
  *
  * @note Note 2. Use with care with validators that check member existence before checking value - if the member does not exist then
- * undefined behaviour is expected, e.g. an exception can be thrown or even the application crashes.
+ * undefined behaviour is possible, e.g. an exception can be thrown or even the application crashes.
  *
- * @note Note 3. If validator is too complicated, e.g. it includes NOT aggregation or some other nested conditions, then failed member collecting
- * might work not properly - some members might be missing while some other members might be excessive.
+ * @note Note 3. If validator is too complicated, e.g. it includes NOT aggregation or some other deeply nested conditions,
+ * then failed member collecting might not work properly - some members might be missing while some other members might be excessive.
+ *
+ * @note Note 4. This adapter keeps data after validation completes. To reuse it again adapter.reset() must be called before next use.
  *
  */
 template <typename ObjT>

@@ -669,13 +669,14 @@ BOOST_AUTO_TEST_CASE(CheckCollectAllFailedMembers)
     BOOST_REQUIRE(members1.empty()); // members are empty because validation succeeded
     ra1.reset();
 
-    // validation failes
+    // validation fails
     auto v5=validator(
         _["field2"](value(lte,5) && value(gt,2))
         ||
         (_["field4"](gte,5) && _["field5"](exists,true) && _["field3"](eq,3))
         );
     ret=v5.apply(ra1);
+    BOOST_CHECK(ret.success());
     BOOST_REQUIRE(!members1.empty()); // members are not empty for failed validation
     BOOST_CHECK_EQUAL(members1.size(),3);
     BOOST_CHECK_EQUAL(members1[0],"field2");
