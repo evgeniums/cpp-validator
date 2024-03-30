@@ -71,12 +71,12 @@ struct foreach_if_impl
      * @brief Invoke a handler on each element of an object till predicate is satisfied, with initial value.
      * @param obj Object.
      * @param pred Predicate.
-     * @param init Initial value to return if object is not a heterogeneous container.
+     * @param defaultRet Default value to return if object is not a heterogeneous container.
      * @param handler Handler to invoke.
      * @return Accumulated result of handler invocations.
      */
-    template <typename T, typename PredicateT, typename InitT, typename HandlerT>
-    auto operator () (T&& obj, const PredicateT& pred, InitT&& init, const HandlerT& handler) const
+    template <typename T, typename PredicateT, typename DefaultT, typename HandlerT>
+    auto operator () (T&& obj, const PredicateT& pred, DefaultT&& defaultRet, const HandlerT& handler) const
     {
         return hana::eval_if(
             is_heterogeneous_container(obj),
@@ -86,7 +86,7 @@ struct foreach_if_impl
             },
             [&](auto&& _)
             {
-                return _(init);
+                return _(defaultRet);
             }
         );
     }
