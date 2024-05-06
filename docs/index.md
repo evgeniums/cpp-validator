@@ -989,7 +989,7 @@ There is also a [contains](#contains) operator added to the library for convenie
 
 A [member](#member) existence can also be checked implicitly before applying validation to the [member](#member). Check of member existence is performed by an [adapter](#adapter) if the [adapter](#adapter) supports that. [Default adapter](#default-adapter) and [reporting adapter](#reporting-adapter) provide this feature which can be configured with  `set_check_member_exists_before_validation` and `set_unknown_member_mode` adapter methods.
 
-Method `set_check_member_exists_before_validation` enables/disables implicit check of member existence. By default this option is disabled which improves validation performance but can sometimes cause exceptions or other undefined errors. Note that some basic check of property existence or type compatibility might be performed statically at compile time regardless of this flag.
+Method `set_check_member_exists_before_validation` enables/disables implicit check of member existence. By default this option is disabled which improves validation performance but can sometimes cause exceptions or other undefined errors. Note that some basic check of property existence or type compatibility might be performed statically at compilation time regardless of this flag.
 
 Method `set_unknown_member_mode` instructs adapter what to do if a member is not found. There are two options:
 - ignore missed members and continue validation process;
@@ -2324,7 +2324,7 @@ int main()
 There are a few built-in adapter types implemented in `cpp-validator` library:
 - [default adapter](#default-adapter) that applies validation to an [object](#object) by invoking [operators](#operator) one by one as specified in a [validator](#validator);
 - [reporting adapter](#reporting-adapter) that does the same as [default adapter](#default-adapter) with addition of constructing a [report](#report) describing an error if validation fails;
-- [failed members adapter](#failed-members-adapter) that collects names of object's members that didn't path validation;
+- [failed members adapter](#failed-members-adapter) that collects names of object's members that failed to pass validation;
 - [prevalidation adapter](#prevalidation-adapter) that validates only one [member](#member) and constructs a [report](#report) if validation fails;
 - [filtering adapter](#partial-validation) used to filter member paths before validation.
 
@@ -2337,7 +2337,7 @@ There are a few built-in adapter types implemented in `cpp-validator` library:
 ### Failed members adapter
 
 Failed members adapter is used to collect all members that did not pass the validation.
-This adapter is defined in `hatn/validator/adapters/reporting_adapter.hpp` header. Call `make_failed_members_adapter(obj)` to make adapter for object that must be validated. The list of failed member names can be accessed via `adapter.traits().reporter().failed_members()` after validation.
+This adapter is defined in `hatn/validator/adapters/failed_members_adapter.hpp` header file. Call `make_failed_members_adapter(obj)` to make adapter for object that must be validated. The list of failed member names can be accessed via `adapter.traits().reporter().failed_members()` after validation.
 
 There are a few notes about using failed members adapter.
 
@@ -2374,7 +2374,7 @@ int main()
         _["field4"](lt,5)
         );
     auto ret=v1.apply(ra1);
-    assert(ret.success()); // DO NOT COUNT ON THIS because success() might be returned when validation failed (see below)
+    assert(ret.success()); // DO NOT COUNT ON THIS because success() might be true even when validation failed (see below)
     assert(members1.empty()); // members are empty for success validation
     ra1.reset(); // do not forget to reset adapter before next use
     
@@ -2385,7 +2385,7 @@ int main()
         (_["field4"](gte,5) && _["field5"](exists,true) && _["field3"](eq,3))
         );
     ret=v2.apply(ra1);
-    assert(ret.success()); // success() for failed validation, DO NOT COUNT ON THIS!
+    assert(ret.success()); // success()==true for failed validation, DO NOT COUNT ON THIS!
     assert(!members1.empty()); // members are not empty for failed validation
     assert(members1.size()=3);
     assert(members1[0]==std::string("field2"));

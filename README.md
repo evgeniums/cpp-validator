@@ -2,23 +2,23 @@
 
 ## Motivation
 
-A common issue when receiving data either by application from user interface or by server remotely from clients is verifying data integrity and/or specific constraints. A typical approach for implementing complex data validation is writing nested *if-conditions* or chained invocations of partial validation methods. Declarations of the constraints could become intermixed with their implementations. Thus, validation would spread over the code which makes it hard to maintain it. Requirement to construct and show error messages could make everything still more complicated.
+Checking data constraints or verifying data integrity is a very common task in programming. A typical approach for complex data validation is writing nested *if-conditions* or chained invocations of partial validation methods. Declarations of the constraints could become intermixed with their implementations, thus, spreading the validation routines over the code. Requirements to construct and show error messages could make everything even more complicated.
 
-`cpp-validator` library allows one to declare data constraints with clean statements in certain points of code and apply them in other points of code on demand. If needed, the validation error messages are automatically constructed by taking into account the user's locale.
+`cpp-validator` library allows one to declare data constraints with clean statements in certain points of code and apply them in other parts of code on demand. If needed, the validation error messages are automatically constructed by taking into account the user's locale.
 
-Minimal example:
+Minimal generic example:
 
 ```cpp
-// define validator
+// define a validator 
 auto v1=validator(
         _[key1][key1_1][key1_1_1](gt,100),
-        _[key2][key2_1](value(ne,"UNKNOWN") ^AND^ size(lte,32))
+        _[key2][key2_1](value(ne,"UNKNOWN") && size(lte,32))
     );
 
-// validate objects
-Class1 obj1;
-Class2 obj2;
+.....
 
+// validate some objects with the validator 
+// throwing exception if validation fails
 validate(obj1,v1);
 validate(obj2,v1);
 ```
