@@ -33,11 +33,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! @ingroup group-config
 //! Macro expanding to the minor version of the library, i.e. the `y` in `x.y.z`.
-#define HATN_VALIDATOR_MINOR_VERSION 0
+#define HATN_VALIDATOR_MINOR_VERSION 1
 
 //! @ingroup group-config
 //! Macro expanding to the patch level of the library, i.e. the `z` in `x.y.z`.
-#define HATN_VALIDATOR_PATCH_VERSION 3
+#define HATN_VALIDATOR_PATCH_VERSION 1
 
 //! @ingroup group-config
 //! Macro expanding to the full version of the library, in hexadecimal
