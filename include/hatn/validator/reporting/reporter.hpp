@@ -350,7 +350,7 @@ class reporter
             auto it=std::find(std::begin(_members),std::end(_members),m);
             if (it!=std::end(_members))
             {
-                _members.erase(it);
+                _members.erase(it,it);
             }
         }
 
