@@ -101,7 +101,12 @@ struct strings
     strings(const strings&)=delete;
     strings& operator =(strings&&)=default;
     strings& operator =(const strings&)=delete;
-
+#if __cplusplus >= 202002L
+    strings(const no_translator_t& no_translator_in,const aggregation_strings_t& no_aggregation_strings_in):
+            _translator(no_translator_in), _aggregation_strings(no_aggregation_strings_in){};
+    strings(const translator& translator_in,const aggregation_strings_t& no_aggregation_strings_in):
+            _translator(translator_in), _aggregation_strings(no_aggregation_strings_in){};
+#endif
     /**
      * @brief Convert ID to string and then translate it.
      * @param id ID that must be converted to string.
@@ -171,7 +176,11 @@ struct strings
 /**
   @brief Default strings object that does not perform any translation.
 */
+#if __cplusplus > 202002L
+const strings<const no_translator_t&,const aggregation_strings_t&> default_strings{no_translator,aggregation_strings};
+#else
 constexpr strings<const no_translator_t&,const aggregation_strings_t&> default_strings{no_translator,aggregation_strings};
+}
 
 template <typename AggregationStringsT>
 using translated_strings=strings<const translator&,AggregationStringsT>;
