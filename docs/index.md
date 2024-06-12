@@ -3531,7 +3531,7 @@ For the rest build systems ensure that `include` subfolder of `cpp-library` is a
 
 ## Supported platforms and compilers
 
-A compiler must support at least C\+\+14 or C\+\+17 standards to build `cpp-validator` library. The library was tested with the following platforms and minimal compiler versions:
+A compiler must support at least C\+\+14 or C\+\+17 or C\+\+20 standards to build `cpp-validator` library. The library was tested with the following platforms and minimal compiler versions:
 
 - `Windows`:
     - `MSVC` 14.2;
