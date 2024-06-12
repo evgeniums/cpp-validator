@@ -93,37 +93,6 @@ struct true_if_empty_t
     {
         return !(*this==other);
     }
-
-    template <typename T>
-    friend bool operator == (const T& other, const true_if_empty_t& v) noexcept
-    {
-        return v==other;
-    }
-    template <typename T>
-    friend bool operator != (const T& other, const true_if_empty_t& v) noexcept
-    {
-        return v!=other;
-    }
-    template <typename T>
-    friend bool operator < (const T& other, const true_if_empty_t& v) noexcept
-    {
-        return v>other;
-    }
-    template <typename T>
-    friend bool operator <= (const T& other, const true_if_empty_t& v) noexcept
-    {
-        return v>=other;
-    }
-    template <typename T>
-    friend bool operator > (const T& other, const true_if_empty_t& v) noexcept
-    {
-        return v<other;
-    }
-    template <typename T>
-    friend bool operator >= (const T& other, const true_if_empty_t& v) noexcept
-    {
-        return v<=other;
-    }
 };
 
 /**

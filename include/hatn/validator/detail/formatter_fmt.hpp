@@ -41,7 +41,7 @@ struct formatter<concrete_phrase> : formatter<string_view>
 {
     template <typename FormatContext>
     auto format(const concrete_phrase& ph, FormatContext& ctx) const {
-        return format_to(ctx.out(),ph.text());
+        return format_to(ctx.out(),"{}",ph.text());
     }
 };
 

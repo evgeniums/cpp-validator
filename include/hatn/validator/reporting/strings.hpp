@@ -96,6 +96,16 @@ struct strings
     TranslatorT _translator;
     AggregationStringsT _aggregation_strings;
 
+#if __cplusplus >= 201703L
+
+    template <typename TranslatorT1, typename AggregationStringsT1>
+    strings(TranslatorT1&& translator, AggregationStringsT1&& aggregation_strings)
+        :_translator(std::forward<TranslatorT1>(translator)),
+         _aggregation_strings(std::forward<AggregationStringsT1>(aggregation_strings))
+    {}
+
+#endif
+
     ~strings()=default;
     strings(strings&&)=default;
     strings(const strings&)=delete;
@@ -171,7 +181,11 @@ struct strings
 /**
   @brief Default strings object that does not perform any translation.
 */
+#if __cplusplus >= 201703L
+inline strings<const no_translator_t&,const aggregation_strings_t&> default_strings{no_translator,aggregation_strings};
+#else
 constexpr strings<const no_translator_t&,const aggregation_strings_t&> default_strings{no_translator,aggregation_strings};
+#endif
 
 template <typename AggregationStringsT>
 using translated_strings=strings<const translator&,AggregationStringsT>;

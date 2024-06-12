@@ -101,6 +101,10 @@ struct translator_env
 
 struct NonCopyable
 {
+    template <typename T>
+    NonCopyable(T&& value):val(std::forward<T>(value))
+    {}
+
     NonCopyable()=default;
     ~NonCopyable()=default;
     NonCopyable(const NonCopyable&)=delete;

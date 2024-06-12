@@ -110,37 +110,6 @@ struct true_if_size
         // we don't know content, so this comparison is always true and does not depend on size
         return true;
     }
-
-    template <typename T>
-    friend bool operator == (const T& other, const true_if_size& v) noexcept
-    {
-        return v==other;
-    }
-    template <typename T>
-    friend bool operator != (const T& other, const true_if_size& v) noexcept
-    {
-        return v!=other;
-    }
-    template <typename T>
-    friend bool operator < (const T& other, const true_if_size& v) noexcept
-    {
-        return v>other;
-    }
-    template <typename T>
-    friend bool operator <= (const T& other, const true_if_size& v) noexcept
-    {
-        return v>=other;
-    }
-    template <typename T>
-    friend bool operator > (const T& other, const true_if_size& v) noexcept
-    {
-        return v<other;
-    }
-    template <typename T>
-    friend bool operator >= (const T& other, const true_if_size& v) noexcept
-    {
-        return v<=other;
-    }
 };
 
 /**
