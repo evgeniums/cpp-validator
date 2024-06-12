@@ -90,7 +90,10 @@ struct member_helper_1arg_t<T1,
      * @return Member with explicit name.
      */
     template <typename MemberT>
-    auto operator() (MemberT&& member, T1&& name) const;
+    auto operator() (MemberT&& member, T1&& name) const
+    {
+        return make_member_with_name(std::forward<MemberT>(member),std::forward<T1>(name));
+    }
 };
 
 /**

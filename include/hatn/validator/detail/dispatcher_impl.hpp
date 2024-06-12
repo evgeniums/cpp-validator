@@ -64,7 +64,11 @@ struct dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>
      *  @return Validation status.
      */
     template <typename ...Args>
-    status operator() (T1&& obj, Args&&... args) const;
+    status operator() (T1&& obj, Args&&... args) const
+    {
+        using type=decltype(make_default_adapter(std::forward<T1>(obj)));
+        return dispatcher_impl_t<type>{}(make_default_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
+    }
 
     /**
      *  @brief Perform validation of object's property at one level without member nesting.
@@ -74,28 +78,44 @@ struct dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>
      *  @return Validation status.
      */
     template <typename ...Args>
-    static status invoke(T1&& obj, Args&&... args);
+    static status invoke(T1&& obj, Args&&... args)
+    {
+        using type=decltype(make_default_adapter(std::forward<T1>(obj)));
+        return dispatcher_impl_t<type>::invoke(make_default_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
+    }
 
     /**
      * @brief Execute validators on object and aggregate their results using logical AND.
      * @return Logical AND of results of intermediate validators.
      */
     template <typename ... Args>
-    static status validate_and(T1&& obj, Args&&... args);
+    static status validate_and(T1&& obj, Args&&... args)
+    {
+        using type=decltype(make_default_adapter(std::forward<T1>(obj)));
+        return dispatcher_impl_t<type>::validate_and(make_default_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
+    }
 
     /**
      * @brief Execute validators on object and aggregate their results using logical OR.
      * @return Logical OR of results of intermediate validators.
      */
     template <typename ... Args>
-    static status validate_or(T1&& obj, Args&&... args);
+    static status validate_or(T1&& obj, Args&&... args)
+    {
+        using type=decltype(make_default_adapter(std::forward<T1>(obj)));
+        return dispatcher_impl_t<type>::validate_or(make_default_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
+    }
 
     /**
      * @brief Execute validator on object and negate its result using logical NOT.
      * @return Logical NOT of result of intermediate validators.
      */
     template <typename ... Args>
-    static status validate_not(T1&& obj, Args&&... args);
+    static status validate_not(T1&& obj, Args&&... args)
+    {
+        using type=decltype(make_default_adapter(std::forward<T1>(obj)));
+        return dispatcher_impl_t<type>::validate_not(make_default_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
+    }
 };
 
 /**
@@ -284,46 +304,6 @@ struct dispatcher_impl_t<T1,hana::when<hana::is_a<adapter_tag,T1>>>
  */
 template <typename T1>
 constexpr dispatcher_impl_t<T1> dispatcher_impl{};
-
-template <typename T1>
-template <typename ...Args>
-status dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::operator() (T1&& obj, Args&&... args) const
-{
-    using type=decltype(make_default_adapter(std::forward<T1>(obj)));
-    return dispatcher_impl<type>(make_default_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
-}
-
-template <typename T1>
-template <typename ...Args>
-status dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::invoke(T1&& obj, Args&&... args)
-{
-    using type=decltype(make_default_adapter(std::forward<T1>(obj)));
-    return dispatcher_impl<type>.invoke(make_default_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
-}
-
-template <typename T1>
-template <typename ...Args>
-status dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_and(T1&& obj, Args&&... args)
-{
-    using type=decltype(make_default_adapter(std::forward<T1>(obj)));
-    return dispatcher_impl<type>.validate_and(make_default_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
-}
-
-template <typename T1>
-template <typename ...Args>
-status dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_or(T1&& obj, Args&&... args)
-{
-    using type=decltype(make_default_adapter(std::forward<T1>(obj)));
-    return dispatcher_impl<type>.validate_or(make_default_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
-}
-
-template <typename T1>
-template <typename ...Args>
-status dispatcher_impl_t<T1,hana::when<!hana::is_a<adapter_tag,T1>>>::validate_not(T1&& obj, Args&&... args)
-{
-    using type=decltype(make_default_adapter(std::forward<T1>(obj)));
-    return dispatcher_impl<type>.validate_not(make_default_adapter(std::forward<T1>(obj)),std::forward<Args>(args)...);
-}
 
 }
 

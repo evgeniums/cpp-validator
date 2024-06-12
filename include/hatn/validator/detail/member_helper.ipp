@@ -28,23 +28,6 @@ HATN_VALIDATOR_NAMESPACE_BEGIN
 namespace detail
 {
 
-template <typename T1>
-template <typename MemberT>
-auto member_helper_1arg_t<T1,hana::when<
-        (
-            std::is_constructible<concrete_phrase,T1>::value
-            &&
-            !hana::is_a<operator_tag,T1>
-        )
-    >>::operator ()
-        (
-            MemberT&& member,
-            T1&& name
-        ) const
-{
-    return make_member_with_name(std::forward<MemberT>(member),std::forward<T1>(name));
-}
-
 template <typename T1, typename T2>
 template <typename MemberT>
 auto member_helper_2args_t<T1,T2,hana::when<std::is_enum<std::decay_t<T2>>::value>>::operator ()
