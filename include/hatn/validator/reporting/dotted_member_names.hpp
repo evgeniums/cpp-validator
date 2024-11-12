@@ -63,7 +63,7 @@ struct dotted_member_names_traits_t
                 backend_formatter.append(str,_(aggregation).name_str(),"(keys)");
                 return str;
             },
-            [&](auto _)
+            [&](auto)
             {
                 return hana::eval_if(
                     std::is_same<std::decay_t<ModifierT>,iterators_t>{},
