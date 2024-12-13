@@ -21,7 +21,7 @@ fi
 mkdir -p $BUILD_DIR
 cd $BUILD_DIR
 
-cmake -G "CodeBlocks - Unix Makefiles" \
+cmake -G "Unix Makefiles" \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
     -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
     -DVALIDATOR_WITH_TESTS=On \
