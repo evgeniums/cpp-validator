@@ -21,7 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <boost/hana.hpp>
 
-#define HATN_VALIDATOR_NAMESPACE_BEGIN namespace hatn { namespace validator {
+#define HATN_VALIDATOR_NAMESPACE_BEGIN namespace hatn { namespace vld {
 #define HATN_VALIDATOR_NAMESPACE_END }}
 
 HATN_VALIDATOR_NAMESPACE_BEGIN
@@ -30,9 +30,9 @@ namespace hana=boost::hana;
 
 HATN_VALIDATOR_NAMESPACE_END
 
-#define HATN_VALIDATOR_NAMESPACE hatn::validator
-#define HATN_VALIDATOR_USING using namespace hatn::validator;
-#define HATN_VALIDATOR_NS validator
+#define HATN_VALIDATOR_NAMESPACE hatn::vld
+#define HATN_VALIDATOR_USING using namespace hatn::vld;
+#define HATN_VALIDATOR_NS vld
 
 #if __cplusplus >= 201703L
     #define HATN_VALIDATOR_INLINE_LAMBDA inline
