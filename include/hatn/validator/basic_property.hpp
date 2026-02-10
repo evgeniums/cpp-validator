@@ -21,10 +21,17 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <hatn/validator/config.hpp>
 #include <hatn/validator/utils/adjust_storable_ignore.hpp>
+#include <hatn/validator/detail/has_property.hpp>
 
 HATN_VALIDATOR_NAMESPACE_BEGIN
 
 struct property_tag;
+
+/**
+ *  Helper to check at compile time if object has a property.
+ */
+template <typename T,typename PropT>
+constexpr detail::has_property_t<T,PropT> has_property{};
 
 //-------------------------------------------------------------
 

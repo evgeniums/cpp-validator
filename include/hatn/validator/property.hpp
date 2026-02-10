@@ -31,12 +31,6 @@ Distributed under the Boost Software License, Version 1.0.
 HATN_VALIDATOR_NAMESPACE_BEGIN
 
 /**
- *  Helper to check at compile time if object has a property.
- */
-template <typename T,typename PropT>
-constexpr detail::has_property_t<T,PropT> has_property{};
-
-/**
   @brief Check at compile time if object has a property.
   @param a Object under test.
   @param b Property which must be pre-declared with HATN_VALIDATOR_PROPERTY().
