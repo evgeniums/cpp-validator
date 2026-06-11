@@ -144,6 +144,11 @@ HATN_VALIDATOR_NAMESPACE_END
 
 //-------------------------------------------------------------
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 5285)
+#endif
+
 namespace std {
 
 // Template specialization of some std type traits helpers for wrap_index_t.
@@ -161,6 +166,10 @@ struct make_unsigned<HATN_VALIDATOR_NAMESPACE::wrap_index_t<T,AggregationT>> : p
 {};
 
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 //-------------------------------------------------------------
 
