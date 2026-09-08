@@ -138,38 +138,14 @@ template <typename T, typename AggregationT>
 struct is_string<wrap_index_t<T,AggregationT>> : public is_string<T>
 {};
 
+// Note: std::is_floating_point, std::is_signed and std::make_unsigned must not be specialized
+// for wrap_index_t. Specializing them is undefined behaviour and recent libc++ rejects it
+// outright ([[clang::no_specializations]]). Nothing needs those specializations: safe_compare
+// dispatches wrap_index_t by wrap_index_tag rather than by std type traits.
+
 //-------------------------------------------------------------
 
 HATN_VALIDATOR_NAMESPACE_END
-
-//-------------------------------------------------------------
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 5285)
-#endif
-
-namespace std {
-
-// Template specialization of some std type traits helpers for wrap_index_t.
-
-template <typename T, typename AggregationT>
-struct is_floating_point<HATN_VALIDATOR_NAMESPACE::wrap_index_t<T,AggregationT>> : public is_floating_point<T>
-{};
-
-template <typename T, typename AggregationT>
-struct is_signed<HATN_VALIDATOR_NAMESPACE::wrap_index_t<T,AggregationT>> : public is_signed<T>
-{};
-
-template <typename T, typename AggregationT>
-struct make_unsigned<HATN_VALIDATOR_NAMESPACE::wrap_index_t<T,AggregationT>> : public make_unsigned<T>
-{};
-
-}
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 //-------------------------------------------------------------
 
